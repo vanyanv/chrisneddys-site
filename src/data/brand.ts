@@ -6,7 +6,8 @@ export const brand = {
   email: "chris@chrisneddys.com",
   ig: "@chrisneddys",
   igUrl: "https://www.instagram.com/chrisneddys/",
-  orderUrl: "https://tryotter.com/",
+  orderUrl:
+    "https://order.tryotter.com/s/chris-n-eddys-%283pd%29/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191",
   founded: 2020,
   festivalsPerYear: 100,
   siteUrl: "https://www.chrisneddys.com",

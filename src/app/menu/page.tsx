@@ -3,6 +3,7 @@ import { MenuHero } from "@/components/menu/MenuHero";
 import { OrderStrip } from "@/components/menu/OrderStrip";
 import { MenuSection } from "@/components/menu/MenuSection";
 import { Toppings } from "@/components/menu/Toppings";
+import { MenuDisclaimer } from "@/components/menu/MenuDisclaimer";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -21,6 +22,7 @@ export default function MenuPage() {
       <MenuSection category="sides" />
       <MenuSection category="drinks" />
       <Toppings />
+      <MenuDisclaimer />
     </div>
   );
 }

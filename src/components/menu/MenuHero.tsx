@@ -7,7 +7,7 @@ export function MenuHero(): ReactElement {
       style={{
         background: "var(--color-cne-red)",
         color: "var(--color-cne-cream)",
-        padding: "60px clamp(20px, 5vw, 60px) 80px",
+        padding: "60px clamp(16px, 5vw, 60px) 72px",
         borderBottom: "4px solid var(--color-cne-ink)",
         position: "relative",
         overflow: "hidden",
@@ -29,11 +29,11 @@ export function MenuHero(): ReactElement {
         </div>
         <h1
           id="menu-h1"
-          className="cne-reveal"
+          className="cne-reveal cne-menu-h1"
           style={{
             animationDelay: ".1s",
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(64px, 10vw, 140px)",
+            fontSize: "clamp(44px, 12vw, 140px)",
             margin: "6px 0 0",
             lineHeight: 0.9,
             color: "var(--color-cne-cream)",
@@ -46,6 +46,11 @@ export function MenuHero(): ReactElement {
           WE MAKE.
         </h1>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .cne-menu-h1 { text-shadow: 3px 3px 0 var(--color-cne-ink) !important; }
+        }
+      `}</style>
     </section>
   );
 }

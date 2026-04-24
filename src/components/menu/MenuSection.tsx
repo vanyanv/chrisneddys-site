@@ -14,14 +14,15 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
   return (
     <section
       aria-labelledby={`menu-sec-${category}`}
-      style={{ padding: "60px clamp(20px, 5vw, 60px) 0", maxWidth: 1280, margin: "0 auto", width: "100%" }}
+      style={{ padding: "60px clamp(16px, 5vw, 60px) 0", maxWidth: 1280, margin: "0 auto", width: "100%" }}
     >
       <div className="cne-onscroll-up" style={{ marginBottom: 24 }}>
         <h2
           id={`menu-sec-${category}`}
+          className="cne-menu-h2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(48px, 8vw, 96px)",
+            fontSize: "clamp(36px, 9vw, 96px)",
             margin: 0,
             letterSpacing: 1,
             color: "var(--color-cne-ink)",
@@ -50,11 +51,12 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
               gap: 16,
             }}
           >
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div
+                className="cne-menu-item-name"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: 28,
+                  fontSize: "clamp(20px, 5vw, 28px)",
                   color: "var(--color-cne-ink)",
                   letterSpacing: 1,
                   display: "flex",
@@ -81,6 +83,7 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
                 )}
               </div>
               <div
+                className="cne-menu-item-desc"
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: 14,
@@ -97,6 +100,10 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
       <style>{`
         .cne-menu-grid { grid-template-columns: repeat(2, 1fr); }
         @media (max-width: 820px) { .cne-menu-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 600px) {
+          .cne-menu-h2 { text-shadow: 3px 3px 0 var(--color-cne-red) !important; }
+          .cne-menu-item-desc { font-size: 13px !important; }
+        }
       `}</style>
     </section>
   );

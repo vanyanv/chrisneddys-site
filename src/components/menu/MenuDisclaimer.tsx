@@ -9,13 +9,14 @@ export function MenuDisclaimer(): ReactElement {
     <section
       aria-label="About our menu"
       style={{
-        padding: "40px clamp(20px, 5vw, 60px) 0",
+        padding: "40px clamp(16px, 5vw, 60px) 0",
         maxWidth: 1280,
         margin: "0 auto",
         width: "100%",
       }}
     >
       <div
+        className="cne-menu-disclaimer-box"
         style={{
           background: "var(--color-cne-ink)",
           color: "var(--color-cne-cream)",
@@ -49,7 +50,7 @@ export function MenuDisclaimer(): ReactElement {
               marginTop: 6,
             }}
           >
-            For prices and availability, order on Otter.
+            For prices and availability, order online.
           </div>
           <div
             style={{
@@ -62,7 +63,7 @@ export function MenuDisclaimer(): ReactElement {
             }}
           >
             Live pricing, secret-menu combos, and real-time availability all
-            live on our Otter ordering page.
+            live on our online ordering page.
           </div>
         </div>
         <a
@@ -87,6 +88,11 @@ export function MenuDisclaimer(): ReactElement {
           See live menu →
         </a>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .cne-menu-disclaimer-box { padding: 20px 20px !important; }
+        }
+      `}</style>
     </section>
   );
 }

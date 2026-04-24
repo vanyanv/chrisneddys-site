@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { MenuHero } from "@/components/menu/MenuHero";
-import { OrderStrip } from "@/components/menu/OrderStrip";
 import { MenuSection } from "@/components/menu/MenuSection";
 import { Toppings } from "@/components/menu/Toppings";
 import { MenuDisclaimer } from "@/components/menu/MenuDisclaimer";
+import { OrderFab } from "@/components/menu/OrderFab";
 
 const description =
   "Smashed sliders, combos, fries, cheese fries, loaded fries, and shakes. Order any slider Chris’s Way or Eddy’s Way. All toppings at no extra charge.";
@@ -29,7 +29,6 @@ export default function MenuPage() {
   return (
     <div style={{ background: "var(--color-cne-cream)", paddingBottom: 80 }}>
       <MenuHero />
-      <OrderStrip />
       <MenuSection category="sliders" />
       <MenuSection category="ways" />
       <MenuSection category="combos" />
@@ -37,6 +36,7 @@ export default function MenuPage() {
       <MenuSection category="drinks" />
       <Toppings />
       <MenuDisclaimer />
+      <OrderFab />
     </div>
   );
 }

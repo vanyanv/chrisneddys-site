@@ -5,14 +5,14 @@ export function Toppings(): ReactElement {
   return (
     <section
       aria-labelledby="toppings-h"
-      style={{ padding: "60px clamp(20px, 5vw, 60px)", maxWidth: 1280, margin: "0 auto", width: "100%" }}
+      style={{ padding: "60px clamp(16px, 5vw, 60px)", maxWidth: 1280, margin: "0 auto", width: "100%" }}
     >
       <h2
         id="toppings-h"
         className="cne-onscroll-up"
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(40px, 6vw, 72px)",
+          fontSize: "clamp(32px, 7vw, 72px)",
           margin: "0 0 20px",
           letterSpacing: 1,
           color: "var(--color-cne-ink)",
@@ -46,6 +46,7 @@ export function Toppings(): ReactElement {
         {toppings.map((t, i) => (
           <li
             key={t.id}
+            className="cne-topping-chip"
             style={{
               padding: "10px 18px",
               background: i % 2 ? "var(--color-cne-yellow)" : "var(--color-cne-paper)",
@@ -61,6 +62,11 @@ export function Toppings(): ReactElement {
           </li>
         ))}
       </ul>
+      <style>{`
+        @media (max-width: 600px) {
+          .cne-topping-chip { padding: 8px 14px !important; font-size: 12px !important; }
+        }
+      `}</style>
     </section>
   );
 }

@@ -139,7 +139,7 @@ export function MobileNavToggle({ activePath }: { activePath: string }) {
               textDecoration: "none",
             }}
           >
-            Order on Otter →
+            Order online →
           </a>
         </div>
       )}

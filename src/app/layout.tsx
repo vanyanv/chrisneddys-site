@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "@/styles/globals.css";
 import { Nav } from "@/components/shared/Nav";
 import { Footer } from "@/components/shared/Footer";
+import { ScrollVar } from "@/components/shared/ScrollVar";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 
@@ -77,12 +79,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: [
-      { url: "/cne-logo.png", type: "image/png" },
-    ],
-    apple: "/cne-logo.png",
-  },
 };
 
 export const viewport: Viewport = {
@@ -96,9 +92,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
         <JsonLd />
+        <ScrollVar />
         <Nav />
         <main id="main">{children}</main>
         <Footer />
+        <Script
+          defer
+          data-domain="chrisneddys.com"
+          src="https://plausible.io/js/script.outbound-links.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

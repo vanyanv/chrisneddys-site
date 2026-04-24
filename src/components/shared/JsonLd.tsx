@@ -17,6 +17,12 @@ export function JsonLd(): ReactElement {
     foundingDate: String(brand.founded),
   };
 
+  const restaurantImages = [
+    `${brand.siteUrl}/photos/ig-pile.jpg`,
+    `${brand.siteUrl}/photos/double.jpg`,
+    `${brand.siteUrl}/photos/fries.jpg`,
+  ];
+
   const restaurants = locations.map((loc) => ({
     "@type": "Restaurant",
     "@id": `${brand.siteUrl}/locations/#${loc.id}`,
@@ -24,7 +30,8 @@ export function JsonLd(): ReactElement {
     url: `${brand.siteUrl}/locations/`,
     servesCuisine: ["American", "Fast Food", "Burgers"],
     priceRange: "$",
-    image: `${brand.siteUrl}/cne-logo.png`,
+    image: restaurantImages,
+    hasMenu: `${brand.siteUrl}/menu/`,
     telephone: brand.phone,
     email: brand.email,
     address: {

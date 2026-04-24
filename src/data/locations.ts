@@ -8,6 +8,8 @@ export type Location = {
   postal: string;
   status: string;
   isOpen: boolean;
+  lat: number;
+  lng: number;
   hours: Array<[string, string]>;
   openingSpec?: Array<{ dayOfWeek: string[]; opens: string; closes: string }>;
 };
@@ -23,18 +25,20 @@ export const locations: Location[] = [
     postal: "90028",
     status: "Open daily",
     isOpen: true,
+    lat: 34.0983,
+    lng: -118.3106,
     hours: [
       ["Mon–Thu", "10:00 AM – 1:00 AM"],
       ["Fri–Sat", "10:00 AM – 2:00 AM"],
-      ["Sunday", "10:00 AM – 1:00 AM"],
+      ["Sunday", "10:00 AM – 2:00 AM"],
     ],
     openingSpec: [
       {
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Sunday"],
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
         opens: "10:00",
-        closes: "25:00",
+        closes: "01:00",
       },
-      { dayOfWeek: ["Friday", "Saturday"], opens: "10:00", closes: "26:00" },
+      { dayOfWeek: ["Friday", "Saturday", "Sunday"], opens: "10:00", closes: "02:00" },
     ],
   },
   {
@@ -47,6 +51,8 @@ export const locations: Location[] = [
     postal: "",
     status: "Opening March",
     isOpen: false,
+    lat: 34.1463,
+    lng: -118.2360,
     hours: [["Launch", "March 2026"]],
   },
   {
@@ -59,6 +65,8 @@ export const locations: Location[] = [
     postal: "",
     status: "Opening May",
     isOpen: false,
+    lat: 34.2010,
+    lng: -118.4487,
     hours: [["Launch", "May 2026"]],
   },
 ];

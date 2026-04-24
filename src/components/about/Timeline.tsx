@@ -9,7 +9,7 @@ export function Timeline(): ReactElement {
     >
       <h2
         id="road-h"
-        className="cne-reveal"
+        className="cne-onscroll-up"
         style={{
           fontFamily: "var(--font-display)",
           fontSize: "clamp(40px, 6vw, 72px)",
@@ -22,7 +22,7 @@ export function Timeline(): ReactElement {
         THE ROAD SO FAR.
       </h2>
       <ol
-        className="cne-stagger cne-timeline-grid"
+        className="cne-onscroll-stagger cne-timeline-grid"
         style={{ display: "grid", gap: 18, listStyle: "none", padding: 0, margin: 0 }}
       >
         {timeline.map((t, i) => (

@@ -1,16 +1,17 @@
 import type { ReactElement } from "react";
-import { BurgerPhoto } from "@/components/art/BurgerPhoto";
 import { HeroStamp } from "@/components/art/HeroStamp";
 import { Marquee } from "@/components/shared/Marquee";
 import { CTAButton } from "@/components/shared/CTAButton";
+import { HeroMedia } from "@/components/home/HeroMedia";
 import { brand } from "@/data/brand";
 
 const marqueeItems = [
-  "100 festivals/year",
+  "burgers",
+  "shakes",
+  "fries",
   "smashed daily",
   "martin’s rolls",
   "since 2020",
-  "open til 2AM",
   "hollywood · glendale · van nuys",
 ];
 
@@ -41,24 +42,6 @@ export function Hero(): ReactElement {
         }}
       >
         <div>
-          <div
-            className="cne-reveal"
-            style={{
-              display: "inline-block",
-              padding: "6px 14px",
-              background: "var(--color-cne-cream)",
-              color: "var(--color-cne-red)",
-              fontFamily: "var(--font-display)",
-              fontSize: 14,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-              border: "3px solid var(--color-cne-ink)",
-              boxShadow: "3px 3px 0 var(--color-cne-ink)",
-              lineHeight: 1.1,
-            }}
-          >
-            ★ Open til 2AM ★
-          </div>
           <h1
             id="hero-h1"
             className="cne-reveal"
@@ -67,7 +50,7 @@ export function Hero(): ReactElement {
               fontFamily: "var(--font-display)",
               fontSize: "clamp(64px, 10vw, 160px)",
               lineHeight: 0.85,
-              margin: "24px 0 0",
+              margin: 0,
               letterSpacing: 1,
               color: "var(--color-cne-cream)",
               textShadow: "5px 5px 0 var(--color-cne-ink)",
@@ -95,7 +78,7 @@ export function Hero(): ReactElement {
             style={{ animationDelay: ".3s", display: "flex", gap: 14, flexWrap: "wrap", marginTop: 32 }}
           >
             <CTAButton href={brand.orderUrl} external variant="yellow" size="lg" style={{ boxShadow: "5px 5px 0 var(--color-cne-ink)" }}>
-              Order on Otter →
+              Order Online →
             </CTAButton>
             <CTAButton href="/menu/" variant="cream" size="lg" style={{ boxShadow: "5px 5px 0 var(--color-cne-ink)" }}>
               See menu
@@ -107,13 +90,25 @@ export function Hero(): ReactElement {
           style={{
             animationDelay: ".15s",
             position: "relative",
-            aspectRatio: "1/1",
-            maxWidth: 640,
+            aspectRatio: "3/4",
+            maxWidth: 520,
             width: "100%",
             justifySelf: "center",
           }}
         >
-          <BurgerPhoto tone="studio" angle="hero" idSeed="hero" />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              border: "4px solid var(--color-cne-ink)",
+              boxShadow: "10px 10px 0 var(--color-cne-ink)",
+              transform: "rotate(-1.5deg)",
+              overflow: "hidden",
+              background: "var(--color-cne-ink)",
+            }}
+          >
+            <HeroMedia />
+          </div>
           <HeroStamp />
         </div>
       </div>

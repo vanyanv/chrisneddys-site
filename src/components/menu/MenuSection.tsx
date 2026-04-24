@@ -3,6 +3,7 @@ import { menu, type MenuCategoryKey } from "@/data/menu";
 
 const TITLES: Record<MenuCategoryKey, string> = {
   sliders: "SLIDERS",
+  ways: "THE WAYS",
   combos: "COMBOS",
   sides: "SIDES",
   drinks: "DRINKS",
@@ -15,7 +16,7 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
       aria-labelledby={`menu-sec-${category}`}
       style={{ padding: "60px clamp(20px, 5vw, 60px) 0", maxWidth: 1280, margin: "0 auto", width: "100%" }}
     >
-      <div className="cne-reveal" style={{ marginBottom: 24 }}>
+      <div className="cne-onscroll-up" style={{ marginBottom: 24 }}>
         <h2
           id={`menu-sec-${category}`}
           style={{
@@ -33,7 +34,7 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
         <div style={{ height: 4, background: "var(--color-cne-ink)", marginTop: 14 }} />
       </div>
       <div
-        className="cne-stagger cne-menu-grid"
+        className="cne-onscroll-stagger cne-menu-grid"
         style={{ display: "grid", gap: "0 36px" }}
       >
         {items.map((it) => (
@@ -49,7 +50,7 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
               gap: 16,
             }}
           >
-            <div style={{ flex: 1, marginRight: 16 }}>
+            <div style={{ flex: 1 }}>
               <div
                 style={{
                   fontFamily: "var(--font-display)",
@@ -89,15 +90,6 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
               >
                 {it.desc}
               </div>
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: 32,
-                color: "var(--color-cne-red)",
-              }}
-            >
-              ${it.price}
             </div>
           </div>
         ))}

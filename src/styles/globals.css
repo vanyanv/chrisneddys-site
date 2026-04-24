@@ -112,6 +112,42 @@ body {
 .cne-stagger > *:nth-child(7) { animation-delay: 0.65s; }
 .cne-stagger > *:nth-child(8) { animation-delay: 0.75s; }
 
+/* Scroll-triggered variants: animate as element enters viewport.
+   Fallback (older browsers / Safari < 26) uses the same load-time animation
+   as .cne-reveal etc. — graceful degradation, zero JS, zero layout impact. */
+.cne-onscroll-up {
+  opacity: 0;
+  animation: cne-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.cne-onscroll-scale {
+  opacity: 0;
+  animation: cne-scale-in 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.cne-onscroll-stagger > * {
+  opacity: 0;
+  animation: cne-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.cne-onscroll-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.cne-onscroll-stagger > *:nth-child(2) { animation-delay: 0.15s; }
+.cne-onscroll-stagger > *:nth-child(3) { animation-delay: 0.25s; }
+.cne-onscroll-stagger > *:nth-child(4) { animation-delay: 0.25s; }
+.cne-onscroll-stagger > *:nth-child(5) { animation-delay: 0.35s; }
+.cne-onscroll-stagger > *:nth-child(6) { animation-delay: 0.35s; }
+.cne-onscroll-stagger > *:nth-child(7) { animation-delay: 0.45s; }
+.cne-onscroll-stagger > *:nth-child(8) { animation-delay: 0.45s; }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cne-onscroll-up,
+    .cne-onscroll-scale,
+    .cne-onscroll-stagger > * {
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+      animation-delay: 0s;
+    }
+  }
+}
+
 .cne-hover-lift {
   transition:
     transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -125,6 +161,51 @@ body {
 }
 .cne-hover-grow:hover {
   transform: scale(1.04);
+}
+
+/* Tactile press: tiny scale-down on click, snappier than the hover transition. */
+.cne-hover-lift:active,
+.cne-hover-grow:active {
+  transform: scale(0.97);
+  transition: transform 0.08s cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+/* Nav link underline wipe (for inactive links only) */
+.cne-nav-link {
+  position: relative;
+}
+.cne-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 3px;
+  height: 3px;
+  background: var(--color-cne-yellow);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  pointer-events: none;
+}
+.cne-nav-link:hover::after,
+.cne-nav-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Scroll-linked parallax: modifies `translate` (not `transform`) so existing
+   rotates/transforms stack cleanly. Desktop + no-reduced-motion only. */
+.cne-parallax-slow,
+.cne-parallax-subtle {
+  will-change: translate;
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .cne-parallax-slow {
+    translate: 0 calc(var(--cne-sy, 0px) * 0.15);
+  }
+  .cne-parallax-subtle {
+    translate: 0 calc(var(--cne-sy, 0px) * 0.06);
+  }
 }
 
 /* Marquee container */
@@ -146,12 +227,121 @@ body {
   pointer-events: none;
 }
 
+/* --- Leaflet map: brand-themed chrome + tile tint --- */
+.leaflet-container {
+  background: #f5ecd4;
+  font-family: var(--font-body);
+}
+.leaflet-tile-pane {
+  filter: sepia(0.45) saturate(1.15) hue-rotate(-8deg) contrast(0.92)
+    brightness(1.03);
+}
+@media (forced-colors: active) {
+  .leaflet-tile-pane {
+    filter: none;
+  }
+}
+
+/* Zoom control rebuilt in brand style */
+.leaflet-bar {
+  border: 3px solid var(--color-cne-ink) !important;
+  box-shadow: 4px 4px 0 var(--color-cne-ink);
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  background: var(--color-cne-cream) !important;
+  color: var(--color-cne-ink) !important;
+  border: none !important;
+  border-bottom: 2px solid var(--color-cne-ink) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-display);
+  font-weight: 700;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 30px !important;
+}
+.leaflet-bar a:last-child {
+  border-bottom: none !important;
+}
+.leaflet-bar a:hover {
+  background: var(--color-cne-yellow) !important;
+}
+
+/* Attribution pill */
+.leaflet-control-attribution {
+  background: var(--color-cne-cream) !important;
+  color: var(--color-cne-ink) !important;
+  border: 2px solid var(--color-cne-ink) !important;
+  padding: 4px 10px !important;
+  font-family: ui-monospace, monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 var(--color-cne-ink);
+  margin: 0 10px 10px 0 !important;
+}
+.leaflet-control-attribution a {
+  color: var(--color-cne-red) !important;
+  text-decoration: none !important;
+}
+
+/* Custom pin icon wrapper */
+.cne-pin {
+  background: transparent !important;
+  border: none !important;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1),
+    filter 0.25s;
+  transform-origin: 50% 100%;
+  cursor: pointer;
+}
+.cne-pin:hover {
+  transform: translateY(-4px) rotate(-3deg);
+  z-index: 600 !important;
+}
+.cne-pin-selected {
+  transform: scale(1.3);
+  z-index: 700 !important;
+}
+.cne-pin-selected:hover {
+  transform: scale(1.3) translateY(-4px) rotate(-3deg);
+}
+.cne-pin-selected::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 36px;
+  height: 12px;
+  margin-left: -18px;
+  border: 3px solid var(--color-cne-red);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: cne-pin-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes cne-pin-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .cne-reveal,
   .cne-reveal-scale,
   .cne-reveal-fade,
   .cne-stagger > *,
+  .cne-onscroll-up,
+  .cne-onscroll-scale,
+  .cne-onscroll-stagger > *,
   .cne-float,
   .cne-marquee-track {
     animation: none !important;
@@ -159,7 +349,19 @@ body {
     transform: none !important;
   }
   .cne-hover-lift:hover,
-  .cne-hover-grow:hover {
+  .cne-hover-grow:hover,
+  .cne-hover-lift:active,
+  .cne-hover-grow:active {
     transform: none !important;
+  }
+  .cne-nav-link::after {
+    transition: none !important;
+  }
+  .cne-parallax-slow,
+  .cne-parallax-subtle {
+    translate: 0 !important;
+  }
+  .cne-pin-selected::after {
+    animation: none !important;
   }
 }

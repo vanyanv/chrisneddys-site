@@ -1,11 +1,11 @@
 import type { ReactElement } from "react";
 
 export function HeroStamp({
-  label = "THE DOUBLE",
-  price = "8",
+  topLine = "SIGNATURE",
+  bottomLine = "DOUBLE",
 }: {
-  label?: string;
-  price?: string;
+  topLine?: string;
+  bottomLine?: string;
 }): ReactElement {
   return (
     <div
@@ -18,17 +18,16 @@ export function HeroStamp({
         color: "var(--color-cne-ink)",
         padding: "14px 20px",
         fontFamily: "var(--font-display)",
-        fontSize: 22,
         letterSpacing: 1,
         border: "3px solid var(--color-cne-ink)",
         boxShadow: "4px 4px 0 var(--color-cne-ink)",
-        lineHeight: 1.1,
+        lineHeight: 1.05,
         textAlign: "center",
+        transform: "rotate(-6deg)",
       }}
     >
-      {label}
-      <br />
-      <span style={{ fontSize: 36, color: "var(--color-cne-red)" }}>${price}</span>
+      <div style={{ fontSize: 18, color: "var(--color-cne-ink)" }}>{topLine}</div>
+      <div style={{ fontSize: 30, color: "var(--color-cne-red)", marginTop: 2 }}>{bottomLine}</div>
     </div>
   );
 }

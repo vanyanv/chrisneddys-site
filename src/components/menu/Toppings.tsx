@@ -9,7 +9,7 @@ export function Toppings(): ReactElement {
     >
       <h2
         id="toppings-h"
-        className="cne-reveal"
+        className="cne-onscroll-up"
         style={{
           fontFamily: "var(--font-display)",
           fontSize: "clamp(40px, 6vw, 72px)",
@@ -33,7 +33,7 @@ export function Toppings(): ReactElement {
         ★ NO EXTRA CHARGE ★
       </div>
       <ul
-        className="cne-stagger"
+        className="cne-onscroll-stagger"
         style={{
           display: "flex",
           flexWrap: "wrap",

@@ -1,12 +1,32 @@
 import type { ReactElement } from "react";
+import Image from "next/image";
 import { BurgerPhoto } from "@/components/art/BurgerPhoto";
 
-type Tone = "warm" | "bright" | "cream";
+type Photo = { src: string; alt: string };
 
-const items: Array<{ name: string; desc: string; price: string; tone: Tone; tag?: string }> = [
-  { name: "The Double", desc: "Two smashed patties. Two cheese.", price: "8", tone: "warm", tag: "SIGNATURE" },
-  { name: "Chris-Cut Fries", desc: "Crinkle cut, house seasoning.", price: "4", tone: "bright" },
-  { name: "Strawberry Shake", desc: "20oz. Quiet legend.", price: "6", tone: "cream" },
+const items: Array<{
+  name: string;
+  desc: string;
+  photo?: Photo;
+  fallbackTone?: "warm" | "bright" | "cream";
+  tag?: string;
+}> = [
+  {
+    name: "Burgers",
+    desc: "Two smashed patties. Two cheese.",
+    photo: { src: "/photos/double.jpg", alt: "Chris N Eddy's smash burger" },
+    tag: "SIGNATURE",
+  },
+  {
+    name: "Fries",
+    desc: "Golden, salty, house-seasoned.",
+    photo: { src: "/photos/fries.jpg", alt: "Chris N Eddy's fries with slider" },
+  },
+  {
+    name: "Shakes",
+    desc: "20oz. Quiet legend.",
+    fallbackTone: "cream",
+  },
 ];
 
 export function Signatures(): ReactElement {
@@ -15,7 +35,7 @@ export function Signatures(): ReactElement {
       aria-labelledby="signatures-h"
       style={{ padding: "100px clamp(20px, 5vw, 60px) 60px", background: "var(--color-cne-cream)" }}
     >
-      <div className="cne-reveal" style={{ textAlign: "center", marginBottom: 48 }}>
+      <div className="cne-onscroll-up" style={{ textAlign: "center", marginBottom: 48 }}>
         <div
           style={{
             fontFamily: "var(--font-display)",
@@ -43,7 +63,7 @@ export function Signatures(): ReactElement {
         </h2>
       </div>
       <div
-        className="cne-stagger cne-signatures-grid"
+        className="cne-onscroll-stagger cne-signatures-grid"
         style={{ display: "grid", gap: 24, maxWidth: 1280, margin: "0 auto" }}
       >
         {items.map((it, i) => (
@@ -63,9 +83,20 @@ export function Signatures(): ReactElement {
                 aspectRatio: "4/3",
                 borderBottom: "4px solid var(--color-cne-ink)",
                 position: "relative",
+                background: "var(--color-cne-ink)",
               }}
             >
-              <BurgerPhoto tone={it.tone} angle="card" label={it.name} idSeed={`sig-${i}`} />
+              {it.photo ? (
+                <Image
+                  src={it.photo.src}
+                  alt={it.photo.alt}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <BurgerPhoto tone={it.fallbackTone ?? "warm"} angle="card" label={it.name} idSeed={`sig-${i}`} />
+              )}
               {it.tag && (
                 <div
                   style={{
@@ -106,35 +137,6 @@ export function Signatures(): ReactElement {
                 }}
               >
                 {it.desc}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                  marginTop: 14,
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: 36,
-                    color: "var(--color-cne-red)",
-                    letterSpacing: 1,
-                  }}
-                >
-                  ${it.price}
-                </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: 13,
-                    color: "var(--color-cne-ink)",
-                    letterSpacing: 2,
-                  }}
-                >
-                  ADD →
-                </div>
               </div>
             </div>
           </article>

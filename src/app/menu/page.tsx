@@ -5,11 +5,24 @@ import { MenuSection } from "@/components/menu/MenuSection";
 import { Toppings } from "@/components/menu/Toppings";
 import { MenuDisclaimer } from "@/components/menu/MenuDisclaimer";
 
+const description =
+  "Smashed sliders, combos, fries, cheese fries, loaded fries, and shakes. Order any slider Chris’s Way or Eddy’s Way. All toppings at no extra charge.";
+
 export const metadata: Metadata = {
   title: "Menu",
-  description:
-    "Smashed sliders, combos, Chris-Cut fries, tater tots, waffle fries, loaded fries, and shakes. All toppings at no extra charge.",
+  description,
   alternates: { canonical: "/menu/" },
+  openGraph: {
+    title: "Menu · Chris N Eddy's",
+    description,
+    url: "/menu/",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Menu · Chris N Eddy's",
+    description,
+  },
 };
 
 export default function MenuPage() {
@@ -18,6 +31,7 @@ export default function MenuPage() {
       <MenuHero />
       <OrderStrip />
       <MenuSection category="sliders" />
+      <MenuSection category="ways" />
       <MenuSection category="combos" />
       <MenuSection category="sides" />
       <MenuSection category="drinks" />

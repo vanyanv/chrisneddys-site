@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
-import { ValueProps } from "@/components/home/ValueProps";
 import { Signatures } from "@/components/home/Signatures";
 import { StoryBand } from "@/components/home/StoryBand";
 import { PressWall } from "@/components/home/PressWall";
@@ -17,7 +16,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <ValueProps />
       <Signatures />
       <StoryBand />
       <PressWall />

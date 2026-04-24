@@ -16,6 +16,7 @@ export function StoryBand(): ReactElement {
     >
       <div
         aria-hidden="true"
+        className="cne-parallax-slow"
         style={{
           position: "absolute",
           right: -30,
@@ -47,7 +48,7 @@ export function StoryBand(): ReactElement {
           margin: "0 auto",
         }}
       >
-        <div className="cne-reveal">
+        <div className="cne-onscroll-up">
           <div
             style={{
               fontFamily: "var(--font-display)",
@@ -84,8 +85,8 @@ export function StoryBand(): ReactElement {
             }}
           >
             Best friends since 13. In 2020 Eddy called Chris with an idea. Chris drove down from
-            SF that week. Nine months of tasting later, they had a recipe. Today, three locations
-            and 100 festivals a year.
+            SF that week. Nine months of tasting later, they had a recipe. Today: three locations
+            and a festival road that doesn&rsquo;t quit.
           </p>
           <div style={{ marginTop: 28 }}>
             <CTAButton
@@ -102,7 +103,7 @@ export function StoryBand(): ReactElement {
           </div>
         </div>
         <div
-          className="cne-reveal-scale"
+          className="cne-onscroll-scale"
           style={{
             animationDelay: ".1s",
             aspectRatio: "4/5",

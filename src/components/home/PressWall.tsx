@@ -38,7 +38,7 @@ export function PressWall(): ReactElement {
         </h2>
       </div>
       <div
-        className="cne-stagger cne-press-grid"
+        className="cne-onscroll-stagger cne-press-grid"
         style={{ display: "grid", gap: 18, maxWidth: 1100, margin: "0 auto" }}
       >
         {press.map((p, i) => (
@@ -80,7 +80,11 @@ export function PressWall(): ReactElement {
             </p>
             <cite
               style={{
-                display: "block",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 12,
+                flexWrap: "wrap",
                 fontFamily: "var(--font-display)",
                 fontSize: 14,
                 letterSpacing: 2,
@@ -89,7 +93,22 @@ export function PressWall(): ReactElement {
                 fontStyle: "normal",
               }}
             >
-              — {p.pub.toUpperCase()}
+              <span>— {p.pub.toUpperCase()}</span>
+              {"url" in p && p.url ? (
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "var(--color-cne-red)",
+                    textDecoration: "none",
+                    borderBottom: "2px solid var(--color-cne-red)",
+                    paddingBottom: 1,
+                  }}
+                >
+                  Read →
+                </a>
+              ) : null}
             </cite>
           </blockquote>
         ))}

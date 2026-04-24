@@ -2,8 +2,7 @@ import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
 
 /**
- * Clarifies that pricing/availability comes from the live Otter menu —
- * prices here are indicative and can drift between 3PD platforms.
+ * Points visitors to Otter for current pricing and real-time availability.
  */
 export function MenuDisclaimer(): ReactElement {
   return (
@@ -50,7 +49,7 @@ export function MenuDisclaimer(): ReactElement {
               marginTop: 6,
             }}
           >
-            For current prices and availability, order on Otter.
+            For prices and availability, order on Otter.
           </div>
           <div
             style={{
@@ -62,8 +61,8 @@ export function MenuDisclaimer(): ReactElement {
               lineHeight: 1.5,
             }}
           >
-            Prices above are a guide — the live menu, secret-menu combos, and
-            real-time availability live on our Otter ordering page.
+            Live pricing, secret-menu combos, and real-time availability all
+            live on our Otter ordering page.
           </div>
         </div>
         <a

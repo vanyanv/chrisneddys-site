@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import type { CSSProperties } from "react";
-import { MapShot } from "@/components/art/MapShot";
+import dynamic from "next/dynamic";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
+
+const LocationsMap = dynamic(
+  () => import("@/components/locations/LocationsMap").then((m) => m.LocationsMap),
+  { ssr: false },
+);
 
 type LocationId = Location["id"];
 
@@ -24,10 +29,17 @@ export function LocationSwitcher() {
     >
       <div
         className="cne-locations-grid"
-        style={{ display: "grid", gap: 24 }}
+        style={{ display: "grid", gap: 32, alignItems: "stretch" }}
       >
+        <div className="cne-locations-map-col">
+          <LocationsMap selectedId={sel} onSelect={setSel} />
+        </div>
         <div
-          className="cne-stagger"
+          className="cne-locations-side"
+          style={{ display: "flex", flexDirection: "column", gap: 24 }}
+        >
+        <div
+          className="cne-onscroll-stagger"
           role="tablist"
           aria-label="Pick a location"
           style={{ display: "flex", flexDirection: "column", gap: 14 }}
@@ -85,14 +97,6 @@ export function LocationSwitcher() {
             background: "var(--color-cne-paper)",
           }}
         >
-          <div
-            style={{
-              aspectRatio: "16/9",
-              borderBottom: "4px solid var(--color-cne-ink)",
-            }}
-          >
-            <MapShot pin={loc.name} color="var(--color-cne-red)" />
-          </div>
           <div style={{ padding: 28 }}>
             <address
               style={{
@@ -168,10 +172,15 @@ export function LocationSwitcher() {
             </div>
           </div>
         </div>
+        </div>
       </div>
       <style>{`
-        .cne-locations-grid { grid-template-columns: 1fr 1.4fr; }
-        @media (max-width: 900px) { .cne-locations-grid { grid-template-columns: 1fr !important; } }
+        .cne-locations-grid { grid-template-columns: 1.15fr 1fr; }
+        .cne-locations-map-col { min-height: 100%; }
+        @media (max-width: 900px) {
+          .cne-locations-grid { grid-template-columns: 1fr !important; }
+          .cne-locations-map-col { min-height: 0; }
+        }
       `}</style>
     </section>
   );

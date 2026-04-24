@@ -54,11 +54,11 @@ export function Nav(): ReactElement {
           <Image
             src="/cne-logo.png"
             alt={brand.name}
-            width={106}
-            height={60}
+            width={155}
+            height={88}
             priority
             style={{
-              height: 60,
+              height: 88,
               width: "auto",
               display: "block",
               filter: "drop-shadow(2px 3px 0 rgba(0,0,0,0.25))",
@@ -78,7 +78,7 @@ export function Nav(): ReactElement {
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className="cne-hover-grow"
+                className={active ? "cne-hover-grow" : "cne-hover-grow cne-nav-link"}
                 style={{
                   background: active ? "var(--color-cne-cream)" : "transparent",
                   color: active ? "var(--color-cne-red)" : "var(--color-cne-cream)",
@@ -120,7 +120,7 @@ export function Nav(): ReactElement {
               whiteSpace: "nowrap",
             }}
           >
-            Order on Otter →
+            Order Online →
           </a>
         </div>
 

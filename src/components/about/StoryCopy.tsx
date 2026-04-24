@@ -20,7 +20,7 @@ export function StoryCopy(): ReactElement {
         }}
       >
         <div
-          className="cne-reveal"
+          className="cne-onscroll-up"
           style={{ fontFamily: "var(--font-body)", fontSize: 18, lineHeight: 1.6 }}
         >
           <p style={{ marginTop: 0 }}>
@@ -32,12 +32,12 @@ export function StoryCopy(): ReactElement {
             roll. They nailed it.
           </p>
           <p>
-            Late 2020: Hollywood parking lot. 2021: 5539 Sunset. Today: ~100 festival stops a
-            year, plus Glendale and Van Nuys opening Spring 2026.
+            Late 2020: Hollywood parking lot. 2021: the Sunset flagship. Since then, a festival
+            road that hasn&rsquo;t stopped — and in 2026, two new doors: Glendale and Van Nuys.
           </p>
         </div>
         <div
-          className="cne-reveal-scale"
+          className="cne-onscroll-scale"
           style={{
             aspectRatio: "1/1",
             maxHeight: 480,

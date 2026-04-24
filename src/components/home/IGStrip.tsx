@@ -1,6 +1,16 @@
 import type { ReactElement } from "react";
+import Image from "next/image";
 import { IGTile } from "@/components/art/IGTile";
 import { brand } from "@/data/brand";
+
+type TilePhoto = { src: string; alt: string };
+const photoTiles: Record<number, TilePhoto> = {
+  0: { src: "/photos/ig-monster.jpg", alt: "Stacked sliders in front of Chris N Eddy's monster mural" },
+  1: { src: "/photos/ig-pile.jpg", alt: "Pile of Chris N Eddy's smash sliders against red graffiti neon" },
+  2: { src: "/photos/ig-stack.jpg", alt: "Towering Chris N Eddy's smash burger with pickles and sauce on flame-print paper" },
+  3: { src: "/photos/ig-pyramid.jpg", alt: "Three sliders stacked on Chris N Eddy's wax paper with loaded fries" },
+  4: { src: "/photos/ig-neon.jpg", alt: "Three Chris N Eddy's sliders in hand with the shop neon glowing behind" },
+};
 
 export function IGStrip(): ReactElement {
   const tiles = Array.from({ length: 6 }, (_, i) => i);
@@ -70,19 +80,36 @@ export function IGStrip(): ReactElement {
         className="cne-ig-grid"
         style={{ display: "grid", gap: 0, background: "var(--color-cne-red)" }}
       >
-        {tiles.map((i) => (
-          <div
-            key={i}
-            className="cne-hover-grow"
-            style={{
-              borderRight: i < 5 ? "3px solid var(--color-cne-ink)" : "none",
-              borderTop: "3px solid var(--color-cne-ink)",
-              cursor: "pointer",
-            }}
-          >
-            <IGTile idx={i} tone="warm" />
-          </div>
-        ))}
+        {tiles.map((i) => {
+          const photo = photoTiles[i];
+          return (
+            <div
+              key={i}
+              className="cne-hover-grow"
+              style={{
+                borderRight: i < 5 ? "3px solid var(--color-cne-ink)" : "none",
+                borderTop: "3px solid var(--color-cne-ink)",
+                cursor: "pointer",
+                position: "relative",
+                aspectRatio: photo ? "1 / 1" : undefined,
+                background: photo ? "var(--color-cne-ink)" : undefined,
+                overflow: "hidden",
+              }}
+            >
+              {photo ? (
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 520px) 50vw, (max-width: 900px) 33vw, 16vw"
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <IGTile idx={i} tone="warm" />
+              )}
+            </div>
+          );
+        })}
       </div>
       <style>{`
         .cne-ig-grid { grid-template-columns: repeat(6, 1fr); }

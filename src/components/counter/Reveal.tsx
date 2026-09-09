@@ -22,15 +22,20 @@ export function RevealRoot() {
 
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".cne-rv"));
+    if (nodes.length === 0) return;
+
+    const show = (n: HTMLElement) => n.classList.add("is-in");
+
     if (!("IntersectionObserver" in window)) {
-      nodes.forEach((n) => n.classList.add("is-in"));
+      nodes.forEach(show);
       return;
     }
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add("is-in");
+            show(e.target as HTMLElement);
             io.unobserve(e.target);
           }
         });
@@ -41,14 +46,41 @@ export function RevealRoot() {
       n.style.transitionDelay = `${(i % 4) * 60}ms`;
       io.observe(n);
     });
-    // Whatever is already above the fold shouldn't wait for a scroll event.
-    const raf = requestAnimationFrame(() => {
+
+    /**
+     * Reveal everything the viewport has already reached or passed.
+     *
+     * The observer alone is not enough: jump far enough in one go — a menu
+     * category link, a hash landing, restored scroll, a flick on a phone — and
+     * a section can go from below the fold to above it without ever being
+     * intersecting, so no entry is ever delivered and it stays at `opacity: 0`
+     * for good. Scrolling back up then finds a blank gap.
+     */
+    let queued = false;
+    const sweep = () => {
+      queued = false;
       nodes.forEach((n) => {
-        if (n.getBoundingClientRect().top < window.innerHeight) n.classList.add("is-in");
+        if (n.classList.contains("is-in")) return;
+        if (n.getBoundingClientRect().top < window.innerHeight) {
+          show(n);
+          io.unobserve(n);
+        }
       });
-    });
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(sweep);
+    };
+
+    const raf = requestAnimationFrame(sweep);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       io.disconnect();
     };
   }, [pathname]);

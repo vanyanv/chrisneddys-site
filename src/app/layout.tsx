@@ -11,6 +11,7 @@ import { NightMode } from "@/components/counter/NightMode";
 import { RevealRoot } from "@/components/counter/Reveal";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { OG_IMAGE } from "@/lib/seo";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -36,11 +37,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smashed sliders in Hollywood`,
+    default: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
     template: `%s · ${brand.name}`,
   },
   description:
-    "Two childhood friends, one parking lot, and a smash burger cult following. Smashed sliders on buttered Martin’s potato rolls. Hollywood, Glendale (Spring ’26), Van Nuys (Spring ’26).",
+    "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
@@ -60,14 +61,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smashed sliders in Hollywood`,
-    description:
-      "Two childhood friends, one parking lot, and a smash burger cult following. Open til 2AM.",
+    title: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
+    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smashed sliders. A 2020 pop-up, on Sunset since 2021.",
+    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    images: [OG_IMAGE.url],
   },
   alternates: {
     canonical: "/",

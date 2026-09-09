@@ -15,7 +15,7 @@ export function MenuBrowser() {
     <>
       <section className="cne-sec" style={{ paddingTop: 14 }}>
         <div className="cne-eyebrow">Pick a way — free</div>
-        <h2>Everything we make.</h2>
+        <h1>Smashed sliders, combos &amp; shakes.</h1>
         <div className="cne-ways">
           {ways.map((w) => (
             <button

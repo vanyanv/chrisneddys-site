@@ -103,7 +103,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
 
       <div className="cne-locs-list cne-sec">
         <div className="cne-eyebrow">Three counters</div>
-        <h2>Find us.</h2>
+        <h1>Find us.</h1>
         {locations.map((loc) => (
           <div
             key={loc.id}

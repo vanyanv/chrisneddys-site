@@ -919,11 +919,10 @@ body {
     border-bottom: 4px solid var(--a-ink);
   }
   .cne-hero-halftone {
-    left: 0;
-    top: 0;
-    bottom: 0;
+    /* `inset` must come first: as a shorthand it resets all four longhands, so
+       declaring it after them wiped the panel out and left cream on cream. */
+    inset: 0;
     right: 41%;
-    inset: auto;
     background: var(--a-nav);
     border-right: 4px solid var(--a-ink);
     opacity: 1;

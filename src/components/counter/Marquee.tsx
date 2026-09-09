@@ -1,7 +1,9 @@
+/* We sell sliders, not burgers, and the reel says "fries" rather than the
+   prototype's "chris-cut fries" — the long form crowded the loop. */
 const PHONE = [
-  "burgers ★",
+  "sliders ★",
   "shakes ★",
-  "chris-cut fries ★",
+  "fries ★",
   "smashed daily ★",
   "martin’s rolls ★",
   "since 2020 ★",
@@ -9,9 +11,9 @@ const PHONE = [
 
 /** Desktop runs a shorter reel that ends on the three counters. */
 const DESK = [
-  "burgers ★",
+  "sliders ★",
   "shakes ★",
-  "chris-cut fries ★",
+  "fries ★",
   "secret menu ★",
   "hollywood · glendale · van nuys ★",
 ];

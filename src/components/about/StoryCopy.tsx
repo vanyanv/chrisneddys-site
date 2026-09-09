@@ -33,7 +33,7 @@ export function StoryCopy(): ReactElement {
           </p>
           <p>
             Late 2020: Hollywood parking lot. 2021: the Sunset flagship. Since then, a festival
-            road that hasn&rsquo;t stopped — and in 2026, two new doors: Glendale and Van Nuys.
+            road that hasn&rsquo;t stopped — and two more doors on the way: Glendale and Van Nuys.
           </p>
         </div>
         <div

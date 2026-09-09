@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { locations } from "@/data/locations";
-import { storeStatus, statusLabel, type StoreStatus } from "@/lib/hours";
+import { statusLabel } from "@/lib/hours";
+import { useStoreStatus } from "@/lib/useStoreStatus";
 
 /**
  * "Are you open right now" is the question people actually arrive with, and
@@ -14,17 +13,7 @@ import { storeStatus, statusLabel, type StoreStatus } from "@/lib/hours";
  * on mount, which keeps the layout stable and avoids a hydration mismatch.
  */
 export function OpenStatus({ locationId = "hollywood" }: { locationId?: string }) {
-  const [status, setStatus] = useState<StoreStatus | null>(null);
-
-  useEffect(() => {
-    const loc = locations.find((l) => l.id === locationId);
-    if (!loc) return;
-    const tick = () => setStatus(storeStatus(loc));
-    tick();
-    // A minute is enough: the only thing that moves is the countdown.
-    const id = setInterval(tick, 60_000);
-    return () => clearInterval(id);
-  }, [locationId]);
+  const status = useStoreStatus(locationId);
 
   const state = status?.state ?? "unknown";
   const tone = state === "closed" ? " is-shut" : state === "last-call" ? " is-last" : "";

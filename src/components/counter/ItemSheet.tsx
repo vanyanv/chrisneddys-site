@@ -19,6 +19,10 @@ type Props = {
   onClose: () => void;
 };
 
+/** Everything the browser will Tab to, in document order. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * Bottom sheet on a phone, right-hand drawer on desktop — same component, the
  * breakpoint does the rest.
@@ -29,6 +33,7 @@ type Props = {
  */
 export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -36,7 +41,28 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
     restoreRef.current = document.activeElement as HTMLElement | null;
     const id = requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      // `aria-modal` tells a screen reader the rest of the page is gone; it
+      // does not stop Tab from walking into it. Without this, the tab after
+      // ADD ON OTTER lands on a menu row behind the scrim.
+      if (e.key !== "Tab") return;
+      const sheet = sheetRef.current;
+      if (!sheet) return;
+      const stops = Array.from(sheet.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (el) => el.getClientRects().length > 0,
+      );
+      if (stops.length === 0) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const active = document.activeElement;
+      const outside = !(active instanceof Node) || !sheet.contains(active);
+      if (e.shiftKey ? active === first || outside : active === last || outside) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     // The page behind a modal shouldn't scroll under it.
@@ -60,6 +86,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
         aria-hidden="true"
       />
       <div
+        ref={sheetRef}
         className={`cne-sheet${open ? " is-open" : ""}`}
         role="dialog"
         aria-modal="true"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * Scroll reveals, matching the prototype: sections marked `.cne-rv` fade and
@@ -8,8 +9,17 @@ import { useEffect } from "react";
  *
  * Anything already on screen at load is revealed immediately rather than
  * waiting for a scroll, so the first frame is the finished page.
+ *
+ * Keyed on the pathname because this lives in the root layout, which survives
+ * client-side navigation. The nodes are collected once per effect run, so a
+ * mount-only effect would never see the sections that arrive with the next
+ * route — and `.js .cne-rv` holds them at `opacity: 0` until `is-in` lands,
+ * which would leave the whole menu invisible to anyone who got there from the
+ * header rather than by typing the URL.
  */
 export function RevealRoot() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".cne-rv"));
     if (!("IntersectionObserver" in window)) {
@@ -32,13 +42,16 @@ export function RevealRoot() {
       io.observe(n);
     });
     // Whatever is already above the fold shouldn't wait for a scroll event.
-    requestAnimationFrame(() => {
+    const raf = requestAnimationFrame(() => {
       nodes.forEach((n) => {
         if (n.getBoundingClientRect().top < window.innerHeight) n.classList.add("is-in");
       });
     });
-    return () => io.disconnect();
-  }, []);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
+  }, [pathname]);
 
   return null;
 }

@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { locations } from "@/data/locations";
 import { storeUrl } from "@/lib/otter";
-import { storeStatus, statusLabel, statusDetail, type StoreStatus } from "@/lib/hours";
+import { statusLabel, statusDetail, type StoreStatus } from "@/lib/hours";
+import { useStoreStatus } from "@/lib/useStoreStatus";
 
 /**
  * The sticky bottom dock from the prototype: what Hollywood's clock is doing,
  * and one button to order. Phone only — desktop keeps ORDER in the header.
  */
 export function OrderDock() {
-  const [status, setStatus] = useState<StoreStatus | null>(null);
-
-  useEffect(() => {
-    const loc = locations.find((l) => l.id === "hollywood");
-    if (!loc) return;
-    const tick = () => setStatus(storeStatus(loc));
-    tick();
-    const id = setInterval(tick, 60_000);
-    return () => clearInterval(id);
-  }, []);
-
+  const status = useStoreStatus("hollywood");
   const headline = dockHeadline(status);
 
   return (

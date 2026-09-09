@@ -20,7 +20,14 @@ export function appleDirections(loc: Location): string {
 }
 
 /**
- * True on iOS/iPadOS/macOS, where Apple Maps is the system default.
+ * True on iOS and iPadOS, where tapping a `maps.apple.com` link opens the Maps
+ * app with the route already loaded.
+ *
+ * Desktop macOS is deliberately excluded. There the link either hands the
+ * browser off to an app the visitor may not use, or lands on Apple's web map;
+ * Google Maps just opens in the tab they are already in, and is where a "send
+ * to phone" hand-off lives. The touch-point check is what separates the two,
+ * since iPadOS 13+ reports itself as a Mac.
  *
  * Only safe to call after mount — the server has no way to know, so the Google
  * link is rendered first and swapped on the client. That keeps hydration
@@ -30,6 +37,5 @@ export function prefersAppleMaps(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
   if (/iPhone|iPad|iPod/.test(ua)) return true;
-  // iPadOS 13+ reports as a Mac; touch points are the usual tell.
   return /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
 }

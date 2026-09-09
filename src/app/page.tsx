@@ -68,13 +68,15 @@ export default function HomePage() {
         <div className="cne-sec-hd">
           <div>
             <div className="cne-eyebrow">What they’re saying</div>
-            <h2>Press.</h2>
+            <h2>
+              Press<span className="cne-only-desk-i"> &amp; reviews</span>.
+            </h2>
           </div>
         </div>
         <div className="cne-pressrow">
           {PRESS.map((p) => (
             <blockquote className="cne-quote" key={p.cite + p.quote.slice(0, 12)}>
-              <p>{p.quote}</p>
+              <p>&ldquo;{p.quote}&rdquo;</p>
               <cite>{p.cite}</cite>
             </blockquote>
           ))}

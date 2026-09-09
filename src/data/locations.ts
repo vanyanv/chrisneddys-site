@@ -18,7 +18,7 @@ export const locations: Location[] = [
   {
     id: "hollywood",
     name: "Hollywood",
-    sub: "The original",
+    sub: "Open since 2021",
     address: "5539 W. Sunset Blvd",
     city: "Los Angeles",
     region: "CA",
@@ -44,7 +44,7 @@ export const locations: Location[] = [
   {
     id: "glendale",
     name: "Glendale",
-    sub: "Now open",
+    sub: "Open since March 2026",
     address: "1360 E Colorado St",
     city: "Glendale",
     region: "CA",

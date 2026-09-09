@@ -13,11 +13,15 @@ export function Hero() {
       <div className="cne-hero-in">
         <div>
           <h1>
-            SLIDERS <span className="y">SO GOOD</span> THEY HURT.
+            SLIDERS <span className="y">SO GOOD</span>
+            <br className="cne-br-desk" /> THEY HURT.
           </h1>
+          {/* The prototype writes this line slightly longer on desktop, where
+              there is room for it, and clips "one" on the phone. */}
           <p className="cne-hero-sub">
-            Two smashed patties, two slices of cheese, buttered Martin&rsquo;s potato roll.
-            Sliders from <b>$6.49</b>.
+            Two smashed patties, two slices of cheese,{" "}
+            <span className="cne-only-desk-i">one&nbsp;</span>buttered Martin&rsquo;s potato
+            roll. Sliders from <b>$6.49</b>.
           </p>
           <div className="cne-cta">
             <a
@@ -29,7 +33,7 @@ export function Hero() {
               ORDER ONLINE →
             </a>
             <a className="cne-big is-secondary" href="/menu/">
-              MENU
+              <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
             </a>
           </div>
         </div>

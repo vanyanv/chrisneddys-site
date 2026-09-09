@@ -873,7 +873,7 @@ body {
   .cne-nav img { height: 44px; filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.28)); }
   .cne-nav-right { order: 3; margin-left: auto; gap: 14px; }
 
-  .cne-stat { font-size: 12px; padding: 9px 14px; border-radius: 24px; gap: 8px; border-width: 2px; min-width: 108px; }
+  .cne-stat { font-size: 12px; padding: 9px 14px; border-radius: 24px; gap: 8px; border-width: 2px; }
   .cne-dot { width: 9px; height: 9px; }
   .cne-orderbtn {
     font-size: 15px;
@@ -1054,7 +1054,6 @@ body {
   .cne-row-name .n { font-size: 17px; line-height: 1.2; }
   .cne-row-name .d { font-size: 13px; margin-top: 4px; line-height: 1.4; }
   .cne-row-price { font-size: 19px; }
-  .cne-chev { width: 32px; height: 32px; font-size: 16px; }
 
   .cne-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; }
 
@@ -1237,14 +1236,6 @@ body {
   justify-content: center;
   transition: transform 0.16s;
   overflow: hidden;
-  text-indent: -9999px;
-}
-.cne-card-cta::after {
-  content: "›";
-  text-indent: 0;
-  float: left;
-  width: 100%;
-  text-align: center;
 }
 [data-mode="night"] .cne-card-cta { border-color: var(--a-red); box-shadow: var(--a-glow); }
   .cne-card-cta { background: var(--a-red-cta); }
@@ -1265,7 +1256,7 @@ body {
     margin: 0;
     transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s;
   }
-  .cne-card.is-star { background: var(--a-card); box-shadow: 7px 7px 0 var(--a-ink); padding: 0; margin: 0; border-color: var(--a-ink); }
+  .cne-card.is-star { background: var(--a-card); box-shadow: 7px 7px 0 var(--a-ink); padding: 0; margin: 0; border: 4px solid var(--a-ink); }
   [data-mode="night"] .cne-card,
   [data-mode="night"] .cne-card.is-star {
     border-color: #2b2620;
@@ -1289,7 +1280,7 @@ body {
   .cne-card:hover .cne-card-img { transform: none; }
   .cne-card:hover .cne-card-img img { transform: scale(1.08); }
   .cne-card-img img { transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1); }
-  .cne-card h3 { font-family: var(--font-display); font-size: 20px; line-height: 1.08; font-weight: 400; }
+  .cne-card h3 { font-family: var(--font-display); font-size: 20px; line-height: 1.08; font-weight: 700; }
   .cne-card p { font-size: 14px; line-height: 1.45; flex: 1; -webkit-line-clamp: 4; line-clamp: 4; margin: 0; }
   .cne-card-ft { justify-content: space-between; margin-top: 8px; gap: 12px; }
   .cne-card-pr { font-size: 24px; }
@@ -1303,10 +1294,8 @@ body {
     padding: 12px 18px;
     border-width: 3px;
     box-shadow: 4px 4px 0 var(--a-ink);
-    text-indent: 0;
     overflow: visible;
   }
-  .cne-card-cta::after { content: "ORDER →"; float: none; width: auto; }
   [data-mode="night"] .cne-card-cta { box-shadow: var(--a-glow); }
   .cne-card:hover .cne-card-cta { transform: none; }
   .cne-card-rib {
@@ -1408,7 +1397,9 @@ body {
   }
   [data-mode="night"] .cne-mapwrap { border-right-color: #2b2620; }
   .cne-locs-list { padding: 38px 34px; }
-  .cne-locs-list h2 { font-family: var(--font-display); font-size: 38px; margin: 0 0 6px; line-height: 0.95; }
+  .cne-locs-list h1,
+  .cne-locs-list h2 { font-family: var(--font-display); font-size: 38px; margin: 0 0 6px; line-height: 0.95; padding-bottom: 0; }
+  .cne-locs-list h1::after { content: none; }
   .cne-callout { font-size: 12px; padding: 9px 13px; }
   .cne-callout small { font-size: 11px; }
 }
@@ -1446,4 +1437,212 @@ body {
 .cne-quote a {
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* ---- menu page ---------------------------------------------------------- */
+/* A phone reads the menu as one column, so the wrapper is inert here and the
+   sections keep the `.cne-sec` rhythm they had. The desktop grid is below. */
+.cne-menu { display: block; }
+.cne-menu-jump { display: none; }
+.cne-cat-rule { display: none; }
+/* The category label: a mono eyebrow on the phone, a display heading on desktop. */
+.cne-cat-h {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--a-red);
+  margin: 0 0 3px;
+  line-height: 1.6;
+}
+[data-mode="night"] .cne-cat-h { color: var(--a-yel); }
+.cne-cat-h::after { content: none; }
+.cne-menu-fine {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--a-sub);
+  margin: 0;
+  line-height: 1.6;
+}
+.cne-menu-foot {
+  padding: 6px 15px 18px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--a-sub);
+  margin: 0;
+}
+
+@media (min-width: 901px) {
+  .cne-menu {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 44px;
+    padding: 44px 44px 60px;
+    align-items: start;
+  }
+  /* The rail follows you down the item list rather than scrolling away. */
+  .cne-menu-side { position: sticky; top: 0; padding: 0; }
+  .cne-menu-side h1 { font-size: 38px; margin: 0 0 18px; line-height: 0.95; padding-bottom: 0; }
+  .cne-menu-side h1::after { content: none; }
+  .cne-menu-side .cne-eyebrow { margin-bottom: 6px; }
+
+  .cne-menu-jump {
+    display: flex;
+    flex-direction: column;
+    border-top: 3px solid var(--a-ink);
+    padding-top: 14px;
+  }
+  [data-mode="night"] .cne-menu-jump { border-top-color: #2b2620; }
+  .cne-menu-jump a {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--a-sub);
+    text-decoration: none;
+    padding: 7px 0;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .cne-menu-jump a:hover { color: var(--a-red); transform: translateX(4px); }
+
+  .cne-menu-fine { font-size: 12px; margin: 18px 0 13px; }
+
+  .cne-menu-main { min-width: 0; }
+  .cne-cat { padding: 0; margin-bottom: 38px; }
+  .cne-cat-h {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--a-fg);
+    margin: 0 0 4px;
+    line-height: 1;
+  }
+
+  .cne-cat-rule { display: block; height: 4px; background: var(--a-ink); margin-bottom: 12px; }
+  [data-mode="night"] .cne-cat-rule { background: var(--a-red); }
+  .cne-menu-foot { padding: 0; font-size: 12px; }
+}
+
+/* ---- display headings --------------------------------------------------- */
+/* In the prototype these are plain h1/h2/h3, which browsers render at weight
+   700. Bowlby One ships a single weight, so that is a synthetic bold — a
+   slightly heavier stroke than 400, and visible at hero sizes. Matching it. */
+h1,
+h2,
+h3 { font-weight: 700; }
+
+/* Beats `.cne-sec h2`, which the category sections also match. */
+.cne-cat h2.cne-cat-h {
+  position: static;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--a-red);
+  margin: 0 0 3px;
+  line-height: 1.6;
+  padding-bottom: 0;
+}
+[data-mode="night"] .cne-cat h2.cne-cat-h { color: var(--a-yel); }
+@media (min-width: 901px) {
+  .cne-cat h2.cne-cat-h {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--a-fg);
+    margin: 0 0 4px;
+    line-height: 1;
+    padding-bottom: 0;
+  }
+  .cne-menu-side .cne-eyebrow { margin-bottom: 0; }
+}
+/* The prototype's Way buttons never inherit the page leading. */
+.cne-way { line-height: 1.3; }
+@media (min-width: 901px) {
+  .cne-way { line-height: normal; }
+}
+
+/* ---- copy that changes at the breakpoint -------------------------------- */
+/* The prototype writes a few lines differently on the phone — "MENU" rather
+   than "SEE THE MENU", "Press." rather than "Press & reviews." — so both are
+   in the HTML and the breakpoint picks one. */
+.cne-only-desk,
+.cne-only-desk-i,
+.cne-mq-desk { display: none; }
+@media (min-width: 901px) {
+  .cne-only-phone { display: none; }
+  .cne-only-desk { display: block; }
+  .cne-only-desk-i { display: inline; }
+  .cne-mq-phone { display: none; }
+  .cne-mq-desk { display: flex; }
+}
+
+/* ---- desktop chrome: values the port had rounded off -------------------- */
+@media (min-width: 901px) {
+  /* The prototype's desktop pill and buttons take the page's 1.6 leading.
+     Only the phone versions set line-height 1, which is what the base carries. */
+  .cne-stat { line-height: 1.6; letter-spacing: 0.08em; }
+  .cne-orderbtn { line-height: 1.6; letter-spacing: 0.06em; }
+  .cne-big,
+  .cne-mini { letter-spacing: 0.06em; }
+}
+
+/* ---- more desktop values the port had rounded off ----------------------- */
+@media (min-width: 901px) {
+  /* `.cne-big.is-primary` carries the phone's 1.7 flex ratio, which out-weighs
+     the `.cne-big { flex: none }` beside it. Desktop sizes both to their label. */
+  .cne-big.is-primary,
+  .cne-big.is-secondary { flex: none; }
+
+  /* The prototype tightens prices only on the phone. */
+  .cne-card-pr,
+  .cne-row-price { letter-spacing: normal; }
+
+  .cne-card-cta { font-weight: 400; line-height: 1; }
+
+  .cne-br-desk { display: inline; }
+}
+.cne-br-desk { display: none; }
+
+/* /about predates the design system and sizes its body copy by inheritance,
+   so it keeps the 16px base the rest of the site no longer uses. */
+.cne-legacy-theme { font-size: 16px; }
+
+/* The prototype's item name is a block, so the description wraps to the name
+   column rather than running under the price. */
+.cne-row-name .n { display: block; }
+
+/* `.dway` is a bare <button>: it never inherits the page size, it takes the
+   UA's 13.333px. Its labels are sized explicitly, so this only sets the box. */
+.cne-way { font-size: 13.3333px; }
+
+.cne-menu-side { padding-top: 14px; }
+@media (min-width: 901px) {
+  .cne-menu-side { padding-top: 0; }
+}
+
+@media (min-width: 901px) {
+  /* Only the phone clamps the description; desktop has the column for it. */
+  .cne-row-name .d { display: block; -webkit-line-clamp: none; line-clamp: none; overflow: visible; }
+}
+
+/* The prototype only ever rendered at 1440, where the item grid has ~480px a
+   column. Two columns need roughly 400px each once the 300px rail and the page
+   padding are out, so between the desktop breakpoint and 1280 the grid runs as
+   one column rather than pushing the page sideways. */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .cne-menu-grid { grid-template-columns: 1fr; }
+}
+
+/* At night the phone's category eyebrow is yellow, but the desktop heading is
+   body cream — it reads as a heading there, not as a label. */
+@media (min-width: 901px) {
+  [data-mode="night"] .cne-cat h2.cne-cat-h { color: var(--a-fg); }
 }

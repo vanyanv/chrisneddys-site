@@ -44,7 +44,7 @@ export function SiteHeader() {
         <div className="cne-nav-right">
           <OpenStatus />
           <a className="cne-orderbtn" href={storeUrl} target="_blank" rel="noopener noreferrer">
-            ORDER
+            ORDER<span className="cne-only-desk-i"> ONLINE →</span>
           </a>
         </div>
       </div>

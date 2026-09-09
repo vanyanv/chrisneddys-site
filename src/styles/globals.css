@@ -23,6 +23,12 @@ body {
   background: var(--color-cne-paper);
   color: var(--color-cne-ink);
   font-family: var(--font-body);
+  /* The prototype's page is 14px/1.6, not Tailwind preflight's 16px/1.5. Almost
+     every element sets its own size, but the ones that don't — flex rows, the
+     card footer — inherit this, and the difference showed up as a pixel or two
+     on prices, eyebrows, the marquee and card heights. */
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 *,

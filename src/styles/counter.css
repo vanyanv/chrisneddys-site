@@ -316,8 +316,34 @@ body {
 }
 [data-mode="night"] .cne-hero h1 { text-shadow: 0 0 22px rgba(255, 59, 47, 0.9); }
 .cne-hero h1 .y { color: var(--a-yel); }
-.cne-hero-sub { font-size: 13px; line-height: 1.45; margin-top: 11px; opacity: 0.94; }
-.cne-hero-sub b { color: var(--a-yel-ink); }
+/* The paragraph carried `opacity: .94`, which took cream on the hero red from 3.9:1 down
+   to about 3.6:1. The two lifted phrases need to sit *above* the running text, so the dimming
+   is gone and the lift is full-strength cream at 700 — brightness and weight, not a second hue.
+   Yellow stays reserved for price, which is the only thing it means anywhere in this hero. */
+.cne-hero-sub { font-size: 13px; line-height: 1.45; margin-top: 11px; }
+.cne-hero-sub b { color: #fffdf6; font-weight: 700; }
+
+.cne-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 7px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* Full-strength cream. Fading this line is the obvious move and the wrong one — see the
+     WCAG note on `.cne-hero-sub` at the desktop breakpoint. Only the separators fade. */
+  color: #fff2c9;
+}
+.cne-hero-meta b { color: var(--a-yel-ink); font-weight: 700; }
+.cne-hero-dot { opacity: 0.45; }
+/* The three facts don't fit one phone line, and left to itself the row wraps after a
+   separator — a dot dangling off the end of line one. So the break is placed rather than
+   allowed: the address takes its own row and the separator before it goes. */
+.cne-hero-meta .cne-hero-addr { flex-basis: 100%; }
+.cne-hero-meta .cne-hero-dot.is-addr { display: none; }
 .cne-cta { display: flex; gap: 8px; margin-top: 15px; }
 
 .cne-big {
@@ -1103,6 +1129,18 @@ body {
     max-width: 32ch;
     animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.12s both;
   }
+  /* Lands between the subtitle (0.12s) and the buttons (0.22s), so the stack still
+     resolves top to bottom rather than the price arriving with the CTA. */
+  .cne-hero-meta {
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    gap: 0 10px;
+    margin-top: 20px;
+    animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
+  }
+  /* There's room for one row here, so the placed break is undone. */
+  .cne-hero-meta .cne-hero-addr { flex-basis: auto; }
+  .cne-hero-meta .cne-hero-dot.is-addr { display: inline; }
   .cne-cta {
     gap: 16px;
     margin-top: 34px;

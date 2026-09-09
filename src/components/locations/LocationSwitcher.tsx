@@ -1,26 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import type { CSSProperties } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
-
-const LocationsMap = dynamic(
-  () => import("@/components/locations/LocationsMap").then((m) => m.LocationsMap),
-  { ssr: false },
-);
+import { LocationsMap } from "@/components/locations/LocationsMap";
+import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 
 type LocationId = Location["id"];
 
-function directionsUrl(loc: Location): string {
-  const addr = encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.region}`);
-  return `https://www.google.com/maps/dir/?api=1&destination=${addr}`;
-}
-
-export function LocationSwitcher() {
+/**
+ * `mapCanvas` is the static map geometry, built by a Server Component in
+ * locations/page.tsx and threaded through so its path data stays out of the
+ * client bundle.
+ */
+export function LocationSwitcher({ mapCanvas }: { mapCanvas: ReactNode }) {
   const [sel, setSel] = useState<LocationId>("hollywood");
+  const [apple, setApple] = useState(false);
   const loc = locations.find((l) => l.id === sel) ?? locations[0];
+
+  // Rendered with the Google link so the server and the first client render
+  // agree; swapped for Apple Maps once we can actually see the platform.
+  useEffect(() => setApple(prefersAppleMaps()), []);
 
   return (
     <section
@@ -32,7 +33,7 @@ export function LocationSwitcher() {
         style={{ display: "grid", gap: 32, alignItems: "stretch" }}
       >
         <div className="cne-locations-map-col">
-          <LocationsMap selectedId={sel} onSelect={setSel} />
+          <LocationsMap selectedId={sel} onSelect={setSel} canvas={mapCanvas} />
         </div>
         <div
           className="cne-locations-side"
@@ -155,7 +156,7 @@ export function LocationSwitcher() {
             >
               <a
                 className="cne-hover-grow"
-                href={directionsUrl(loc)}
+                href={apple ? appleDirections(loc) : googleDirections(loc)}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={btn("red")}

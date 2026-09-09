@@ -1,0 +1,266 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]: Working prototype Â· Concept 01
+    - heading [level=1] [ref=e7]:
+      - text: The Counter,
+      - emphasis [ref=e8]: running.
+    - paragraph [ref=e9]: Real photography and hero video from the repo, a live open/closed clock computed from the actual Hollywood hours, a working cart, and the 2AM night skin on a toggle. Tap it â€” everything responds. Then read how checkout actually resolves against Otter.
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - button "â˜¾ 2AM mode" [ref=e13] [cursor=pointer]
+        - button "Fill cart" [ref=e14] [cursor=pointer]
+        - button "Reset" [ref=e15] [cursor=pointer]
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: 4:22
+          - generic [ref=e21]:
+            - generic [ref=e22]: â–®â–®â–®
+            - generic [ref=e23]: LTE
+        - generic [ref=e25]:
+          - img "Chris N Eddy's" [ref=e26]
+          - generic [ref=e27]:
+            - generic [ref=e28]: 8H 38M LEFT
+            - button "ORDER 0" [ref=e31] [cursor=pointer]:
+              - text: ORDER
+              - generic [ref=e32]: "0"
+        - tablist [ref=e33]:
+          - tab "HOME" [selected] [ref=e34] [cursor=pointer]
+          - tab "MENU" [ref=e35] [cursor=pointer]
+          - tab "LOCATIONS" [ref=e36] [cursor=pointer]
+        - generic [ref=e38]:
+          - generic [ref=e41]:
+            - heading "SLIDERS SO GOOD THEY HURT." [level=1] [ref=e42]
+            - paragraph [ref=e43]: Smashed to order. Two patties, two cheese, one buttered Martinâ€™s roll. Doubles from $6.
+            - generic [ref=e44]:
+              - generic [ref=e45] [cursor=pointer]: ORDER ONLINE â†’
+              - generic [ref=e46] [cursor=pointer]: MENU
+            - generic [ref=e47]: SIGNATUREDOUBLE
+          - generic [ref=e52]:
+            - generic [ref=e53]: burgers â˜…
+            - generic [ref=e54]: shakes â˜…
+            - generic [ref=e55]: fries â˜…
+            - generic [ref=e56]: smashed daily â˜…
+            - generic [ref=e57]: martinâ€™s rolls â˜…
+            - generic [ref=e58]: since 2020 â˜…
+            - generic [ref=e59]: burgers â˜…
+            - generic [ref=e60]: shakes â˜…
+            - generic [ref=e61]: fries â˜…
+            - generic [ref=e62]: smashed daily â˜…
+            - generic [ref=e63]: martinâ€™s rolls â˜…
+            - generic [ref=e64]: since 2020 â˜…
+          - generic [ref=e65]:
+            - generic [ref=e66]: â˜… Most ordered
+            - heading "Start here." [level=2] [ref=e67]
+            - generic [ref=e68]:
+              - generic [ref=e70]:
+                - generic [ref=e71]: The Double â˜…
+                - generic [ref=e72]: Two smashed patties, two slices cheese. The one you came for.
+              - generic [ref=e73]: $6
+              - button "Add The Double" [ref=e74] [cursor=pointer]: ï¼‹
+            - generic [ref=e75]:
+              - generic [ref=e77]:
+                - generic [ref=e78]: "Combo #2 â˜…"
+                - generic [ref=e79]: Two sliders + fries. Most ordered.
+              - generic [ref=e80]: $13
+              - 'button "Add Combo #2" [ref=e81] [cursor=pointer]': ï¼‹
+            - generic [ref=e82]:
+              - generic [ref=e84]:
+                - generic [ref=e85]: Fries
+                - generic [ref=e86]: Seasoned and hot.
+              - generic [ref=e87]: $4
+              - button "Add Fries" [ref=e88] [cursor=pointer]: ï¼‹
+            - generic [ref=e89]:
+              - generic [ref=e90]: STRAW
+              - generic [ref=e91]:
+                - generic [ref=e92]: Strawberry Shake
+                - generic [ref=e93]: 20oz. A quiet legend.
+              - generic [ref=e94]: $7
+              - button "Add Strawberry Shake" [ref=e95] [cursor=pointer]: ï¼‹
+          - generic [ref=e96]:
+            - generic [ref=e97]: Open right now
+            - heading "Where we are." [level=2] [ref=e98]
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - heading "HOLLYWOOD" [level=3] [ref=e101]
+                - generic [ref=e102]: 8H 38M LEFT
+              - generic [ref=e104]: 5539 W. Sunset BlvdLos Angeles, CA 90028 Â· 1.2 mi
+              - generic [ref=e105]:
+                - generic [ref=e106]:
+                  - generic [ref=e107]: MONâ€“THU
+                  - generic [ref=e108]: 10:00 AM â€“ 1:00 AM
+                - generic [ref=e109]:
+                  - generic [ref=e110]: FRIâ€“SUN
+                  - generic [ref=e111]: 10:00 AM â€“ 2:00 AM
+              - generic [ref=e112]:
+                - link "DIRECTIONS" [ref=e113] [cursor=pointer]:
+                  - /url: https://maps.google.com/?q=5539+W+Sunset+Blvd+Los+Angeles
+                - link "CALL" [ref=e114] [cursor=pointer]:
+                  - /url: tel:+13235443600
+          - generic [ref=e115]:
+            - generic [ref=e116]: What theyâ€™re saying
+            - heading "Press." [level=2] [ref=e117]
+            - generic [ref=e118]:
+              - paragraph [ref=e119]: "\"The Brendan Fraser of the LA smashburger scene.\""
+              - generic [ref=e120]: â€” THE INFATUATION Â· 7.6
+            - generic [ref=e121]:
+              - paragraph [ref=e122]: "\"The Hollywood smash-burger favorite is bringing its signature double to Glendale and Van Nuys.\""
+              - generic [ref=e123]: â€” EATER LA
+            - generic [ref=e124]:
+              - paragraph [ref=e125]: "\"A childhood friendship turned Hollywood institution.\""
+              - generic [ref=e126]: â€” NBC LOS ANGELES
+          - generic [ref=e127]:
+            - generic [ref=e128]: From the gram
+            - heading "@chrisneddys" [level=2] [ref=e129]
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - generic [ref=e139]: Hollywood Â· 8H 38M LEFT
+            - generic [ref=e140]: Last call 1:00 AM
+          - button "SEE MENU â†’" [ref=e141] [cursor=pointer]
+        - dialog "Your order" [ref=e142]:
+          - generic [ref=e144]:
+            - heading "YOUR ORDER" [level=3] [ref=e145]
+            - button "Close" [ref=e146] [cursor=pointer]: âœ•
+      - paragraph [ref=e149]: Live clock drives the status pill. Night skin auto-arms after 9PM â€” the toggle forces it.
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - generic [ref=e152]: What's real in here
+        - heading "Everything you can tap." [level=2] [ref=e153]
+        - generic [ref=e154]:
+          - generic [ref=e155]:
+            - heading "Photography" [level=4] [ref=e156]
+            - paragraph [ref=e157]:
+              - text: The actual JPEGs from
+              - code [ref=e158]: public/photos/
+              - text: ", resized and inlined. Nothing is stock."
+          - generic [ref=e159]:
+            - heading "Hero video" [level=4] [ref=e160]
+            - paragraph [ref=e161]:
+              - code [ref=e162]: hero.mp4
+              - text: ", re-encoded, autoplaying muted on loop behind the stamp."
+          - generic [ref=e163]:
+            - heading "Live status" [level=4] [ref=e164]
+            - paragraph [ref=e165]: Open/closed and the countdown to last call are computed from the real Monâ€“Thu 1AM / Friâ€“Sun 2AM windows.
+          - generic [ref=e166]:
+            - heading "Cart" [level=4] [ref=e167]
+            - paragraph [ref=e168]: Add, step quantities, switch Way, watch the subtotal. It survives view changes.
+          - generic [ref=e169]:
+            - heading "2AM skin" [level=4] [ref=e170]
+            - paragraph [ref=e171]: Concept 03 as a token swap on the same components â€” the recommendation from round one, made real.
+          - generic [ref=e172]:
+            - heading "Motion" [level=4] [ref=e173]
+            - paragraph [ref=e174]: Fly-to-cart, badge pop, sheet spring, marquee, pin ping, view transitions. All respect reduced-motion.
+        - paragraph [ref=e175]: Prices are illustrative, anchored to the $6 double reported by The Infatuation. Swap in POS numbers before this goes near a customer.
+      - generic [ref=e176]:
+        - generic [ref=e177]: Your question
+        - heading "So how does checkout work if Otter takes the order?" [level=2] [ref=e178]
+        - paragraph [ref=e179]:
+          - text: "Short answer:"
+          - strong [ref=e180]: for now, it doesn't â€” and it shouldn't.
+          - text: The cart in this prototype is an
+          - emphasis [ref=e181]: order builder
+          - text: ", not a checkout. It composes the order on your domain and hands off. That seam is the whole design problem, and there are three honest ways to close it, in increasing order of cost."
+        - generic [ref=e182]:
+          - heading "The one thing not to do" [level=3] [ref=e183]
+          - paragraph [ref=e184]:
+            - text: Don't ship a cart that collects items and then dumps the customer onto an empty Otter storefront to re-pick everything. A cart that dead-ends is
+            - strong [ref=e185]: worse than no cart
+            - text: "â€” it converts a 30-second order into a 90-second one and teaches people not to trust the site. If you can't carry the cart across, don't build a cart: make every \"ï¼‹\" a direct link that opens Otter on that item."
+        - generic [ref=e186]:
+          - generic [ref=e187]:
+            - generic [ref=e188]: A
+            - generic [ref=e189]:
+              - generic [ref=e190]: Ship this month Â· $0 Â· no Otter conversation
+              - heading "Catalog + deep link" [level=3] [ref=e191]
+          - generic [ref=e192]:
+            - list [ref=e193]:
+              - listitem [ref=e194]: "Your site owns browse: prices, photos, Ways, the \"most ordered\" rail, SEO, schema."
+              - listitem [ref=e195]:
+                - text: No cart. Every item's button reads
+                - code [ref=e196]: Order this â†’
+                - text: and opens the Otter storefront. Verify whether Otter's URL accepts an item path â€” if it does, land people on the item; if not, land them on the store.
+              - listitem [ref=e197]: Keeps the promise the page makes. Nothing is lost in the jump because nothing was carried.
+            - generic [ref=e198]:
+              - generic [ref=e199]: Your site Â· browse
+              - generic [ref=e200]: â†’
+              - generic [ref=e201]: Otter Â· cart
+              - generic [ref=e202]: â†’
+              - generic [ref=e203]: Otter Â· pay
+              - generic [ref=e204]: â†’
+              - generic [ref=e205]: POS / KDS
+            - generic [ref=e206]:
+              - generic [ref=e207]: "Effort: days"
+              - generic [ref=e208]: "Risk: none"
+              - generic [ref=e209]: One domain jump
+        - generic [ref=e210]:
+          - generic [ref=e211]:
+            - generic [ref=e212]: B
+            - generic [ref=e213]:
+              - generic [ref=e214]: The realistic target Â· one call with your rep
+              - heading "Otter Direct on your own subdomain" [level=3] [ref=e215]
+          - generic [ref=e216]:
+            - list [ref=e217]:
+              - listitem [ref=e218]: Otter sells commission-free direct ordering with a branded storefront â€” logo, banner, your own ordering URL, orders syncing straight into your POS and KDS.
+              - listitem [ref=e219]:
+                - text: Point it at
+                - code [ref=e220]: order.chrisneddys.com
+                - text: "and theme it to the brand. The jump stops feeling like a jump: same name, same colors, no"
+                - code [ref=e221]: tryotter.com
+                - text: in the address bar.
+              - listitem [ref=e222]: Marketplace apps stay on for discovery. Direct becomes the default for anyone who already knows you â€” which is where the margin is.
+              - listitem [ref=e223]: "Published plans start at $89/mo per location, so the math is simple: it pays for itself the moment it moves a handful of orders off 15â€“30% commission."
+            - generic [ref=e224]:
+              - generic [ref=e225]: Your site Â· browse
+              - generic [ref=e226]: â†’
+              - generic [ref=e227]: order.chrisneddys.com
+              - generic [ref=e228]: â†’
+              - generic [ref=e229]: Otter pay
+              - generic [ref=e230]: â†’
+              - generic [ref=e231]: POS / KDS
+            - generic [ref=e232]:
+              - generic [ref=e233]: "Effort: ~1â€“2 weeks"
+              - generic [ref=e234]: $89+/mo per location
+              - generic [ref=e235]: Best value
+        - generic [ref=e236]:
+          - generic [ref=e237]:
+            - generic [ref=e238]: C
+            - generic [ref=e239]:
+              - generic [ref=e240]: Only after A or B is proven
+              - heading "True on-site checkout via the API" [level=3] [ref=e241]
+          - generic [ref=e242]:
+            - list [ref=e243]:
+              - listitem [ref=e244]: "Otter publishes API documentation and describes an open API with order injection into the POS. If you can get partner access, the cart in this prototype becomes real: pay on your domain with Stripe, push the order into Otter's OMS, done."
+              - listitem [ref=e245]: This is the only option where you own the customer record â€” email, order history, the list you'd want before opening a fourth store.
+              - listitem [ref=e246]: It also makes you responsible for payments, refunds, tax, item availability and store-closed states. That's real operational surface, not just code.
+              - listitem [ref=e247]: Menus must stay in sync â€” Otter's own docs are explicit that orders only inject when the menu matches the POS. One source of truth or it breaks at 1AM on a Saturday.
+            - generic [ref=e248]:
+              - generic [ref=e249]: Your site Â· browse
+              - generic [ref=e250]: â†’
+              - generic [ref=e251]: Your cart
+              - generic [ref=e252]: â†’
+              - generic [ref=e253]: Your checkout
+              - generic [ref=e254]: â†’
+              - generic [ref=e255]: Otter API
+              - generic [ref=e256]: â†’
+              - generic [ref=e257]: POS / KDS
+            - generic [ref=e258]:
+              - generic [ref=e259]: "Effort: 6â€“10 weeks"
+              - generic [ref=e260]: Needs partner approval
+              - generic [ref=e261]: You own the data
+        - generic [ref=e262]:
+          - heading "My recommendation" [level=3] [ref=e263]
+          - paragraph [ref=e264]:
+            - strong [ref=e265]: Ship A now, book the call for B this week.
+            - text: A costs nothing and makes the site honest immediately. B is almost certainly already available on your plan or one tier up, and it removes the domain jump â€” which is the single biggest drop-off point in the current flow. C only earns its cost once you can see how many orders are coming direct, which you can't measure until B is live.
+          - paragraph [ref=e266]:
+            - text: The prototype deliberately shows the
+            - emphasis [ref=e267]: B/C
+            - text: experience so you can feel what's on the other side of that call. If the answer from Otter is no, we fall back to A and the menu work is still worth every hour â€” prices and hours on your own domain are the fix regardless of who takes the payment.
+        - list [ref=e269]:
+          - listitem [ref=e270]: What plan are you on with Otter today? Lite/Standard/Premium decides whether B is a config change or an upgrade.
+          - listitem [ref=e271]: Is the current storefront the commission-free Direct product, or a marketplace channel? The URL alone doesn't tell us.
+          - listitem [ref=e272]: What's the POS? Otter integrates with Clover, Square and Toast among others, and the POS determines how cleanly menu sync works.
+          - listitem [ref=e273]: Who can approve an API request? Partner access takes lead time; starting it now costs nothing even if you never use it.
+  - contentinfo [ref=e274]:
+    - generic [ref=e275]: Chris N Eddy's â€” Concept 01 prototype Â· Sep 8 2026
+    - generic [ref=e276]: Assets inlined from the repo Â· Otter details from tryotter.com product pages

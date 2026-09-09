@@ -52,7 +52,7 @@ export function Nav(): ReactElement {
           }}
         >
           <Image
-            src="/cne-logo.png"
+            src="/cne-logo.webp"
             alt={brand.name}
             width={155}
             height={88}

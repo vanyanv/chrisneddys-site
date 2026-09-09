@@ -1,0 +1,537 @@
+- generic [ref=f44e2]:
+  - generic [ref=f44e5]:
+    - generic [ref=f44e6]: Round 3 Â· built against the live Otter Direct storefront
+    - heading [level=1] [ref=f44e7]:
+      - text: Real menu.
+      - emphasis [ref=f44e8]: Real handoff.
+    - paragraph [ref=f44e9]: Every item, price and description below was read off your actual Otter storefront, and every "Add on Otter" button deep-links to that exact item â€” verified opening its add-to-cart modal. No invented prices, no fake cart. This is what the site can be with Otter Direct and nothing else. The map is real OpenStreetMap geometry, baked in.
+  - generic [ref=f44e10]:
+    - button "â˜¾ 2AM mode" [ref=f44e11] [cursor=pointer]
+    - button "Open an item" [ref=f44e12] [cursor=pointer]
+    - button "Reset" [ref=f44e13] [cursor=pointer]
+    - generic [ref=f44e14]:
+      - generic [ref=f44e15]: Clock
+      - combobox "Day of week" [ref=f44e16] [cursor=pointer]:
+        - option "Mon"
+        - option "Tue" [selected]
+        - option "Wed"
+        - option "Thu"
+        - option "Fri"
+        - option "Sat"
+        - option "Sun"
+      - slider "Time of day" [ref=f44e17]: "1050"
+      - generic [ref=f44e18]:
+        - text: 5:31 PM
+        - generic [ref=f44e19]: LIVE Â· TUE Â· TIL 1 AM
+  - generic [ref=f44e20]:
+    - generic [ref=f44e21]:
+      - generic [ref=f44e22]: Desktop â€” 1440 Ã— 900
+      - generic [ref=f44e23]:
+        - generic [ref=f44e29]:
+          - generic [ref=f44e30]: ðŸ”’
+          - generic [ref=f44e31]: chrisneddys.com
+          - generic [ref=f44e32]: /
+        - generic [ref=f44e34]:
+          - generic [ref=f44e35]:
+            - img "Chris N Eddy's" [ref=f44e36]
+            - tablist [ref=f44e37]:
+              - tab "HOME" [selected] [ref=f44e38] [cursor=pointer]
+              - tab "MENU" [ref=f44e39] [cursor=pointer]
+              - tab "LOCATIONS" [ref=f44e40] [cursor=pointer]
+            - generic [ref=f44e41]:
+              - generic [ref=f44e42]: OPEN
+              - link "ORDER ONLINE â†’" [ref=f44e45] [cursor=pointer]:
+                - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+          - generic [ref=f44e47]:
+            - generic [ref=f44e50]:
+              - generic [ref=f44e51]:
+                - heading "SLIDERS SO GOOD THEY HURT." [level=1] [ref=f44e52]: SLIDERS SO GOODTHEY HURT.
+                - paragraph [ref=f44e53]: Two smashed patties, two slices of cheese, one buttered Martinâ€™s potato roll. Sliders from $6.49.
+                - generic [ref=f44e54]:
+                  - link "ORDER ONLINE â†’" [ref=f44e55] [cursor=pointer]:
+                    - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+                  - generic [ref=f44e56] [cursor=pointer]: SEE THE MENU
+              - generic [ref=f44e57]: SIGNATURESLIDER
+            - generic [ref=f44e62]:
+              - generic [ref=f44e63]: burgers â˜…
+              - generic [ref=f44e64]: shakes â˜…
+              - generic [ref=f44e65]: chris-cut fries â˜…
+              - generic [ref=f44e66]: secret menu â˜…
+              - generic [ref=f44e67]: hollywood Â· glendale Â· van nuys â˜…
+              - generic [ref=f44e68]: burgers â˜…
+              - generic [ref=f44e69]: shakes â˜…
+              - generic [ref=f44e70]: chris-cut fries â˜…
+              - generic [ref=f44e71]: secret menu â˜…
+              - generic [ref=f44e72]: hollywood Â· glendale Â· van nuys â˜…
+            - generic [ref=f44e73]:
+              - generic [ref=f44e74]:
+                - generic [ref=f44e75]:
+                  - generic [ref=f44e76]: â˜… One tap to order
+                  - heading "Start here." [level=2] [ref=f44e77]
+                - generic [ref=f44e78]: Live Hollywood pickup pricing.Every topping free.
+              - generic [ref=f44e79]:
+                - article [ref=f44e80] [cursor=pointer]:
+                  - generic [ref=f44e81]: MOST ORDERED
+                  - generic [ref=f44e83]:
+                    - heading "2 Sliders and Fries" [level=3] [ref=f44e84]
+                    - paragraph [ref=f44e85]: Two sliders and a side of chris-cut fries. The order most people are actually here for.
+                    - generic [ref=f44e86]:
+                      - generic [ref=f44e87]: $16.49
+                      - generic [ref=f44e88]: ORDER â†’
+                - article [ref=f44e89] [cursor=pointer]:
+                  - generic [ref=f44e92]:
+                    - heading "Chris N Eddy's Slider" [level=3] [ref=f44e93]
+                    - paragraph [ref=f44e94]: Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.
+                    - generic [ref=f44e95]:
+                      - generic [ref=f44e96]: $7.49
+                      - generic [ref=f44e97]: ORDER â†’
+                - article [ref=f44e98] [cursor=pointer]:
+                  - generic [ref=f44e101]:
+                    - heading "The Quad" [level=3] [ref=f44e102]
+                    - paragraph [ref=f44e103]: Four smashed patties on four slices of cheese, one roll. Exactly what it says.
+                    - generic [ref=f44e104]:
+                      - generic [ref=f44e105]: $11.28
+                      - generic [ref=f44e106]: ORDER â†’
+            - generic [ref=f44e107]:
+              - generic [ref=f44e108]:
+                - generic [ref=f44e109]: Open right now
+                - heading "Where we are." [level=2] [ref=f44e110]
+                - generic [ref=f44e111] [cursor=pointer]:
+                  - generic [ref=f44e112]:
+                    - heading "HOLLYWOOD" [level=3] [ref=f44e113]
+                    - generic [ref=f44e114]: OPEN
+                  - generic [ref=f44e116]: 5539 Sunset BlvdLos Angeles, CA 90028
+                  - generic [ref=f44e117]:
+                    - generic [ref=f44e118]:
+                      - generic [ref=f44e119]: MONâ€“THU
+                      - generic [ref=f44e120]: 10:00 AM â€“ 1:00 AM
+                    - generic [ref=f44e121]:
+                      - generic [ref=f44e122]: FRIâ€“SUN
+                      - generic [ref=f44e123]: 10:00 AM â€“ 2:00 AM
+                  - generic [ref=f44e124]:
+                    - link "ORDER" [ref=f44e125]:
+                      - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+                    - link "DIRECTIONS" [ref=f44e126]:
+                      - /url: https://www.google.com/maps/dir/?api=1&destination=Chris%20N%20Eddy's%2C%205539%20Sunset%20Blvd%2C%20Los%20Angeles%2C%20CA%2090028
+              - generic [ref=f44e127]:
+                - img "Map of Chris N Eddy's three Los Angeles locations, drawn from OpenStreetMap data" [ref=f44e128]:
+                  - generic [ref=f44e147]: VICTORY BLVD
+                  - generic [ref=f44e148]: RIVERSIDE DR
+                  - generic [ref=f44e149]: HIGHLAND AVE
+                  - generic [ref=f44e150]: VENTURA BLVD
+                  - generic [ref=f44e151]: SUNSET BLVD
+                  - generic [ref=f44e152]: VAN NUYS BLVD
+                  - generic [ref=f44e153]: SHERMAN WAY
+                  - generic [ref=f44e154]: SANTA MONICA BLVD
+                  - generic [ref=f44e155]: VINE ST
+                  - generic [ref=f44e156]: "2"
+                  - generic [ref=f44e159]: "5"
+                  - generic [ref=f44e162]: "101"
+                  - generic [ref=f44e165]: "134"
+                  - generic [ref=f44e168]: "170"
+                  - generic [ref=f44e171]: "405"
+                  - generic [ref=f44e174]: 2 MI
+                  - generic [ref=f44e178]: Â© OpenStreetMap contributors
+                  - generic [ref=f44e179]: "N"
+                  - generic [ref=f44e182]: HOLLYWOOD
+                  - generic [ref=f44e188]: GLENDALE
+                  - generic [ref=f44e194]: VAN NUYS
+                - generic:
+                  - text: HOLLYWOOD
+                  - generic: OPEN
+            - generic [ref=f44e200]:
+              - generic [ref=f44e202]:
+                - generic [ref=f44e203]: What theyâ€™re saying
+                - heading "Press & reviews." [level=2] [ref=f44e204]
+              - generic [ref=f44e205]:
+                - generic [ref=f44e206]:
+                  - paragraph [ref=f44e207]: "\"The Brendan Fraser of the LA smashburger scene â€” it might have been a minute since youâ€™ve heard their name, but they clearly can still bring it.\""
+                  - generic [ref=f44e208]: â€” THE INFATUATION Â· 7.6/10
+                - generic [ref=f44e209]:
+                  - paragraph [ref=f44e210]: "\"Co-owned by Poghosyan and his childhood friend, Chris Karimian, whoâ€™ve known each other since they were about 13 years old.\""
+                  - generic [ref=f44e211]: â€” NBC LOS ANGELES Â· FEB 2026
+                - generic [ref=f44e212]:
+                  - paragraph [ref=f44e213]: "\"Two juicy $6 doubles will fill you up unless youâ€™re a professional bodybuilder.\""
+                  - generic [ref=f44e214]: â€” THE INFATUATION
+            - generic [ref=f44e217]:
+              - generic [ref=f44e218]: From the gram
+              - heading "@chrisneddys" [level=2] [ref=f44e219]
+            - generic [ref=f44e227]:
+              - generic [ref=f44e228]: CHRIS N EDDYâ€™S â€” Smashed sliders, done right. Pop-up in 2020, Hollywood since 2021.
+              - generic [ref=f44e229]: Hollywood Â· Glendale Â· Van Nuys Â· (323) 544-3600 Â· @chrisneddys
+          - dialog "Item" [ref=f44e230]:
+            - button "Close" [ref=f44e231] [cursor=pointer]: âœ•
+    - generic [ref=f44e234]:
+      - generic [ref=f44e235]: Mobile â€” 390 Ã— 844
+      - generic [ref=f44e238]:
+        - generic [ref=f44e239]:
+          - generic [ref=f44e240]: 5:31
+          - generic [ref=f44e241]:
+            - generic [ref=f44e242]: â–®â–®â–®
+            - generic [ref=f44e243]: LTE
+        - generic [ref=f44e245]:
+          - img "Chris N Eddy's" [ref=f44e246]
+          - generic [ref=f44e247]:
+            - generic [ref=f44e248]: OPEN
+            - link "ORDER" [ref=f44e251] [cursor=pointer]:
+              - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+        - tablist [ref=f44e252]:
+          - tab "HOME" [selected] [ref=f44e253] [cursor=pointer]
+          - tab "MENU" [ref=f44e254] [cursor=pointer]
+          - tab "LOCATIONS" [ref=f44e255] [cursor=pointer]
+        - generic [ref=f44e258]:
+          - generic [ref=f44e261]:
+            - heading "SLIDERS SO GOOD THEY HURT." [level=1] [ref=f44e262]
+            - paragraph [ref=f44e263]: Two smashed patties, two slices of cheese, buttered Martinâ€™s potato roll. Sliders from $6.49.
+            - generic [ref=f44e264]:
+              - link "ORDER ONLINE â†’" [ref=f44e265] [cursor=pointer]:
+                - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+              - generic [ref=f44e266] [cursor=pointer]: MENU
+            - generic [ref=f44e267]: SIGNATURESLIDER
+          - generic [ref=f44e272]:
+            - generic [ref=f44e273]: burgers â˜…
+            - generic [ref=f44e274]: shakes â˜…
+            - generic [ref=f44e275]: chris-cut fries â˜…
+            - generic [ref=f44e276]: smashed daily â˜…
+            - generic [ref=f44e277]: martinâ€™s rolls â˜…
+            - generic [ref=f44e278]: since 2020 â˜…
+            - generic [ref=f44e279]: burgers â˜…
+            - generic [ref=f44e280]: shakes â˜…
+            - generic [ref=f44e281]: chris-cut fries â˜…
+            - generic [ref=f44e282]: smashed daily â˜…
+            - generic [ref=f44e283]: martinâ€™s rolls â˜…
+            - generic [ref=f44e284]: since 2020 â˜…
+          - generic [ref=f44e285]:
+            - generic [ref=f44e286]: â˜… One tap to order
+            - heading "Start here." [level=2] [ref=f44e287]
+            - generic [ref=f44e288] [cursor=pointer]:
+              - generic [ref=f44e290]:
+                - generic [ref=f44e291]: 2 Sliders and Fries â˜…
+                - generic [ref=f44e292]: Two sliders and a side of chris-cut fries. The order most people are actually here for.
+              - generic [ref=f44e293]: $16.49
+              - generic [ref=f44e294]: â€º
+            - generic [ref=f44e295] [cursor=pointer]:
+              - generic [ref=f44e297]:
+                - generic [ref=f44e298]: Chris N Eddy's Slider
+                - generic [ref=f44e299]: Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.
+              - generic [ref=f44e300]: $7.49
+              - generic [ref=f44e301]: â€º
+            - generic [ref=f44e302] [cursor=pointer]:
+              - generic [ref=f44e304]:
+                - generic [ref=f44e305]: The Quad
+                - generic [ref=f44e306]: Four smashed patties on four slices of cheese, one roll. Exactly what it says.
+              - generic [ref=f44e307]: $11.28
+              - generic [ref=f44e308]: â€º
+          - generic [ref=f44e309]:
+            - generic [ref=f44e310]: Open right now
+            - heading "Where we are." [level=2] [ref=f44e311]
+            - generic [ref=f44e312]:
+              - generic [ref=f44e313]:
+                - heading "HOLLYWOOD" [level=3] [ref=f44e314]
+                - generic [ref=f44e315]: OPEN
+              - generic [ref=f44e317]: 5539 Sunset BlvdLos Angeles, CA 90028
+              - generic [ref=f44e318]:
+                - generic [ref=f44e319]:
+                  - generic [ref=f44e320]: MONâ€“THU
+                  - generic [ref=f44e321]: 10:00 AM â€“ 1:00 AM
+                - generic [ref=f44e322]:
+                  - generic [ref=f44e323]: FRIâ€“SUN
+                  - generic [ref=f44e324]: 10:00 AM â€“ 2:00 AM
+              - generic [ref=f44e325]:
+                - link "DIRECTIONS" [ref=f44e326] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=Chris%20N%20Eddy's%2C%205539%20Sunset%20Blvd%2C%20Los%20Angeles%2C%20CA%2090028
+                - link "CALL" [ref=f44e327] [cursor=pointer]:
+                  - /url: tel:+13235443600
+          - generic [ref=f44e328]:
+            - generic [ref=f44e329]: What theyâ€™re saying
+            - heading "Press." [level=2] [ref=f44e330]
+            - generic [ref=f44e331]:
+              - paragraph [ref=f44e332]: "\"The Brendan Fraser of the LA smashburger scene â€” it might have been a minute since youâ€™ve heard their name, but they clearly can still bring it.\""
+              - generic [ref=f44e333]: â€” THE INFATUATION Â· 7.6/10
+            - generic [ref=f44e334]:
+              - paragraph [ref=f44e335]: "\"Co-owned by Poghosyan and his childhood friend, Chris Karimian, whoâ€™ve known each other since they were about 13 years old.\""
+              - generic [ref=f44e336]: â€” NBC LOS ANGELES Â· FEB 2026
+          - generic [ref=f44e337]:
+            - generic [ref=f44e338]: From the gram
+            - heading "@chrisneddys" [level=2] [ref=f44e339]
+        - generic [ref=f44e347]:
+          - generic [ref=f44e348]:
+            - generic [ref=f44e349]: Hollywood Â· open now
+            - generic [ref=f44e350]: Last call 1:00 AM
+          - link "ORDER â†’" [ref=f44e351] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+        - dialog "Item" [ref=f44e352]:
+          - button "Close" [ref=f44e354] [cursor=pointer]: âœ•
+  - generic [ref=f44e357]:
+    - generic [ref=f44e358]:
+      - generic [ref=f44e359]: Verified on the live storefront
+      - heading "What Otter Direct actually gives you." [level=2] [ref=f44e360]
+      - paragraph [ref=f44e361]: "I opened your storefront in a real browser and tested it rather than guessing. Four findings change the design:"
+      - table [ref=f44e363]:
+        - rowgroup [ref=f44e364]:
+          - row [ref=f44e365]:
+            - columnheader "Capability" [ref=f44e366]
+            - columnheader "Result" [ref=f44e367]
+            - columnheader "What it means for the site" [ref=f44e368]
+        - rowgroup [ref=f44e369]:
+          - row [ref=f44e370]:
+            - cell "Item deep links" [ref=f44e371]
+            - cell "WORKS" [ref=f44e372]
+            - cell [ref=f44e373]:
+              - text: Appending
+              - code [ref=f44e374]: "/{Item Name}/{item-uuid}"
+              - text: to the store URL opens that item's add-to-cart modal directly. Every item on your site can be one tap from being in a cart.
+          - row [ref=f44e375]:
+            - cell "Canonical URL" [ref=f44e376]
+            - cell "WRONG ONE" [ref=f44e377]
+            - cell [ref=f44e378]:
+              - text: Your site links the
+              - code [ref=f44e379]: chris-n-eddys-(3pd)
+              - text: slug. The storefront's own canonical is
+              - code [ref=f44e380]: chris-n-eddys
+              - text: . Prices are identical on both â€” but use the clean one.
+          - row [ref=f44e381]:
+            - cell "Modifier prefill" [ref=f44e382]
+            - cell "NOT POSSIBLE" [ref=f44e383]
+            - cell "Toppings can't be set from a URL. So the site must not make people pick toppings twice â€” it names the boxes instead." [ref=f44e384]
+          - row [ref=f44e385]:
+            - cell "Multi-item cart prefill" [ref=f44e386]
+            - cell "NOT POSSIBLE" [ref=f44e387]
+            - cell "No cart can be handed across. So the site doesn't fake one. See below." [ref=f44e388]
+    - generic [ref=f44e389]:
+      - generic [ref=f44e390]: The map
+      - heading "Why this one is drawn, and what ships instead." [level=2] [ref=f44e391]
+      - paragraph [ref=f44e392]:
+        - text: "You're right that a real site uses a real map provider. This artifact can't:"
+        - strong [ref=f44e393]: Artifacts block external images and network requests entirely
+        - text: ", so Google Maps JS, Mapbox GL and Leaflet all fail here in the same way â€” the library loads from a CDN, and then every tile request dies. You'd get an empty grey box with pins floating on it."
+      - paragraph [ref=f44e394]:
+        - text: "So the map above is the honest workaround:"
+        - strong [ref=f44e395]: real OpenStreetMap geometry, fetched once and baked into the page as inline SVG
+        - text: . The freeways, boulevards, water and the LA River are actual coordinates, the three pins are placed by real latitude and longitude, and the scale bar is computed from the projection â€” Van Nuys lands on Sherman Way × Van Nuys Blvd because that genuinely is the corner. Zero network requests at runtime, and the freeways can be brand yellow because we own the render. Attribution is on the map, as ODbL requires.
+      - table [ref=f44e397]:
+        - rowgroup [ref=f44e398]:
+          - row [ref=f44e399]:
+            - columnheader "Option for production" [ref=f44e400]
+            - columnheader "Cost" [ref=f44e401]
+            - columnheader "Weight" [ref=f44e402]
+            - columnheader "Brand control" [ref=f44e403]
+            - columnheader "Verdict" [ref=f44e404]
+        - rowgroup [ref=f44e405]:
+          - row [ref=f44e406]:
+            - cell "Google Maps JS" [ref=f44e407]
+            - cell "Free tier, then usage-billed per 1k loads" [ref=f44e408]
+            - cell "Heavy JS" [ref=f44e409]
+            - cell "Low" [ref=f44e410]
+            - cell "Familiar to users, but styling is limited and it will never look like your brand." [ref=f44e411]
+          - row [ref=f44e412]:
+            - cell "Google Static Maps" [ref=f44e413]
+            - cell "Cheapest metered option" [ref=f44e414]
+            - cell "One image" [ref=f44e415]
+            - cell "Low" [ref=f44e416]
+            - cell "Fine and fast, but Google's look." [ref=f44e417]
+          - row [ref=f44e418]:
+            - cell "Mapbox GL JS" [ref=f44e419]
+            - cell "Generous free tier" [ref=f44e420]
+            - cell "Heavy JS" [ref=f44e421]
+            - cell "High" [ref=f44e422]
+            - cell [ref=f44e423]:
+              - text: The right pick
+              - emphasis [ref=f44e424]: if
+              - text: you need interactivity â€” full style control, so it can be red and cream.
+          - row [ref=f44e425]:
+            - cell "MapLibre GL" [ref=f44e426]
+            - cell "Free / self-host" [ref=f44e427]
+            - cell "Heavy JS" [ref=f44e428]
+            - cell "High" [ref=f44e429]
+            - cell "Same power, no vendor lock, more setup." [ref=f44e430]
+          - row [ref=f44e431]:
+            - cell "Leaflet + muted tiles" [ref=f44e432]
+            - cell "Free with OSM tiles" [ref=f44e433]
+            - cell "Light JS" [ref=f44e434]
+            - cell "Medium" [ref=f44e435]
+            - cell [ref=f44e436]:
+              - generic [ref=f44e437]:
+                - text: Already in your
+                - code [ref=f44e438]: package.json
+              - text: and wired in
+              - code [ref=f44e439]: LocationsMap.tsx
+              - text: .
+          - row [ref=f44e440]:
+            - cell "Static styled image + native deep links" [ref=f44e441]
+            - cell "Near zero" [ref=f44e442]
+            - cell "One image, no JS" [ref=f44e443]
+            - cell "High" [ref=f44e444]
+            - cell "Recommended." [ref=f44e445]
+      - generic [ref=f44e446]:
+        - heading "For three locations, don't ship a slippy map" [level=3] [ref=f44e447]
+        - paragraph [ref=f44e448]:
+          - text: "A visitor has exactly two questions:"
+          - strong [ref=f44e449]: which one is closest
+          - text: ", and"
+          - strong [ref=f44e450]: get me there
+          - text: . Neither is answered by pan and zoom â€” they're answered by a picture and a button. A pannable map is a widget people fiddle with instead of leaving for the navigation app they were always going to use.
+        - paragraph [ref=f44e451]:
+          - text: "So: a"
+          - strong [ref=f44e452]: brand-styled static map image
+          - text: (Mapbox's Static Images API renders your custom style to a single URL, no JS at all) with the pins drawn on, and a Directions button that opens the person's
+          - strong [ref=f44e453]: own
+          - text: maps app â€”
+          - code [ref=f44e454]: maps.apple.com/?daddr=â€¦
+          - text: on iOS,
+          - code [ref=f44e455]: google.com/maps/dir/?api=1&destination=â€¦
+          - text: everywhere else. Faster, cheaper, and it converts better because it ends in turn-by-turn rather than in a widget.
+      - paragraph [ref=f44e456]:
+        - text: Two caveats worth stating. First, if you ever pass roughly eight locations, a real store locator with search and filtering does start to earn its weight â€” at that point go
+        - strong [ref=f44e457]: Mapbox or MapLibre, not Google
+        - text: ", because brand styling is the entire point on a site that looks like this. Second,"
+        - code [ref=f44e458]: next.config.mjs
+        - text: sets
+        - code [ref=f44e459]: "output: \"export\""
+        - text: ", so a static build can't hide a Mapbox token server-side; use a public token restricted by URL, which is what those tokens are designed for."
+    - generic [ref=f44e460]:
+      - generic [ref=f44e461]: The design consequence
+      - heading "No cart. One tap per item." [level=2] [ref=f44e462]
+      - generic [ref=f44e463]:
+        - heading "Why the cart from round two is gone" [level=3] [ref=f44e464]
+        - paragraph [ref=f44e465]:
+          - text: Round two had a working cart because it was showing you the world where Otter's API exists. With Otter Direct only, a cart on your domain would collect four items and then drop the customer on a storefront with an empty basket.
+          - strong [ref=f44e466]: That is strictly worse than no cart.
+          - text: "So this build removes it and spends the interaction budget on the part that actually works: getting a person from \"I want that\" to \"it's in the cart\" in a single tap."
+      - generic [ref=f44e467]:
+        - heading "What replaces it" [level=3] [ref=f44e468]
+        - paragraph [ref=f44e469]:
+          - strong [ref=f44e470]: Your menu is already combo-shaped
+          - text: "â€” \"2 Sliders and Fries\" at $16.49 is a complete order, not a component. Most late-night orders are one line item. That makes per-item deep linking the right primitive, not a compromise: tap the combo on your site, land on that exact item in Otter with Add to cart ready."
+        - paragraph [ref=f44e471]:
+          - text: "And because toppings can't be prefilled, the item sheet does the next best thing: it names"
+          - strong [ref=f44e472]: the exact checkboxes to tap on the next screen
+          - text: for Chris's Way or Eddy's Way. Choosing a Way stays a decision made on your brand's page; the mechanical part happens once, in Otter, where it has to.
+    - generic [ref=f44e473]:
+      - generic [ref=f44e474]: Corrections to the earlier audit
+      - heading "Two things I flagged that turned out fine â€” and two that didn't." [level=2] [ref=f44e475]
+      - generic [ref=f44e476]:
+        - generic [ref=f44e477]:
+          - heading "Hours â€” I was wrong" [level=4] [ref=f44e478]
+          - paragraph [ref=f44e479]:
+            - text: Otter's store record shows Monâ€“Thu closing 1AM and Friâ€“Sun closing 2AM. That matches
+            - code [ref=f44e480]: locations.ts
+            - text: exactly. The site is right; the press listings saying "midnight" are the stale ones. Withdraw that finding.
+        - generic [ref=f44e481]:
+          - heading "Pricing â€” no markup" [level=4] [ref=f44e482]
+          - paragraph [ref=f44e483]:
+            - text: The
+            - code [ref=f44e484]: (3pd)
+            - text: and canonical slugs return identical prices. There's no hidden delivery markup on the link you're using.
+        - generic [ref=f44e485]:
+          - heading "The menu is wrong â€” badly" [level=4] [ref=f44e486]
+          - paragraph [ref=f44e487]:
+            - code [ref=f44e488]: menu.ts
+            - text: invents "Single / Double / Triple" sliders. Otter sells "Chris N Eddy's Slider" ($7.49, two patties), "Single Patty Slider" ($6.49) and "Triple Patty Slider" ($8.49). The $6 double from The Infatuation no longer exists at that price.
+        - generic [ref=f44e489]:
+          - heading "A whole menu is missing" [level=4] [ref=f44e490]
+          - paragraph [ref=f44e491]: The site has no Secret Menu. Otter sells The Quad, The Triple Pack, The Family Box and The Reverse Bun â€” the most brand-defining items you have, invisible on your own website.
+    - generic [ref=f44e492]:
+      - generic [ref=f44e493]: Round 4 â€” accuracy pass
+      - heading "Your locations data has been wrong for six months." [level=2] [ref=f44e494]
+      - paragraph [ref=f44e495]: This round I checked every claim on the prototype against a primary source and fixed what didn't hold. Most of it was mine. One of them is yours, and it's costing money.
+      - generic [ref=f44e496]:
+        - heading "Glendale has been open since March 16" [level=3] [ref=f44e497]
+        - paragraph [ref=f44e498]:
+          - code [ref=f44e499]: locations.ts
+          - text: still carries
+          - code [ref=f44e500]: "status: \"Opening March\""
+          - text: ","
+          - code [ref=f44e501]: "isOpen: false"
+          - text: and
+          - code [ref=f44e502]: "sub: \"Opening Spring 2026\""
+          - text: . Van Nuys still says
+          - code [ref=f44e503]: "\"Opening May\""
+          - text: . Both dates are in the past â€” Glendale by nearly six months.
+        - paragraph [ref=f44e504]: Anyone in Glendale who searches for you, lands on your locations page and reads "Opening Spring 2026" concludes you aren't open and orders somewhere else. This is the single highest-value line of code on the site right now.
+      - generic [ref=f44e505]:
+        - generic [ref=f44e506]:
+          - heading [level=4] [ref=f44e507]:
+            - text: "Address: Colorado"
+            - emphasis [ref=f44e508]: St
+            - text: ", not Blvd"
+          - paragraph [ref=f44e509]: Glendale's street is 1360 E Colorado St. The repo copied NBC's typo. A wrong street type can send a maps query to the wrong city.
+        - generic [ref=f44e510]:
+          - heading "Van Nuys has a street number" [level=4] [ref=f44e511]
+          - paragraph [ref=f44e512]: It's 14523 Sherman Way â€” the old Menchie's at Van Nuys Blvd. "Sherman Way & Van Nuys Blvd" isn't geocodable.
+        - generic [ref=f44e513]:
+          - heading "I misattributed a press quote" [level=4] [ref=f44e514]
+          - paragraph [ref=f44e515]: The Glendale/Van Nuys expansion story is NBC Los Angeles, Feb 27 2026 â€” not Eater LA, and the line I ran wasn't a quote at all. Both press blocks are now verbatim and sourced.
+        - generic [ref=f44e516]:
+          - heading "\"Hollywood since 2020\" â€” no" [level=4] [ref=f44e517]
+          - paragraph [ref=f44e518]: The pop-up launched 2020; the Sunset Blvd storefront opened 2021, about nine months later. Fixed in the footer.
+      - paragraph [ref=f44e519]:
+        - text: "Also corrected in this pass: prices now render two decimals throughout ("
+        - code [ref=f44e520]: $4
+        - text: and
+        - code [ref=f44e521]: $48
+        - text: sat in a column next to
+        - code [ref=f44e522]: $11.49
+        - text: ), Directions opens the visitor's own maps app instead of a legacy
+        - code [ref=f44e523]: maps.google.com/?q=
+        - text: search, the two invented walking distances are gone, Glendale's status pill is computed from the clock instead of hardcoded to
+        - code [ref=f44e524]: OPEN NOW
+        - text: ", and Glendale's pin moved 780 m south to its real coordinates. All 31 deep links, all 31 prices and every hour boundary across the week were re-verified in a browser."
+    - generic [ref=f44e525]:
+      - generic [ref=f44e526]: Ship list
+      - heading "What to build first." [level=2] [ref=f44e527]
+      - table [ref=f44e529]:
+        - rowgroup [ref=f44e530]:
+          - row [ref=f44e531]:
+            - columnheader "#" [ref=f44e532]
+            - columnheader "Change" [ref=f44e533]
+            - columnheader "Why now" [ref=f44e534]
+        - rowgroup [ref=f44e535]:
+          - row [ref=f44e536]:
+            - cell "1" [ref=f44e537]
+            - cell [ref=f44e538]:
+              - generic [ref=f44e539]:
+                - text: Fix
+                - code [ref=f44e540]: locations.ts
+                - text: today
+              - text: â€” Glendale live, Van Nuys confirmed, real street addresses
+            - cell "A store that's been open six months reads as \"Opening Spring 2026\" on your own site. One file, ten minutes." [ref=f44e541]
+          - row [ref=f44e542]:
+            - cell "2" [ref=f44e543]
+            - cell [ref=f44e544]:
+              - generic [ref=f44e545]:
+                - text: Replace
+                - code [ref=f44e546]: menu.ts
+                - text: with the live menu
+              - text: ", including prices, real descriptions and the Secret Menu"
+            - cell "The current menu describes food you don't sell at prices that don't exist. Everything else depends on this." [ref=f44e547]
+          - row [ref=f44e548]:
+            - cell "3" [ref=f44e549]
+            - cell "Store the Otter item UUID on every item and render per-item deep links" [ref=f44e550]
+            - cell "Turns the menu from a brochure into a one-tap order path. Verified working today." [ref=f44e551]
+          - row [ref=f44e552]:
+            - cell "4" [ref=f44e553]
+            - cell [ref=f44e554]:
+              - generic [ref=f44e555]:
+                - text: Swap the
+                - code [ref=f44e556]: (3pd)
+                - text: slug for the canonical one
+              - text: in
+              - code [ref=f44e557]: brand.ts
+            - cell "One-line change; use the URL the storefront considers its own." [ref=f44e558]
+          - row [ref=f44e559]:
+            - cell "5" [ref=f44e560]
+            - cell "Ship the Way â†’ checkbox bridge" [ref=f44e561]
+            - cell "Keeps the brand's best idea on your page without forcing a double entry." [ref=f44e562]
+          - row [ref=f44e563]:
+            - cell "6" [ref=f44e564]
+            - cell "Add a menu-sync check â€” a script that fetches the storefront and fails the build when names, prices or UUIDs drift" [ref=f44e565]
+            - cell "Otter is the source of truth. Hardcoding it once just recreates today's problem in six months." [ref=f44e566]
+      - list [ref=f44e568]:
+        - listitem [ref=f44e569]: Is Van Nuys open? Glendale I confirmed (March 16). Van Nuys was slated for "around May" and I found no opening coverage â€” you're the only source. The prototype still shows it as Coming Soon.
+        - listitem [ref=f44e570]: Are Glendale and Van Nuys on Otter yet? Each store has its own UUID; the deep-link pattern needs one per location before those cards can order.
+        - listitem [ref=f44e571]: Who maintains the Otter menu? Item UUIDs change if items are deleted and recreated â€” that's what the sync check in row 5 protects against.
+        - listitem [ref=f44e572]: Is the Ball-Cap still in stock? It's live at $48 on the storefront; if it's gone, it should come off before the site advertises it.
+  - contentinfo [ref=f44e573]:
+    - generic [ref=f44e574]: Chris N Eddy's â€” Concept 01, round 4 Â· Sep 8 2026
+    - generic [ref=f44e575]: Menu, prices, modifiers and hours read from order.tryotter.com on Sep 8 2026

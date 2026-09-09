@@ -1,0 +1,199 @@
+- generic [active] [ref=f45e1]:
+  - banner [ref=f45e2]:
+    - generic [ref=f45e3]:
+      - link "Chris N Eddy's — Home" [ref=f45e4] [cursor=pointer]:
+        - /url: /
+        - img "Chris N Eddy's" [ref=f45e5]
+      - button "Open menu" [ref=f45e7] [cursor=pointer]
+  - main [ref=f45e11]:
+    - region [ref=f45e12]:
+      - generic [ref=f45e13]:
+        - generic [ref=f45e14]:
+          - heading "SLIDERS SO GOOD THEY HURT." [level=1] [ref=f45e15]
+          - paragraph [ref=f45e16]: Smashed to order. Two patties, two cheese, one buttered Martin’s potato roll. Hollywood, since 2020.
+          - generic [ref=f45e17]:
+            - link "Order Online →" [ref=f45e18] [cursor=pointer]:
+              - /url: https://order.tryotter.com/s/chris-n-eddys-%283pd%29/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+            - link "See menu" [ref=f45e19] [cursor=pointer]:
+              - /url: /menu/
+        - generic [ref=f45e20]:
+          - generic "Chris N Eddy's sliders" [ref=f45e22]
+          - generic [ref=f45e23]:
+            - generic [ref=f45e24]: SIGNATURE
+            - generic [ref=f45e25]: DOUBLE
+      - generic [ref=f45e27]:
+        - generic [ref=f45e28]:
+          - generic [ref=f45e29]:
+            - text: burgers
+            - generic [aria-hidden] [ref=f45e30]: ★
+          - generic [ref=f45e31]:
+            - text: shakes
+            - generic [aria-hidden] [ref=f45e32]: ★
+          - generic [ref=f45e33]:
+            - text: fries
+            - generic [aria-hidden] [ref=f45e34]: ★
+          - generic [ref=f45e35]:
+            - text: smashed daily
+            - generic [aria-hidden] [ref=f45e36]: ★
+          - generic [ref=f45e37]:
+            - text: martin’s rolls
+            - generic [aria-hidden] [ref=f45e38]: ★
+          - generic [ref=f45e39]:
+            - text: since 2020
+            - generic [aria-hidden] [ref=f45e40]: ★
+          - generic [ref=f45e41]:
+            - text: hollywood · glendale · van nuys
+            - generic [aria-hidden] [ref=f45e42]: ★
+        - generic [ref=f45e43]:
+          - generic [ref=f45e44]:
+            - text: burgers
+            - generic [aria-hidden] [ref=f45e45]: ★
+          - generic [ref=f45e46]:
+            - text: shakes
+            - generic [aria-hidden] [ref=f45e47]: ★
+          - generic [ref=f45e48]:
+            - text: fries
+            - generic [aria-hidden] [ref=f45e49]: ★
+          - generic [ref=f45e50]:
+            - text: smashed daily
+            - generic [aria-hidden] [ref=f45e51]: ★
+          - generic [ref=f45e52]:
+            - text: martin’s rolls
+            - generic [aria-hidden] [ref=f45e53]: ★
+          - generic [ref=f45e54]:
+            - text: since 2020
+            - generic [aria-hidden] [ref=f45e55]: ★
+          - generic [ref=f45e56]:
+            - text: hollywood · glendale · van nuys
+            - generic [aria-hidden] [ref=f45e57]: ★
+        - generic [ref=f45e58]:
+          - generic [ref=f45e59]:
+            - text: burgers
+            - generic [aria-hidden] [ref=f45e60]: ★
+          - generic [ref=f45e61]:
+            - text: shakes
+            - generic [aria-hidden] [ref=f45e62]: ★
+          - generic [ref=f45e63]:
+            - text: fries
+            - generic [aria-hidden] [ref=f45e64]: ★
+          - generic [ref=f45e65]:
+            - text: smashed daily
+            - generic [aria-hidden] [ref=f45e66]: ★
+          - generic [ref=f45e67]:
+            - text: martin’s rolls
+            - generic [aria-hidden] [ref=f45e68]: ★
+          - generic [ref=f45e69]:
+            - text: since 2020
+            - generic [aria-hidden] [ref=f45e70]: ★
+          - generic [ref=f45e71]:
+            - text: hollywood · glendale · van nuys
+            - generic [aria-hidden] [ref=f45e72]: ★
+    - region [ref=f45e73]:
+      - generic [ref=f45e74]:
+        - generic [ref=f45e75]: The lineup
+        - heading "What we make." [level=2] [ref=f45e76]
+      - generic [ref=f45e77]:
+        - article [ref=f45e78]:
+          - generic [ref=f45e79]:
+            - img "Chris N Eddy's smash burger" [ref=f45e80]
+            - generic [ref=f45e81]: SIGNATURE
+          - generic [ref=f45e82]:
+            - generic [ref=f45e83]: Burgers
+            - generic [ref=f45e84]: Two smashed patties. Two cheese.
+        - article [ref=f45e85]:
+          - img "Chris N Eddy's fries with slider" [ref=f45e87]
+          - generic [ref=f45e88]:
+            - generic [ref=f45e89]: Fries
+            - generic [ref=f45e90]: Golden, salty, house-seasoned.
+        - article [ref=f45e91]:
+          - img [aria-hidden] [ref=f45e93]:
+            - generic [ref=f45e129]: SHAKES
+          - generic [ref=f45e131]:
+            - generic [ref=f45e132]: Shakes
+            - generic [ref=f45e133]: 20oz. Quiet legend.
+    - region [ref=f45e134]:
+      - generic [aria-hidden]: EST2020
+      - generic [ref=f45e135]:
+        - generic [ref=f45e136]:
+          - generic [ref=f45e137]: Our story
+          - heading "Two friends. One parking lot." [level=2] [ref=f45e138]: Two friends.One parking lot.
+          - paragraph [ref=f45e139]: "Best friends since 13. In 2020 Eddy called Chris with an idea. Chris drove down from SF that week. Nine months of tasting later, they had a recipe. Today: three locations and a festival road that doesn’t quit."
+          - link "Read the full story →" [ref=f45e141] [cursor=pointer]:
+            - /url: /about/
+        - img [aria-hidden] [ref=f45e143]:
+          - generic [ref=f45e183]: HOLLYWOOD, 2020
+    - region [ref=f45e185]:
+      - generic [ref=f45e186]:
+        - generic [ref=f45e187]: WHAT THEY’RE SAYING
+        - heading "Press & reviews." [level=2] [ref=f45e188]
+      - generic [ref=f45e189]:
+        - blockquote [ref=f45e190]:
+          - generic [aria-hidden] [ref=f45e191]: “
+          - paragraph [ref=f45e192]: The Brendan Fraser of the LA smashburger scene.
+          - generic [ref=f45e193]: — THE INFATUATION
+        - blockquote [ref=f45e195]:
+          - generic [aria-hidden] [ref=f45e196]: “
+          - paragraph [ref=f45e197]: The Hollywood smash-burger favorite is bringing its signature double to Glendale and Van Nuys.
+          - generic [ref=f45e198]:
+            - generic [ref=f45e199]: — EATER LA
+            - link "Read →" [ref=f45e200] [cursor=pointer]:
+              - /url: https://la.eater.com/los-angeles-restaurant-news/299740/chris-n-eddys-smash-burger-opening-glendale-van-nuys
+        - blockquote [ref=f45e201]:
+          - generic [aria-hidden] [ref=f45e202]: “
+          - paragraph [ref=f45e203]: A childhood friendship turned Hollywood institution.
+          - generic [ref=f45e204]: — NBC LOS ANGELES
+        - blockquote [ref=f45e206]:
+          - generic [aria-hidden] [ref=f45e207]: “
+          - paragraph [ref=f45e208]: An Instagram sensation.
+          - generic [ref=f45e209]: — KTLA 5
+        - blockquote [ref=f45e211]:
+          - generic [aria-hidden] [ref=f45e212]: “
+          - paragraph [ref=f45e213]: Some of the best burgers in LA — full stop.
+          - generic [ref=f45e214]: — BRUINLIFE
+    - region [ref=f45e216]:
+      - generic [ref=f45e217]:
+        - generic [ref=f45e218]:
+          - generic [ref=f45e219]: FROM THE GRAM
+          - heading "@chrisneddys" [level=2] [ref=f45e220]
+        - link "Follow →" [ref=f45e221] [cursor=pointer]:
+          - /url: https://www.instagram.com/chrisneddys/
+      - generic [ref=f45e222]:
+        - img "Stacked sliders in front of Chris N Eddy's monster mural" [ref=f45e224] [cursor=pointer]
+        - img "Pile of Chris N Eddy's smash sliders against red graffiti neon" [ref=f45e226] [cursor=pointer]
+        - img "Towering Chris N Eddy's smash burger with pickles and sauce on flame-print paper" [ref=f45e228] [cursor=pointer]
+        - img "Three sliders stacked on Chris N Eddy's wax paper with loaded fries" [ref=f45e230] [cursor=pointer]
+        - img "Three Chris N Eddy's sliders in hand with the shop neon glowing behind" [ref=f45e232] [cursor=pointer]
+        - generic [ref=f45e234] [cursor=pointer]:
+          - img [aria-hidden] [ref=f45e235]:
+            - generic [ref=f45e239]:
+              - generic [ref=f45e241]: CHRIS N
+              - generic [ref=f45e242]: Eddy's
+          - generic [ref=f45e243]: ♡ 476
+  - contentinfo [ref=f45e244]:
+    - generic [ref=f45e245]:
+      - generic [ref=f45e246]:
+        - img "Chris N Eddy's" [ref=f45e247]
+        - generic [ref=f45e248]: Smashed sliders, done right. Hollywood since 2020.
+      - generic [ref=f45e249]:
+        - generic [ref=f45e250]: Visit
+        - generic [ref=f45e251]: Hollywood
+        - generic [ref=f45e252]: Glendale (Spring ’26)
+        - generic [ref=f45e253]: Van Nuys (Spring ’26)
+      - generic [ref=f45e254]:
+        - generic [ref=f45e255]: Menu
+        - generic [ref=f45e256]: Sliders
+        - generic [ref=f45e257]: Combos
+        - generic [ref=f45e258]: Sides
+        - generic [ref=f45e259]: Drinks
+      - generic [ref=f45e260]:
+        - generic [ref=f45e261]: Contact
+        - link "(323) 544-3600" [ref=f45e262] [cursor=pointer]:
+          - /url: tel:+13235443600
+        - link "chris@chrisneddys.com" [ref=f45e263] [cursor=pointer]:
+          - /url: mailto:chris@chrisneddys.com
+        - link "@chrisneddys" [ref=f45e264] [cursor=pointer]:
+          - /url: https://www.instagram.com/chrisneddys/
+    - generic [ref=f45e265]:
+      - generic [ref=f45e266]: © 2026 Chris N Eddy’s — Hollywood, CA
+      - generic [ref=f45e267]: Made with 🔥 + Martin’s rolls
+  - alert [ref=f45e268]

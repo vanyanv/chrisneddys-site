@@ -1,0 +1,75 @@
+- generic [active] [ref=f46e1]:
+  - banner [ref=f46e2]:
+    - generic [ref=f46e3]:
+      - link "Chris N Eddy's — Home" [ref=f46e4] [cursor=pointer]:
+        - /url: /
+        - img "Chris N Eddy's" [ref=f46e5]
+      - button "Open menu" [ref=f46e7] [cursor=pointer]
+  - main [ref=f46e11]:
+    - generic [ref=f46e12]:
+      - region [ref=f46e13]:
+        - generic [ref=f46e14]:
+          - generic [ref=f46e15]: Find us
+          - heading "3 CORNERS OF LA." [level=1] [ref=f46e16]: 3 CORNERSOF LA.
+      - region "Locations" [ref=f46e17]:
+        - generic [ref=f46e19]:
+          - tablist "Pick a location" [ref=f46e20]:
+            - tab "Hollywood OPEN DAILY 5539 W. Sunset Blvd" [selected] [ref=f46e21] [cursor=pointer]:
+              - generic [ref=f46e22]: Hollywood
+              - generic [ref=f46e23]: OPEN DAILY
+              - generic [ref=f46e24]: 5539 W. Sunset Blvd
+            - tab "Glendale OPEN DAILY 1360 E Colorado St" [ref=f46e25] [cursor=pointer]:
+              - generic [ref=f46e26]: Glendale
+              - generic [ref=f46e27]: OPEN DAILY
+              - generic [ref=f46e28]: 1360 E Colorado St
+            - tab "Van Nuys OPENING SOON 14523 Sherman Way" [ref=f46e29] [cursor=pointer]:
+              - generic [ref=f46e30]: Van Nuys
+              - generic [ref=f46e31]: OPENING SOON
+              - generic [ref=f46e32]: 14523 Sherman Way
+          - tabpanel [ref=f46e33]:
+            - generic [ref=f46e34]:
+              - generic [ref=f46e35]: 5539 W. Sunset Blvd
+              - generic [ref=f46e36]: Los Angeles, CA 90028
+              - generic [ref=f46e37]:
+                - generic [ref=f46e38]:
+                  - term [ref=f46e39]: Mon–Thu
+                  - definition [ref=f46e40]: 10:00 AM – 1:00 AM
+                - generic [ref=f46e41]:
+                  - term [ref=f46e42]: Fri–Sat
+                  - definition [ref=f46e43]: 10:00 AM – 2:00 AM
+                - generic [ref=f46e44]:
+                  - term [ref=f46e45]: Sunday
+                  - definition [ref=f46e46]: 10:00 AM – 2:00 AM
+              - generic [ref=f46e47]:
+                - link "Get directions →" [ref=f46e48] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=5539%20W.%20Sunset%20Blvd%2C%20Los%20Angeles%2C%20CA
+                - link "Call us →" [ref=f46e49] [cursor=pointer]:
+                  - /url: tel:+13235443600
+  - contentinfo [ref=f46e50]:
+    - generic [ref=f46e51]:
+      - generic [ref=f46e52]:
+        - img "Chris N Eddy's" [ref=f46e53]
+        - generic [ref=f46e54]: Smashed sliders, done right. Hollywood since 2020.
+      - generic [ref=f46e55]:
+        - generic [ref=f46e56]: Visit
+        - generic [ref=f46e57]: Hollywood
+        - generic [ref=f46e58]: Glendale (Spring ’26)
+        - generic [ref=f46e59]: Van Nuys (Spring ’26)
+      - generic [ref=f46e60]:
+        - generic [ref=f46e61]: Menu
+        - generic [ref=f46e62]: Sliders
+        - generic [ref=f46e63]: Combos
+        - generic [ref=f46e64]: Sides
+        - generic [ref=f46e65]: Drinks
+      - generic [ref=f46e66]:
+        - generic [ref=f46e67]: Contact
+        - link "(323) 544-3600" [ref=f46e68] [cursor=pointer]:
+          - /url: tel:+13235443600
+        - link "chris@chrisneddys.com" [ref=f46e69] [cursor=pointer]:
+          - /url: mailto:chris@chrisneddys.com
+        - link "@chrisneddys" [ref=f46e70] [cursor=pointer]:
+          - /url: https://www.instagram.com/chrisneddys/
+    - generic [ref=f46e71]:
+      - generic [ref=f46e72]: © 2026 Chris N Eddy’s — Hollywood, CA
+      - generic [ref=f46e73]: Made with 🔥 + Martin’s rolls
+  - alert [ref=f46e74]

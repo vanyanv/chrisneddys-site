@@ -23,7 +23,7 @@ export function Footer(): ReactElement {
       >
         <div style={{ gridColumn: "span 1", minWidth: 220 }}>
           <Image
-            src="/cne-logo.png"
+            src="/cne-logo.webp"
             alt={brand.name}
             width={141}
             height={80}

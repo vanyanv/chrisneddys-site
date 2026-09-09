@@ -25,8 +25,8 @@ export const locations: Location[] = [
     postal: "90028",
     status: "Open daily",
     isOpen: true,
-    lat: 34.0983,
-    lng: -118.3106,
+    lat: 34.0980,
+    lng: -118.3099,
     hours: [
       ["Mon–Thu", "10:00 AM – 1:00 AM"],
       ["Fri–Sat", "10:00 AM – 2:00 AM"],

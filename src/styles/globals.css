@@ -227,112 +227,6 @@ body {
   pointer-events: none;
 }
 
-/* --- Leaflet map: brand-themed chrome + tile tint --- */
-.leaflet-container {
-  background: #f5ecd4;
-  font-family: var(--font-body);
-}
-.leaflet-tile-pane {
-  filter: sepia(0.45) saturate(1.15) hue-rotate(-8deg) contrast(0.92)
-    brightness(1.03);
-}
-@media (forced-colors: active) {
-  .leaflet-tile-pane {
-    filter: none;
-  }
-}
-
-/* Zoom control rebuilt in brand style */
-.leaflet-bar {
-  border: 3px solid var(--color-cne-ink) !important;
-  box-shadow: 4px 4px 0 var(--color-cne-ink);
-  border-radius: 0 !important;
-  overflow: hidden;
-}
-.leaflet-bar a,
-.leaflet-bar a:hover {
-  background: var(--color-cne-cream) !important;
-  color: var(--color-cne-ink) !important;
-  border: none !important;
-  border-bottom: 2px solid var(--color-cne-ink) !important;
-  border-radius: 0 !important;
-  font-family: var(--font-display);
-  font-weight: 700;
-  width: 32px !important;
-  height: 32px !important;
-  line-height: 30px !important;
-}
-.leaflet-bar a:last-child {
-  border-bottom: none !important;
-}
-.leaflet-bar a:hover {
-  background: var(--color-cne-yellow) !important;
-}
-
-/* Attribution pill */
-.leaflet-control-attribution {
-  background: var(--color-cne-cream) !important;
-  color: var(--color-cne-ink) !important;
-  border: 2px solid var(--color-cne-ink) !important;
-  padding: 4px 10px !important;
-  font-family: ui-monospace, monospace !important;
-  font-size: 10px !important;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  box-shadow: 3px 3px 0 var(--color-cne-ink);
-  margin: 0 10px 10px 0 !important;
-}
-.leaflet-control-attribution a {
-  color: var(--color-cne-red) !important;
-  text-decoration: none !important;
-}
-
-/* Custom pin icon wrapper */
-.cne-pin {
-  background: transparent !important;
-  border: none !important;
-  transition:
-    transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1),
-    filter 0.25s;
-  transform-origin: 50% 100%;
-  cursor: pointer;
-}
-.cne-pin:hover {
-  transform: translateY(-4px) rotate(-3deg);
-  z-index: 600 !important;
-}
-.cne-pin-selected {
-  transform: scale(1.3);
-  z-index: 700 !important;
-}
-.cne-pin-selected:hover {
-  transform: scale(1.3) translateY(-4px) rotate(-3deg);
-}
-.cne-pin-selected::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 36px;
-  height: 12px;
-  margin-left: -18px;
-  border: 3px solid var(--color-cne-red);
-  border-radius: 50%;
-  opacity: 0.7;
-  animation: cne-pin-pulse 1.6s ease-out infinite;
-  pointer-events: none;
-}
-@keyframes cne-pin-pulse {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-  }
-}
-
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .cne-reveal,
@@ -361,9 +255,6 @@ body {
   .cne-parallax-subtle {
     translate: 0 !important;
   }
-  .cne-pin-selected::after {
-    animation: none !important;
-  }
 }
 
 /* Visually hidden, still announced. Used where an icon carries the meaning. */
@@ -377,4 +268,122 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ---- Locations map -------------------------------------------------------
+   Real OpenStreetMap geometry, drawn in brand colours. See src/data/laGeo.ts.
+   Everything here is presentational; the geometry itself is in the SVG. */
+.cne-map-water { fill: #bcd3dd; stroke: none; }
+.cne-map-river { stroke: #bcd3dd; stroke-width: 1.3; fill: none; stroke-linecap: round; }
+.cne-map-blvd {
+  stroke: rgba(26, 22, 18, 0.4);
+  stroke-width: 1.25;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cne-map-fwy-case {
+  stroke: var(--color-cne-ink);
+  stroke-width: 3.1;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cne-map-fwy {
+  stroke: var(--color-cne-yellow);
+  stroke-width: 1.7;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cne-map-reach {
+  fill: none;
+  stroke: var(--color-cne-red);
+  stroke-width: 0.7;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+.cne-map-rule { stroke: var(--color-cne-ink); stroke-width: 1.1; }
+.cne-map-plate { fill: var(--color-cne-paper); opacity: 0.82; }
+.cne-map-label {
+  font-family: var(--font-mono);
+  font-size: 5.4px;
+  letter-spacing: 0.85px;
+  font-weight: 700;
+  fill: var(--color-cne-muted);
+  /* halo so a label stays readable where it crosses a road */
+  paint-order: stroke;
+  stroke: var(--color-cne-paper);
+  stroke-width: 2.2px;
+  stroke-linejoin: round;
+}
+.cne-map-attr {
+  font-family: var(--font-mono);
+  font-size: 4.4px;
+  letter-spacing: 0.4px;
+  fill: var(--color-cne-muted);
+  opacity: 0.75;
+}
+.cne-map-shield rect { fill: var(--color-cne-ink); }
+.cne-map-shield text {
+  font-family: var(--font-mono);
+  font-size: 5.6px;
+  font-weight: 800;
+  fill: var(--color-cne-cream);
+  text-anchor: middle;
+}
+
+.cne-map-pin .hit { fill: transparent; cursor: pointer; }
+.cne-map-pin .hit:focus-visible { outline: 3px solid var(--color-cne-red); outline-offset: 2px; }
+.cne-map-pin .ring { fill: none; stroke: var(--color-cne-red); stroke-width: 2; opacity: 0; }
+.cne-map-pin.is-selected .ring { opacity: 0.55; }
+.cne-map-pin .head {
+  fill: var(--color-cne-red);
+  stroke: var(--color-cne-cream);
+  stroke-width: 2.4;
+  transition: transform 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cne-map-pin.is-selected .head { transform: scale(1.28); }
+.cne-map-pin.is-soon .head {
+  fill: var(--color-cne-paper);
+  stroke: var(--color-cne-yellow);
+  stroke-dasharray: 3 2.4;
+}
+.cne-map-pin .cap {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.9px;
+  fill: var(--color-cne-ink);
+  paint-order: stroke;
+  stroke: var(--color-cne-paper);
+  stroke-width: 2.6px;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-map-pin.is-selected .ring { animation: cne-map-ring 2.4s ease-out infinite; }
+}
+@keyframes cne-map-ring {
+  0% { r: 9; opacity: 0.6; }
+  100% { r: 26; opacity: 0; }
+}
+
+/* Map overlays are decoration on a map that is already small on a phone —
+   at 390px the ribbon sat directly on top of the Van Nuys pin. */
+@media (max-width: 700px) {
+  .cne-map-ribbon { display: none; }
+  .cne-map-legend {
+    top: auto !important;
+    bottom: 10px;
+    right: 10px;
+    padding: 6px 9px !important;
+    font-size: 9px !important;
+    gap: 4px !important;
+    box-shadow: 2px 2px 0 var(--color-cne-ink) !important;
+    border-width: 2px !important;
+  }
+  .cne-map-legend span[style] { width: 9px !important; height: 9px !important; }
 }

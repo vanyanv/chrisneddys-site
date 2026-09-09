@@ -5,11 +5,11 @@ import { brand } from "@/data/brand";
 
 type TilePhoto = { src: string; alt: string };
 const photoTiles: Record<number, TilePhoto> = {
-  0: { src: "/photos/ig-monster.jpg", alt: "Stacked sliders in front of Chris N Eddy's monster mural" },
-  1: { src: "/photos/ig-pile.jpg", alt: "Pile of Chris N Eddy's smash sliders against red graffiti neon" },
-  2: { src: "/photos/ig-stack.jpg", alt: "Towering Chris N Eddy's smash burger with pickles and sauce on flame-print paper" },
-  3: { src: "/photos/ig-pyramid.jpg", alt: "Three sliders stacked on Chris N Eddy's wax paper with loaded fries" },
-  4: { src: "/photos/ig-neon.jpg", alt: "Three Chris N Eddy's sliders in hand with the shop neon glowing behind" },
+  0: { src: "/photos/ig-monster.webp", alt: "Stacked sliders in front of Chris N Eddy's monster mural" },
+  1: { src: "/photos/ig-pile.webp", alt: "Pile of Chris N Eddy's smash sliders against red graffiti neon" },
+  2: { src: "/photos/ig-stack.webp", alt: "Towering Chris N Eddy's smash burger with pickles and sauce on flame-print paper" },
+  3: { src: "/photos/ig-pyramid.webp", alt: "Three sliders stacked on Chris N Eddy's wax paper with loaded fries" },
+  4: { src: "/photos/ig-neon.webp", alt: "Three Chris N Eddy's sliders in hand with the shop neon glowing behind" },
 };
 
 export function IGStrip(): ReactElement {

@@ -1,0 +1,367 @@
+- generic [active] [ref=f47e1]:
+  - banner [ref=f47e2]:
+    - generic [ref=f47e3]:
+      - link "Chris N Eddy's — Home" [ref=f47e4] [cursor=pointer]:
+        - /url: /
+        - img "Chris N Eddy's" [ref=f47e5]
+      - button "Open menu" [ref=f47e7] [cursor=pointer]
+  - main [ref=f47e11]:
+    - generic [ref=f47e12]:
+      - region [ref=f47e13]:
+        - generic [ref=f47e14]:
+          - generic [ref=f47e15]: The lineup
+          - heading "EVERYTHING WE MAKE." [level=1] [ref=f47e16]: EVERYTHINGWE MAKE.
+      - region [ref=f47e17]:
+        - generic [ref=f47e18]:
+          - generic [ref=f47e19]: Pick a way — free
+          - heading "THE WAYS" [level=2] [ref=f47e20]
+        - generic [ref=f47e22]:
+          - article [ref=f47e23]:
+            - heading "Chris’s Way" [level=3] [ref=f47e24]
+            - paragraph [ref=f47e25]: Lettuce, tomato, sauce, raw onion
+            - generic [ref=f47e26]: Tap these when you order
+            - list [ref=f47e27]:
+              - listitem [ref=f47e28]: ☐ Add Lettuce
+              - listitem [ref=f47e29]: ☐ Add Tomato
+              - listitem [ref=f47e30]: ☐ Add Sauce
+              - listitem [ref=f47e31]: ☐ Add Raw Onion
+          - article [ref=f47e32]:
+            - heading "Eddy’s Way" [level=3] [ref=f47e33]
+            - paragraph [ref=f47e34]: Sauce, grilled onion
+            - generic [ref=f47e35]: Tap these when you order
+            - list [ref=f47e36]:
+              - listitem [ref=f47e37]: ☐ Add Sauce
+              - listitem [ref=f47e38]: ☐ Add Grilled Onion
+        - paragraph [ref=f47e39]:
+          - text: Every topping below is free. The only add-ons that cost anything are
+          - strong [ref=f47e41]: extra cheese ($1.00)
+          - generic [ref=f47e42]:
+            - text: and
+            - strong [ref=f47e43]: make it halal ($2.00)
+          - text: .
+      - region [ref=f47e44]:
+        - heading "Slider & Fries Combos" [level=2] [ref=f47e46]
+        - generic [ref=f47e48]:
+          - link "1 Slider and Fries One slider and a side of chris-cut fries. A slider is two smashed patties on two slices of cheese, buttered Martin’s roll. $11.49 Order 1 Slider and Fries online" [ref=f47e49] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/1%20Slider%20and%20Fries/d119da4a-bfc1-4913-8249-21dd96d58456
+            - generic [ref=f47e50]:
+              - generic [ref=f47e51]: 1 Slider and Fries
+              - generic [ref=f47e52]: One slider and a side of chris-cut fries. A slider is two smashed patties on two slices of cheese, buttered Martin’s roll.
+            - generic [ref=f47e53]:
+              - generic [ref=f47e54]: $11.49
+              - generic [aria-hidden] [ref=f47e55]: ›
+              - generic [ref=f47e56]: Order 1 Slider and Fries online
+          - link "2 Sliders and Fries SIGNATURE Two sliders and a side of chris-cut fries. The order most people are actually here for. $16.49 Order 2 Sliders and Fries online" [ref=f47e57] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/2%20Sliders%20and%20Fries/7bbcdf64-0e6f-489f-8ca4-0bee1e835bb0
+            - generic [ref=f47e58]:
+              - generic [ref=f47e59]:
+                - text: 2 Sliders and Fries
+                - generic [ref=f47e60]: SIGNATURE
+              - generic [ref=f47e61]: Two sliders and a side of chris-cut fries. The order most people are actually here for.
+            - generic [ref=f47e62]:
+              - generic [ref=f47e63]: $16.49
+              - generic [aria-hidden] [ref=f47e64]: ›
+              - generic [ref=f47e65]: Order 2 Sliders and Fries online
+          - link "2 Triples and Fries Two triples — three patties, three slices of cheese each — and a side of fries. $19.49 Order 2 Triples and Fries online" [ref=f47e66] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/2%20Triples%20and%20Fries/c191ef14-1142-4b82-a230-8fe5850bbb7f
+            - generic [ref=f47e67]:
+              - generic [ref=f47e68]: 2 Triples and Fries
+              - generic [ref=f47e69]: Two triples — three patties, three slices of cheese each — and a side of fries.
+            - generic [ref=f47e70]:
+              - generic [ref=f47e71]: $19.49
+              - generic [aria-hidden] [ref=f47e72]: ›
+              - generic [ref=f47e73]: Order 2 Triples and Fries online
+          - link "2 Grilled Cheeses and Fries Two grilled cheeses with a side of chris-cut fries. $11.69 Order 2 Grilled Cheeses and Fries online" [ref=f47e74] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/2%20Grilled%20Cheeses%20and%20Fries/ea389886-8fd5-4871-a31e-6cfc76eebdea
+            - generic [ref=f47e75]:
+              - generic [ref=f47e76]: 2 Grilled Cheeses and Fries
+              - generic [ref=f47e77]: Two grilled cheeses with a side of chris-cut fries.
+            - generic [ref=f47e78]:
+              - generic [ref=f47e79]: $11.69
+              - generic [aria-hidden] [ref=f47e80]: ›
+              - generic [ref=f47e81]: Order 2 Grilled Cheeses and Fries online
+      - region [ref=f47e82]:
+        - heading "On The Side" [level=2] [ref=f47e84]
+        - generic [ref=f47e86]:
+          - link "Chris N Eddy's Slider SIGNATURE Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll. $7.49 Order Chris N Eddy's Slider online" [ref=f47e87] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Chris%20N%20Eddy's%20Slider/de38e42c-7600-473f-913f-acb6b2a45aa8
+            - generic [ref=f47e88]:
+              - generic [ref=f47e89]:
+                - text: Chris N Eddy's Slider
+                - generic [ref=f47e90]: SIGNATURE
+              - generic [ref=f47e91]: Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.
+            - generic [ref=f47e92]:
+              - generic [ref=f47e93]: $7.49
+              - generic [aria-hidden] [ref=f47e94]: ›
+              - generic [ref=f47e95]: Order Chris N Eddy's Slider online
+          - link "Single Patty Slider One smashed patty and a slice of cheese on a buttered, toasted Martin’s roll. $6.49 Order Single Patty Slider online" [ref=f47e96] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Single%20Patty%20Slider/9f342712-de8e-4a0f-9680-c55fbc60bc2e
+            - generic [ref=f47e97]:
+              - generic [ref=f47e98]: Single Patty Slider
+              - generic [ref=f47e99]: One smashed patty and a slice of cheese on a buttered, toasted Martin’s roll.
+            - generic [ref=f47e100]:
+              - generic [ref=f47e101]: $6.49
+              - generic [aria-hidden] [ref=f47e102]: ›
+              - generic [ref=f47e103]: Order Single Patty Slider online
+          - link "Triple Patty Slider Three smashed patties on three slices of cheese. $8.49 Order Triple Patty Slider online" [ref=f47e104] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Triple%20Patty%20Slider/123dd31f-36a8-48ff-9f6e-40aeb7b4c3d9
+            - generic [ref=f47e105]:
+              - generic [ref=f47e106]: Triple Patty Slider
+              - generic [ref=f47e107]: Three smashed patties on three slices of cheese.
+            - generic [ref=f47e108]:
+              - generic [ref=f47e109]: $8.49
+              - generic [aria-hidden] [ref=f47e110]: ›
+              - generic [ref=f47e111]: Order Triple Patty Slider online
+          - link "Grilled Cheese Two slices of cheese in a buttered, reverse-toasted Martin’s potato bun. $4.00 Order Grilled Cheese online" [ref=f47e112] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Grilled%20Cheese/5a6adaac-1bee-49a9-afbd-9449756a0d1e
+            - generic [ref=f47e113]:
+              - generic [ref=f47e114]: Grilled Cheese
+              - generic [ref=f47e115]: Two slices of cheese in a buttered, reverse-toasted Martin’s potato bun.
+            - generic [ref=f47e116]:
+              - generic [ref=f47e117]: $4.00
+              - generic [aria-hidden] [ref=f47e118]: ›
+              - generic [ref=f47e119]: Order Grilled Cheese online
+          - link "Straight-Cut Fries A side portion of our seasoned chris-cut fries. $4.49 Order Straight-Cut Fries online" [ref=f47e120] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Straight-Cut%20Fries/2736f0a2-a7c8-4901-8a3d-3f074367b70a
+            - generic [ref=f47e121]:
+              - generic [ref=f47e122]: Straight-Cut Fries
+              - generic [ref=f47e123]: A side portion of our seasoned chris-cut fries.
+            - generic [ref=f47e124]:
+              - generic [ref=f47e125]: $4.49
+              - generic [aria-hidden] [ref=f47e126]: ›
+              - generic [ref=f47e127]: Order Straight-Cut Fries online
+          - link "Cheese Fries Melted cheese over our seasoned chris-cut fries. $5.99 Order Cheese Fries online" [ref=f47e128] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Cheese%20Fries/e2233b25-5761-4be8-a891-4e6e77aa1a50
+            - generic [ref=f47e129]:
+              - generic [ref=f47e130]: Cheese Fries
+              - generic [ref=f47e131]: Melted cheese over our seasoned chris-cut fries.
+            - generic [ref=f47e132]:
+              - generic [ref=f47e133]: $5.99
+              - generic [aria-hidden] [ref=f47e134]: ›
+              - generic [ref=f47e135]: Order Cheese Fries online
+          - link "Loaded Fries Melted cheese, Chris N Eddy’s sauce and grilled onions over the fries. $6.99 Order Loaded Fries online" [ref=f47e136] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Loaded%20Fries/db826564-9237-48f6-9756-b8320bea377c
+            - generic [ref=f47e137]:
+              - generic [ref=f47e138]: Loaded Fries
+              - generic [ref=f47e139]: Melted cheese, Chris N Eddy’s sauce and grilled onions over the fries.
+            - generic [ref=f47e140]:
+              - generic [ref=f47e141]: $6.99
+              - generic [aria-hidden] [ref=f47e142]: ›
+              - generic [ref=f47e143]: Order Loaded Fries online
+          - link "Side of Yellow Chilies 2–3 yellow chilies in a 2oz cup. $0.25 Order Side of Yellow Chilies online" [ref=f47e144] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Side%20of%20Yellow%20Chilies/4e0c491a-57b0-44ac-9964-a22ce05670e6
+            - generic [ref=f47e145]:
+              - generic [ref=f47e146]: Side of Yellow Chilies
+              - generic [ref=f47e147]: 2–3 yellow chilies in a 2oz cup.
+            - generic [ref=f47e148]:
+              - generic [ref=f47e149]: $0.25
+              - generic [aria-hidden] [ref=f47e150]: ›
+              - generic [ref=f47e151]: Order Side of Yellow Chilies online
+          - link "Extra Chris N Eddy's Sauce The signature sauce, in a 4oz cup. $0.75 Order Extra Chris N Eddy's Sauce online" [ref=f47e152] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Extra%20Chris%20N%20Eddy's%20Sauce/ece67cf5-f628-4562-a2a0-7f445403a650
+            - generic [ref=f47e153]:
+              - generic [ref=f47e154]: Extra Chris N Eddy's Sauce
+              - generic [ref=f47e155]: The signature sauce, in a 4oz cup.
+            - generic [ref=f47e156]:
+              - generic [ref=f47e157]: $0.75
+              - generic [aria-hidden] [ref=f47e158]: ›
+              - generic [ref=f47e159]: Order Extra Chris N Eddy's Sauce online
+      - region [ref=f47e160]:
+        - heading "Secret Menu" [level=2] [ref=f47e162]
+        - generic [ref=f47e164]:
+          - link "The Quad SIGNATURE Four smashed patties on four slices of cheese, one roll. Exactly what it says. $11.28 Order The Quad online" [ref=f47e165] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/The%20Quad/43d72be5-d38f-459d-9306-4c45f512715a
+            - generic [ref=f47e166]:
+              - generic [ref=f47e167]:
+                - text: The Quad
+                - generic [ref=f47e168]: SIGNATURE
+              - generic [ref=f47e169]: Four smashed patties on four slices of cheese, one roll. Exactly what it says.
+            - generic [ref=f47e170]:
+              - generic [ref=f47e171]: $11.28
+              - generic [aria-hidden] [ref=f47e172]: ›
+              - generic [ref=f47e173]: Order The Quad online
+          - link "The Triple Pack Three doubles with a side of chris-cut fries. $28.08 Order The Triple Pack online" [ref=f47e174] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/The%20Triple%20Pack/b5fa7b7a-c1bf-4516-885d-02aac4571cfe
+            - generic [ref=f47e175]:
+              - generic [ref=f47e176]: The Triple Pack
+              - generic [ref=f47e177]: Three doubles with a side of chris-cut fries.
+            - generic [ref=f47e178]:
+              - generic [ref=f47e179]: $28.08
+              - generic [aria-hidden] [ref=f47e180]: ›
+              - generic [ref=f47e181]: Order The Triple Pack online
+          - link "The Family Box Four doubles with two sides of chris-cut fries. $37.20 Order The Family Box online" [ref=f47e182] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/The%20Family%20Box/283855c8-4586-4f3e-9457-aa2528f6dad9
+            - generic [ref=f47e183]:
+              - generic [ref=f47e184]: The Family Box
+              - generic [ref=f47e185]: Four doubles with two sides of chris-cut fries.
+            - generic [ref=f47e186]:
+              - generic [ref=f47e187]: $37.20
+              - generic [aria-hidden] [ref=f47e188]: ›
+              - generic [ref=f47e189]: Order The Family Box online
+          - link "The Reverse Bun The Slider, but the toasted buns go on upside down. $7.92 Order The Reverse Bun online" [ref=f47e190] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/The%20Reverse%20Bun/e6bc7175-79e2-4813-abca-d1618df90ba8
+            - generic [ref=f47e191]:
+              - generic [ref=f47e192]: The Reverse Bun
+              - generic [ref=f47e193]: The Slider, but the toasted buns go on upside down.
+            - generic [ref=f47e194]:
+              - generic [ref=f47e195]: $7.92
+              - generic [aria-hidden] [ref=f47e196]: ›
+              - generic [ref=f47e197]: Order The Reverse Bun online
+          - link "Chris N Eddy's Ball-Cap (Limited Run) Limited quantity. One size fits all. $48.00 Order Chris N Eddy's Ball-Cap (Limited Run) online" [ref=f47e198] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Chris%20N%20Eddy's%20Ball-Cap%20(Limited%20Run)/32636e41-adf8-4307-b68e-4bb34fb71364
+            - generic [ref=f47e199]:
+              - generic [ref=f47e200]: Chris N Eddy's Ball-Cap (Limited Run)
+              - generic [ref=f47e201]: Limited quantity. One size fits all.
+            - generic [ref=f47e202]:
+              - generic [ref=f47e203]: $48.00
+              - generic [aria-hidden] [ref=f47e204]: ›
+              - generic [ref=f47e205]: Order Chris N Eddy's Ball-Cap (Limited Run) online
+      - region [ref=f47e206]:
+        - heading "Drinks" [level=2] [ref=f47e208]
+        - generic [ref=f47e210]:
+          - link "Strawberry Shake (20 oz cup) 20oz. A quiet legend. $4.49 Order Strawberry Shake (20 oz cup) online" [ref=f47e211] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Strawberry%20Shake%20(20%20oz%20cup)/931c2d0b-54c2-420b-b5eb-fbb2201fa223
+            - generic [ref=f47e212]:
+              - generic [ref=f47e213]: Strawberry Shake (20 oz cup)
+              - generic [ref=f47e214]: 20oz. A quiet legend.
+            - generic [ref=f47e215]:
+              - generic [ref=f47e216]: $4.49
+              - generic [aria-hidden] [ref=f47e217]: ›
+              - generic [ref=f47e218]: Order Strawberry Shake (20 oz cup) online
+          - link "Chocolate Shake (20 oz cup) 20oz. Rich. $4.49 Order Chocolate Shake (20 oz cup) online" [ref=f47e219] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Chocolate%20Shake%20(20%20oz%20cup)/0de9cdf0-14b6-49b7-bba8-753950e48f6f
+            - generic [ref=f47e220]:
+              - generic [ref=f47e221]: Chocolate Shake (20 oz cup)
+              - generic [ref=f47e222]: 20oz. Rich.
+            - generic [ref=f47e223]:
+              - generic [ref=f47e224]: $4.49
+              - generic [aria-hidden] [ref=f47e225]: ›
+              - generic [ref=f47e226]: Order Chocolate Shake (20 oz cup) online
+          - link "Vanilla Shake (20 oz cup) 20oz. Classic. $5.04 Order Vanilla Shake (20 oz cup) online" [ref=f47e227] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Vanilla%20Shake%20(20%20oz%20cup)/e7e9803f-644d-4598-bf80-2032de2966f3
+            - generic [ref=f47e228]:
+              - generic [ref=f47e229]: Vanilla Shake (20 oz cup)
+              - generic [ref=f47e230]: 20oz. Classic.
+            - generic [ref=f47e231]:
+              - generic [ref=f47e232]: $5.04
+              - generic [aria-hidden] [ref=f47e233]: ›
+              - generic [ref=f47e234]: Order Vanilla Shake (20 oz cup) online
+          - link "Coca Cola (20 oz cup) $2.99 Order Coca Cola (20 oz cup) online" [ref=f47e235] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Coca%20Cola%20(20%20oz%20cup)/85984a1b-6a80-4038-acb0-7243d4739566
+            - generic [ref=f47e236]: Coca Cola (20 oz cup)
+            - generic [ref=f47e238]:
+              - generic [ref=f47e239]: $2.99
+              - generic [aria-hidden] [ref=f47e240]: ›
+              - generic [ref=f47e241]: Order Coca Cola (20 oz cup) online
+          - link "Diet Coke (20 oz cup) $2.99 Order Diet Coke (20 oz cup) online" [ref=f47e242] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Diet%20Coke%20(20%20oz%20cup)/c5dbe882-3600-413a-aae7-bd22dd1ecb2c
+            - generic [ref=f47e243]: Diet Coke (20 oz cup)
+            - generic [ref=f47e245]:
+              - generic [ref=f47e246]: $2.99
+              - generic [aria-hidden] [ref=f47e247]: ›
+              - generic [ref=f47e248]: Order Diet Coke (20 oz cup) online
+          - link "Coke Zero (20 oz cup) $2.89 Order Coke Zero (20 oz cup) online" [ref=f47e249] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Coke%20Zero%20(20%20oz%20cup)/69307336-d6a0-4694-89b5-4c47b31d6b3a
+            - generic [ref=f47e250]: Coke Zero (20 oz cup)
+            - generic [ref=f47e252]:
+              - generic [ref=f47e253]: $2.89
+              - generic [aria-hidden] [ref=f47e254]: ›
+              - generic [ref=f47e255]: Order Coke Zero (20 oz cup) online
+          - link "Sprite (20 oz cup) $2.99 Order Sprite (20 oz cup) online" [ref=f47e256] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Sprite%20(20%20oz%20cup)/1d78e878-eae1-488f-a6a8-5829194c7282
+            - generic [ref=f47e257]: Sprite (20 oz cup)
+            - generic [ref=f47e259]:
+              - generic [ref=f47e260]: $2.99
+              - generic [aria-hidden] [ref=f47e261]: ›
+              - generic [ref=f47e262]: Order Sprite (20 oz cup) online
+          - link "Orange Fanta (20 oz cup) $2.99 Order Orange Fanta (20 oz cup) online" [ref=f47e263] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Orange%20Fanta%20(20%20oz%20cup)/1d9e0d63-4326-4ec5-8708-839c730171d0
+            - generic [ref=f47e264]: Orange Fanta (20 oz cup)
+            - generic [ref=f47e266]:
+              - generic [ref=f47e267]: $2.99
+              - generic [aria-hidden] [ref=f47e268]: ›
+              - generic [ref=f47e269]: Order Orange Fanta (20 oz cup) online
+          - link "Hi-C (20 oz cup) $2.99 Order Hi-C (20 oz cup) online" [ref=f47e270] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Hi-C%20(20%20oz%20cup)/b007e9bd-fd56-4d9f-a414-996a5f419bac
+            - generic [ref=f47e271]: Hi-C (20 oz cup)
+            - generic [ref=f47e273]:
+              - generic [ref=f47e274]: $2.99
+              - generic [aria-hidden] [ref=f47e275]: ›
+              - generic [ref=f47e276]: Order Hi-C (20 oz cup) online
+          - link "Minute Maid (20 oz cup) $2.99 Order Minute Maid (20 oz cup) online" [ref=f47e277] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Minute%20Maid%20(20%20oz%20cup)/bcb86e49-ab7e-49d6-a580-169207b548d3
+            - generic [ref=f47e278]: Minute Maid (20 oz cup)
+            - generic [ref=f47e280]:
+              - generic [ref=f47e281]: $2.99
+              - generic [aria-hidden] [ref=f47e282]: ›
+              - generic [ref=f47e283]: Order Minute Maid (20 oz cup) online
+          - link "Mexican Sprite 500ml $4.20 Order Mexican Sprite 500ml online" [ref=f47e284] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Mexican%20Sprite%20500ml/5cfc1be8-1861-4b8a-8acd-0a7d2cb1a6a5
+            - generic [ref=f47e285]: Mexican Sprite 500ml
+            - generic [ref=f47e287]:
+              - generic [ref=f47e288]: $4.20
+              - generic [aria-hidden] [ref=f47e289]: ›
+              - generic [ref=f47e290]: Order Mexican Sprite 500ml online
+          - link "Mexican Fanta 500ml $4.20 Order Mexican Fanta 500ml online" [ref=f47e291] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Mexican%20Fanta%20500ml/bf389591-c2c2-4d35-8ae0-66544c8f2fb2
+            - generic [ref=f47e292]: Mexican Fanta 500ml
+            - generic [ref=f47e294]:
+              - generic [ref=f47e295]: $4.20
+              - generic [aria-hidden] [ref=f47e296]: ›
+              - generic [ref=f47e297]: Order Mexican Fanta 500ml online
+          - link "Bottle of Water $2.85 Order Bottle of Water online" [ref=f47e298] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191/Bottle%20of%20Water/59a1a9fe-283b-46ec-92a1-6af650139cf2
+            - generic [ref=f47e299]: Bottle of Water
+            - generic [ref=f47e301]:
+              - generic [ref=f47e302]: $2.85
+              - generic [aria-hidden] [ref=f47e303]: ›
+              - generic [ref=f47e304]: Order Bottle of Water online
+      - region [ref=f47e305]:
+        - heading "TOPPINGS" [level=2] [ref=f47e306]
+        - generic [ref=f47e307]: ★ NO EXTRA CHARGE ★
+        - list [ref=f47e308]:
+          - listitem [ref=f47e309]: + CNE Sauce
+          - listitem [ref=f47e310]: + Lettuce
+          - listitem [ref=f47e311]: + Tomato
+          - listitem [ref=f47e312]: + Raw Onions
+          - listitem [ref=f47e313]: + Grilled Onions
+          - listitem [ref=f47e314]: + Pickles
+      - region "About our menu" [ref=f47e315]:
+        - generic [ref=f47e316]:
+          - generic [ref=f47e317]:
+            - generic [ref=f47e318]: GOOD TO KNOW
+            - generic [ref=f47e319]: These are pickup prices. Delivery apps charge more.
+            - generic [ref=f47e320]: Every price here comes straight from our own ordering page, and ordering there sends the whole thing to us. Sold-out items show as unavailable at checkout.
+          - link "Order online →" [ref=f47e321] [cursor=pointer]:
+            - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+      - link "Order online":
+        - /url: https://order.tryotter.com/s/chris-n-eddys/5539-sunset-boulevard-los-angeles/8c836303-8d5d-4c32-b9d1-a1ca5325b191
+        - text: Order online →
+  - contentinfo [ref=f47e322]:
+    - generic [ref=f47e323]:
+      - generic [ref=f47e324]:
+        - img "Chris N Eddy's" [ref=f47e325]
+        - generic [ref=f47e326]: Smashed sliders, done right. Hollywood since 2020.
+      - generic [ref=f47e327]:
+        - generic [ref=f47e328]: Visit
+        - generic [ref=f47e329]: Hollywood
+        - generic [ref=f47e330]: Glendale (Spring ’26)
+        - generic [ref=f47e331]: Van Nuys (Spring ’26)
+      - generic [ref=f47e332]:
+        - generic [ref=f47e333]: Menu
+        - generic [ref=f47e334]: Sliders
+        - generic [ref=f47e335]: Combos
+        - generic [ref=f47e336]: Sides
+        - generic [ref=f47e337]: Drinks
+      - generic [ref=f47e338]:
+        - generic [ref=f47e339]: Contact
+        - link "(323) 544-3600" [ref=f47e340] [cursor=pointer]:
+          - /url: tel:+13235443600
+        - link "chris@chrisneddys.com" [ref=f47e341] [cursor=pointer]:
+          - /url: mailto:chris@chrisneddys.com
+        - link "@chrisneddys" [ref=f47e342] [cursor=pointer]:
+          - /url: https://www.instagram.com/chrisneddys/
+    - generic [ref=f47e343]:
+      - generic [ref=f47e344]: © 2026 Chris N Eddy’s — Hollywood, CA
+      - generic [ref=f47e345]: Made with 🔥 + Martin’s rolls
+  - alert [ref=f47e346]

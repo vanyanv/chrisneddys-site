@@ -14,13 +14,13 @@ const items: Array<{
   {
     name: "Burgers",
     desc: "Two smashed patties. Two cheese.",
-    photo: { src: "/photos/double.jpg", alt: "Chris N Eddy's smash burger" },
+    photo: { src: "/photos/double.webp", alt: "Chris N Eddy's smash burger" },
     tag: "SIGNATURE",
   },
   {
     name: "Fries",
     desc: "Golden, salty, house-seasoned.",
-    photo: { src: "/photos/fries.jpg", alt: "Chris N Eddy's fries with slider" },
+    photo: { src: "/photos/fries.webp", alt: "Chris N Eddy's fries with slider" },
   },
   {
     name: "Shakes",

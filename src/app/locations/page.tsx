@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { LocationsHero } from "@/components/locations/LocationsHero";
 import { LocationSwitcher } from "@/components/locations/LocationSwitcher";
+import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 
 const description =
-  "Chris N Eddy’s is open in Hollywood (5539 W. Sunset Blvd), with Glendale and Van Nuys opening Spring 2026.";
+  "Chris N Eddy’s smashed sliders in Hollywood (5539 Sunset Blvd) and Glendale (1360 E Colorado St), with Van Nuys opening soon. Hours, directions and online ordering.";
 
 export const metadata: Metadata = {
   title: "Locations",
@@ -26,7 +27,7 @@ export default function LocationsPage() {
   return (
     <div style={{ background: "var(--color-cne-cream)", paddingBottom: 80 }}>
       <LocationsHero />
-      <LocationSwitcher />
+      <LocationSwitcher mapCanvas={<LocationsMapCanvas />} />
     </div>
   );
 }

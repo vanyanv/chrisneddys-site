@@ -22,4 +22,6 @@ export function SiteFooter() {
   );
 }
 
-const linkStyle = { color: "var(--a-yel)", textDecoration: "none" };
+// Underline comes from counter.css (.cne-foot a) so the link is identifiable
+// without relying on colour alone.
+const linkStyle = { color: "var(--a-yel)" };

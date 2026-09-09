@@ -26,6 +26,8 @@
   --a-nav: #e63027;
   --a-glow: none;
   --a-shadow: #1a1612;
+  /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
+  --a-red-cta: #d0281c;
   /* map */
   --a-mapbg: #f4ecd8;
   --a-water: #bcd3dd;
@@ -47,6 +49,7 @@
   --a-nav: #0d0b09;
   --a-glow: 0 0 24px rgba(255, 59, 47, 0.45);
   --a-shadow: #000;
+  --a-red-cta: #d0281c;
   /* map */
   --a-mapbg: #100d0b;
   --a-water: #17323d;
@@ -116,7 +119,7 @@ body {
   white-space: nowrap;
 }
 [data-mode="night"] .cne-orderbtn {
-  background: var(--a-red);
+  background: var(--a-red-cta);
   color: #fff2c9;
   border-color: var(--a-red);
   box-shadow: var(--a-glow);
@@ -262,7 +265,7 @@ body {
 .cne-big.is-primary { background: var(--a-yel); color: #1a1612; flex: 1.7; }
 .cne-big.is-secondary { background: #fff2c9; color: #1a1612; flex: 1; }
 [data-mode="night"] .cne-big.is-primary {
-  background: var(--a-red);
+  background: var(--a-red-cta);
   color: #fff2c9;
   border-color: var(--a-red);
   box-shadow: 0 0 22px rgba(255, 59, 47, 0.6);
@@ -492,7 +495,7 @@ body {
 .cne-way .s { font-size: 9px; color: var(--a-sub); margin-top: 3px; }
 .cne-way[aria-pressed="true"] { background: var(--a-ink); color: #fff2c9; }
 [data-mode="night"] .cne-way[aria-pressed="true"] {
-  background: var(--a-red);
+  background: var(--a-red-cta);
   border-color: var(--a-red);
   color: #fff2c9;
 }
@@ -555,10 +558,10 @@ body {
   display: block;
   color: var(--a-fg);
 }
-.cne-mini.is-red { background: var(--a-red); color: #fff2c9; }
+.cne-mini.is-red { background: var(--a-red-cta); color: #fff2c9; }
 .cne-mini.is-plain { background: var(--a-card); }
 [data-mode="night"] .cne-mini { border-color: #2b2620; }
-[data-mode="night"] .cne-mini.is-red { background: var(--a-red); border-color: var(--a-red); }
+[data-mode="night"] .cne-mini.is-red { background: var(--a-red-cta); border-color: var(--a-red); }
 
 /* ---- press + instagram -------------------------------------------------- */
 .cne-quote { border-left: 4px solid var(--a-yel); padding: 2px 0 2px 11px; margin-bottom: 13px; }
@@ -624,7 +627,7 @@ body {
   transition: background 0.5s;
 }
 [data-mode="night"] .cne-dock {
-  background: var(--a-red);
+  background: var(--a-red-cta);
   border-top-color: var(--a-red);
   box-shadow: 0 -6px 26px rgba(255, 59, 47, 0.4);
 }
@@ -637,7 +640,7 @@ body {
   font-weight: 700;
   color: var(--a-yel);
 }
-[data-mode="night"] .cne-dock-msg .t { color: #fff2c9; opacity: 0.82; }
+[data-mode="night"] .cne-dock-msg .t { color: #fff2c9; }
 .cne-dock-msg .s {
   font-size: 12px;
   font-weight: 700;
@@ -802,7 +805,7 @@ body {
   font-family: var(--font-display);
   font-size: 13px;
   letter-spacing: 0.05em;
-  background: var(--a-red);
+  background: var(--a-red-cta);
   color: #fff2c9;
   border: 2.5px solid var(--a-ink);
   box-shadow: 4px 4px 0 var(--a-ink);
@@ -909,7 +912,7 @@ body {
     box-shadow: 4px 4px 0 var(--a-ink);
   }
   [data-mode="night"] .cne-tab[aria-current="page"] {
-    background: var(--a-red);
+    background: var(--a-red-cta);
     color: #fff2c9;
     border-color: var(--a-red);
     box-shadow: var(--a-glow);
@@ -1194,7 +1197,7 @@ body {
 .cne-card p {
   grid-column: 2;
   grid-row: 2;
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.35;
   color: var(--a-sub);
   margin: 3px 0 0;
@@ -1244,6 +1247,7 @@ body {
   text-align: center;
 }
 [data-mode="night"] .cne-card-cta { border-color: var(--a-red); box-shadow: var(--a-glow); }
+  .cne-card-cta { background: var(--a-red-cta); }
 .cne-card:hover .cne-card-cta { transform: translateX(3px); }
 .cne-card-rib { display: none; }
 .cne-cardgrid { display: block; }
@@ -1432,4 +1436,14 @@ body {
   --a-sub: rgba(26, 22, 18, 0.62);
   background: var(--color-cne-cream);
   color: var(--color-cne-ink);
+}
+
+/* Links inside body copy carry an underline, not just a colour — colour alone
+   is invisible to anyone who can't distinguish it. Buttons and nav are exempt:
+   they read as controls from their shape. */
+.cne-foot a,
+.cne-sec p a,
+.cne-quote a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

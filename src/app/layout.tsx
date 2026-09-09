@@ -12,6 +12,7 @@ import { RevealRoot } from "@/components/counter/Reveal";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
+import { Analytics } from "@/components/shared/Analytics";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -117,6 +118,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://plausible.io/js/script.outbound-links.js"
           strategy="afterInteractive"
         />
+        <Analytics />
       </body>
     </html>
   );

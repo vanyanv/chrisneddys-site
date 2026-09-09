@@ -92,7 +92,18 @@ export default function HomePage() {
       <div className="cne-ig cne-rv">
         {GRAM.map((g) => (
           <span key={g.src}>
-            <img src={g.src} alt={g.alt} width={500} height={500} loading="lazy" decoding="async" />
+            {/* 3 columns on a phone (~120px), 6 on desktop (~230px) — the
+                300px variant covers the phone at 2x, the 500px the desktop. */}
+            <img
+              src={g.src}
+              srcSet={`${g.src.replace(".webp", "-sm.webp")} 300w, ${g.src} 500w`}
+              sizes="(min-width: 901px) 230px, 33vw"
+              alt={g.alt}
+              width={500}
+              height={500}
+              loading="lazy"
+              decoding="async"
+            />
           </span>
         ))}
       </div>

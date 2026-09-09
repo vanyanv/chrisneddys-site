@@ -31,8 +31,13 @@ export function FeaturedCards() {
           >
             <span className="cne-card-img">
               {it.photo && (
+                /* A 60px square on a phone, a full-width card image on desktop.
+                   Without this the phone downloaded the 720px version to draw
+                   it at 60px. */
                 <img
                   src={`/menu/${it.photo}.webp`}
+                  srcSet={`/menu/${it.photo}-thumb.webp 200w, /menu/${it.photo}.webp 720w`}
+                  sizes="(min-width: 901px) 440px, 60px"
                   alt=""
                   width={720}
                   height={479}

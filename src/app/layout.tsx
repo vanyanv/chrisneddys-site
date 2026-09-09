@@ -2,9 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "@/styles/globals.css";
-import { Nav } from "@/components/shared/Nav";
-import { Footer } from "@/components/shared/Footer";
-import { ScrollVar } from "@/components/shared/ScrollVar";
+import "@/styles/counter.css";
+import { SiteHeader } from "@/components/counter/SiteHeader";
+import { SiteFooter } from "@/components/counter/SiteFooter";
+import { OrderDock } from "@/components/counter/OrderDock";
+import { LastCall } from "@/components/counter/LastCall";
+import { NightMode } from "@/components/counter/NightMode";
+import { RevealRoot } from "@/components/counter/Reveal";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 
@@ -91,11 +95,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
+        {/* Set before first paint so scroll-reveal sections start hidden and
+            animate in. Without it they would flash visible, then hide. */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
         <JsonLd />
-        <ScrollVar />
-        <Nav />
+        <NightMode />
+        <RevealRoot />
+        <SiteHeader />
+        <LastCall />
         <main id="main">{children}</main>
-        <Footer />
+        <SiteFooter />
+        <OrderDock />
         <Script
           defer
           data-domain="chrisneddys.com"

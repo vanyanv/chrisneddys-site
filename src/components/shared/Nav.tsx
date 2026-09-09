@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { MobileNavToggle } from "./MobileNavToggle";
+import { OpenStatus } from "./OpenStatus";
 
 const links = [
   { href: "/", label: "Home" },
@@ -99,7 +100,8 @@ export function Nav(): ReactElement {
           })}
         </nav>
 
-        <div className="cne-desktop-cta">
+        <div className="cne-desktop-cta" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <OpenStatus />
           <a
             href={brand.orderUrl}
             target="_blank"
@@ -125,6 +127,8 @@ export function Nav(): ReactElement {
         </div>
 
         <div className="cne-mobile-nav">
+          {/* Mobile is where "are you open right now" actually gets asked. */}
+          <OpenStatus />
           <MobileNavToggle activePath={activePath} />
         </div>
       </div>
@@ -134,7 +138,11 @@ export function Nav(): ReactElement {
         .cne-mobile-nav { display: none; }
         @media (max-width: 900px) {
           .cne-desktop-nav, .cne-desktop-cta { display: none !important; }
-          .cne-mobile-nav { display: inline-flex; }
+          .cne-mobile-nav { display: inline-flex; align-items: center; gap: 10px; }
+        }
+        @media (max-width: 380px) {
+          /* Narrowest phones: the pill would push the toggle off the row. */
+          .cne-mobile-nav .cne-open-status { display: none; }
         }
       `}</style>
     </header>

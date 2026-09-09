@@ -6,6 +6,7 @@ import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
 import { LocationsMap } from "@/components/locations/LocationsMap";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
+import { OpenStatus } from "@/components/shared/OpenStatus";
 
 type LocationId = Location["id"];
 
@@ -79,6 +80,11 @@ export function LocationSwitcher({ mapCanvas }: { mapCanvas: ReactNode }) {
               >
                 {l.status.toUpperCase()}
               </div>
+              {l.isOpen && (
+                <div style={{ marginTop: 8 }}>
+                  <OpenStatus locationId={l.id} />
+                </div>
+              )}
               <div style={{ fontFamily: "var(--font-body)", fontSize: 14, marginTop: 8 }}>
                 {l.address}
               </div>

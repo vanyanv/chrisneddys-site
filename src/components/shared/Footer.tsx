@@ -39,7 +39,7 @@ export function Footer(): ReactElement {
               lineHeight: 1.5,
             }}
           >
-            Smashed sliders, done right. Hollywood since 2020.
+            Smashed sliders, done right. Pop-up in 2020, Hollywood since 2021.
           </div>
         </div>
 

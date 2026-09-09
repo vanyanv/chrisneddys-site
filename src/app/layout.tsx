@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smashed sliders. Hollywood since 2020.",
+    description: "Smashed sliders. A 2020 pop-up, on Sunset since 2021.",
   },
   alternates: {
     canonical: "/",

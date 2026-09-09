@@ -71,7 +71,7 @@ export function Hero(): ReactElement {
               maxWidth: 540,
             }}
           >
-            Smashed to order. Two patties, two cheese, one buttered Martin&rsquo;s potato roll. Hollywood, since 2020.
+            Smashed to order. Two patties, two cheese, one buttered Martin&rsquo;s potato roll. A parking-lot pop-up in 2020, on Sunset since 2021.
           </p>
           <div
             className="cne-reveal"

@@ -3,6 +3,7 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl } from "@/lib/otter";
+import { slugFor } from "@/lib/locationSlug";
 
 /**
  * Emits Organization + one Restaurant node per location + the full Menu with
@@ -54,9 +55,12 @@ export function JsonLd(): ReactElement {
 
   const restaurants = locations.map((loc) => ({
     "@type": "Restaurant",
-    "@id": `${brand.siteUrl}/locations/#${loc.id}`,
+    // The store's own page is the canonical home for this node, so both
+    // carry the same @id and the same url. Two nodes sharing an @id but
+    // disagreeing on url is a conflict, not a cross-reference.
+    "@id": `${brand.siteUrl}/locations/${slugFor(loc)}/#restaurant`,
     name: `${brand.name} — ${loc.name}`,
-    url: `${brand.siteUrl}/locations/`,
+    url: `${brand.siteUrl}/locations/${slugFor(loc)}/`,
     servesCuisine: ["American", "Fast Food", "Burgers"],
     priceRange: "$",
     image: restaurantImages,

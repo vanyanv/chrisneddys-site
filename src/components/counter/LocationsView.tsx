@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
 import { storeUrl } from "@/lib/otter";
 import { mapBox, projectX, projectY, pxPerKm } from "@/data/laGeo";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { OpenStatus } from "@/components/shared/OpenStatus";
+import { slugFor } from "@/lib/locationSlug";
 import { storeStatus, statusLabel } from "@/lib/hours";
 
 type LocationId = Location["id"];
@@ -175,9 +177,25 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                     Online ordering for this store isn&rsquo;t live on Otter yet.
                   </div>
                 )}
+                <Link
+                  href={`/locations/${slugFor(loc)}/`}
+                  className="cne-loc-note"
+                  style={{ display: "inline-block", textDecoration: "underline" }}
+                >
+                  {loc.name} details &amp; directions &rarr;
+                </Link>
               </>
             ) : (
-              <div className="cne-loc-note">Opening date to be announced.</div>
+              <>
+                <div className="cne-loc-note">Opening date to be announced.</div>
+                <Link
+                  href={`/locations/${slugFor(loc)}/`}
+                  className="cne-loc-note"
+                  style={{ display: "inline-block", textDecoration: "underline" }}
+                >
+                  {loc.name} details &rarr;
+                </Link>
+              </>
             )}
           </div>
         ))}

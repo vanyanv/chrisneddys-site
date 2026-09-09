@@ -1,12 +1,41 @@
 import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
+import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import { itemOrderUrl } from "@/lib/otter";
 
 /**
- * Emits Organization + one Restaurant node per location. Critical for
- * local search / Google Maps rich results.
+ * Emits Organization + one Restaurant node per location + the full Menu with
+ * per-item prices. Critical for local search / Google Maps rich results; the
+ * Menu node is what lets Google surface items and prices directly.
  */
 export function JsonLd(): ReactElement {
+  const menuId = `${brand.siteUrl}/menu/#menu`;
+
+  const menuNode = {
+    "@type": "Menu",
+    "@id": menuId,
+    name: `${brand.name} Menu`,
+    url: `${brand.siteUrl}/menu/`,
+    inLanguage: "en-US",
+    hasMenuSection: (Object.keys(menu) as MenuCategoryKey[]).map((key) => ({
+      "@type": "MenuSection",
+      name: categoryTitles[key],
+      hasMenuItem: menu[key].map((item) => ({
+        "@type": "MenuItem",
+        name: item.name,
+        description: item.desc || undefined,
+        offers: {
+          "@type": "Offer",
+          price: item.price.toFixed(2),
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: itemOrderUrl(item),
+        },
+      })),
+    })),
+  };
+
   const organization = {
     "@type": "Organization",
     "@id": `${brand.siteUrl}/#org`,
@@ -31,7 +60,7 @@ export function JsonLd(): ReactElement {
     servesCuisine: ["American", "Fast Food", "Burgers"],
     priceRange: "$",
     image: restaurantImages,
-    hasMenu: `${brand.siteUrl}/menu/`,
+    hasMenu: { "@id": menuId },
     telephone: brand.phone,
     email: brand.email,
     address: {
@@ -55,7 +84,7 @@ export function JsonLd(): ReactElement {
 
   const graph = {
     "@context": "https://schema.org",
-    "@graph": [organization, ...restaurants],
+    "@graph": [organization, menuNode, ...restaurants],
   };
 
   return (

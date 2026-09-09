@@ -1,20 +1,24 @@
 import type { ReactElement } from "react";
-import { menu, type MenuCategoryKey } from "@/data/menu";
+import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import { itemOrderUrl, formatPrice } from "@/lib/otter";
 
-const TITLES: Record<MenuCategoryKey, string> = {
-  sliders: "SLIDERS",
-  ways: "THE WAYS",
-  combos: "COMBOS",
-  sides: "SIDES",
-  drinks: "DRINKS",
-};
-
+/**
+ * One menu category. Every row links straight to that item on Otter, so the
+ * shortest path from reading about a slider to ordering it is a single tap.
+ */
 export function MenuSection({ category }: { category: MenuCategoryKey }): ReactElement {
   const items = menu[category];
   return (
     <section
       aria-labelledby={`menu-sec-${category}`}
-      style={{ padding: "60px clamp(16px, 5vw, 60px) 0", maxWidth: 1280, margin: "0 auto", width: "100%" }}
+      id={`menu-${category}`}
+      style={{
+        padding: "60px clamp(16px, 5vw, 60px) 0",
+        maxWidth: 1280,
+        margin: "0 auto",
+        width: "100%",
+        scrollMarginTop: 80,
+      }}
     >
       <div className="cne-onscroll-up" style={{ marginBottom: 24 }}>
         <h2
@@ -22,33 +26,37 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
           className="cne-menu-h2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 9vw, 96px)",
+            fontSize: "clamp(30px, 7.5vw, 76px)",
             margin: 0,
             letterSpacing: 1,
             color: "var(--color-cne-ink)",
             textShadow: "4px 4px 0 var(--color-cne-red)",
             lineHeight: 0.9,
+            textTransform: "uppercase",
           }}
         >
-          {TITLES[category]}
+          {categoryTitles[category]}
         </h2>
         <div style={{ height: 4, background: "var(--color-cne-ink)", marginTop: 14 }} />
       </div>
-      <div
-        className="cne-onscroll-stagger cne-menu-grid"
-        style={{ display: "grid", gap: "0 36px" }}
-      >
+
+      <div className="cne-onscroll-stagger cne-menu-grid" style={{ display: "grid", gap: "0 36px" }}>
         {items.map((it) => (
-          <div
+          <a
             key={it.id}
-            className="cne-hover-grow"
+            href={itemOrderUrl(it)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cne-menu-row"
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "baseline",
+              alignItems: "center",
               padding: "18px 0",
               borderBottom: "2px dashed var(--color-cne-ink)",
               gap: 16,
+              textDecoration: "none",
+              color: "inherit",
             }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -56,13 +64,14 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
                 className="cne-menu-item-name"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(20px, 5vw, 28px)",
+                  fontSize: "clamp(19px, 4.4vw, 26px)",
                   color: "var(--color-cne-ink)",
                   letterSpacing: 1,
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
                   flexWrap: "wrap",
+                  lineHeight: 1.15,
                 }}
               >
                 {it.name}
@@ -82,23 +91,81 @@ export function MenuSection({ category }: { category: MenuCategoryKey }): ReactE
                   </span>
                 )}
               </div>
-              <div
-                className="cne-menu-item-desc"
+              {it.desc && (
+                <div
+                  className="cne-menu-item-desc"
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: 14,
+                    color: "var(--color-cne-muted)",
+                    marginTop: 4,
+                    lineHeight: 1.45,
+                  }}
+                >
+                  {it.desc}
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                flex: "none",
+              }}
+            >
+              <span
+                className="cne-menu-price"
                 style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 14,
-                  color: "var(--color-cne-muted)",
-                  marginTop: 4,
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "clamp(15px, 3.6vw, 19px)",
+                  fontWeight: 700,
+                  fontVariantNumeric: "tabular-nums",
+                  color: "var(--color-cne-ink)",
                 }}
               >
-                {it.desc}
-              </div>
+                {formatPrice(it.price)}
+              </span>
+              <span
+                aria-hidden="true"
+                className="cne-menu-chev"
+                style={{
+                  width: 30,
+                  height: 30,
+                  flex: "none",
+                  borderRadius: "50%",
+                  background: "var(--color-cne-red)",
+                  color: "var(--color-cne-cream)",
+                  border: "2px solid var(--color-cne-ink)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: 13,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  lineHeight: 1,
+                }}
+              >
+                ›
+              </span>
+              <span className="cne-sr-only">Order {it.name} online</span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
+
       <style>{`
         .cne-menu-grid { grid-template-columns: repeat(2, 1fr); }
+        .cne-menu-row .cne-menu-chev { transition: transform .16s ease; }
+        .cne-menu-row:hover .cne-menu-chev { transform: translateX(3px); }
+        .cne-menu-row:hover .cne-menu-item-name { color: var(--color-cne-red); }
+        .cne-menu-row:focus-visible {
+          outline: 3px solid var(--color-cne-red);
+          outline-offset: 3px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cne-menu-row .cne-menu-chev { transition: none; }
+        }
         @media (max-width: 820px) { .cne-menu-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 600px) {
           .cne-menu-h2 { text-shadow: 3px 3px 0 var(--color-cne-red) !important; }

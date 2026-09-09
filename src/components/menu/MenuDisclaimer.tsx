@@ -2,7 +2,9 @@ import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
 
 /**
- * Points visitors to Otter for current pricing and real-time availability.
+ * The prices on this page are the live Hollywood pickup prices. This says so,
+ * and says the thing worth knowing: ordering direct is cheaper than the
+ * delivery apps.
  */
 export function MenuDisclaimer(): ReactElement {
   return (
@@ -39,7 +41,7 @@ export function MenuDisclaimer(): ReactElement {
               color: "var(--color-cne-yellow)",
             }}
           >
-            HEADS UP
+            GOOD TO KNOW
           </div>
           <div
             style={{
@@ -50,7 +52,7 @@ export function MenuDisclaimer(): ReactElement {
               marginTop: 6,
             }}
           >
-            For prices and availability, order online.
+            These are pickup prices. Delivery apps charge more.
           </div>
           <div
             style={{
@@ -62,8 +64,9 @@ export function MenuDisclaimer(): ReactElement {
               lineHeight: 1.5,
             }}
           >
-            Live pricing, secret-menu combos, and real-time availability all
-            live on our online ordering page.
+            Every price here comes straight from our own ordering page, and
+            ordering there sends the whole thing to us. Sold-out items show as
+            unavailable at checkout.
           </div>
         </div>
         <a
@@ -85,7 +88,7 @@ export function MenuDisclaimer(): ReactElement {
             whiteSpace: "nowrap",
           }}
         >
-          See live menu →
+          Order online →
         </a>
       </div>
       <style>{`

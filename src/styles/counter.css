@@ -95,10 +95,15 @@ body {
 [data-mode="night"] .cne-nav { border-bottom-color: #2b2620; }
 .cne-logo { display: block; line-height: 0; }
 .cne-nav img {
-  height: 26px;
+  /* 26px in the prototype — but 63% of that box was transparent padding, so the
+     mark itself drew at about 10px and read as decoration rather than as the
+     name of the restaurant. The artwork is trimmed to its ink now, which makes
+     this 30px of actual wordmark: roughly three times what was on screen, at
+     the same header height. */
+  height: 30px;
   width: auto;
   display: block;
-  filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.3));
 }
 .cne-nav-right { display: flex; gap: 6px; align-items: center; }
 
@@ -884,7 +889,7 @@ body {
   [data-mode="night"] .cne-header { border-bottom-color: #2b2620; }
   .cne-nav { display: contents; }
   .cne-logo { order: 1; }
-  .cne-nav img { height: 44px; filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.28)); }
+  .cne-nav img { height: 44px; filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.28)); }
   .cne-nav-right { order: 3; margin-left: auto; gap: 14px; }
 
   .cne-stat { font-size: 12px; padding: 9px 14px; border-radius: 24px; gap: 8px; border-width: 2px; }

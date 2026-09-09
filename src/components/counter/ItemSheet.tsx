@@ -9,6 +9,11 @@ export type WayId = (typeof ways)[number]["id"];
 
 type Props = {
   item: MenuItem | null;
+  /**
+   * Separate from `item` on purpose: the item stays mounted after closing so
+   * the sheet keeps its height, which is what the slide animates against.
+   */
+  open: boolean;
   way: WayId;
   onWayChange: (id: WayId) => void;
   onClose: () => void;
@@ -22,10 +27,9 @@ type Props = {
  * link. Rather than make someone choose toppings twice, it names the exact
  * checkboxes waiting on the next screen, then hands off to that one item.
  */
-export function ItemSheet({ item, way, onWayChange, onClose }: Props) {
+export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
-  const open = item !== null;
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +64,7 @@ export function ItemSheet({ item, way, onWayChange, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={item ? item.name : "Item"}
-        aria-hidden={open ? undefined : true}
+        inert={!open}
       >
         <div className="cne-sheet-grab" aria-hidden="true" />
         <button ref={closeRef} className="cne-xbtn" onClick={onClose} aria-label="Close">

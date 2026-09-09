@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { allItems, type MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
-import { ItemSheet, type WayId } from "./ItemSheet";
+import { ItemSheet } from "./ItemSheet";
+import { useItemSheet } from "./useItemSheet";
 
 /** The three the prototype leads with. */
 const FEATURED = [
@@ -13,8 +13,7 @@ const FEATURED = [
 ];
 
 export function FeaturedCards() {
-  const [item, setItem] = useState<MenuItem | null>(null);
-  const [way, setWay] = useState<WayId>("chris");
+  const { item, open, way, setWay, openItem, close } = useItemSheet();
   const items = FEATURED.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
@@ -27,7 +26,7 @@ export function FeaturedCards() {
             key={it.id}
             type="button"
             className={`cne-card${i === 0 ? " is-star" : ""}`}
-            onClick={() => setItem(it)}
+            onClick={() => openItem(it)}
             aria-haspopup="dialog"
           >
             <span className="cne-card-img">
@@ -60,7 +59,7 @@ export function FeaturedCards() {
           </button>
         ))}
       </div>
-      <ItemSheet item={item} way={way} onWayChange={setWay} onClose={() => setItem(null)} />
+      <ItemSheet item={item} open={open} way={way} onWayChange={setWay} onClose={close} />
     </>
   );
 }

@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { menu, categoryTitles, ways, type MenuItem, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
-import { ItemSheet, type WayId } from "./ItemSheet";
+import { ItemSheet } from "./ItemSheet";
+import { useItemSheet } from "./useItemSheet";
 
 const ORDER: MenuCategoryKey[] = ["combos", "sides", "secret", "drinks"];
 
 /** The whole menu, plus the sheet every row opens. */
 export function MenuBrowser() {
-  const [item, setItem] = useState<MenuItem | null>(null);
-  const [way, setWay] = useState<WayId>("chris");
+  const { item, open, way, setWay, openItem, close } = useItemSheet();
 
   return (
     <>
@@ -48,7 +47,7 @@ export function MenuBrowser() {
           <div className="cne-eyebrow">{categoryTitles[key]}</div>
           <div className="cne-menu-grid">
             {menu[key].map((it) => (
-              <MenuRow key={it.id} item={it} onOpen={setItem} />
+              <MenuRow key={it.id} item={it} onOpen={openItem} />
             ))}
           </div>
         </section>
@@ -66,7 +65,7 @@ export function MenuBrowser() {
         Live prices from our Hollywood ordering page. Delivery apps price higher.
       </div>
 
-      <ItemSheet item={item} way={way} onWayChange={setWay} onClose={() => setItem(null)} />
+      <ItemSheet item={item} open={open} way={way} onWayChange={setWay} onClose={close} />
     </>
   );
 }

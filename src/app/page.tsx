@@ -1,4 +1,5 @@
 import { preload } from "react-dom";
+import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
 import { Marquee } from "@/components/counter/Marquee";
 import { FeaturedCards } from "@/components/counter/FeaturedCards";
@@ -103,7 +104,19 @@ export default function HomePage() {
         <div className="cne-sec-hd">
           <div>
             <div className="cne-eyebrow">From the gram</div>
-            <h2>@chrisneddys</h2>
+            {/* The handle is the section's own heading, so the link lives
+                inside the h2 rather than around it — the animated rule under
+                the heading belongs to the h2 and stays put. */}
+            <h2>
+              <a
+                className="cne-iglink"
+                href={brand.igUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {brand.ig}
+              </a>
+            </h2>
           </div>
         </div>
       </section>

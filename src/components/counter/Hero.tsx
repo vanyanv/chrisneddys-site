@@ -17,8 +17,9 @@ export function Hero() {
             <br className="cne-br-desk" /> HIT.
           </h1>
           <p className="cne-hero-sub">
-            Your favorite toppings served on a buttered Martin&rsquo;s Potato Roll. Sliders from{" "}
-            <b>$6.49</b>.
+            Sliders come with two All-American smashed patties, two slices of melted cheese
+            and your favorite toppings served on a buttered Martin&rsquo;s Potato Roll.
+            Sliders from <b>$7.49</b>.
           </p>
           <div className="cne-cta">
             <a

@@ -194,12 +194,26 @@ body {
 .cne-tab[aria-current="page"] { opacity: 1; }
 .cne-tab:focus-visible { outline: 2px solid var(--a-yel); outline-offset: -3px; }
 .cne-tabind {
+  /* Width of the bar as a share of one tab, per the prototype: 22% of a
+     three-tab strip is roughly two thirds of a tab. */
+  --cne-tab-fill: 0.66;
+  --cne-tab-n: 3;
+  --cne-tab-i: 0;
+  /* One tab, as a share of the strip. */
+  --cne-tab-w: calc(100% / var(--cne-tab-n));
+
   position: absolute;
   bottom: 0;
   height: 4px;
   background: var(--a-yel);
-  width: 22%;
-  left: 5.6%;
+  width: calc(var(--cne-tab-w) * var(--cne-tab-fill));
+  /* Centred under the first tab, whatever the tab count. */
+  left: calc(var(--cne-tab-w) * (1 - var(--cne-tab-fill)) / 2);
+  /* A step is one tab — but `translateX(%)` is a share of the bar's OWN width,
+     which is only `--cne-tab-fill` of a tab. Dividing by it is what the port
+     was missing: at 100% the bar moved two thirds of a tab and fell 42px short
+     of MENU on a phone, 85px short of LOCATIONS. */
+  transform: translateX(calc(var(--cne-tab-i) * 100% / var(--cne-tab-fill)));
   transition: transform 0.34s cubic-bezier(0.35, 1.3, 0.4, 1);
 }
 

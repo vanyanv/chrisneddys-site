@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -61,10 +62,19 @@ export function SiteHeader() {
           </Link>
         ))}
         {activeIndex >= 0 && (
+          /* The slide is `--cne-tab-i` tabs wide, and only the stylesheet knows
+             how wide a tab and the bar itself are — so it does the arithmetic.
+             Passing a percentage from here would have to hardcode the bar's
+             own width and drift the moment either changes. */
           <span
             className="cne-tabind"
             aria-hidden="true"
-            style={{ transform: `translateX(${activeIndex * 100}%)` }}
+            style={
+              {
+                "--cne-tab-i": activeIndex,
+                "--cne-tab-n": TABS.length,
+              } as CSSProperties
+            }
           />
         )}
       </nav>

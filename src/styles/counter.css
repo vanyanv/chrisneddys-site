@@ -24,6 +24,18 @@
   --a-ink: #1a1612;
   --a-sub: rgba(26, 22, 18, 0.62);
   --a-nav: #e63027;
+  /* The tab strip runs a shade deeper than the display red, because 10px cream
+     type cannot clear 4.5:1 on #E63027 — that red tops out at 4.35:1 against
+     pure white, so no text colour passes on it. Both edges of the strip are
+     3px ink rules, which is what makes the step invisible. */
+  --a-navsurf: #d0281c;
+  /* The brand yellow is a fill colour. As *text* on the hero red it reads at
+     2.45:1, and the price is the one number in the hero worth reading, so text
+     on red uses a brighter cut of the same yellow. */
+  --a-yel-ink: #ffd633;
+  /* Idle tabs are dimmed at night, where the near-black bar can carry it, and
+     not in day, where the dim is what took the contrast to 2.18:1. */
+  --a-tab-idle: 1;
   --a-glow: none;
   --a-shadow: #1a1612;
   /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
@@ -47,6 +59,9 @@
   --a-ink: #0d0b09;
   --a-sub: rgba(255, 242, 201, 0.6);
   --a-nav: #0d0b09;
+  --a-navsurf: #0d0b09;
+  --a-yel-ink: var(--a-yel);
+  --a-tab-idle: 0.6;
   --a-glow: 0 0 24px rgba(255, 59, 47, 0.45);
   --a-shadow: #000;
   --a-red-cta: #d0281c;
@@ -168,7 +183,7 @@ body {
 /* tab bar */
 .cne-tabs {
   display: flex;
-  background: var(--a-nav);
+  background: var(--a-navsurf);
   border-bottom: 3px solid var(--a-ink);
   position: relative;
   transition: background 0.5s;
@@ -182,16 +197,17 @@ body {
   padding: 10px 4px;
   text-align: center;
   color: #fff2c9;
-  opacity: 0.6;
+  opacity: var(--a-tab-idle);
   cursor: pointer;
   border: none;
   background: none;
-  transition: opacity 0.25s;
+  transition: opacity 0.25s, color 0.25s;
   text-decoration: none;
   display: block;
   line-height: normal;
 }
-.cne-tab[aria-current="page"] { opacity: 1; }
+/* The yellow indicator under the strip is the state; this is the second cue. */
+.cne-tab[aria-current="page"] { opacity: 1; color: #fffdf6; }
 .cne-tab:focus-visible { outline: 2px solid var(--a-yel); outline-offset: -3px; }
 .cne-tabind {
   /* Width of the bar as a share of one tab, per the prototype: 22% of a
@@ -256,7 +272,7 @@ body {
 [data-mode="night"] .cne-hero h1 { text-shadow: 0 0 22px rgba(255, 59, 47, 0.9); }
 .cne-hero h1 .y { color: var(--a-yel); }
 .cne-hero-sub { font-size: 13px; line-height: 1.45; margin-top: 11px; opacity: 0.94; }
-.cne-hero-sub b { color: var(--a-yel); }
+.cne-hero-sub b { color: var(--a-yel-ink); }
 .cne-cta { display: flex; gap: 8px; margin-top: 15px; }
 
 .cne-big {
@@ -909,7 +925,7 @@ body {
     gap: 26px;
     height: 76px;
     padding: 0 44px;
-    background: var(--a-nav);
+    background: var(--a-navsurf);
     border-bottom: 4px solid var(--a-ink);
     transition: background 0.5s;
   }
@@ -953,7 +969,7 @@ body {
   .cne-tab:hover { transform: translateY(-2px); }
   .cne-tab[aria-current="page"] {
     background: #fff2c9;
-    color: var(--a-red);
+    color: var(--a-red-cta);
     border-color: var(--a-ink);
     box-shadow: 4px 4px 0 var(--a-ink);
   }
@@ -1016,7 +1032,9 @@ body {
   }
   [data-mode="night"] .cne-hero h1 { text-shadow: 0 0 44px rgba(255, 59, 47, 0.9); }
   .cne-hero-sub {
-    font-size: 22px;
+    /* 24px is where the WCAG large-text threshold starts, and cream clears 3:1
+       on the hero red but not 4.5:1. Two pixels, and the subtitle is legible. */
+    font-size: 24px;
     line-height: 1.4;
     margin-top: 26px;
     max-width: 32ch;

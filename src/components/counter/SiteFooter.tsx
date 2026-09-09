@@ -17,6 +17,7 @@ const NAV = [
     label: neighbourhoodFor(loc),
   })),
   { href: "/about/", label: "Our story" },
+  { href: "/contact/", label: "Contact" },
 ];
 
 export function SiteFooter() {

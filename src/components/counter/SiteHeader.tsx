@@ -14,10 +14,11 @@ const TABS = [
   { href: "/menu/", label: "MENU" },
   { href: "/locations/", label: "LOCATIONS" },
   { href: "/about/", label: "OUR STORY" },
+  { href: "/contact/", label: "CONTACT" },
 ];
 
 /**
- * Red header with the live status pill and a four-tab bar.
+ * Red header with the live status pill and a five-tab bar.
  *
  * On a phone the tab bar is its own band under the logo row; on desktop the two
  * collapse into a single 76px row. That's one DOM either way — `.cne-nav` goes

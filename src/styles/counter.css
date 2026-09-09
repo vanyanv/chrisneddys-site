@@ -1403,3 +1403,28 @@ body {
   .cne-callout { font-size: 12px; padding: 9px 13px; }
   .cne-callout small { font-size: 11px; }
 }
+
+/* ---- /about -------------------------------------------------------------
+   The story page predates this design system: it's a long-form editorial page
+   whose every colour — red on cream, ink on brand yellow, cream on red — was
+   picked against the day palette. Re-pointing its tokens at the 2AM ones
+   half-translated it and produced red-on-yellow at 2.5:1 and cream-on-yellow
+   at 1.3:1.
+
+   So it stays in daylight. The day values are pinned locally, which keeps
+   every pairing exactly as it was designed and legible at any hour. The header
+   and footer still follow the clock, so at 2AM this reads as a lit page
+   between dark chrome — a deliberate editorial break, not a broken theme. */
+.cne-legacy-theme {
+  --a-bg: #fff8e7;
+  --a-fg: #1a1612;
+  --a-red: #e63027;
+  --a-yel: #f5b82e;
+  --a-cream: #fff2c9;
+  --a-line: #e3d8bc;
+  --a-card: #fffdf6;
+  --a-ink: #1a1612;
+  --a-sub: rgba(26, 22, 18, 0.62);
+  background: var(--color-cne-cream);
+  color: var(--color-cne-ink);
+}

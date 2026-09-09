@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div style={{ background: "var(--color-cne-cream)", paddingBottom: 80 }}>
+    <div className="cne-legacy-theme" style={{ paddingBottom: 80 }}>
       <AboutHero />
       <StoryCopy />
       <Timeline />

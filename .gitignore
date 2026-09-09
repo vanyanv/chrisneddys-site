@@ -7,3 +7,7 @@ out/
 *.log
 .vscode/
 .idea/
+
+# Local scratch: Playwright MCP captures and TS incremental cache
+.playwright-mcp/
+tsconfig.tsbuildinfo

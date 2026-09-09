@@ -2,30 +2,23 @@ import type { Metadata } from "next";
 import { AboutHero } from "@/components/about/AboutHero";
 import { StoryCopy } from "@/components/about/StoryCopy";
 import { Timeline } from "@/components/about/Timeline";
+import { openGraphFor, twitterFor } from "@/lib/seo";
 
+const title = "Our Story — A Parking Lot to Sunset Blvd";
 const description =
-  "Chris and Eddy: two childhood friends, a Hollywood parking lot, nine months of recipe testing, and a cult smash burger following.";
+  "Two childhood friends started Chris N Eddy’s as a pandemic pop-up in 2020 and opened on Sunset Blvd in 2021. Nine months of recipe testing, one smashed slider.";
 
 export const metadata: Metadata = {
-  title: "Our Story",
+  title,
   description,
   alternates: { canonical: "/about/" },
-  openGraph: {
-    title: "Our Story · Chris N Eddy's",
-    description,
-    url: "/about/",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Our Story · Chris N Eddy's",
-    description,
-  },
+  openGraph: openGraphFor({ title: `${title} · Chris N Eddy's`, description, path: "/about/" }),
+  twitter: twitterFor({ title: `${title} · Chris N Eddy's`, description }),
 };
 
 export default function AboutPage() {
   return (
-    <div style={{ background: "var(--color-cne-cream)", paddingBottom: 80 }}>
+    <div className="cne-legacy-theme" style={{ paddingBottom: 80 }}>
       <AboutHero />
       <StoryCopy />
       <Timeline />

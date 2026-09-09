@@ -17,8 +17,18 @@ export function HeroMedia() {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mq.matches) return;
 
+    // The loop is decoration. Don't spend someone's data plan on it when
+    // they've asked us not to, or when the connection can't carry it.
+    const conn = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+    if (conn?.saveData) return;
+    if (conn?.effectiveType && !/4g/.test(conn.effectiveType)) return;
+
     const poster = new Image();
-    poster.src = "/hero-poster.jpg";
+    poster.src = "/hero-poster.webp";
     const attach = () => setShowVideo(true);
     if (poster.complete) attach();
     else poster.addEventListener("load", attach, { once: true });
@@ -28,7 +38,7 @@ export function HeroMedia() {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src="/hero-poster.jpg"
+        src="/hero-poster.webp"
         alt="Chris N Eddy's smashed sliders"
         fetchPriority="high"
         decoding="async"
@@ -45,7 +55,7 @@ export function HeroMedia() {
       loop
       playsInline
       preload="auto"
-      poster="/hero-poster.jpg"
+      poster="/hero-poster.webp"
       style={posterStyle}
     >
       <source src="/hero.webm" type="video/webm" />

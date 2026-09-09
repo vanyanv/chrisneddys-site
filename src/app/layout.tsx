@@ -2,11 +2,17 @@ import type { Metadata, Viewport } from "next";
 import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "@/styles/globals.css";
-import { Nav } from "@/components/shared/Nav";
-import { Footer } from "@/components/shared/Footer";
-import { ScrollVar } from "@/components/shared/ScrollVar";
+import "@/styles/counter.css";
+import { SiteHeader } from "@/components/counter/SiteHeader";
+import { SiteFooter } from "@/components/counter/SiteFooter";
+import { OrderDock } from "@/components/counter/OrderDock";
+import { LastCall } from "@/components/counter/LastCall";
+import { NightMode } from "@/components/counter/NightMode";
+import { RevealRoot } from "@/components/counter/Reveal";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
+import { OG_IMAGE } from "@/lib/seo";
+import { Analytics } from "@/components/shared/Analytics";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -32,11 +38,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smashed sliders in Hollywood`,
+    default: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
     template: `%s · ${brand.name}`,
   },
   description:
-    "Two childhood friends, one parking lot, and a smash burger cult following. Smashed sliders on buttered Martin’s potato rolls. Hollywood, Glendale (Spring ’26), Van Nuys (Spring ’26).",
+    "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
@@ -56,14 +62,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smashed sliders in Hollywood`,
-    description:
-      "Two childhood friends, one parking lot, and a smash burger cult following. Open til 2AM.",
+    title: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
+    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smashed sliders. Hollywood since 2020.",
+    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    images: [OG_IMAGE.url],
   },
   alternates: {
     canonical: "/",
@@ -91,17 +98,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
+        {/* Set before first paint so scroll-reveal sections start hidden and
+            animate in. Without it they would flash visible, then hide. */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
         <JsonLd />
-        <ScrollVar />
-        <Nav />
+        <NightMode />
+        <RevealRoot />
+        <SiteHeader />
+        <LastCall />
         <main id="main">{children}</main>
-        <Footer />
+        <SiteFooter />
+        <OrderDock />
         <Script
           defer
           data-domain="chrisneddys.com"
           src="https://plausible.io/js/script.outbound-links.js"
           strategy="afterInteractive"
         />
+        <Analytics />
       </body>
     </html>
   );

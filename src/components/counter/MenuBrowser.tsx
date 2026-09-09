@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { menu, categoryTitles, ways, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { ItemSheet } from "./ItemSheet";
@@ -75,7 +77,11 @@ export function MenuBrowser() {
           ))}
 
           <p className="cne-menu-foot">
-            Live prices from our Hollywood ordering page. Delivery apps price higher.
+            Live prices from our{" "}
+            <Link href="/order/" style={{ color: "inherit" }}>
+              Hollywood ordering page
+            </Link>
+            . Delivery apps price higher.
           </p>
         </div>
       </div>

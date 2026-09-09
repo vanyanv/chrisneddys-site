@@ -16,6 +16,13 @@ export const OG_IMAGE = {
   alt: "A Chris N Eddy's double slider — two smashed patties and two slices of cheese on a buttered Martin's roll",
 };
 
+/** Stable @ids, so every page's graph points at the same three nodes. */
+export const ID = {
+  org: `${brand.siteUrl}/#org`,
+  website: `${brand.siteUrl}/#website`,
+  menu: `${brand.siteUrl}/menu/#menu`,
+};
+
 /**
  * Page metadata declared per-page replaces the parent's `openGraph` wholesale,
  * which is why the sub-pages were shipping with no social image at all. This
@@ -39,5 +46,26 @@ export function twitterFor(opts: { title: string; description: string }) {
     title: opts.title,
     description: opts.description,
     images: [OG_IMAGE.url],
+  };
+}
+
+/**
+ * A BreadcrumbList for every page below the home page.
+ *
+ * Beyond the breadcrumb line Google draws in place of the URL, this is the
+ * clearest statement a static site can make about its own hierarchy — which is
+ * the same signal the sitelinks under a brand result are generated from. Home
+ * is always position 1, so callers pass only what sits under it.
+ */
+export function breadcrumbLd(trail: Array<{ name: string; path: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "/" }, ...trail].map((step, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: step.name,
+      item: `${brand.siteUrl}${step.path}`,
+    })),
   };
 }

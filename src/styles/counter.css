@@ -369,7 +369,7 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--a-red);
+  color: var(--a-red-cta);
   margin-bottom: 3px;
 }
 [data-mode="night"] .cne-eyebrow { color: var(--a-yel); }
@@ -538,7 +538,26 @@ body {
   border-color: var(--a-red);
 }
 .cne-loc.is-soon { border-style: dashed; box-shadow: none; }
-.cne-loc h3 { font-family: var(--font-display); font-size: 19px; margin: 0; line-height: 1; }
+.cne-loc h3,
+.cne-loc h2.cne-loc-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin: 0;
+  line-height: 1;
+  position: static;
+  padding-bottom: 0;
+}
+.cne-loc h2.cne-loc-name::after { content: none; }
+
+/* The "details & directions" link: 9px type gives a 14px tap target, under the
+   24px minimum. The padding buys the height without moving the text. */
+.cne-loc-more {
+  display: inline-block;
+  text-decoration: underline;
+  padding: 5px 0;
+  min-height: 24px;
+  box-sizing: border-box;
+}
 .cne-loc-addr { font-size: 12.5px; line-height: 1.45; margin-top: 7px; }
 .cne-loc-hrs {
   font-family: var(--font-mono);
@@ -555,7 +574,6 @@ body {
   text-transform: uppercase;
   color: var(--a-sub);
   margin-top: 7px;
-  opacity: 0.85;
 }
 .cne-loc-btns { display: flex; gap: 7px; margin-top: 11px; }
 .cne-mini {
@@ -867,6 +885,20 @@ body {
 }
 [data-mode="night"] .cne-foot { background: #171310; }
 
+/* Every route in one row, so the footer is the site's own table of contents.
+   The padding is what turns an 11px link into a 24px tap target. */
+.cne-foot-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+}
+.cne-foot-nav a {
+  display: inline-block;
+  padding: 5px 0;
+  min-height: 24px;
+  box-sizing: border-box;
+}
+
 /* =========================================================================
    Desktop — the prototype's 1440px frame.
    ========================================================================= */
@@ -1079,7 +1111,8 @@ body {
 
   .cne-loc { border-width: 4px; box-shadow: 6px 6px 0 var(--a-ink); padding: 22px; margin-top: 20px; margin-bottom: 0; }
   .cne-loc.is-selected { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--a-red); }
-  .cne-loc h3 { font-size: 26px; }
+  .cne-loc h3,
+  .cne-loc h2.cne-loc-name { font-size: 26px; }
   .cne-loc-addr { font-size: 15px; margin-top: 10px; line-height: 1.5; }
   .cne-loc-hrs { font-size: 12.5px; line-height: 2; margin-top: 12px; }
   .cne-loc-note { font-size: 11px; margin-top: 9px; }
@@ -1448,6 +1481,7 @@ body {
    they read as controls from their shape. */
 .cne-foot a,
 .cne-sec p a,
+.cne-menu-foot a,
 .cne-quote a {
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -1466,7 +1500,7 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--a-red);
+  color: var(--a-red-cta);
   margin: 0 0 3px;
   line-height: 1.6;
 }
@@ -1558,7 +1592,7 @@ h3 { font-weight: 700; }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--a-red);
+  color: var(--a-red-cta);
   margin: 0 0 3px;
   line-height: 1.6;
   padding-bottom: 0;

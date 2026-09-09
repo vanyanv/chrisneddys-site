@@ -111,9 +111,12 @@ export function StoreDetail({
           sauce and grilled onion — every topping is free either way. Alongside them,
           chris-cut fries, cheese fries, loaded fries, shakes, and the Secret Menu.
         </p>
-        <div className="cne-loc-btns" style={{ maxWidth: 420 }}>
+        <div className="cne-loc-btns" style={{ maxWidth: 420, flexWrap: "wrap" }}>
           <Link className="cne-mini is-red" href="/menu/">
             SEE THE MENU
+          </Link>
+          <Link className="cne-mini is-plain" href="/order/">
+            ORDER ONLINE
           </Link>
           <Link className="cne-mini is-plain" href="/locations/">
             ALL LOCATIONS

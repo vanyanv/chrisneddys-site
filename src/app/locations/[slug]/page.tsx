@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { openGraphFor, twitterFor } from "@/lib/seo";
+import { breadcrumbLd, openGraphFor, twitterFor } from "@/lib/seo";
+import { JsonLdScript } from "@/components/shared/JsonLd";
 import {
   allLocationSlugs,
   locationBySlug,
@@ -22,11 +23,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!loc) return {};
 
   const hood = neighbourhoodFor(loc);
-  const title = `${hood} — Smash Burger Sliders`;
+  const title = `${hood} Smash Burgers & Sliders`;
   const full = `${title} · ${brand.name}`;
   const description = loc.isOpen
-    ? `Chris N Eddy’s ${hood}: smashed sliders at ${loc.address}. Open 10AM till 1AM weeknights, 2AM Fri–Sun. Hours, directions and online ordering.`
-    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}. The same smashed sliders, chris-cut fries and Secret Menu as our Hollywood counter.`;
+    ? `Looking for the best burgers in ${hood}? Chris N Eddy’s is at ${loc.address} — smashed sliders and chris-cut fries, 10AM till 1AM weeknights, 2AM Fri–Sun.`
+    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}: the same smashed sliders, chris-cut fries and Secret Menu we serve at our Hollywood counter.`;
 
   return {
     title,
@@ -50,23 +51,14 @@ export default async function LocationPage({ params }: Params) {
    * once, by the sitewide JsonLd component, with this page's URL as its
    * canonical `url` — so this page doesn't restate it.
    */
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${brand.siteUrl}/` },
-      { "@type": "ListItem", position: 2, name: "Locations", item: `${brand.siteUrl}/locations/` },
-      { "@type": "ListItem", position: 3, name: hood, item: `${brand.siteUrl}/locations/${slug}/` },
-    ],
-  };
+  const jsonLd = breadcrumbLd([
+    { name: "Locations", path: "/locations/" },
+    { name: hood, path: `/locations/${slug}/` },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
       <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">
           <Link href="/locations/" style={{ color: "inherit" }}>

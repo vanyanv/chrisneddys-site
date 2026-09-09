@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const entries: Array<{ path: string; priority: number }> = [
     { path: "/", priority: 1.0 },
     { path: "/menu/", priority: 0.9 },
+    { path: "/order/", priority: 0.9 },
     { path: "/locations/", priority: 0.8 },
     ...allLocationSlugs().map((slug) => ({
       path: `/locations/${slug}/`,

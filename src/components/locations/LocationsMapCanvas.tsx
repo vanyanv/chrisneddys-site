@@ -36,7 +36,7 @@ export function LocationsMapCanvas() {
       aria-label="Map of Chris N Eddy's locations across Los Angeles, drawn from OpenStreetMap data"
       style={{ display: "block", width: "100%", height: "auto" }}
     >
-      <rect width={mapBox.w} height={mapBox.h} fill="var(--color-cne-paper)" />
+      <rect width={mapBox.w} height={mapBox.h} fill="var(--a-mapbg)" />
 
       <path d={waterPath} className="cne-map-water" />
       <path d={riverPath} className="cne-map-river" />
@@ -84,7 +84,7 @@ export function LocationsMapCanvas() {
       </g>
 
       <g transform={`translate(${mapBox.w - 16},14)`}>
-        <path d="M0,-8 L3.6,5 L0,2.6 L-3.6,5 Z" fill="var(--color-cne-ink)" />
+        <path d="M0,-8 L3.6,5 L0,2.6 L-3.6,5 Z" fill="var(--a-fg)" />
         <text className="cne-map-label" y={13} textAnchor="middle">
           N
         </text>

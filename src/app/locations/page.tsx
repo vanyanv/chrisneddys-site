@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { LocationsHero } from "@/components/locations/LocationsHero";
-import { LocationSwitcher } from "@/components/locations/LocationSwitcher";
+import { LocationsView } from "@/components/counter/LocationsView";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 
 const description =
@@ -24,10 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function LocationsPage() {
-  return (
-    <div style={{ background: "var(--color-cne-cream)", paddingBottom: 80 }}>
-      <LocationsHero />
-      <LocationSwitcher mapCanvas={<LocationsMapCanvas />} />
-    </div>
-  );
+  return <LocationsView mapCanvas={<LocationsMapCanvas />} />;
 }

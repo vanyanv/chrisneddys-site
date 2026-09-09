@@ -273,24 +273,24 @@ body {
 /* ---- Locations map -------------------------------------------------------
    Real OpenStreetMap geometry, drawn in brand colours. See src/data/laGeo.ts.
    Everything here is presentational; the geometry itself is in the SVG. */
-.cne-map-water { fill: #bcd3dd; stroke: none; }
-.cne-map-river { stroke: #bcd3dd; stroke-width: 1.3; fill: none; stroke-linecap: round; }
+.cne-map-water { fill: var(--a-water); stroke: none; }
+.cne-map-river { stroke: var(--a-water); stroke-width: 1.3; fill: none; stroke-linecap: round; }
 .cne-map-blvd {
-  stroke: rgba(26, 22, 18, 0.4);
+  stroke: var(--a-blvd);
   stroke-width: 1.25;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .cne-map-fwy-case {
-  stroke: var(--color-cne-ink);
+  stroke: var(--a-fwycase);
   stroke-width: 3.1;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .cne-map-fwy {
-  stroke: var(--color-cne-yellow);
+  stroke: var(--a-fwy);
   stroke-width: 1.7;
   fill: none;
   stroke-linecap: round;
@@ -298,22 +298,22 @@ body {
 }
 .cne-map-reach {
   fill: none;
-  stroke: var(--color-cne-red);
+  stroke: var(--a-red);
   stroke-width: 0.7;
   stroke-dasharray: 3 3;
   opacity: 0.5;
 }
-.cne-map-rule { stroke: var(--color-cne-ink); stroke-width: 1.1; }
-.cne-map-plate { fill: var(--color-cne-paper); opacity: 0.82; }
+.cne-map-rule { stroke: var(--a-fg); stroke-width: 1.1; }
+.cne-map-plate { fill: var(--a-mapbg); opacity: 0.82; }
 .cne-map-label {
   font-family: var(--font-mono);
   font-size: 5.4px;
   letter-spacing: 0.85px;
   font-weight: 700;
-  fill: var(--color-cne-muted);
+  fill: var(--a-sub);
   /* halo so a label stays readable where it crosses a road */
   paint-order: stroke;
-  stroke: var(--color-cne-paper);
+  stroke: var(--a-mapbg);
   stroke-width: 2.2px;
   stroke-linejoin: round;
 }
@@ -321,25 +321,25 @@ body {
   font-family: var(--font-mono);
   font-size: 4.4px;
   letter-spacing: 0.4px;
-  fill: var(--color-cne-muted);
+  fill: var(--a-sub);
   opacity: 0.75;
 }
-.cne-map-shield rect { fill: var(--color-cne-ink); }
+.cne-map-shield rect { fill: var(--a-fwycase); }
 .cne-map-shield text {
   font-family: var(--font-mono);
   font-size: 5.6px;
   font-weight: 800;
-  fill: var(--color-cne-cream);
+  fill: #fff2c9;
   text-anchor: middle;
 }
 
 .cne-map-pin .hit { fill: transparent; cursor: pointer; }
-.cne-map-pin .hit:focus-visible { outline: 3px solid var(--color-cne-red); outline-offset: 2px; }
-.cne-map-pin .ring { fill: none; stroke: var(--color-cne-red); stroke-width: 2; opacity: 0; }
+.cne-map-pin .hit:focus-visible { outline: 3px solid var(--a-red); outline-offset: 2px; }
+.cne-map-pin .ring { fill: none; stroke: var(--a-red); stroke-width: 2; opacity: 0; }
 .cne-map-pin.is-selected .ring { opacity: 0.55; }
 .cne-map-pin .head {
-  fill: var(--color-cne-red);
-  stroke: var(--color-cne-cream);
+  fill: var(--a-red);
+  stroke: #fff2c9;
   stroke-width: 2.4;
   transition: transform 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
   transform-box: fill-box;
@@ -347,8 +347,8 @@ body {
 }
 .cne-map-pin.is-selected .head { transform: scale(1.28); }
 .cne-map-pin.is-soon .head {
-  fill: var(--color-cne-paper);
-  stroke: var(--color-cne-yellow);
+  fill: var(--a-mapbg);
+  stroke: var(--a-yel);
   stroke-dasharray: 3 2.4;
 }
 .cne-map-pin .cap {
@@ -356,9 +356,9 @@ body {
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.9px;
-  fill: var(--color-cne-ink);
+  fill: var(--a-fg);
   paint-order: stroke;
-  stroke: var(--color-cne-paper);
+  stroke: var(--a-mapbg);
   stroke-width: 2.6px;
   stroke-linejoin: round;
 }

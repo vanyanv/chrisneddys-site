@@ -26,6 +26,12 @@
   --a-nav: #e63027;
   --a-glow: none;
   --a-shadow: #1a1612;
+  /* map */
+  --a-mapbg: #f4ecd8;
+  --a-water: #bcd3dd;
+  --a-fwy: #f5b82e;
+  --a-fwycase: #1a1612;
+  --a-blvd: rgba(26, 22, 18, 0.42);
 }
 
 [data-mode="night"] {
@@ -41,6 +47,12 @@
   --a-nav: #0d0b09;
   --a-glow: 0 0 24px rgba(255, 59, 47, 0.45);
   --a-shadow: #000;
+  /* map */
+  --a-mapbg: #100d0b;
+  --a-water: #17323d;
+  --a-fwy: #ffd53d;
+  --a-fwycase: #000;
+  --a-blvd: #3a332a;
 }
 
 html {
@@ -1335,4 +1347,59 @@ body {
 @media (max-width: 900px) {
   .cne-split-r { display: none; }
   .cne-split-l { padding: 16px 15px 4px; }
+}
+
+/* ---- locations ---------------------------------------------------------- */
+.cne-mapwrap {
+  position: relative;
+  background: var(--a-mapbg);
+  border-bottom: 3px solid var(--a-ink);
+  overflow: hidden;
+  transition: background 0.5s;
+}
+[data-mode="night"] .cne-mapwrap { border-bottom-color: #2b2620; }
+.cne-mapwrap svg { display: block; width: 100%; height: auto; }
+.cne-callout {
+  position: absolute;
+  background: var(--a-ink);
+  color: #fff2c9;
+  border: 2px solid var(--a-yel);
+  padding: 7px 10px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  pointer-events: none;
+  transform: translate(-50%, -185%);
+  white-space: nowrap;
+  z-index: 2;
+}
+.cne-callout small { display: block; font-weight: 400; opacity: 0.7; font-size: 8.5px; margin-top: 2px; }
+.cne-notify { display: flex; gap: 7px; margin-top: 11px; }
+.cne-notify input {
+  flex: 1;
+  border: 2px solid var(--a-ink);
+  background: var(--a-bg);
+  color: var(--a-fg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 9px;
+  min-width: 0;
+}
+[data-mode="night"] .cne-notify input { border-color: #2b2620; }
+
+@media (min-width: 901px) {
+  .cne-locs { display: grid; grid-template-columns: 1.25fr 0.75fr; align-items: stretch; }
+  .cne-mapwrap {
+    border-bottom: none;
+    border-right: 4px solid var(--a-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 26px;
+  }
+  [data-mode="night"] .cne-mapwrap { border-right-color: #2b2620; }
+  .cne-locs-list { padding: 38px 34px; }
+  .cne-locs-list h2 { font-family: var(--font-display); font-size: 38px; margin: 0 0 6px; line-height: 0.95; }
+  .cne-callout { font-size: 12px; padding: 9px 13px; }
+  .cne-callout small { font-size: 11px; }
 }

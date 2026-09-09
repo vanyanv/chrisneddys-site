@@ -38,20 +38,22 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
+    default: `${brand.name} — Smash Burgers & Sliders in Los Angeles`,
     template: `%s · ${brand.name}`,
   },
   description:
-    "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
     "sliders",
     "Hollywood burgers",
     "Los Angeles burgers",
+    "best burgers in Los Angeles",
     "Chris N Eddy's",
     "Sunset Blvd",
     "late night burgers",
+    "burgers near me",
     "fast casual",
   ],
   authors: [{ name: brand.name, url: brand.siteUrl }],
@@ -62,14 +64,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smash Burger Sliders in Hollywood, LA`,
-    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    title: `${brand.name} — Smash Burgers & Sliders in Los Angeles`,
+    description: "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smashed sliders in Hollywood, open till 1AM. Two patties, two slices of cheese, a buttered Martin’s roll. Order Chris’s Way or Eddy’s Way — every topping free.",
+    description: "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
     images: [OG_IMAGE.url],
   },
   alternates: {
@@ -87,6 +89,9 @@ export const metadata: Metadata = {
     },
   },
 };
+
+/** Mirrors the stagger RevealRoot applies, so the two agree on the first frame. */
+const REVEAL_ABOVE_FOLD = `(function(){try{var n=document.querySelectorAll('.cne-rv'),h=window.innerHeight,i,e;for(i=0;i<n.length;i++){e=n[i];if(e.getBoundingClientRect().top<h){e.style.transitionDelay=(i%4)*60+'ms';e.classList.add('is-in')}}}catch(_){}})()`;
 
 export const viewport: Viewport = {
   themeColor: "#E63027",
@@ -110,6 +115,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <LastCall />
         <main id="main">{children}</main>
+        {/* Reveal what is already on screen while the HTML is still parsing.
+            RevealRoot does the same sweep, but only once React has hydrated —
+            on a throttled phone that is ~3s after first paint, and the section
+            holding the largest text sits at opacity 0 for all of it, which is
+            what the browser reports as LCP. The transition still runs, so the
+            animation is unchanged; it just starts when the page does. */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }}
+        />
         <SiteFooter />
         <OrderDock />
         <Script

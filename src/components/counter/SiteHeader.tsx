@@ -13,15 +13,20 @@ const TABS = [
   { href: "/", label: "HOME" },
   { href: "/menu/", label: "MENU" },
   { href: "/locations/", label: "LOCATIONS" },
+  { href: "/about/", label: "OUR STORY" },
 ];
 
 /**
- * Red header with the live status pill and a three-tab bar.
+ * Red header with the live status pill and a four-tab bar.
  *
  * On a phone the tab bar is its own band under the logo row; on desktop the two
  * collapse into a single 76px row. That's one DOM either way — `.cne-nav` goes
  * `display: contents` at the desktop breakpoint so the logo, tabs and right-hand
  * group become siblings in the header's flex row, reordered with `order`.
+ *
+ * The wordmark is centred at both sizes and takes no part in that flex row: it
+ * is positioned against the header instead, so it sits on the true centre
+ * rather than being pushed off it by whatever the pill currently reads.
  */
 export function SiteHeader() {
   const raw = usePathname() ?? "/";

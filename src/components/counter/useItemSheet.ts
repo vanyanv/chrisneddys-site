@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { MenuItem } from "@/data/menu";
 import type { WayId } from "./ItemSheet";
 
@@ -16,6 +16,20 @@ export function useItemSheet() {
   const [item, setItem] = useState<MenuItem | null>(null);
   const [open, setOpen] = useState(false);
   const [way, setWay] = useState<WayId>("chris");
+
+  /**
+   * `/menu/?way=eddy` opens the menu on that Way — the two buttons at the foot
+   * of the story page are the only things that link it, and the promise there
+   * is that the choice carries over.
+   *
+   * Read after mount rather than during render: the site is a static export,
+   * so the HTML is built without a query string and reading one at render time
+   * would be a hydration mismatch.
+   */
+  useEffect(() => {
+    const asked = new URLSearchParams(window.location.search).get("way");
+    if (asked === "chris" || asked === "eddy") setWay(asked);
+  }, []);
 
   const openItem = useCallback((next: MenuItem) => {
     setItem(next);

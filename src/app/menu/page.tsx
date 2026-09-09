@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { MenuBrowser } from "@/components/counter/MenuBrowser";
-import { openGraphFor, twitterFor } from "@/lib/seo";
+import { JsonLdScript, menuNode } from "@/components/shared/JsonLd";
+import { breadcrumbLd, openGraphFor, twitterFor } from "@/lib/seo";
 
-const title = "Menu — Sliders, Combos, Fries & Shakes";
+const title = "Menu & Prices — Sliders, Combos, Fries & Shakes";
 const description =
-  "Our full menu with live pickup prices: sliders from $6.49, combos from $11.49, the Secret Menu, chris-cut fries and shakes. Tap any item to order it online.";
+  "The full Chris N Eddy's menu with live pickup prices: sliders from $6.49, combos from $11.49, chris-cut fries, shakes and the Secret Menu. Tap any item to order.";
 
 export const metadata: Metadata = {
   title,
@@ -15,5 +16,13 @@ export const metadata: Metadata = {
 };
 
 export default function MenuPage() {
-  return <MenuBrowser />;
+  return (
+    <>
+      {/* The one page that carries the whole Menu node — every item, every
+          price. Elsewhere the Restaurant nodes point at the stub. */}
+      <JsonLdScript data={{ "@context": "https://schema.org", ...menuNode() }} />
+      <JsonLdScript data={breadcrumbLd([{ name: "Menu", path: "/menu/" }])} />
+      <MenuBrowser />
+    </>
+  );
 }

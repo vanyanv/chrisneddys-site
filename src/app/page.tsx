@@ -41,7 +41,7 @@ export default function HomePage() {
      the preload scanner only reaches it after the stylesheet. React hoists this
      into <head>, where it starts with the document. Home only — no other page
      shows it, and preloading it there would be a wasted 30 KB. */
-  preload("/hero-poster.webp", { as: "image", fetchPriority: "high" });
+  preload("/hero-still.webp", { as: "image", fetchPriority: "high" });
 
   return (
     <>

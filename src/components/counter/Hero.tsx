@@ -1,8 +1,7 @@
 import { storeUrl } from "@/lib/otter";
-import { HeroMedia } from "@/components/home/HeroMedia";
 
 /**
- * Red panel, oversized display type, and the signature slider on video.
+ * Red panel, oversized display type, and the basket shot.
  * On desktop the red becomes a left-hand panel and the media sits beside it —
  * see `.cne-hero-halftone` at the desktop breakpoint.
  */
@@ -53,12 +52,18 @@ export function Hero() {
           </div>
         </div>
         <div className="cne-heromedia">
-          <HeroMedia />
-          <div className="cne-stamp" aria-hidden="true">
-            SIGNATURE
-            <br />
-            SLIDER
-          </div>
+          {/* The loop this replaces was decoration, so it was loaded conditionally and
+              never counted as the LCP. A still *is* the LCP: it ships eagerly, at high
+              priority, and is preloaded from `page.tsx`. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero-still.webp"
+            alt="A basket of Chris N Eddy's smashed cheeseburger sliders"
+            width={1400}
+            height={1480}
+            fetchPriority="high"
+            decoding="async"
+          />
         </div>
       </div>
     </section>

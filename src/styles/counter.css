@@ -2712,19 +2712,6 @@ h3 { font-weight: 700; }
   to   { opacity: 1; transform: none; }
 }
 
-/* ---- the crawlable address --------------------------------------------- */
-.cne-ct-vcard {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-style: normal;
-  letter-spacing: 0.06em;
-  line-height: 1.9;
-  color: var(--a-sub);
-  text-align: center;
-  padding: 8px 15px 22px;
-}
-.cne-ct-vcard a { color: inherit; }
-
 /* ---- desktop ------------------------------------------------------------ */
 @media (min-width: 901px) {
   .cne-ct-hero { padding: 56px 44px 62px; }
@@ -2755,7 +2742,6 @@ h3 { font-weight: 700; }
   .cne-ct-card,
   .cne-ct-faq { padding: 20px; box-shadow: 5px 5px 0 var(--a-shadow); }
   .cne-ct-cardh { font-size: 10px; }
-  .cne-ct-vcard { padding: 12px 44px 30px; font-size: 11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

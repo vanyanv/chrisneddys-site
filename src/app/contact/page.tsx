@@ -43,8 +43,6 @@ const DEFLECT: Array<{ q: string; a: string }> = [
 ];
 
 export default function ContactPage() {
-  const flagship = locations.find((l) => l.id === "hollywood") ?? locations[0];
-
   /**
    * ContactPage is the type Google expects at this URL, and `contactPoint` is
    * where a phone number on a contact page is actually read from — the sitewide
@@ -143,15 +141,6 @@ export default function ContactPage() {
           </div>
         </aside>
       </div>
-
-      {/* The address block is the machine-readable half of "where we are": a
-          crawler reading this page for an address finds a real <address> with
-          a tel: link, not three cards it has to guess at. */}
-      <address className="cne-ct-vcard">
-        {brand.name} · {flagship.address}, {flagship.city}, {flagship.region} {flagship.postal} ·{" "}
-        <a href={`tel:${brand.phoneTel}`}>{brand.phone}</a> ·{" "}
-        <a href={`mailto:${brand.email}`}>{brand.email}</a>
-      </address>
     </>
   );
 }

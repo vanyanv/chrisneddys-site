@@ -5,14 +5,19 @@ import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
 import { storeUrl } from "@/lib/otter";
-import { mapBox, projectX, projectY, pxPerKm } from "@/data/laGeo";
+import { mapBox, projectX, projectY } from "@/data/laGeo";
+import {
+  MapPinArt,
+  pinClass,
+  TWO_MILES,
+  mapOverlayStyle,
+} from "@/components/locations/MapPins";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
 import { storeStatus, statusLabel } from "@/lib/hours";
 
 type LocationId = Location["id"];
-const TWO_MILES = 3.2187 * pxPerKm;
 
 /**
  * Map plus store cards, as in the prototype: pick a pin or a card and the other
@@ -44,7 +49,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
       <div className="cne-mapwrap">
         <div style={{ position: "relative", width: "100%" }}>
           {mapCanvas}
-          <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={overlay}>
+          <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={mapOverlayStyle}>
             {selected.isOpen && (
               <circle
                 cx={projectX(selected.lng)}
@@ -57,19 +62,9 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               <g
                 key={loc.id}
                 transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
-                className={[
-                  "cne-map-pin",
-                  loc.id === sel ? "is-selected" : "",
-                  loc.isOpen ? "" : "is-soon",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
+                className={pinClass(loc, sel)}
               >
-                <circle className="ring" r={9} />
-                <circle className="head" r={6.4} />
-                <text className="cap" y={-13} textAnchor="middle">
-                  {loc.name.toUpperCase()}
-                </text>
+                <MapPinArt loc={loc} />
                 <circle
                   className="hit"
                   r={17}
@@ -203,11 +198,3 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
     </div>
   );
 }
-
-const overlay = {
-  position: "absolute" as const,
-  inset: 0,
-  width: "100%",
-  height: "100%",
-  zIndex: 1,
-};

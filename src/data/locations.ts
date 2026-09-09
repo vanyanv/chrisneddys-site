@@ -44,28 +44,19 @@ export const locations: Location[] = [
   {
     id: "glendale",
     name: "Glendale",
-    sub: "Open since March 2026",
+    sub: "Opening soon",
     address: "1360 E Colorado St",
     city: "Glendale",
     region: "CA",
     postal: "91205",
-    status: "Open daily",
-    isOpen: true,
+    status: "Opening soon",
+    isOpen: false,
     lat: 34.1393,
     lng: -118.2380,
-    hours: [
-      ["Mon–Thu", "10:00 AM – 1:00 AM"],
-      ["Fri–Sat", "10:00 AM – 2:00 AM"],
-      ["Sunday", "10:00 AM – 2:00 AM"],
-    ],
-    openingSpec: [
-      {
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-        opens: "10:00",
-        closes: "01:00",
-      },
-      { dayOfWeek: ["Friday", "Saturday", "Sunday"], opens: "10:00", closes: "02:00" },
-    ],
+    hours: [["Launch", "Date to be announced"]],
+    // No openingSpec until it opens: it is what the live open/closed pill and
+    // the JSON-LD openingHoursSpecification are both built from, and neither
+    // should claim hours for a counter that is not serving.
   },
   {
     id: "vannuys",

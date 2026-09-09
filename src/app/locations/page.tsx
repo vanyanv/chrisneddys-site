@@ -5,7 +5,7 @@ import { openGraphFor, twitterFor } from "@/lib/seo";
 
 const title = "Locations — Hollywood, Glendale & Van Nuys";
 const description =
-  "Chris N Eddy’s in Hollywood (5539 Sunset Blvd) and Glendale (1360 E Colorado St), open till 1AM on weeknights and 2AM Friday to Sunday. Van Nuys opening soon.";
+  "Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd), open till 1AM on weeknights and 2AM Friday to Sunday. Glendale and Van Nuys opening soon.";
 
 export const metadata: Metadata = {
   title,

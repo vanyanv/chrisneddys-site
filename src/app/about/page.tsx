@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { AboutHero } from "@/components/about/AboutHero";
-import { StoryCopy } from "@/components/about/StoryCopy";
-import { Timeline } from "@/components/about/Timeline";
+import { TwoWays } from "@/components/about/TwoWays";
+import { StorySeam } from "@/components/about/StorySeam";
+import { StoryColumns } from "@/components/about/StoryColumns";
+import { StoryPress } from "@/components/about/StoryPress";
+import { StoryClose } from "@/components/about/StoryClose";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 import { brand } from "@/data/brand";
@@ -48,12 +50,14 @@ const aboutLd = {
 
 export default function AboutPage() {
   return (
-    <div className="cne-legacy-theme" style={{ paddingBottom: 80 }}>
+    <div className="cne-story">
       <JsonLdScript data={breadcrumbLd([{ name: "About", path: "/about/" }])} />
       <JsonLdScript data={aboutLd} />
-      <AboutHero />
-      <StoryCopy />
-      <Timeline />
+      <TwoWays />
+      <StorySeam />
+      <StoryColumns />
+      <StoryPress />
+      <StoryClose />
     </div>
   );
 }

@@ -1753,3 +1753,353 @@ h3 { font-weight: 700; }
 @media (min-width: 901px) {
   [data-mode="night"] .cne-cat h2.cne-cat-h { color: var(--a-fg); }
 }
+
+/* ---- desktop header, 901–1179 ------------------------------------------- */
+/* Four tabs, a pill, a button and a centred wordmark do not fit a 901px window
+   at the 1440-frame sizes — the tabs would run under the logo. Everything in
+   the row steps down a size until there is room for all three groups, which is
+   from 1180px up. */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .cne-header { gap: 14px; padding: 0 22px; }
+  .cne-nav img { height: 34px; }
+  .cne-tabs { gap: 4px; }
+  .cne-tab { font-size: 11px; letter-spacing: 0.08em; padding: 8px 8px; }
+  .cne-stat { font-size: 11px; padding: 7px 10px; }
+  .cne-orderbtn { font-size: 13px; padding: 11px 14px; }
+  .cne-orderbtn .cne-only-desk-i { display: none; }
+}
+
+/* =========================================================================
+   /about — the two Ways.
+
+   The page opens split down the middle, one founder either side, because the
+   argument they never settled is the reason the menu has two Ways on it. Every
+   class not in this block is the system's own; this is the only CSS the story
+   page adds, and it reuses the hero's halftone rather than inventing a texture.
+   ========================================================================= */
+.cne-story .cne-sec p { margin: 0 0 13px; }
+
+/* ---- the split ---------------------------------------------------------- */
+.cne-split {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: 3px solid var(--a-ink);
+}
+[data-mode="night"] .cne-split { border-bottom-color: #2b2620; }
+.cne-side {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 26px 15px 22px;
+  min-height: 292px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: filter 0.45s ease, opacity 0.45s ease;
+}
+.cne-side + .cne-side { border-top: 3px solid var(--a-ink); }
+.cne-side.is-chris { background: var(--sp-a-bg); color: var(--sp-a-fg); box-shadow: var(--sp-a-glow); }
+.cne-side.is-eddy { background: var(--sp-b-bg); color: var(--sp-b-fg); box-shadow: var(--sp-b-glow); }
+/* The half you didn't pick steps back rather than leaving. */
+.cne-side.is-off { filter: saturate(0.5); opacity: 0.55; }
+.cne-side.is-chris::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
+  background-size: 19px 19px;
+  opacity: var(--sp-dots);
+}
+.cne-side > * { position: relative; z-index: 2; }
+
+.cne-side-who {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.78;
+  margin-bottom: 10px;
+}
+.cne-side h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 12vw, 52px);
+  line-height: 0.9;
+  margin: 0 0 16px;
+  text-shadow: 4px 4px 0 var(--a-ink);
+}
+.cne-side.is-chris h2 { color: var(--sp-a-accent); }
+.cne-side.is-eddy h2 { color: var(--sp-b-fg); }
+[data-mode="night"] .cne-side.is-eddy h2 { color: var(--sp-b-accent); }
+
+.cne-taps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.cne-taps span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cne-taps span::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border: 2px solid currentColor;
+}
+.cne-side-q {
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-weight: 600;
+  max-width: 32ch;
+  border-top: 2px solid currentColor;
+  padding-top: 13px;
+  margin: 0;
+}
+.cne-side-pick {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cne-side[aria-pressed="true"] .cne-side-pick { opacity: 1; }
+.cne-side[aria-pressed="true"] .cne-side-pick::before { content: "\2713 "; }
+
+/* The halves arrive from opposite edges. `.cne-rv` is borrowed only to get
+   `is-in` from RevealRoot — the container itself must not fade or the two
+   animations fight over the same transform. */
+.js .cne-split.cne-rv,
+.js .cne-split.cne-rv.is-in { opacity: 1; transform: none; }
+.js .cne-side.is-chris,
+.js .cne-side.is-eddy { transform: translateY(16px); opacity: 0; }
+.js .cne-split.is-in .cne-side {
+  transform: none;
+  opacity: 1;
+  transition: transform 0.75s cubic-bezier(0.2, 0.8, 0.25, 1), opacity 0.6s ease,
+    filter 0.45s ease;
+}
+.js .cne-split.is-in .cne-side.is-off { opacity: 0.55; }
+
+/* The seam is a desktop object: on a phone the halves stack, so there is none. */
+.cne-seam { display: none; }
+
+.cne-evenbar {
+  background: var(--a-ink);
+  border-bottom: 3px solid var(--a-ink);
+  display: flex;
+  justify-content: center;
+  padding: 9px 15px;
+}
+[data-mode="night"] .cne-evenbar { background: #171310; border-bottom-color: #2b2620; }
+.cne-evenbar button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--a-yel);
+  padding: 4px 6px;
+}
+.cne-evenbar button:hover { color: #fff; }
+[data-mode="night"] .cne-evenbar button:hover { color: #fff2c9; }
+
+/* ---- the seam: the phone call ------------------------------------------- */
+.cne-band {
+  background: var(--a-nav);
+  color: #fff2c9;
+  padding: 30px 15px 32px;
+  border-bottom: 3px solid var(--a-ink);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.5s;
+}
+[data-mode="night"] .cne-band { border-bottom-color: #2b2620; }
+[data-mode="night"] .cne-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(78% 70% at 50% 42%, rgba(255, 59, 47, 0.4) 0%, transparent 74%);
+}
+.cne-band > * { position: relative; z-index: 2; }
+.cne-band .cne-eyebrow { color: var(--a-yel); }
+.cne-band-big {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(19px, 5.6vw, 26px);
+  line-height: 1.16;
+  max-width: 22ch;
+  margin: 8px auto 0;
+  color: #fff2c9;
+}
+.cne-band-big em { font-style: normal; color: var(--a-yel); }
+.cne-hair {
+  height: 3px;
+  background: var(--a-yel);
+  max-width: 260px;
+  margin: 20px auto 0;
+  transform: scaleX(0);
+  transform-origin: center;
+}
+.js .cne-hair.cne-rv { opacity: 1; }
+.js .cne-hair.cne-rv.is-in {
+  transform: scaleX(1);
+  transition: transform 0.85s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.cne-band-after {
+  margin: 18px auto 0;
+  max-width: 46ch;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 242, 201, 0.78);
+}
+
+/* ---- what they agreed on, and what they didn't -------------------------- */
+.cne-twocol { display: grid; grid-template-columns: 1fr; }
+.cne-twocol > div + div { border-top: 1.5px solid var(--a-line); }
+.cne-facts { margin-top: 14px; display: flex; flex-direction: column; }
+.cne-facts div {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  border-top: 1.5px solid var(--a-line);
+  padding: 8px 0;
+  color: var(--a-sub);
+}
+.cne-facts b { color: var(--a-red-cta); font-weight: 700; white-space: nowrap; }
+[data-mode="night"] .cne-facts b { color: var(--a-yel); }
+
+/* ---- closing ------------------------------------------------------------ */
+.cne-close { text-align: center; padding-bottom: 26px; }
+.cne-close h2 { display: inline-block; }
+.cne-close h2::after { left: 50%; transform: translateX(-50%); }
+.cne-close .cne-cta { max-width: 420px; margin-left: auto; margin-right: auto; }
+/* Beats `.cne-story .cne-sec p`, which resets the margin and would otherwise
+   take the `auto` that centres this line under a centred heading. */
+.cne-story .cne-close p.cne-close-p { max-width: 44ch; margin: 14px auto 0; }
+
+/* The two Ways keep their own colours all the way to the buttons. */
+.cne-big.is-chris { background: var(--a-red-cta); color: #fff2c9; flex: 1; }
+.cne-big.is-eddy { background: var(--a-yel); color: #1a1612; flex: 1; }
+[data-mode="night"] .cne-big.is-chris {
+  border-color: var(--a-red);
+  box-shadow: 0 0 22px rgba(255, 59, 47, 0.55);
+}
+[data-mode="night"] .cne-big.is-eddy { border-color: #2b2620; box-shadow: 4px 4px 0 #000; }
+
+@media (min-width: 901px) {
+  .cne-story .cne-sec p { font-size: 16px; margin-bottom: 14px; }
+
+  /* The two halves are one grid, so the seam between them can be re-weighted
+     in a single transition when someone takes a side. */
+  .cne-split {
+    grid-template-columns: var(--sp-l, 1fr) var(--sp-r, 1fr);
+    border-bottom: 4px solid var(--a-ink);
+    min-height: 560px;
+    transition: grid-template-columns 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
+  }
+  .cne-side { padding: 56px 44px 48px; min-height: 0; }
+  .cne-side + .cne-side { border-top: 0; }
+  .cne-side-who { font-size: 12px; letter-spacing: 0.24em; margin-bottom: 16px; }
+  .cne-side h2 {
+    font-size: clamp(40px, 4.6vw, 68px);
+    margin-bottom: 24px;
+    text-shadow: 6px 6px 0 var(--a-ink);
+  }
+  .cne-taps { gap: 8px; margin-bottom: 24px; }
+  .cne-taps span { font-size: 14px; gap: 11px; }
+  .cne-taps span::before { width: 12px; height: 12px; }
+  .cne-side-q { font-size: 19px; padding-top: 18px; border-top-width: 3px; }
+  .cne-side-pick { font-size: 12px; margin-top: 22px; }
+
+  /* Off the page rather than up it, once there is room either side.
+     These come before the `is-in` rule below on purpose: same specificity,
+     so source order is what decides, and the halves must end at `none`. */
+  .js .cne-side.is-chris { transform: translateX(-100%); opacity: 1; }
+  .js .cne-side.is-eddy { transform: translateX(100%); opacity: 1; }
+  .js .cne-split.is-in .cne-side { transform: none; opacity: 1; }
+  .js .cne-split.is-in .cne-side.is-off { opacity: 0.55; }
+
+  .cne-seam {
+    display: flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--sp-seam, 50%);
+    width: 4px;
+    background: var(--a-ink);
+    transform: translateX(-50%);
+    z-index: 4;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: left 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
+  }
+  [data-mode="night"] .cne-seam { background: #2b2620; }
+  .cne-seam span {
+    writing-mode: vertical-rl;
+    background: var(--a-ink);
+    color: #fff2c9;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    padding: 22px 5px;
+    white-space: nowrap;
+  }
+  [data-mode="night"] .cne-seam span { background: #2b2620; color: var(--a-yel); }
+
+  .cne-evenbar { padding: 12px 44px; border-bottom-width: 4px; }
+  .cne-evenbar button { font-size: 11px; }
+
+  .cne-band { padding: 72px 44px; border-bottom-width: 4px; }
+  .cne-band-big { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.12; margin-top: 18px; }
+  .cne-hair { max-width: 520px; margin-top: 32px; height: 4px; }
+  .cne-band-after { font-size: 16px; margin-top: 26px; max-width: 52ch; }
+
+  .cne-twocol { grid-template-columns: 1fr 1fr; }
+  .cne-twocol > div + div { border-top: 0; border-left: 4px solid var(--a-ink); }
+  [data-mode="night"] .cne-twocol > div + div { border-left-color: #2b2620; }
+  .cne-facts { margin-top: 22px; }
+  .cne-facts div { font-size: 13px; padding: 11px 0; border-top-width: 2px; }
+
+  .cne-close { padding-bottom: 60px; }
+  /* Wide enough that "CHRIS'S WAY →" stays on one line at the desktop button
+     size, which is bigger here than anywhere else on the site. */
+  .cne-close .cne-cta { max-width: 540px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .cne-side { transform: none !important; opacity: 1 !important; }
+  .js .cne-side.is-off { opacity: 0.55 !important; }
+  .cne-hair { transform: scaleX(1) !important; }
+  .cne-split,
+  .cne-seam { transition: none !important; }
+}

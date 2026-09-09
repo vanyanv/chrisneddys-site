@@ -1,3 +1,4 @@
+import { preload } from "react-dom";
 import { Hero } from "@/components/counter/Hero";
 import { Marquee } from "@/components/counter/Marquee";
 import { FeaturedCards } from "@/components/counter/FeaturedCards";
@@ -35,6 +36,12 @@ const GRAM = [
 ];
 
 export default function HomePage() {
+  /* The hero poster is this page's largest paint and it is a plain <img>, so
+     the preload scanner only reaches it after the stylesheet. React hoists this
+     into <head>, where it starts with the document. Home only — no other page
+     shows it, and preloading it there would be a wasted 30 KB. */
+  preload("/hero-poster.webp", { as: "image", fetchPriority: "high" });
+
   return (
     <>
       <Hero />

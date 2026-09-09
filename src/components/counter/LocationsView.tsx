@@ -49,7 +49,12 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
       <div className="cne-mapwrap">
         <div style={{ position: "relative", width: "100%" }}>
           {mapCanvas}
-          <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={mapOverlayStyle}>
+          <svg
+            viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
+            role="group"
+            aria-label="Pick a location on the map"
+            style={mapOverlayStyle}
+          >
             {selected.isOpen && (
               <circle
                 cx={projectX(selected.lng)}
@@ -122,7 +127,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-              <h3>{loc.name.toUpperCase()}</h3>
+              <h2 className="cne-loc-name">{loc.name.toUpperCase()}</h2>
               {loc.isOpen ? (
                 <OpenStatus locationId={loc.id} />
               ) : (
@@ -172,22 +177,14 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                     Online ordering for this store isn&rsquo;t live on Otter yet.
                   </div>
                 )}
-                <Link
-                  href={`/locations/${slugFor(loc)}/`}
-                  className="cne-loc-note"
-                  style={{ display: "inline-block", textDecoration: "underline" }}
-                >
+                <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
                   {loc.name} details &amp; directions &rarr;
                 </Link>
               </>
             ) : (
               <>
                 <div className="cne-loc-note">Opening date to be announced.</div>
-                <Link
-                  href={`/locations/${slugFor(loc)}/`}
-                  className="cne-loc-note"
-                  style={{ display: "inline-block", textDecoration: "underline" }}
-                >
+                <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
                   {loc.name} details &rarr;
                 </Link>
               </>

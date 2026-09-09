@@ -3,6 +3,8 @@ import { Marquee } from "@/components/counter/Marquee";
 import { FeaturedCards } from "@/components/counter/FeaturedCards";
 import { HollywoodCard } from "@/components/counter/HollywoodCard";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
+import { MapPins } from "@/components/locations/MapPins";
+import { MapCallout } from "@/components/locations/MapCallout";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -59,8 +61,15 @@ export default function HomePage() {
           <h2>Where we are.</h2>
           <HollywoodCard />
         </div>
-        <div className="cne-split-r" aria-hidden="true">
-          <LocationsMapCanvas />
+        {/* The pins are what make this read as our map rather than a map of
+            LA, so the home page draws the same three the prototype does. It is
+            a picture here — /locations owns the interactive version. */}
+        <div className="cne-split-r">
+          <div style={{ position: "relative", width: "100%" }} aria-hidden="true">
+            <LocationsMapCanvas />
+            <MapPins />
+            <MapCallout />
+          </div>
         </div>
       </section>
 

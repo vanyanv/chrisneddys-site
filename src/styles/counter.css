@@ -24,6 +24,18 @@
   --a-ink: #1a1612;
   --a-sub: rgba(26, 22, 18, 0.62);
   --a-nav: #e63027;
+  /* The tab strip runs a shade deeper than the display red, because 10px cream
+     type cannot clear 4.5:1 on #E63027 — that red tops out at 4.35:1 against
+     pure white, so no text colour passes on it. Both edges of the strip are
+     3px ink rules, which is what makes the step invisible. */
+  --a-navsurf: #d0281c;
+  /* The brand yellow is a fill colour. As *text* on the hero red it reads at
+     2.45:1, and the price is the one number in the hero worth reading, so text
+     on red uses a brighter cut of the same yellow. */
+  --a-yel-ink: #ffd633;
+  /* Idle tabs are dimmed at night, where the near-black bar can carry it, and
+     not in day, where the dim is what took the contrast to 2.18:1. */
+  --a-tab-idle: 1;
   --a-glow: none;
   --a-shadow: #1a1612;
   /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
@@ -34,6 +46,18 @@
   --a-fwy: #f5b82e;
   --a-fwycase: #1a1612;
   --a-blvd: rgba(26, 22, 18, 0.42);
+  /* /about's two Ways. Day is the brand's two flat colours, straight from the
+     hero panel and the order button; night trades both for the card black and
+     lights each side from inside, the way the rest of 2AM works. */
+  --sp-a-bg: #e63027;
+  --sp-a-fg: #fff2c9;
+  --sp-a-accent: #f5b82e;
+  --sp-a-glow: none;
+  --sp-b-bg: #f5b82e;
+  --sp-b-fg: #1a1612;
+  --sp-b-accent: #e63027;
+  --sp-b-glow: none;
+  --sp-dots: 0.1;
 }
 
 [data-mode="night"] {
@@ -47,6 +71,9 @@
   --a-ink: #0d0b09;
   --a-sub: rgba(255, 242, 201, 0.6);
   --a-nav: #0d0b09;
+  --a-navsurf: #0d0b09;
+  --a-yel-ink: var(--a-yel);
+  --a-tab-idle: 0.6;
   --a-glow: 0 0 24px rgba(255, 59, 47, 0.45);
   --a-shadow: #000;
   --a-red-cta: #d0281c;
@@ -56,6 +83,15 @@
   --a-fwy: #ffd53d;
   --a-fwycase: #000;
   --a-blvd: #3a332a;
+  --sp-a-bg: #171310;
+  --sp-a-fg: #fff2c9;
+  --sp-a-accent: #ff3b2f;
+  --sp-a-glow: inset 0 0 120px rgba(255, 59, 47, 0.34);
+  --sp-b-bg: #171310;
+  --sp-b-fg: #fff2c9;
+  --sp-b-accent: #ffd53d;
+  --sp-b-glow: inset 0 0 120px rgba(255, 213, 61, 0.22);
+  --sp-dots: 0;
 }
 
 html {
@@ -91,9 +127,23 @@ body {
   background: var(--a-nav);
   border-bottom: 3px solid var(--a-ink);
   transition: background 0.5s;
+  position: relative;
 }
 [data-mode="night"] .cne-nav { border-bottom-color: #2b2620; }
-.cne-logo { display: block; line-height: 0; }
+
+/* The wordmark sits on the row's centre with the status pill to its left and
+   the order button to its right. Taking it out of flow is what puts it on the
+   header's true centre: the pill and the button are different widths, so a
+   flex layout would centre it between them instead, and it would drift as the
+   pill's label changes through the day. */
+.cne-logo {
+  display: block;
+  line-height: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 .cne-nav img {
   /* 26px in the prototype, but 63% of that box was transparent padding, so the
      mark itself drew at ~10px and read as decoration rather than as the name of
@@ -104,7 +154,9 @@ body {
   display: block;
   filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.3));
 }
-.cne-nav-right { display: flex; gap: 6px; align-items: center; }
+/* `display: contents` promotes the pill and the button to children of the row,
+   so `justify-content: space-between` sends one to each end around the logo. */
+.cne-nav-right { display: contents; }
 
 .cne-orderbtn {
   font-family: var(--font-display);
@@ -172,7 +224,7 @@ body {
 /* tab bar */
 .cne-tabs {
   display: flex;
-  background: var(--a-nav);
+  background: var(--a-navsurf);
   border-bottom: 3px solid var(--a-ink);
   position: relative;
   transition: background 0.5s;
@@ -186,16 +238,17 @@ body {
   padding: 10px 4px;
   text-align: center;
   color: #fff2c9;
-  opacity: 0.6;
+  opacity: var(--a-tab-idle);
   cursor: pointer;
   border: none;
   background: none;
-  transition: opacity 0.25s;
+  transition: opacity 0.25s, color 0.25s;
   text-decoration: none;
   display: block;
   line-height: normal;
 }
-.cne-tab[aria-current="page"] { opacity: 1; }
+/* The yellow indicator under the strip is the state; this is the second cue. */
+.cne-tab[aria-current="page"] { opacity: 1; color: #fffdf6; }
 .cne-tab:focus-visible { outline: 2px solid var(--a-yel); outline-offset: -3px; }
 .cne-tabind {
   /* Width of the bar as a share of one tab, per the prototype: 22% of a
@@ -260,7 +313,7 @@ body {
 [data-mode="night"] .cne-hero h1 { text-shadow: 0 0 22px rgba(255, 59, 47, 0.9); }
 .cne-hero h1 .y { color: var(--a-yel); }
 .cne-hero-sub { font-size: 13px; line-height: 1.45; margin-top: 11px; opacity: 0.94; }
-.cne-hero-sub b { color: var(--a-yel); }
+.cne-hero-sub b { color: var(--a-yel-ink); }
 .cne-cta { display: flex; gap: 8px; margin-top: 15px; }
 
 .cne-big {
@@ -913,15 +966,16 @@ body {
     gap: 26px;
     height: 76px;
     padding: 0 44px;
-    background: var(--a-nav);
+    background: var(--a-navsurf);
     border-bottom: 4px solid var(--a-ink);
     transition: background 0.5s;
   }
   [data-mode="night"] .cne-header { border-bottom-color: #2b2620; }
   .cne-nav { display: contents; }
-  .cne-logo { order: 1; }
+  /* Centred against the header rather than the row, and by the same means. */
+  .cne-logo { left: 50%; top: 50%; transform: translate(-50%, -50%); }
   .cne-nav img { height: 44px; filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.28)); }
-  .cne-nav-right { order: 3; margin-left: auto; gap: 14px; }
+  .cne-nav-right { display: flex; align-items: center; order: 3; margin-left: auto; gap: 14px; }
 
   .cne-stat { font-size: 12px; padding: 9px 14px; border-radius: 24px; gap: 8px; border-width: 2px; }
   .cne-dot { width: 9px; height: 9px; }
@@ -937,12 +991,11 @@ body {
 
   /* The tab bar becomes inline nav links inside the header. */
   .cne-tabs {
-    order: 2;
+    order: 1;
     border-bottom: none;
     background: none;
     flex: none;
     gap: 8px;
-    margin-left: 14px;
   }
   .cne-tabind { display: none; }
   .cne-tab {
@@ -957,7 +1010,7 @@ body {
   .cne-tab:hover { transform: translateY(-2px); }
   .cne-tab[aria-current="page"] {
     background: #fff2c9;
-    color: var(--a-red);
+    color: var(--a-red-cta);
     border-color: var(--a-ink);
     box-shadow: 4px 4px 0 var(--a-ink);
   }
@@ -1020,7 +1073,9 @@ body {
   }
   [data-mode="night"] .cne-hero h1 { text-shadow: 0 0 44px rgba(255, 59, 47, 0.9); }
   .cne-hero-sub {
-    font-size: 22px;
+    /* 24px is where the WCAG large-text threshold starts, and cream clears 3:1
+       on the hero red but not 4.5:1. Two pixels, and the subtitle is legible. */
+    font-size: 24px;
     line-height: 1.4;
     margin-top: 26px;
     max-width: 32ch;

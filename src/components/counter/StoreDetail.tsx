@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
-import { brand } from "@/data/brand";
 import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
@@ -88,9 +87,11 @@ export function StoreDetail({
             >
               DIRECTIONS
             </a>
-            <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
-              CALL
-            </a>
+            {loc.phoneTel && (
+              <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
+                CALL
+              </a>
+            )}
           </div>
 
           {loc.isOpen && loc.id !== "hollywood" && (

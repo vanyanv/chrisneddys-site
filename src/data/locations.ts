@@ -1,7 +1,17 @@
+import { brand } from "./brand";
+
 export type Location = {
   id: "hollywood" | "glendale" | "vannuys";
   name: string;
   sub: string;
+  /**
+   * The line this counter answers itself. A store only gets a CALL button and a
+   * `telephone` in its JSON-LD once it has one — three addresses across two
+   * cities sharing the Hollywood number is the pattern local search reads as a
+   * virtual office. Glendale and Van Nuys get theirs when they open.
+   */
+  phone?: string;
+  phoneTel?: string;
   address: string;
   city: string;
   region: string;
@@ -25,6 +35,8 @@ export const locations: Location[] = [
     postal: "90028",
     status: "Open daily",
     isOpen: true,
+    phone: brand.phone,
+    phoneTel: brand.phoneTel,
     lat: 34.0980,
     lng: -118.3099,
     hours: [

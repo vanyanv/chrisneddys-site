@@ -166,9 +166,11 @@ export default function OrderPage() {
                   >
                     DIRECTIONS
                   </a>
-                  <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
-                    CALL
-                  </a>
+                  {loc.phoneTel && (
+                    <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
+                      CALL
+                    </a>
+                  )}
                 </div>
               </>
             ) : (

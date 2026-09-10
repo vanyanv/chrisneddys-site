@@ -35,11 +35,11 @@ export function SiteFooter() {
         ))}
       </nav>
       <div>
+        {/* No phone number here on purpose: the sitewide footer is on every page,
+            and the only number we have is the Hollywood counter's. Showing it
+            under a Glendale or Van Nuys page reads as that store's line. The
+            number lives on the pages that name a store instead. */}
         Hollywood · Glendale · Van Nuys ·{" "}
-        <a href={`tel:${brand.phoneTel}`} style={linkStyle}>
-          {brand.phone}
-        </a>{" "}
-        ·{" "}
         <a href={brand.igUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>
           {brand.ig}
         </a>

@@ -151,7 +151,7 @@ export function JsonLd(): ReactElement {
     // Only the counter that answers it. Three addresses across two cities
     // sharing one number is the pattern local search treats as a virtual
     // office — and Glendale and Van Nuys have no line to answer yet.
-    telephone: loc.isOpen ? brand.phone : undefined,
+    telephone: loc.phone,
     email: brand.email,
     address: {
       "@type": "PostalAddress",

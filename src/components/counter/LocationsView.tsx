@@ -3,7 +3,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
-import { brand } from "@/data/brand";
 import { orderUrl } from "@/lib/otter";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import {
@@ -168,9 +167,11 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                   >
                     DIRECTIONS
                   </a>
-                  <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
-                    CALL
-                  </a>
+                  {loc.phoneTel && (
+                    <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
+                      CALL
+                    </a>
+                  )}
                 </div>
                 {loc.id !== "hollywood" && (
                   <div className="cne-loc-note">

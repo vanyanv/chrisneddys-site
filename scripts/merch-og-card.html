@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chris N Eddy's Ball-Cap — social card source</title>
+<!--
+  Source for /public/shop/ball-cap.png, the product's social card and its
+  `Product.image` in structured data.
+
+  It states only what is known about the cap: the name, the price, that the run
+  is limited and that it is one size. The crown carries no embroidery, because
+  nobody has seen the artwork.
+
+  It is a real PNG in /public rather than a generated `opengraph-image` route
+  because a static export writes that route to an extensionless file, which
+  serves as application/octet-stream — no use to Google Images, and no use to a
+  link preview. `og.jpg` for the site as a whole is a real file for the same
+  reason; this follows it.
+
+  Regenerate with: node scripts/render-merch-og.mjs
+  Delete both the moment there is a photograph of the actual hat.
+-->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=JetBrains+Mono:wght@700;800&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    display: flex;
+    background: #e63027;
+    color: #fff2c9;
+    font-family: "Bowlby One", Impact, sans-serif;
+    overflow: hidden;
+  }
+  /* The halftone the site puts on every red panel. */
+  .dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
+    background-size: 19px 19px;
+    opacity: 0.1;
+  }
+  .left {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    padding: 52px 0 50px 68px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .flag {
+    align-self: flex-start;
+    background: #1a1612;
+    color: #f5b82e;
+    font-size: 25px;
+    letter-spacing: 0.09em;
+    padding: 13px 17px;
+    line-height: 1;
+    transform: rotate(-1.5deg);
+  }
+  h1 { font-size: 76px; line-height: 0.94; letter-spacing: 0.01em; text-shadow: 5px 5px 0 #1a1612; }
+  h1 em { font-style: normal; display: block; color: #f5b82e; font-size: 98px; }
+  .row { display: flex; align-items: baseline; gap: 20px; margin-top: 22px; }
+  .price {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 62px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .size {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    opacity: 0.92;
+  }
+  .foot {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+  /* The cap, drawn with the same geometry as CapArt on the site itself. */
+  .right {
+    position: relative;
+    z-index: 2;
+    width: 470px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cap {
+    position: relative;
+    width: 360px;
+    aspect-ratio: 2 / 1.35;
+    transform: rotate(-7deg);
+    filter: drop-shadow(10px 12px 0 rgba(26, 22, 18, 0.35));
+  }
+  .cap .crown {
+    position: absolute; left: 8%; top: 0; width: 84%; height: 74%;
+    background: #1a1612; border: 4px solid #1a1612;
+    border-radius: 50% 50% 12% 12% / 62% 62% 18% 18%;
+    overflow: hidden;
+  }
+  .cap .crown::after {
+    content: ""; position: absolute; left: 50%; top: 0; bottom: 14%; width: 3px;
+    background: rgba(255, 255, 255, 0.14); transform: translateX(-50%);
+  }
+  .cap .brim {
+    position: absolute; left: 0; bottom: 0; width: 100%; height: 30%;
+    background: #1a1612; border: 4px solid #1a1612;
+    border-radius: 50% / 100% 100% 34% 34%; transform: rotate(-2deg);
+  }
+  .cap .btn {
+    position: absolute; left: 50%; top: -6px; width: 17px; height: 17px;
+    border-radius: 50%; background: #1a1612; border: 4px solid #1a1612;
+    transform: translateX(-50%); z-index: 3;
+  }
+</style>
+</head>
+<body>
+  <span class="dots"></span>
+  <div class="left">
+    <span class="flag">LIMITED RUN</span>
+    <div>
+      <h1>CHRIS N EDDY&rsquo;S<em>BALL-CAP</em></h1>
+      <div class="row">
+        <span class="price">$48.00</span>
+        <span class="size">ONE SIZE FITS ALL</span>
+      </div>
+    </div>
+    <div class="foot">CHRISNEDDYS.COM/SHOP &middot; 5539 W. SUNSET BLVD</div>
+  </div>
+  <div class="right">
+    <div class="cap">
+      <span class="btn"></span>
+      <span class="crown"></span>
+      <span class="brim"></span>
+    </div>
+  </div>
+</body>
+</html>

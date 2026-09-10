@@ -40,6 +40,8 @@
   --a-shadow: #1a1612;
   /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
   --a-red-cta: #d0281c;
+  /* The one positive colour on the site — free shipping, and the bag meter. */
+  --a-ok: #2f6b43;
   /* map */
   --a-mapbg: #f4ecd8;
   --a-water: #bcd3dd;
@@ -77,6 +79,7 @@
   --a-glow: 0 0 24px rgba(255, 59, 47, 0.45);
   --a-shadow: #000;
   --a-red-cta: #d0281c;
+  --a-ok: #6fbe8b;
   /* map */
   --a-mapbg: #100d0b;
   --a-water: #17323d;
@@ -991,9 +994,15 @@ body {
   box-sizing: border-box;
 }
 
-/* Five tabs on a narrow phone. */
+/* Six tabs on a narrow phone. SHOP is short, but it still takes a sixth of the
+   strip away from LOCATIONS and OUR STORY, which were already the two that set
+   the floor. The second step is for 360px handsets, where a sixth of the strip
+   is 60px and the tracking has to go entirely. */
 @media (max-width: 480px) {
   .cne-tab { font-size: 8.5px; letter-spacing: 0.02em; padding: 10px 1px; }
+}
+@media (max-width: 390px) {
+  .cne-tab { font-size: 7.5px; letter-spacing: 0; padding: 10px 0; }
 }
 
 /* =========================================================================
@@ -1035,18 +1044,20 @@ body {
     border-bottom: none;
     background: none;
     flex: none;
-    gap: 5px;
+    gap: 3px;
   }
   .cne-tabind { display: none; }
   .cne-tab {
     flex: none;
-    font-size: 14px;
-    /* Five tabs, not four: the run has to end before the centred wordmark
+    font-size: 13px;
+    /* Six tabs, not five: the run has to end before the centred wordmark
        starts, and the wordmark is positioned against the header rather than
-       laid out in the row, so nothing pushes it out of the way. The tracking
-       and padding here are what buy the fifth tab its room. */
-    letter-spacing: 0.06em;
-    padding: 10px 11px;
+       laid out in the row, so nothing pushes it out of the way — the tabs run
+       straight under it instead. The tracking and padding here are what buy
+       the sixth tab its room. At the old five-tab values SHOP pushed the run
+       48px past the logo's left edge at 1366. */
+    letter-spacing: 0.02em;
+    padding: 10px 7px;
     opacity: 1;
     border: 3px solid transparent;
     transition: background 0.2s, color 0.2s, transform 0.14s;
@@ -1807,16 +1818,16 @@ h3 { font-weight: 700; }
 }
 
 /* ---- desktop header, 901–1339 ------------------------------------------- */
-/* Five tabs, a pill, a button and a centred wordmark do not fit a 901px window
+/* Six tabs, a pill, a button and a centred wordmark do not fit a 901px window
    at the 1440-frame sizes — the tabs would run under the logo. Everything in
    the row steps down a size until there is room for all three groups, which is
-   from 1340px up. The ceiling moved with /contact: at four tabs the full-size
-   row already fit by 1280. */
+   from 1340px up. The ceiling moved with /contact, and again with /shop: each
+   tab added is ~40px the run has to find before it reaches the wordmark. */
 @media (min-width: 901px) and (max-width: 1339px) {
   .cne-header { gap: 12px; padding: 0 18px; }
   .cne-nav img { height: 34px; }
-  .cne-tabs { gap: 2px; }
-  .cne-tab { font-size: 10.5px; letter-spacing: 0.02em; padding: 8px 5px; }
+  .cne-tabs { gap: 1px; }
+  .cne-tab { font-size: 9.5px; letter-spacing: 0.01em; padding: 8px 3px; }
   .cne-stat { font-size: 11px; padding: 7px 10px; }
   .cne-orderbtn { font-size: 13px; padding: 11px 14px; }
   .cne-orderbtn .cne-only-desk-i { display: none; }
@@ -2734,4 +2745,731 @@ h3 { font-weight: 700; }
     transition: none !important;
   }
   .cne-ck-underline { transition: none !important; }
+}
+
+/* =========================================================================
+   THE SHOP — /shop, the product page, and the bag.
+   ========================================================================= *
+   Ported from the checkout prototype. Phone values are the base and
+   `@media (min-width: 901px)` carries the desktop ones, same as the rest of
+   this file.
+
+   The bag is the only part of this that appears outside /shop: the header
+   button and the drawer are mounted sitewide, because a bag that vanishes when
+   you wander off to the menu is a bag nobody trusts.
+   ========================================================================= */
+
+/* ---- the cap, drawn ------------------------------------------------------
+   Stands in for photography that does not exist yet. Every container fixes its
+   own aspect ratio, so real shots drop in without moving anything. */
+.cne-capshot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--a-cream);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  --cne-mark: 15px;
+}
+[data-mode="night"] .cne-capshot { background: #171310; }
+.cne-capshot-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#1a1612 1px, transparent 1px);
+  background-size: 9px 9px;
+  opacity: 0.13;
+}
+[data-mode="night"] .cne-capshot-dots { opacity: 0.28; }
+
+.cne-cap {
+  position: relative;
+  z-index: 2;
+  width: 62%;
+  max-width: 230px;
+  aspect-ratio: 2 / 1.35;
+  --cne-cap-c: #1a1612;
+  --cne-cap-m: var(--a-yel);
+  transform: var(--cne-cap-t, none);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.cne-cap .crown {
+  position: absolute;
+  left: 8%;
+  top: 0;
+  width: 84%;
+  height: 74%;
+  background: var(--cne-cap-c);
+  border: 2.5px solid #1a1612;
+  border-radius: 50% 50% 12% 12% / 62% 62% 18% 18%;
+  overflow: hidden;
+}
+/* The centre seam. Light rather than dark, because the crown is near-black. */
+.cne-cap .crown::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 14%;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateX(-50%);
+}
+.cne-cap .brim {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 30%;
+  background: var(--cne-cap-c);
+  border: 2.5px solid #1a1612;
+  border-radius: 50% / 100% 100% 34% 34%;
+  transform: rotate(-2deg);
+}
+.cne-cap .btn {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--cne-cap-c);
+  border: 2.5px solid #1a1612;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+[data-mode="night"] .cne-cap .crown,
+[data-mode="night"] .cne-cap .brim,
+[data-mode="night"] .cne-cap .btn { border-color: #3a332a; }
+.cne-cap .mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30%;
+  z-index: 4;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--cne-mark);
+  color: var(--cne-cap-m);
+  line-height: 1;
+}
+.cne-cap .mark small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.36em;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  margin-top: 5px;
+  opacity: 0.9;
+}
+/* Says out loud that this is a drawing. One string, in merch.ts, deleted the
+   day a photograph exists. */
+.cne-capshot-tag {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(26, 22, 18, 0.82);
+  color: #fff2c9;
+  padding: 4px 7px;
+}
+
+/* ---- shop index --------------------------------------------------------- */
+.cne-shop-lede {
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--a-sub);
+  margin: 0 0 18px;
+}
+.cne-drops { display: grid; gap: 16px; }
+.cne-drop {
+  position: relative;
+  display: grid;
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-shadow);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+[data-mode="night"] .cne-drop { border-color: #2b2620; box-shadow: none; }
+.cne-drop:hover { transform: translate(-4px, -4px); box-shadow: 9px 9px 0 var(--a-red); border-color: var(--a-red); }
+[data-mode="night"] .cne-drop:hover { box-shadow: var(--a-glow); }
+.cne-drop:hover .cne-cap { transform: rotate(-4deg) scale(1.05); }
+.cne-drop:active { transform: translate(0, 0); box-shadow: 2px 2px 0 var(--a-shadow); }
+.cne-drop-art { --cne-mark: 20px; border-bottom: 2.5px solid var(--a-ink); }
+[data-mode="night"] .cne-drop-art { border-bottom-color: #2b2620; }
+.cne-drop-art .cne-capshot { aspect-ratio: 4 / 3; }
+.cne-drop-b { padding: 17px 17px 19px; display: flex; flex-direction: column; gap: 6px; }
+.cne-drop-b h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.05;
+  margin: 0;
+  padding: 0;
+}
+/* The index card is a link, not a section — no yellow rule underneath it. */
+.cne-drop-b h2::after { content: none; }
+.cne-drop-price {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+[data-mode="night"] .cne-drop-price { color: var(--a-yel); }
+.cne-drop-b p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--a-sub); max-width: 44ch; }
+.cne-drop-go {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--a-red-cta);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+[data-mode="night"] .cne-drop-go { color: var(--a-yel); }
+.cne-drop-go span { transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1); }
+.cne-drop:hover .cne-drop-go span { transform: translateX(5px); }
+.cne-drop-flag {
+  position: absolute;
+  right: -7px;
+  top: 12px;
+  z-index: 6;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  background: var(--a-red-cta);
+  color: #fff2c9;
+  border: 2px solid var(--a-ink);
+  padding: 6px 8px;
+  line-height: 1;
+  transform: rotate(3deg);
+}
+[data-mode="night"] .cne-drop-flag { border-color: var(--a-red); box-shadow: var(--a-glow); }
+.cne-drop-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  line-height: 1.6;
+}
+.cne-drop-note span { flex: none; width: 26px; height: 2px; background: var(--a-line); }
+
+.cne-shop-facts { display: grid; gap: 0; border: 2.5px solid var(--a-ink); background: var(--a-card); margin-top: 4px; }
+[data-mode="night"] .cne-shop-facts { border-color: #2b2620; }
+.cne-shop-facts > div { padding: 13px 15px 15px; border-bottom: 2px solid var(--a-line); }
+.cne-shop-facts > div:last-child { border-bottom: none; }
+.cne-shop-facts b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.cne-shop-facts span { font-size: 12.5px; line-height: 1.55; color: var(--a-sub); }
+.cne-shop-facts a { text-decoration: underline; color: inherit; }
+
+/* ---- product page ------------------------------------------------------- */
+.cne-pdp-crumb {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  padding: 14px 15px 0;
+}
+.cne-pdp-crumb a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.cne-pdp-crumb a:hover { color: var(--a-red-cta); }
+
+.cne-pdp { display: grid; gap: 18px; padding: 14px 15px 4px; }
+.cne-pdp-gal { display: flex; flex-direction: column; gap: 9px; }
+.cne-pdp-main { border: 3px solid var(--a-ink); }
+[data-mode="night"] .cne-pdp-main { border-color: #2b2620; }
+.cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; --cne-mark: 22px; }
+.cne-pdp-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.cne-pdp-t { border: 2.5px solid var(--a-line); background: none; padding: 0; cursor: pointer; }
+.cne-pdp-t[aria-selected="true"] { border-color: var(--a-ink); }
+[data-mode="night"] .cne-pdp-t[aria-selected="true"] { border-color: var(--a-red); }
+.cne-pdp-t .cne-capshot { aspect-ratio: 1 / 1; --cne-mark: 9px; }
+.cne-pdp-t .cne-cap { width: 78%; }
+.cne-pdp-t .cne-cap .mark small { display: none; }
+
+.cne-pdp-buy h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  line-height: 0.96;
+  margin: 5px 0 0;
+  font-weight: 400;
+}
+.cne-pdp-price { display: flex; align-items: baseline; gap: 10px; margin: 12px 0 2px; flex-wrap: wrap; }
+.cne-price { font-family: var(--font-mono); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.cne-pdp-price .p { font-size: 26px; }
+[data-mode="night"] .cne-price { color: var(--a-yel); }
+.cne-pdp-price .s { font-family: var(--font-mono); font-size: 10px; color: var(--a-sub); font-weight: 500; }
+
+/* The scarcity flag takes the space a size grid would have used. */
+.cne-limited {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-cream);
+}
+[data-mode="night"] .cne-limited { border-color: var(--a-red); background: rgba(255, 59, 47, 0.08); }
+.cne-limited .tag {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  background: var(--a-red-cta);
+  color: #fff2c9;
+  border: 2px solid var(--a-ink);
+  padding: 5px 7px;
+  line-height: 1;
+  flex: none;
+  transform: rotate(-2deg);
+}
+[data-mode="night"] .cne-limited .tag { border-color: var(--a-red); box-shadow: var(--a-glow); }
+.cne-limited .txt { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; font-weight: 700; }
+
+.cne-pdp-lab {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--a-sub);
+  margin: 18px 0 8px;
+}
+.cne-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 2px solid var(--a-ink);
+  background: var(--a-ink);
+  color: #fff2c9;
+  padding: 8px 11px;
+  line-height: 1;
+}
+/* One size means there is nothing to choose — so it states, it does not offer. */
+.cne-chip.is-static { cursor: default; }
+[data-mode="night"] .cne-chip { background: var(--a-red-cta); border-color: var(--a-red); }
+
+.cne-pdp-row { display: flex; gap: 9px; align-items: stretch; margin-top: 18px; }
+.cne-qty { display: flex; border: 3px solid var(--a-ink); flex: none; }
+[data-mode="night"] .cne-qty { border-color: #2b2620; }
+.cne-qty button {
+  width: 38px;
+  background: transparent;
+  border: none;
+  color: var(--a-fg);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+.cne-qty button:disabled { opacity: 0.3; cursor: not-allowed; }
+.cne-qty > span {
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  border-left: 2px solid var(--a-line);
+  border-right: 2px solid var(--a-line);
+  font-variant-numeric: tabular-nums;
+}
+.cne-qty > span b { font-weight: 800; display: block; }
+
+.cne-btn-primary {
+  flex: 1;
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: #fff2c9;
+  background: var(--a-red-cta);
+  border: 3px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-shadow);
+  padding: 15px 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.2s;
+}
+[data-mode="night"] .cne-btn-primary { border-color: var(--a-red); box-shadow: var(--a-glow); }
+.cne-btn-primary:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--a-shadow); }
+/* Payment is not connected yet, so the button reads as a placeholder rather
+   than as something that failed. */
+.cne-btn-primary.is-dead,
+.cne-btn-primary:disabled {
+  background: transparent;
+  color: var(--a-sub);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: not-allowed;
+  font-size: 11.5px;
+}
+.cne-btn-primary:disabled:active { transform: none; }
+.cne-btn-ghost {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: transparent;
+  color: var(--a-sub);
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* What has not been settled yet, said in the place a buyer looks for it. */
+.cne-pending {
+  margin: 16px 0 0;
+  padding: 11px 12px;
+  border: 2px dashed var(--a-line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+[data-mode="night"] .cne-pending { border-color: #3a332a; }
+
+/* The price and the button must never scroll away on a phone. */
+.cne-pdp-sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 15px;
+  margin-top: 18px;
+  background: var(--a-bg);
+  border-top: 3px solid var(--a-ink);
+}
+[data-mode="night"] .cne-pdp-sticky { border-top-color: #2b2620; }
+.cne-pdp-sticky .p { font-size: 19px; flex: none; }
+.cne-pdp-sticky .cne-btn-primary { padding: 14px 12px; font-size: 12px; box-shadow: 3px 3px 0 var(--a-shadow); }
+
+.cne-pdp-more { padding-top: 26px; }
+.cne-pdp-more p { max-width: 62ch; margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: var(--a-sub); }
+.cne-pdp-more a { text-decoration: underline; color: inherit; }
+
+/* ---- the bag button, in the site header --------------------------------- */
+.cne-bag-slot { display: inline-flex; }
+.cne-bagbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #1a1612;
+  background: var(--a-yel);
+  border: 2px solid #1a1612;
+  box-shadow: 2px 2px 0 #1a1612;
+  padding: 7px 9px;
+  line-height: 1;
+  cursor: pointer;
+  transform-origin: 70% 50%;
+  transition: transform 0.09s, box-shadow 0.09s;
+}
+.cne-bagbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1a1612; }
+[data-mode="night"] .cne-bagbtn { background: var(--a-red-cta); color: #fff2c9; border-color: var(--a-red); box-shadow: var(--a-glow); }
+.cne-bagbtn svg { width: 12px; height: 12px; flex: none; }
+.cne-bagbtn-t { display: none; }
+.cne-bagbtn-c {
+  background: #1a1612;
+  color: var(--a-yel);
+  padding: 0 5px;
+  font-size: 9px;
+  min-width: 16px;
+  height: 14px;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+}
+[data-mode="night"] .cne-bagbtn-c { background: #fff2c9; color: #1a1612; }
+.cne-bagbtn-c span { display: block; height: 14px; line-height: 14px; }
+
+/* ---- the drawer --------------------------------------------------------- */
+.cne-bag-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(13, 11, 9, 0.55);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cne-bag-scrim.is-in { opacity: 1; }
+.cne-drawer {
+  position: fixed;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 91;
+  height: 90%;
+  max-height: 90dvh;
+  background: var(--a-bg);
+  border-top: 4px solid var(--a-ink);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(101%);
+  transition: transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+.cne-drawer.is-in { transform: none; }
+[data-mode="night"] .cne-drawer { border-top-color: var(--a-red); }
+.cne-dr-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 17px;
+  border-bottom: 3px solid var(--a-ink);
+  background: var(--a-cream);
+}
+[data-mode="night"] .cne-dr-head { background: #171310; border-bottom-color: #2b2620; }
+.cne-dr-head h2 { font-family: var(--font-display); font-size: 18px; margin: 0; font-weight: 400; line-height: 1; }
+.cne-dr-x {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--a-fg);
+  line-height: 1;
+  padding: 6px 8px;
+}
+.cne-dr-body { flex: 1; overflow: auto; padding: 15px 17px; -webkit-overflow-scrolling: touch; }
+
+.cne-bag-lines { list-style: none; margin: 0; padding: 0; }
+.cne-li { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1.5px solid var(--a-line); overflow: hidden; }
+[data-mode="night"] .cne-li { border-bottom-color: #2b2620; }
+.cne-li-art { width: 72px; flex: none; border: 2.5px solid var(--a-ink); }
+[data-mode="night"] .cne-li-art { border-color: #2b2620; }
+.cne-li-art .cne-capshot { aspect-ratio: 1 / 1; --cne-mark: 8px; }
+.cne-li-art .cne-cap { width: 80%; }
+.cne-li-b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cne-li-b .n { font-family: var(--font-display); font-size: 13px; line-height: 1.1; }
+.cne-li-b .v { font-family: var(--font-mono); font-size: 9.5px; color: var(--a-sub); letter-spacing: 0.06em; }
+.cne-li-ft { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
+.cne-li-ft .cne-price { font-size: 14px; }
+.cne-qty-sm { display: flex; border: 2px solid var(--a-ink); }
+[data-mode="night"] .cne-qty-sm { border-color: #3a332a; }
+.cne-qty-sm button {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  color: var(--a-fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+.cne-qty-sm button:disabled { opacity: 0.3; cursor: not-allowed; }
+.cne-qty-sm span {
+  width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  border-left: 1.5px solid var(--a-line);
+  border-right: 1.5px solid var(--a-line);
+}
+.cne-li-rm {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--a-sub);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.cne-li-rm:hover { color: var(--a-red); }
+
+.cne-dr-foot { border-top: 3px solid var(--a-ink); padding: 14px 17px 16px; background: var(--a-cream); }
+[data-mode="night"] .cne-dr-foot { background: #171310; border-top-color: #2b2620; }
+.cne-tot { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.cne-tot div { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-mono); font-size: 11px; }
+.cne-tot div span:last-child { font-weight: 800; font-variant-numeric: tabular-nums; }
+.cne-tot .sub span:last-child { font-size: 14px; }
+.cne-tot .muted { color: var(--a-sub); }
+.cne-tot .grand { border-top: 2px solid var(--a-ink); padding-top: 9px; margin-top: 4px; font-size: 13px; }
+[data-mode="night"] .cne-tot .grand { border-top-color: #2b2620; }
+.cne-tot .grand span:last-child { font-size: 19px; }
+[data-mode="night"] .cne-tot .grand span:last-child { color: var(--a-yel); }
+.cne-dr-note.is-terms {
+  margin: 10px 0 13px;
+  text-align: left;
+  font-size: 11px;
+  padding: 10px 11px;
+  border: 2px dashed var(--a-line);
+}
+[data-mode="night"] .cne-dr-note.is-terms { border-color: #3a332a; }
+.cne-dr-note {
+  margin: 9px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: var(--a-sub);
+  text-align: center;
+}
+
+/* The cap in flight, between the gallery and the header. */
+.cne-flyer {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  width: 56px;
+  height: 56px;
+  border: 2.5px solid #1a1612;
+  background: #fff2c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.cne-flyer .cne-cap { width: 78%; max-width: none; }
+
+/* ---- shop motion --------------------------------------------------------
+   Everything decorative sits behind the reduced-motion guard; the flow works
+   identically without a single one of them. */
+@media (prefers-reduced-motion: no-preference) {
+  .cne-bagbtn.is-new { animation: cne-bag-in 0.56s cubic-bezier(0.18, 1.5, 0.4, 1) both; }
+  .cne-bagbtn.is-bump { animation: cne-bag-bump 0.4s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .cne-bagbtn-c span { animation: cne-bag-roll 0.32s cubic-bezier(0.25, 0.9, 0.3, 1) both; }
+  .cne-qty > span b { animation: cne-qty-nudge 0.26s cubic-bezier(0.3, 1.4, 0.5, 1); }
+  .cne-drawer.is-in .cne-li { animation: cne-li-in 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both; animation-delay: calc(var(--cne-li-i, 0) * 70ms + 110ms); }
+  .cne-li.is-out { animation: cne-li-out 0.28s cubic-bezier(0.4, 0, 0.7, 0.2) both; }
+  .cne-capshot.is-swap { animation: cne-shot-in 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+}
+@keyframes cne-bag-in {
+  0% { transform: scale(0.2) rotate(-22deg); opacity: 0; }
+  55% { transform: scale(1.18) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes cne-bag-bump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.2) rotate(-4deg); }
+  100% { transform: scale(1); }
+}
+@keyframes cne-bag-roll { from { transform: translateY(14px); } to { transform: translateY(0); } }
+@keyframes cne-qty-nudge {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+@keyframes cne-li-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes cne-li-out { to { opacity: 0; transform: translateX(38px); margin-bottom: -96px; filter: blur(2px); } }
+@keyframes cne-shot-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-drawer,
+  .cne-bag-scrim,
+  .cne-cap,
+  .cne-drop,
+  .cne-drop-go span { transition: none !important; }
+}
+
+/* ---- desktop ------------------------------------------------------------ */
+@media (min-width: 901px) {
+  .cne-shop-lede { font-size: 15px; margin-bottom: 22px; }
+  .cne-drops { gap: 20px; }
+  .cne-drop { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); box-shadow: 6px 6px 0 var(--a-shadow); }
+  .cne-drop-art { border-bottom: none; border-right: 2.5px solid var(--a-ink); }
+  [data-mode="night"] .cne-drop-art { border-right-color: #2b2620; }
+  .cne-drop-art { --cne-mark: 30px; }
+  .cne-drop-art .cne-capshot { aspect-ratio: auto; height: 100%; min-height: 270px; }
+  .cne-drop-art .cne-cap { width: 58%; max-width: 340px; }
+  .cne-drop-b { padding: 26px 28px; justify-content: center; gap: 7px; }
+  .cne-drop-b h2 { font-size: 25px; }
+  .cne-drop-price { font-size: 22px; }
+  .cne-drop-b p { font-size: 13px; }
+  .cne-drop-flag { font-size: 10.5px; padding: 7px 9px; top: 16px; right: -8px; }
+
+  .cne-shop-facts { grid-template-columns: repeat(4, 1fr); }
+  .cne-shop-facts > div { border-bottom: none; border-right: 2px solid var(--a-line); }
+  .cne-shop-facts > div:last-child { border-right: none; }
+
+  .cne-pdp-crumb { padding: 20px 30px 0; }
+  .cne-pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr); gap: 34px; padding: 18px 30px 8px; }
+  .cne-pdp-gal { gap: 10px; }
+  .cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; }
+  .cne-pdp-main .cne-cap { width: 66%; max-width: 430px; }
+  .cne-pdp-thumbs { gap: 10px; }
+  .cne-pdp-buy h1 { font-size: 31px; }
+  .cne-pdp-price .p { font-size: 27px; }
+  .cne-btn-primary { font-size: 13.5px; padding: 16px; }
+  /* The sticky bar is a phone answer to a phone problem. On a desktop the buy
+     row is still on screen, so a second one would just be a second one. */
+  .cne-pdp-sticky { display: none; }
+  .cne-limited .txt { font-size: 10.5px; }
+  .cne-pending { font-size: 10.5px; }
+  .cne-pdp-more { padding-top: 34px; }
+
+  .cne-bagbtn { font-size: 10px; padding: 8px 11px; box-shadow: 2px 2px 0 #1a1612; }
+  .cne-bagbtn-t { display: inline; }
+
+  /* Above the phone breakpoint the drawer comes in from the right, which is
+     where a bag has lived since carts had corners. */
+  .cne-drawer {
+    top: 0;
+    left: auto;
+    width: 392px;
+    height: auto;
+    max-height: none;
+    border-top: none;
+    border-left: 4px solid var(--a-ink);
+    transform: translateX(101%);
+    transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
+  }
+  [data-mode="night"] .cne-drawer { border-left-color: var(--a-red); border-top-color: transparent; }
+  .cne-drawer.is-in { transform: none; }
+  .cne-dr-head { padding: 15px 18px; }
+  .cne-dr-head h2 { font-size: 19px; }
+  .cne-dr-body { padding: 16px 18px; }
+  .cne-dr-foot { padding: 15px 18px 18px; }
 }

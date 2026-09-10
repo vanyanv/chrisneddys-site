@@ -8,17 +8,19 @@ import { useEffect, useState } from "react";
 import { brand } from "@/data/brand";
 import { orderUrl } from "@/lib/otter";
 import { OpenStatus } from "@/components/shared/OpenStatus";
+import { BagButton } from "@/components/shop/BagButton";
 
 const TABS = [
   { href: "/", label: "HOME" },
   { href: "/menu/", label: "MENU" },
   { href: "/locations/", label: "LOCATIONS" },
+  { href: "/shop/", label: "SHOP" },
   { href: "/about/", label: "OUR STORY" },
   { href: "/contact/", label: "CONTACT" },
 ];
 
 /**
- * Red header with the live status pill and a five-tab bar.
+ * Red header with the live status pill and a six-tab bar.
  *
  * On a phone the tab bar is its own band under the logo row; on desktop the two
  * collapse into a single 76px row. That's one DOM either way — `.cne-nav` goes
@@ -50,6 +52,12 @@ export function SiteHeader() {
         </Link>
         <div className="cne-nav-right">
           <OpenStatus />
+          {/* The bag is additive: it renders nothing at all until there is
+              something in it, and it never replaces ORDER ONLINE — that button
+              is the food business's front door and it points at Otter. A nav
+              control that means different things on different pages is one
+              people stop trusting. */}
+          <BagButton />
           <a className="cne-orderbtn" data-surface="header" href={orderUrl("header")} target="_blank" rel="noopener noreferrer">
             ORDER<span className="cne-only-desk-i"> ONLINE →</span>
           </a>

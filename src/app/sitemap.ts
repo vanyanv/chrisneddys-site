@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
 import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
+import { merch, MERCH_UPDATED } from "@/data/merch";
 
 export const dynamic = "force-static";
 
@@ -64,6 +65,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: i.photo ? [`${brand.siteUrl}/menu/${i.photo}.webp`] : undefined,
     })),
     { path: "/order/", priority: 0.9, updated: SITE_UPDATED },
+    // The shop is its own funnel: /shop/ is the entry point and each product
+    // page is what a search for the product itself should land on, so the
+    // product ranks above the index it sits in.
+    { path: "/shop/", priority: 0.7, updated: MERCH_UPDATED },
+    ...merch.map((p) => ({
+      path: `/shop/${p.slug}/`,
+      priority: 0.8,
+      updated: MERCH_UPDATED,
+      images: [`${brand.siteUrl}/shop/${p.slug}.png`],
+    })),
     { path: "/locations/", priority: 0.8, updated: LOCATIONS_UPDATED },
     ...allLocationSlugs().map((slug) => ({
       path: `/locations/${slug}/`,

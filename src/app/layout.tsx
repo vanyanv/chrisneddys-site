@@ -9,6 +9,7 @@ import { OrderDock } from "@/components/counter/OrderDock";
 import { LastCall } from "@/components/counter/LastCall";
 import { NightMode } from "@/components/counter/NightMode";
 import { RevealRoot } from "@/components/counter/Reveal";
+import { BagDrawer } from "@/components/shop/BagDrawer";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
@@ -128,6 +129,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }}
         />
         <SiteFooter />
+        {/* Sitewide, because the bag is: someone who put a cap in it and then
+            wandered off to the menu should still be able to open it. Renders
+            no DOM at all until it is opened. */}
+        <BagDrawer />
         <OrderDock />
         <Script
           defer

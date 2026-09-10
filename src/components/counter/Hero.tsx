@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { orderUrl, formatPrice } from "@/lib/otter";
 import { SLIDER_PRICE } from "@/data/menu";
 import { HERO } from "@/lib/heroImage";
@@ -51,9 +52,9 @@ export function Hero() {
             >
               ORDER ONLINE →
             </a>
-            <a className="cne-big is-secondary" href="/menu/">
+            <Link className="cne-big is-secondary" href="/menu/">
               <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
-            </a>
+            </Link>
           </div>
         </div>
         <div className="cne-heromedia">

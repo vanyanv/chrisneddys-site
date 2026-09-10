@@ -6,7 +6,7 @@ import { TERMS_PENDING, merch, money, productBySlug } from "@/data/merch";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { productLd, productImage } from "@/lib/merchLd";
+import { productLd, socialCard } from "@/lib/merchLd";
 import { breadcrumbLd, twitterFor } from "@/lib/seo";
 
 type Params = { product: string };
@@ -44,7 +44,7 @@ export async function generateMetadata({
       locale: "en_US",
       images: [
         {
-          url: productImage(product.slug),
+          url: socialCard(product.slug),
           width: 1200,
           height: 630,
           alt: `${product.name} — ${money(product.price)}`,
@@ -53,7 +53,7 @@ export async function generateMetadata({
     },
     twitter: {
       ...twitterFor({ title: `${title} · ${brand.name}`, description }),
-      images: [productImage(product.slug)],
+      images: [socialCard(product.slug)],
     },
   };
 }

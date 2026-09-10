@@ -22,9 +22,26 @@ import { SHOP_OPEN, type MerchProduct } from "@/data/merch";
  * There is no `aggregateRating` and no `review`, because there are no reviews.
  */
 
-/** The generated social card doubles as the product image until photography exists. */
-export function productImage(slug: string): string {
+/**
+ * The 1200x630 link preview. Always the generated card, never the photograph:
+ * a product shot letterboxed into a social slot is a small object in a wide
+ * grey field, and the card is built to that ratio on purpose.
+ */
+export function socialCard(slug: string): string {
   return `${brand.siteUrl}/shop/${slug}.png`;
+}
+
+/**
+ * What Google is shown for the product.
+ *
+ * The photograph first, because a merchant listing wants the object and not a
+ * poster of it; the generated social card second, since it is the 1200x630 that
+ * link previews want and a second image costs nothing here. Products without a
+ * photo fall back to the card alone.
+ */
+export function productImage(product: { slug: string; photo?: string }): string[] {
+  const card = socialCard(product.slug);
+  return product.photo ? [`${brand.siteUrl}/menu/${product.photo}.webp`, card] : [card];
 }
 
 export function productLd(product: MerchProduct) {
@@ -36,7 +53,7 @@ export function productLd(product: MerchProduct) {
     "@id": `${url}#product`,
     name: product.name,
     description: product.description,
-    image: [productImage(product.slug)],
+    image: productImage(product),
     url,
     sku: `CNE-${product.slug.toUpperCase()}`,
     brand: { "@type": "Brand", name: brand.name },

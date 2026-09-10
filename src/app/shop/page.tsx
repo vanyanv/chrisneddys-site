@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, merch, money } from "@/data/merch";
-import { CapArt } from "@/components/shop/CapArt";
+import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { shopListLd } from "@/lib/merchLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
@@ -65,7 +65,12 @@ export default function ShopPage() {
             <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
               <span className="cne-drop-flag">LIMITED RUN</span>
               <div className="cne-drop-art">
-                <CapArt />
+                <ProductShot
+                  product={product}
+                  view={product.views[0]}
+                  sizes="(min-width: 901px) 700px, 100vw"
+                  priority
+                />
               </div>
               <div className="cne-drop-b">
                 <h2>

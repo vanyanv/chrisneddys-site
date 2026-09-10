@@ -82,7 +82,10 @@
     letter-spacing: 0.12em;
     white-space: nowrap;
   }
-  /* The cap, drawn with the same geometry as CapArt on the site itself. */
+  /* The product photograph — the same Otter file /shop and the menu row use,
+     read straight off disk, so the card cannot drift from the page. It is a
+     cutout on white, so it sits on the red as a printed plate: ink rule, hard
+     offset shadow, and the tilt the drawing used to have. */
   .right {
     position: relative;
     z-index: 2;
@@ -91,33 +94,16 @@
     align-items: center;
     justify-content: center;
   }
-  .cap {
-    position: relative;
-    width: 360px;
-    aspect-ratio: 2 / 1.35;
-    transform: rotate(-7deg);
-    filter: drop-shadow(10px 12px 0 rgba(26, 22, 18, 0.35));
-  }
-  .cap .crown {
-    position: absolute; left: 8%; top: 0; width: 84%; height: 74%;
-    background: #1a1612; border: 4px solid #1a1612;
-    border-radius: 50% 50% 12% 12% / 62% 62% 18% 18%;
+  .shot {
+    width: 400px;
+    border: 5px solid #1a1612;
+    background: #fffdf6;
+    transform: rotate(-2.5deg);
+    box-shadow: 12px 14px 0 rgba(26, 22, 18, 0.42);
     overflow: hidden;
+    line-height: 0;
   }
-  .cap .crown::after {
-    content: ""; position: absolute; left: 50%; top: 0; bottom: 14%; width: 3px;
-    background: rgba(255, 255, 255, 0.14); transform: translateX(-50%);
-  }
-  .cap .brim {
-    position: absolute; left: 0; bottom: 0; width: 100%; height: 30%;
-    background: #1a1612; border: 4px solid #1a1612;
-    border-radius: 50% / 100% 100% 34% 34%; transform: rotate(-2deg);
-  }
-  .cap .btn {
-    position: absolute; left: 50%; top: -6px; width: 17px; height: 17px;
-    border-radius: 50%; background: #1a1612; border: 4px solid #1a1612;
-    transform: translateX(-50%); z-index: 3;
-  }
+  .shot img { width: 100%; height: auto; display: block; }
 </style>
 </head>
 <body>
@@ -134,10 +120,8 @@
     <div class="foot">CHRISNEDDYS.COM/SHOP &middot; 5539 W. SUNSET BLVD</div>
   </div>
   <div class="right">
-    <div class="cap">
-      <span class="btn"></span>
-      <span class="crown"></span>
-      <span class="brim"></span>
+    <div class="shot">
+      <img src="../public/menu/6cff1a91-e6d5-4bad-adc6-e62bc26f19cf.webp" alt="">
     </div>
   </div>
 </body>

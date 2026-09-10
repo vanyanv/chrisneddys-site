@@ -1,11 +1,15 @@
 /**
  * The merch catalogue.
  *
- * Unlike `menu.ts`, this is not a mirror of anything — Otter sells the food and
- * knows nothing about a hat, and the whole point of putting merch on our own
- * domain is that we own the browsing. So this file is the source of truth, and
- * a price change here is a price change everywhere: the product page, the bag,
+ * Otter carries the cap too, as `chris-n-eddy-s-ball-cap-limited-run` in
+ * `menu.ts`, which is where its photograph comes from. What Otter cannot do is
+ * a merch browse: a hat filed between the shakes and the fries is not a shop.
+ * So this file is the source of truth for everything except the photo, and a
+ * price change here is a price change everywhere: the product page, the bag,
  * the Product structured data and the sitemap's `lastmod` all read from it.
+ *
+ * The one number that has to agree with Otter is the price. If they diverge,
+ * `menu.ts` is what the till charges.
  *
  * EVERY FIELD HERE IS A CLAIM THE BUSINESS HAS TO HONOUR. Four things about
  * this cap are actually known — the name, the price, that the run is limited,
@@ -50,9 +54,16 @@ export type MerchProduct = {
   /** Sold as one size — set false the day a product has variants. */
   oneSize: boolean;
   /**
+   * Basename of the product photograph in /public/menu, without extension —
+   * the same Otter asset the menu row uses, so there is one file and one
+   * upload rather than a second copy that drifts. `<photo>-thumb.webp` is the
+   * 200px cut, `<photo>.webp` the 720px one.
+   */
+  photo?: string;
+  /**
    * Gallery angles. One entry means one image and no thumbnail strip: there is
-   * no photography yet, and four labelled "views" of a drawing would be
-   * describing angles nobody has shot. Add entries when the shots exist.
+   * one photograph, and four labelled "views" of it would be describing angles
+   * nobody has shot. Add entries when more shots exist.
    */
   views: MerchView[];
 };
@@ -77,13 +88,6 @@ export const MAX_PER_ORDER = 6;
 export const MERCH_UPDATED = "2026-09-10";
 
 /**
- * Photography does not exist yet, so every product renders as the drawn cap in
- * `CapArt`. This is the one string that says so on the page — delete it the day
- * real shots land, and nothing else about the layout has to move.
- */
-export const ARTWORK_NOTE = "Illustration — photography coming";
-
-/**
  * What is not settled yet, said once, in the place a buyer would look for it.
  * Replace with the real terms; do not delete without replacing.
  */
@@ -102,7 +106,14 @@ export const merch: MerchProduct[] = [
       "Chris N Eddy’s Ball-Cap — $48, one size fits all, limited quantity. A limited run from the Hollywood smash-burger counter.",
     limitedNote: "Limited quantity. Once they’re gone, they’re gone.",
     oneSize: true,
-    views: [{ id: "cap", label: "CAP", caption: "Chris N Eddy’s Ball-Cap" }],
+    photo: "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf",
+    views: [
+      {
+        id: "cap",
+        label: "CAP",
+        caption: "Navy trucker cap with the Chris N Eddy’s wordmark embroidered on the front",
+      },
+    ],
   },
 ];
 

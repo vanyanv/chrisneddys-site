@@ -23,7 +23,9 @@ export type CapView = "cap" | "on" | "side" | "back" | "stitch";
 
 /** Per-angle transforms, for when there is more than one shot to show. */
 const VIEW_TRANSFORM: Record<CapView, string> = {
-  cap: "none",
+  /* The tilt the social card uses. A cap sitting dead level on a flat panel
+     reads as a logo; seven degrees reads as an object on a shelf. */
+  cap: "rotate(-7deg)",
   on: "none",
   side: "rotate(-7deg) scale(1.04)",
   back: "rotate(4deg) scaleX(-1)",

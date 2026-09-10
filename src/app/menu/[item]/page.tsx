@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const full = `${title} · ${brand.name}`;
   const description = `${item.desc} ${formatPrice(
     item.price,
-  )} for pickup from our Hollywood counter at 5539 W. Sunset Blvd, open till 2AM. Every topping free.`;
+  )} for pickup from our Hollywood counter at 5539 W. Sunset Blvd, open late. Every topping free.`;
 
   return {
     title,

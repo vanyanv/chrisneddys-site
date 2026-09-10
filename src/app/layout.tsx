@@ -39,11 +39,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smash Burger Sliders in LA, Open Till 2AM`,
+    default: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
     template: `%s · ${brand.name}`,
   },
   description:
-    "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
+    "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
@@ -65,14 +65,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smash Burger Sliders in LA, Open Till 2AM`,
-    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
+    title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
+    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
+    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE.url],
   },
   alternates: {

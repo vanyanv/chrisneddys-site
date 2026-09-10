@@ -30,7 +30,7 @@ export default function OG() {
             fontWeight: 800,
           }}
         >
-          OPEN TIL 2AM
+          OPEN LATE
         </div>
         <div
           style={{

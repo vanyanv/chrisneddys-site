@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // field mostly does not — For The Win shuts at 9PM — so the open counter says
   // so in its title rather than burying it in the hours table.
   const title = loc.isOpen
-    ? `${hood} Smash Burgers, Open Till 2AM`
+    ? `${hood} Smash Burgers, Open Late`
     : `${hood} Smash Burgers & Sliders`;
   const full = `${title} · ${brand.name}`;
   const description = loc.isOpen

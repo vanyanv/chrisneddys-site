@@ -7,7 +7,6 @@ import { SiteHeader } from "@/components/counter/SiteHeader";
 import { SiteFooter } from "@/components/counter/SiteFooter";
 import { OrderDock } from "@/components/counter/OrderDock";
 import { LastCall } from "@/components/counter/LastCall";
-import { NightMode } from "@/components/counter/NightMode";
 import { RevealRoot } from "@/components/counter/Reveal";
 import { BagDrawer } from "@/components/shop/BagDrawer";
 import { brand } from "@/data/brand";
@@ -112,7 +111,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
         />
         <JsonLd />
-        <NightMode />
         <RevealRoot />
         <TrackEvents />
         <SiteHeader />

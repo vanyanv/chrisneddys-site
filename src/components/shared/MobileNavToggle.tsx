@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { brand } from "@/data/brand";
+import { orderUrl } from "@/lib/otter";
 
 const links = [
   { href: "/", label: "Home" },
@@ -121,7 +121,7 @@ export function MobileNavToggle({ activePath }: { activePath: string }) {
             })}
           </nav>
           <a
-            href={brand.orderUrl}
+            href={orderUrl("nav")}
             target="_blank"
             rel="noopener noreferrer"
             style={{

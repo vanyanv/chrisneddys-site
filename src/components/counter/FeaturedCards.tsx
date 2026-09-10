@@ -1,7 +1,7 @@
 "use client";
 
 import { allItems, type MenuItem } from "@/data/menu";
-import { formatPrice } from "@/lib/otter";
+import { formatPrice, itemPhotoAlt } from "@/lib/otter";
 import { ItemSheet } from "./ItemSheet";
 import { useItemSheet } from "./useItemSheet";
 
@@ -38,7 +38,7 @@ export function FeaturedCards() {
                   src={`/menu/${it.photo}.webp`}
                   srcSet={`/menu/${it.photo}-thumb.webp 200w, /menu/${it.photo}.webp 720w`}
                   sizes="(min-width: 901px) 440px, 60px"
-                  alt=""
+                  alt={itemPhotoAlt(it)}
                   width={720}
                   height={479}
                   loading="lazy"

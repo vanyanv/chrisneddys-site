@@ -1,4 +1,6 @@
-import { storeUrl } from "@/lib/otter";
+import { orderUrl, formatPrice } from "@/lib/otter";
+import { SLIDER_PRICE } from "@/data/menu";
+import { HERO } from "@/lib/heroImage";
 
 /**
  * Red panel, oversized display type, and the basket shot.
@@ -23,10 +25,13 @@ export function Hero() {
           {/* The price used to be the last four words of the paragraph, which put it as far
               from the order button as the copy allowed. It reads as a fact strip now, one
               line above the button that spends it. Hollywood only: Glendale and Van Nuys
-              have no hours in `locations.ts` because they are not serving yet. */}
+              have no hours in `locations.ts` because they are not serving yet.
+
+              The figure comes from the menu data rather than the copy: it and the /menu/
+              meta description had already drifted a dollar apart. */}
           <p className="cne-hero-meta">
             <span>
-              Sliders from <b>$7.49</b>
+              Sliders from <b>{formatPrice(SLIDER_PRICE)}</b>
             </span>
             <span className="cne-hero-dot" aria-hidden="true">
               ·
@@ -37,10 +42,10 @@ export function Hero() {
             </span>
             <span className="cne-hero-addr">5539 W. Sunset Blvd</span>
           </p>
-          <div className="cne-cta">
+          <div className="cne-cta" data-surface="hero">
             <a
               className="cne-big is-primary"
-              href={storeUrl}
+              href={orderUrl("hero")}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -57,10 +62,12 @@ export function Hero() {
               priority, and is preloaded from `page.tsx`. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/hero-still.webp"
-            alt="A basket of Chris N Eddy's smashed cheeseburger sliders"
-            width={1400}
-            height={1480}
+            src={HERO.src}
+            srcSet={HERO.srcSet}
+            sizes={HERO.sizes}
+            alt={HERO.alt}
+            width={HERO.width}
+            height={HERO.height}
             fetchPriority="high"
             decoding="async"
           />

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { MenuItem } from "@/data/menu";
 import { ways, extras } from "@/data/menu";
-import { itemOrderUrl, formatPrice } from "@/lib/otter";
+import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
 
 export type WayId = (typeof ways)[number]["id"];
 
@@ -109,7 +109,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
                     : undefined
                 }
                 role="img"
-                aria-label={item.name}
+                aria-label={itemPhotoAlt(item)}
               />
               <div className="cne-sheet-hd">
                 <h3>{item.name}</h3>
@@ -168,7 +168,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
             <>
               <a
                 className="cne-otter"
-                href={itemOrderUrl(item)}
+                href={itemOrderUrl(item, "item-sheet")}
+                data-item={item.id}
                 target="_blank"
                 rel="noopener noreferrer"
               >

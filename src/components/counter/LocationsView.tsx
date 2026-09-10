@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
-import { storeUrl } from "@/lib/otter";
+import { orderUrl } from "@/lib/otter";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import {
   MapPinArt,
@@ -156,7 +156,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                 {loc.sub && <div className="cne-loc-note">{loc.sub}</div>}
                 <div className="cne-loc-btns">
                   {loc.id === "hollywood" && (
-                    <a className="cne-mini is-red" href={storeUrl} target="_blank" rel="noopener noreferrer">
+                    <a className="cne-mini is-red" href={orderUrl("locations-map")} target="_blank" rel="noopener noreferrer">
                       ORDER
                     </a>
                   )}

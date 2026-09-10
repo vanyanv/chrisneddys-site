@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { locations } from "@/data/locations";
 import { brand } from "@/data/brand";
-import { storeUrl } from "@/lib/otter";
+import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 
@@ -33,7 +33,7 @@ export function HollywoodCard() {
         ))}
       </div>
       <div className="cne-loc-btns">
-        <a className="cne-mini is-red" href={storeUrl} target="_blank" rel="noopener noreferrer">
+        <a className="cne-mini is-red" href={orderUrl("location-card")} target="_blank" rel="noopener noreferrer">
           ORDER
         </a>
         <a

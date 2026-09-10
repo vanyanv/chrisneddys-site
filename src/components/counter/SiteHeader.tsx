@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { brand } from "@/data/brand";
-import { storeUrl } from "@/lib/otter";
+import { orderUrl } from "@/lib/otter";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 
 const TABS = [
@@ -50,7 +50,7 @@ export function SiteHeader() {
         </Link>
         <div className="cne-nav-right">
           <OpenStatus />
-          <a className="cne-orderbtn" href={storeUrl} target="_blank" rel="noopener noreferrer">
+          <a className="cne-orderbtn" data-surface="header" href={orderUrl("header")} target="_blank" rel="noopener noreferrer">
             ORDER<span className="cne-only-desk-i"> ONLINE →</span>
           </a>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { MenuItem } from "@/data/menu";
-import { formatPrice } from "@/lib/otter";
+import { formatPrice, itemPhotoAlt } from "@/lib/otter";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -30,7 +30,7 @@ export function MenuRow({
         {item.photo ? (
           <img
             src={`/menu/${item.photo}-thumb.webp`}
-            alt=""
+            alt={itemPhotoAlt(item)}
             width={200}
             height={133}
             loading="lazy"

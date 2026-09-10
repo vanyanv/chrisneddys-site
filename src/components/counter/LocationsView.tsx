@@ -12,7 +12,7 @@ import {
   mapOverlayStyle,
 } from "@/components/locations/MapPins";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
-import { OpenStatus } from "@/components/shared/OpenStatus";
+import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
 import { storeStatus, statusLabel } from "@/lib/hours";
 
@@ -130,10 +130,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               {loc.isOpen ? (
                 <OpenStatus locationId={loc.id} />
               ) : (
-                <span className="cne-stat is-shut">
-                  <span className="cne-dot" aria-hidden="true" />
-                  COMING SOON
-                </span>
+                <ComingSoonTag />
               )}
             </div>
             <div className="cne-loc-addr">

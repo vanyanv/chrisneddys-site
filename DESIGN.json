@@ -337,12 +337,12 @@
       "css": ".ds-btn-order { display: inline-block; white-space: nowrap; font-family: 'Bowlby One', Impact, sans-serif; font-size: 11px; letter-spacing: 0.05em; line-height: 1; text-decoration: none; background: #f5b82e; color: #1a1612; border: 2px solid #1a1612; border-radius: 0; padding: 8px 11px; box-shadow: 2px 2px 0 #1a1612; transition: transform 0.12s, box-shadow 0.12s; cursor: pointer; } .ds-btn-order:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #1a1612; } .ds-btn-order:focus-visible { outline: 3px solid #1a1612; outline-offset: 2px; } .ds-btn-order:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1a1612; }"
     },
     {
-      "name": "Store Status Pill",
+      "name": "Store Status Tag",
       "kind": "chip",
-      "refersTo": "status-pill",
-      "description": "Live open/closed state in the header. The only rounded rectangle in the system, and the dot pulses.",
-      "html": "<span class=\"ds-stat\"><i class=\"ds-stat-dot\"></i>OPEN TIL 2</span>",
-      "css": ".ds-stat { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 74px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; line-height: 1; white-space: nowrap; background: #fff2c9; color: #1a1612; border: 1.5px solid #1a1612; border-radius: 20px; padding: 5px 9px; } .ds-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b43; flex: none; animation: ds-stat-pulse 2.2s ease-in-out infinite; } @keyframes ds-stat-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } } @media (prefers-reduced-motion: reduce) { .ds-stat-dot { animation: none; } }"
+      "refersTo": "status-tag",
+      "description": "Live open/closed state in the header: a two-cell punch card. The state in the display face on cream with the pulsing dot, the fact it implies reversed out on ink in the mono. Square, ruled and shadowed like every other object here.",
+      "html": "<span class=\"ds-stat\"><span class=\"ds-stat-a\"><i class=\"ds-stat-dot\"></i>OPEN</span><span class=\"ds-stat-b\">TILL 1 AM</span></span>",
+      "css": ".ds-stat { display: inline-flex; align-items: stretch; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; border: 2px solid #1a1612; border-radius: 0; box-shadow: 2px 2px 0 #1a1612; } .ds-stat-a { display: inline-flex; align-items: center; gap: 5px; padding: 10px 8px; background: #fff2c9; color: #1a1612; font-family: 'Bowlby One', Impact, sans-serif; font-size: 9.5px; letter-spacing: 0.02em; } .ds-stat-b { display: inline-flex; align-items: center; padding: 10px 8px; border-left: 2px solid #1a1612; background: #1a1612; color: #fff2c9; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; } .ds-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b43; flex: none; animation: ds-stat-pulse 2.2s ease-in-out infinite; } @keyframes ds-stat-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } } @media (prefers-reduced-motion: reduce) { .ds-stat-dot { animation: none; } }"
     },
     {
       "name": "Topic Chip",
@@ -390,7 +390,7 @@
     "overview": "This is roadside signage you can order from. Warm paper, two spot colors laid down flat, everything outlined in near-black ink like a sign someone painted by hand and a printer reproduced badly on purpose. There is one palette and one light: daylight on Sunset Blvd. Nothing here dims, glows, or switches with the clock.\n\nThe register is brand: design is the product here. The site exists to send a hungry person to the order button, and it earns that by being unmistakably a specific place rather than a generic food page. Density is high and deliberately unrefined. Type is oversized past the point of comfort, borders are thick enough to read as physical edges, and nothing is soft.\n\nWhat this system explicitly rejects: the delivery-app aesthetic it links out to, corporate chain polish, upscale-restaurant minimalism, and the hipster craft-burger kit of kraft paper and distressed textures.",
     "keyCharacteristics": [
       "One palette, one light. No theme switch, no dark variant, no time-of-day behavior.",
-      "Zero rounding by default. Sharp corners everywhere except pills and one status capsule.",
+      "Zero rounding by default. Sharp corners everywhere except pills.",
       "Shadows with no blur: solid ink offsets that read as printed registration, not lighting.",
       "Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.",
       "Flat spot color. No gradients, no tints, no glass. A surface is one color.",
@@ -459,7 +459,7 @@
       "Don't add a dark mode, a theme toggle, or any time-of-day color behavior. This was removed deliberately.",
       "Don't use a blurred or grey drop shadow. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.",
       "Don't emit light. No glow, no neon, no colored shadow with a blur radius.",
-      "Don't round corners. Square by default, 999px for pills, 20px for the status capsule, and nothing else.",
+      "Don't round corners. Square by default, 999px for pills, 50% for the status dot, and nothing else. There is no 20px left in the system.",
       "Don't introduce a gradient, a tint, a glass surface or a backdrop-filter as decoration. Surfaces are one flat color.",
       "Don't use background-clip: text with a gradient. The display face is already the emphasis.",
       "Don't use border-left or border-right greater than 1px as a colored accent stripe on a card, row or callout.",

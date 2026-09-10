@@ -68,7 +68,6 @@ typography:
     letterSpacing: "0.05em"
 rounded:
   none: "0"
-  stat: "20px"
   pill: "999px"
   sheet: "18px 18px 0 0"
   circle: "50%"
@@ -112,18 +111,18 @@ components:
     typography: "{typography.label}"
     rounded: "{rounded.pill}"
     padding: "8px 12px"
-  status-pill:
+  status-tag-state:
     backgroundColor: "{colors.counter-cream}"
     textColor: "{colors.griddle-ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.stat}"
-    padding: "5px 9px"
-  status-pill-closed:
+    typography: "{typography.title}"
+    rounded: "{rounded.none}"
+    padding: "10px 8px"
+  status-tag-time:
     backgroundColor: "{colors.griddle-ink}"
     textColor: "{colors.counter-cream}"
     typography: "{typography.label}"
-    rounded: "{rounded.stat}"
-    padding: "5px 9px"
+    rounded: "{rounded.none}"
+    padding: "10px 8px"
   card-location:
     backgroundColor: "{colors.card-white}"
     textColor: "{colors.griddle-ink}"
@@ -156,7 +155,7 @@ What this system explicitly rejects: the delivery-app aesthetic it links out to,
 
 **Key Characteristics:**
 - One palette, one light. No theme switch, no dark variant, no time-of-day behavior.
-- Zero rounding by default. Sharp corners everywhere except pills and one status capsule.
+- Zero rounding by default. Sharp corners everywhere except pills.
 - Shadows with no blur: solid ink offsets that read as printed registration, not lighting.
 - Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.
 - Flat spot color. No gradients, no tints, no glass. A surface is one color.
@@ -208,7 +207,7 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 - **Title** (Bowlby One 400, 19px to 20px, line-height 1): location names, item sheet titles, card headings.
 - **Body** (Inter 400, 14px, line-height 1.6): the document baseline. Prose is capped at 32ch in the hero lede and should not exceed 65ch to 75ch anywhere else.
 - **Lede** (Inter 400, 13px phone to 24px desktop, line-height 1.45 to 1.4): the hero subtitle and shop introduction. The 24px desktop size is not decorative: it is the WCAG large-text threshold.
-- **Label** (JetBrains Mono 700, 9.5px to 13px, letter-spacing 0.16em to 0.2em, uppercase): eyebrows, field labels, status pills, chips, character counts. Always uppercase, always tracked out.
+- **Label** (JetBrains Mono 700, 9.5px to 13px, letter-spacing 0.16em to 0.2em, uppercase): eyebrows, field labels, the status tag's time cell, chips, character counts. Always uppercase, always tracked out.
 - **Meta** (JetBrains Mono 400, 12px to 15px, letter-spacing 0.08em): prices, addresses, hours, map annotations. Uses `font-variant-numeric: tabular-nums` wherever figures can change. Emphasis inside this role is carried by weight, never by a second color.
 
 ### Named Rules
@@ -253,7 +252,8 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 ### Chips
 - **Style:** Pill (`999px`), 2px rule-colored border, transparent fill, JetBrains Mono 700 at 10.5px uppercase with 0.09em tracking, 8px 12px padding, muted ink text.
 - **Selected:** fills with Signal Red, text goes cream, gains a Raised shadow, prepends a check glyph, and plays a 0.34s stamp animation that overshoots to 1.16 scale with a 3.5-degree rotation before settling. The rotation is the character: it lands like a rubber stamp, not like a toggle.
-- **Status Pill:** the one rounded rectangle in the system (`20px`), Counter Cream on a 1.5px ink border, minimum 74px wide so the label can change through the day without the header reflowing. Carries a 6px pulsing dot: green when open, red when closed, deep red at last call.
+- **Status Tag:** a two-cell punch card, square like everything else. The left cell names the state in Bowlby One on Counter Cream and carries the pulsing dot; the right cell carries the fact that state implies — the closing time, the minutes left, the hour it opens — in JetBrains Mono reversed out on Griddle Ink, so the number people came for is the highest-contrast thing in the header after the order button. An ink rule divides the cells and swaps to cream when the tag goes dark. Ink border and hard offset shadow one step under the button beside it: 2px and 2px on a card, 3px and 3px in the header, against the button's 3px and 5px. State is carried three ways — dot color, fill and the words — so it survives greyscale. The tag sits at exactly the order button's height at every breakpoint: 31px on a phone, 48.8px from 901 to 1339, 58px above that.
+- **How the tag narrows:** by giving up words, never by shrinking type past reading size. The connective ("TILL", "OPENS") goes first, then the qualifier ("LAST CALL" to "LAST"), then the state word itself once the dot and the fill are already saying it. What it may occupy is half the viewport less half the wordmark — 127px at 375, 91px at 320 — and the widest state is the closed one. Only the header's tag steps down; the tags on location cards have a card to sit in and keep their words at every size.
 
 ### Cards / Containers
 - **Corner Style:** Square (`0`).
@@ -270,7 +270,7 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 - The underline lives in its own wrapper element pinned to the input's bottom edge, so an error message appearing below does not drag the rule down with it.
 
 ### Navigation
-- **Style:** a two-row sticky header. The top row is Counter Red with a 3px ink bottom rule, the status pill hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the pill's label changes.
+- **Style:** a two-row sticky header. The top row is Counter Red with a 3px ink bottom rule, the status tag hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the tag's label changes.
 - **Tab Strip:** below it, on Signal Red, full-width equal tabs in Bowlby One at 10px with 0.11em tracking. State is carried twice: a 4px Marquee Yellow indicator that slides on a `cubic-bezier(0.35, 1.3, 0.4, 1)` overshoot, and full opacity on the current label.
 - **Focus:** 3px Griddle Ink outline at 2px offset globally, switching to Marquee Yellow on dark surfaces.
 - **Mobile:** identical structure. This system is phone-first and the desktop layout is the variant, not the reverse.
@@ -299,7 +299,7 @@ Every section heading carries a 4px Marquee Yellow bar that animates from 0 to 4
 - **Don't** add a dark mode, a theme toggle, or any time-of-day color behavior. This was removed deliberately.
 - **Don't** use a blurred or grey drop shadow. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.
 - **Don't** emit light. No glow, no neon, no colored shadow with a blur radius.
-- **Don't** round corners. Square by default, `999px` for pills, `20px` for the status capsule, and nothing else.
+- **Don't** round corners. Square by default, `999px` for pills, `50%` for the status dot, and nothing else. There is no `20px` left in the system: the status capsule that used to own it was the one object here that wasn't printed, and a soft rectangle is the delivery app's shape.
 - **Don't** introduce a gradient, a tint, a glass surface or a `backdrop-filter` as decoration. Surfaces are one flat color.
 - **Don't** use `background-clip: text` with a gradient. The display face is already the emphasis.
 - **Don't** use `border-left` or `border-right` greater than 1px as a colored accent stripe on a card, row or callout. Use a full ink border, a Counter Cream fill, or nothing.

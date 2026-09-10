@@ -131,31 +131,87 @@ body {
 }
 .cne-orderbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--a-ink); }
 
-/* status pill */
+/* ---- the status tag ------------------------------------------------------
+   A two-cell punch card, not a capsule. The left cell names the state in the
+   display face on cream; the right cell carries the fact that state implies,
+   reversed out on ink in the mono. Square, ruled and shadowed like everything
+   else here — the 20px capsule this replaces was the one object on the site
+   that wasn't printed, and a soft rectangle is the delivery app's shape.
+
+   Tone is set once, on the tag, and read back through custom properties, so
+   every cell switches state together and no rule has to name a color twice.  */
 .cne-stat {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 5px 9px;
-  border-radius: 20px;
+  --stat-fill: #fff2c9;
+  --stat-text: #1a1612;
+  --stat-dot: #2f6b3f;
+  /* The fact cell runs inverted, which is what puts the closing time at the
+     highest contrast in the header after the order button itself. */
+  --stat-inv-fill: #1a1612;
+  --stat-inv-text: #fff2c9;
+  --stat-rule: var(--a-ink);
+
+  display: inline-flex;
+  align-items: stretch;
+  border: 2px solid var(--a-ink);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 var(--a-ink);
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: box-shadow 0.3s;
+}
+.cne-stat.is-shut {
+  --stat-fill: #1a1612;
+  --stat-text: #fff2c9;
+  --stat-dot: #e63027;
+  --stat-inv-fill: #fff2c9;
+  --stat-inv-text: #1a1612;
+  /* The divider has to change hands too, or it disappears into the ink cell. */
+  --stat-rule: #fff2c9;
+}
+.cne-stat.is-last {
+  --stat-fill: var(--a-yel);
+  --stat-text: #1a1612;
+  --stat-dot: #b41d14;
+  --stat-inv-fill: #1a1612;
+  --stat-inv-text: var(--a-yel-ink);
+}
+
+.cne-stat-a {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  line-height: 1;
-  white-space: nowrap;
-  background: #fff2c9;
-  color: #1a1612;
-  border: 1.5px solid var(--a-ink);
-  min-width: 74px;
-  justify-content: center;
+  padding: 10px 8px;
+  background: var(--stat-fill);
+  color: var(--stat-text);
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
   transition: background 0.3s, color 0.3s;
 }
-.cne-stat.is-shut { background: #1a1612; color: #fff2c9; }
-.cne-stat.is-last { background: var(--a-yel); color: #1a1612; border-color: #1a1612; }
-.cne-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b3f; flex: none; }
-.cne-stat.is-shut .cne-dot { background: #e63027; }
-.cne-stat.is-last .cne-dot { background: #b41d14; }
+.cne-stat-b {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 8px;
+  border-left: 2px solid var(--stat-rule);
+  background: var(--stat-inv-fill);
+  color: var(--stat-inv-text);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+/* The clock is unknown until mount — the site is a static export. Both cells
+   hold their width so the header does not jump when the answer arrives. */
+.cne-stat-a { min-width: 42px; justify-content: center; }
+.cne-stat-b { min-width: 44px; justify-content: center; }
+
+/* "TILL" and "OPENS" are the first words to go. A location card never shows
+   them: it lists the whole week directly underneath. */
+.cne-stat-lead { display: none; }
+
+.cne-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--stat-dot); flex: none; }
 @media (prefers-reduced-motion: no-preference) {
   .cne-dot { animation: cne-pulse 2.2s ease-in-out infinite; }
 }
@@ -506,6 +562,10 @@ body {
   border-color: var(--a-red);
 }
 .cne-loc.is-soon { border-style: dashed; box-shadow: none; }
+/* The dashed border and the missing shadow are how a counter that has not
+   opened reads as structurally different. A tag still casting one inside it
+   puts the shadow back. */
+.cne-loc.is-soon .cne-stat { box-shadow: none; }
 .cne-loc h3,
 .cne-loc h2.cne-loc-name {
   font-family: var(--font-display);
@@ -915,6 +975,38 @@ body {
   .cne-tab { font-size: 7.5px; letter-spacing: 0; padding: 10px 0; }
 }
 
+/* The status tag on a phone, stepping down the same way.
+
+   The header row is the wordmark centred on the bar with the tag to its left,
+   so what the tag may occupy is half the viewport less half the wordmark: 127px
+   at 375, 115px at 360, 91px at 320. Each step gives up a word rather than
+   shrinking the type past reading size, and the words go in order of how much
+   they carry: the connective first, then the qualifier, then the state itself
+   once the dot and the fill are saying it anyway. */
+/* Every step below is scoped to the header's tag. It is the only one with a
+   width problem — the tags on the location cards have a whole card to sit in
+   and keep their words at every size. */
+@media (max-width: 480px) {
+  /* "LAST CALL" becomes "LAST". The tag is yellow with a deep red dot by then,
+     and the cell beside it is counting minutes down. */
+  .cne-stat.is-head .cne-stat-rest { display: none; }
+}
+@media (max-width: 390px) {
+  .cne-stat.is-head .cne-stat-a { font-size: 8.5px; padding: 9.5px 7px; gap: 4px; min-width: 38px; }
+  .cne-stat.is-head .cne-stat-b { font-size: 8px; padding: 9.5px 7px; min-width: 40px; }
+  .cne-stat.is-head .cne-dot { width: 5px; height: 5px; }
+}
+@media (max-width: 360px) {
+  .cne-stat.is-head .cne-stat-a { padding-left: 6px; padding-right: 6px; gap: 0; min-width: 0; }
+  .cne-stat.is-head .cne-stat-b { padding-left: 5px; padding-right: 5px; letter-spacing: 0.03em; min-width: 0; }
+  /* Last stop. The state cell keeps the dot and loses its word: a green dot on
+     cream has never needed to be told it means open. */
+  .cne-stat.is-head .cne-stat-word { display: none; }
+  /* Closed is the exception. "10 AM" under a red dot could be a closing time,
+     so the word it gives up is bought back here. */
+  .cne-stat.is-head.is-shut .cne-stat-lead { display: inline; }
+}
+
 /* =========================================================================
    Desktop — the prototype's 1440px frame.
    ========================================================================= */
@@ -934,8 +1026,28 @@ body {
   .cne-nav img { height: 44px; filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.28)); }
   .cne-nav-right { display: flex; align-items: center; order: 3; margin-left: auto; gap: 14px; }
 
-  .cne-stat { font-size: 12px; padding: 9px 14px; border-radius: 24px; gap: 8px; border-width: 2px; }
+  .cne-stat-a { font-size: 12px; padding: 11px 13px; gap: 8px; min-width: 0; }
+  .cne-stat-b { font-size: 11px; padding: 11px 13px; min-width: 0; }
   .cne-dot { width: 9px; height: 9px; }
+
+  /* The header's tag runs one step up from the ones on the cards: 3px rule and
+     3px shadow against the order button's 3px and 5px, so it reads as the same
+     kind of object one rank down, rather than as a badge floated on the bar. */
+  .cne-stat.is-head { border-width: 3px; box-shadow: 3px 3px 0 var(--a-ink); }
+  .cne-stat.is-head .cne-stat-a {
+    font-size: 14px;
+    padding: 15px 14px;
+    min-width: 78px;
+    justify-content: flex-start;
+  }
+  .cne-stat.is-head .cne-stat-b {
+    font-size: 12.5px;
+    padding: 15px 14px;
+    border-left-width: 3px;
+    letter-spacing: 0.08em;
+    min-width: 96px;
+  }
+  .cne-stat.is-head .cne-stat-lead { display: inline; }
   .cne-orderbtn {
     font-size: 15px;
     padding: 14px 22px;
@@ -1590,7 +1702,8 @@ h3 { font-weight: 700; }
 @media (min-width: 901px) {
   /* The prototype's desktop pill and buttons take the page's 1.6 leading.
      Only the phone versions set line-height 1, which is what the base carries. */
-  .cne-stat { line-height: 1.6; letter-spacing: 0.08em; }
+  .cne-stat-a,
+  .cne-stat-b { line-height: 1.6; }
   .cne-orderbtn { line-height: 1.6; letter-spacing: 0.06em; }
   .cne-big,
   .cne-mini { letter-spacing: 0.06em; }
@@ -1654,7 +1767,14 @@ h3 { font-weight: 700; }
   .cne-nav img { height: 34px; }
   .cne-tabs { gap: 1px; }
   .cne-tab { font-size: 9.5px; letter-spacing: 0.01em; padding: 8px 3px; }
-  .cne-stat { font-size: 11px; padding: 7px 10px; }
+  /* 12.2px, not 12: the order button in this band is 48.8px tall (13px on 1.6
+     leading, 11px padding, 3px rule) and the tag sits level with it or it is
+     back to being a badge floated on the bar. */
+  .cne-stat.is-head .cne-stat-a { font-size: 11.5px; padding: 12.2px 11px; min-width: 66px; }
+  .cne-stat.is-head .cne-stat-b { font-size: 10.5px; padding: 12.2px 11px; min-width: 78px; }
+  /* Below 1340 the tabs are already down to 9.5px. "TILL" is what the tag can
+     spare before the run reaches the wordmark. */
+  .cne-stat.is-head .cne-stat-lead { display: none; }
   .cne-orderbtn { font-size: 13px; padding: 11px 14px; }
   .cne-orderbtn .cne-only-desk-i { display: none; }
 }
@@ -2526,25 +2646,40 @@ h3 { font-weight: 700; }
    you wander off to the menu is a bag nobody trusts.
    ========================================================================= */
 
-/* ---- the cap, drawn ------------------------------------------------------
-   Stands in for photography that does not exist yet. Every container fixes its
-   own aspect ratio, so real shots drop in without moving anything. */
+/* ---- the product shot ----------------------------------------------------
+   Two things share this frame: `CapArt`, the drawing that stands in for any
+   product photographed later, and the photograph itself. Every container fixes
+   its own aspect ratio, so the two occupy the same box. */
 .cne-capshot {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--a-cream);
+  background: var(--a-red);
   overflow: hidden;
   aspect-ratio: 4 / 3;
   --cne-mark: 15px;
 }
+/* 720x411 is the Otter cut, and the frame is cut to match it: a product shot
+   letterboxed inside a 4:3 box is a small hat in a large empty room. */
+.cne-capshot.is-photo {
+  background: var(--a-card);
+  aspect-ratio: 720 / 411;
+}
+.cne-capshot.is-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Matched to scripts/merch-og-card.html: same dot size, tile and opacity, so
+   the product image and the social card are one picture in two places. */
 .cne-capshot-dots {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(#1a1612 1px, transparent 1px);
-  background-size: 9px 9px;
-  opacity: 0.13;
+  background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
+  background-size: 19px 19px;
+  opacity: 0.1;
 }
 
 .cne-cap {
@@ -2557,6 +2692,9 @@ h3 { font-weight: 700; }
   --cne-cap-m: var(--a-yel);
   transform: var(--cne-cap-t, none);
   transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+  /* Zero blur, ink, offset down and right: the same shadow every raised
+     surface on the site carries, and the same one the social card draws. */
+  filter: drop-shadow(10px 12px 0 rgba(26, 22, 18, 0.35));
 }
 .cne-cap .crown {
   position: absolute;
@@ -2668,6 +2806,7 @@ h3 { font-weight: 700; }
 .cne-drop:active { transform: translate(0, 0); box-shadow: 2px 2px 0 var(--a-shadow); }
 .cne-drop-art { --cne-mark: 20px; border-bottom: 2.5px solid var(--a-ink); }
 .cne-drop-art .cne-capshot { aspect-ratio: 4 / 3; }
+.cne-drop-art .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
 .cne-drop-b { padding: 17px 17px 19px; display: flex; flex-direction: column; gap: 6px; }
 .cne-drop-b h2 {
   font-family: var(--font-display);
@@ -2757,6 +2896,7 @@ h3 { font-weight: 700; }
 .cne-pdp-gal { display: flex; flex-direction: column; gap: 9px; }
 .cne-pdp-main { border: 3px solid var(--a-ink); }
 .cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; --cne-mark: 22px; }
+.cne-pdp-main .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
 .cne-pdp-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
 .cne-pdp-t { border: 2.5px solid var(--a-line); background: none; padding: 0; cursor: pointer; }
 .cne-pdp-t[aria-selected="true"] { border-color: var(--a-ink); }
@@ -3171,6 +3311,7 @@ h3 { font-weight: 700; }
   .cne-pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr); gap: 34px; padding: 18px 30px 8px; }
   .cne-pdp-gal { gap: 10px; }
   .cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; }
+  .cne-pdp-main .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
   .cne-pdp-main .cne-cap { width: 66%; max-width: 430px; }
   .cne-pdp-thumbs { gap: 10px; }
   .cne-pdp-buy h1 { font-size: 31px; }

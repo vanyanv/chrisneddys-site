@@ -51,7 +51,7 @@ export function SiteHeader() {
           <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} priority />
         </Link>
         <div className="cne-nav-right">
-          <OpenStatus />
+          <OpenStatus head />
           {/* The bag is additive: it renders nothing at all until there is
               something in it, and it never replaces ORDER ONLINE — that button
               is the food business's front door and it points at Otter. A nav

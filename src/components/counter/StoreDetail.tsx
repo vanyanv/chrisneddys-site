@@ -6,7 +6,7 @@ import { locations, type Location } from "@/data/locations";
 import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
-import { OpenStatus } from "@/components/shared/OpenStatus";
+import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 
 /**
  * One store's page. Beyond ranking for the neighbourhood, this is the page
@@ -49,10 +49,7 @@ export function StoreDetail({
             {loc.isOpen ? (
               <OpenStatus locationId={loc.id} />
             ) : (
-              <span className="cne-stat is-shut">
-                <span className="cne-dot" aria-hidden="true" />
-                COMING SOON
-              </span>
+              <ComingSoonTag />
             )}
           </div>
 

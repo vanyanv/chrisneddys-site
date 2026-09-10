@@ -78,12 +78,21 @@ export type StoreStatus =
 /** Last 45 minutes of service. Long enough to still be worth the drive. */
 const LAST_CALL_MINUTES = 45;
 
+/**
+ * A time of day, written the way the counter says it out loud.
+ *
+ * On the hour the zeroes are noise, and the header has no width to spend on
+ * noise: "1 AM", not "1:00 AM". Minutes survive whenever they are not zero, so
+ * a store that one day closes at 12:30 still prints correctly with no change
+ * here.
+ */
 function clockLabel(minutesFromMidnight: number): string {
   const m = ((minutesFromMidnight % 1440) + 1440) % 1440;
   const h24 = Math.floor(m / 60);
   const h = h24 % 12 === 0 ? 12 : h24 % 12;
-  const mm = String(m % 60).padStart(2, "0");
-  return `${h}:${mm} ${h24 < 12 ? "AM" : "PM"}`;
+  const mm = m % 60;
+  const meridiem = h24 < 12 ? "AM" : "PM";
+  return mm === 0 ? `${h} ${meridiem}` : `${h}:${String(mm).padStart(2, "0")} ${meridiem}`;
 }
 
 export function storeStatus(loc: Location, at: Date = new Date()): StoreStatus {
@@ -116,34 +125,70 @@ export function storeStatus(loc: Location, at: Date = new Date()): StoreStatus {
   return { state: "closed", opensAt: tomorrow ? clockLabel(tomorrow.open) : null };
 }
 
-/** Short label for a status pill. */
-export function statusLabel(status: StoreStatus): string {
+/**
+ * The two cells of the status tag, plus the sentence a screen reader gets.
+ *
+ * The tag is a punch card: a display-face cell naming the state, and a mono
+ * cell carrying the one fact that state implies. "OPEN" on its own answers a
+ * question nobody arrives with — at 11:40 on a Tuesday the question is how
+ * long is left, and the answer worth giving is the closing time, not a
+ * countdown the reader has to subtract from a clock they cannot see.
+ *
+ * Each cell is split again, because a phone header is 375px wide and the
+ * wordmark sits in the middle of it. `rest` and `lead` are the parts the
+ * stylesheet drops as the viewport narrows: "LAST CALL" becomes "LAST",
+ * "TILL 1 AM" becomes "1 AM". Both are real words, not abbreviations, so
+ * nothing has to be decoded at the size where decoding is hardest.
+ */
+export type StatusParts = {
+  /** Display cell. `short` is what survives on the narrowest phones. */
+  state: { short: string; rest: string };
+  /** Mono cell. `lead` is the connective word the phone drops. */
+  time: { lead: string; value: string };
+  /** The whole thing as a sentence. This is the accessible name. */
+  aria: string;
+};
+
+const EMPTY_PARTS: StatusParts = {
+  state: { short: "", rest: "" },
+  time: { lead: "", value: "" },
+  aria: "",
+};
+
+export function statusParts(status: StoreStatus): StatusParts {
   switch (status.state) {
+    case "open":
+      return {
+        state: { short: "OPEN", rest: "" },
+        time: { lead: "TILL", value: status.closesAt },
+        aria: `Open until ${status.closesAt}`,
+      };
     case "last-call":
-      return `LAST CALL · ${status.minutesLeft}M`;
-    case "open": {
-      if (status.minutesLeft > 180) return "OPEN";
-      const h = Math.floor(status.minutesLeft / 60);
-      const m = status.minutesLeft % 60;
-      if (h > 0) return m ? `${h}H ${m}M LEFT` : `${h}H LEFT`;
-      return `${m}M LEFT`;
-    }
+      return {
+        state: { short: "LAST", rest: " CALL" },
+        // The countdown earns its place here and only here: inside the last
+        // 45 minutes it is a decision window, not something to plan around.
+        time: { lead: "", value: `${status.minutesLeft} MIN` },
+        aria: `Last call, ${status.minutesLeft} minutes left`,
+      };
     case "closed":
-      return "CLOSED";
+      return status.opensAt
+        ? {
+            state: { short: "CLOSED", rest: "" },
+            time: { lead: "OPENS", value: status.opensAt },
+            aria: `Closed, opens ${status.opensAt}`,
+          }
+        : { ...EMPTY_PARTS, state: { short: "CLOSED", rest: "" }, aria: "Closed" };
     default:
-      return "";
+      return EMPTY_PARTS;
   }
 }
 
-/** The line underneath the pill. */
-export function statusDetail(status: StoreStatus): string {
-  switch (status.state) {
-    case "open":
-    case "last-call":
-      return `Last call ${status.closesAt}`;
-    case "closed":
-      return status.opensAt ? `Opens ${status.opensAt}` : "";
-    default:
-      return "";
-  }
+/** One line, for the surfaces that have a single text slot: map callouts, the dock. */
+export function statusLabel(status: StoreStatus): string {
+  const { state, time } = statusParts(status);
+  const word = `${state.short}${state.rest}`;
+  if (!time.value) return word;
+  const fact = time.lead ? `${time.lead} ${time.value}` : time.value;
+  return status.state === "open" ? `${word} ${fact}` : `${word} · ${fact}`;
 }

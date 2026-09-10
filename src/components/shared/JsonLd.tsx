@@ -4,6 +4,7 @@ import { locations } from "@/data/locations";
 import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl } from "@/lib/otter";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { ID } from "@/lib/seo";
 
 /** One `<script type="application/ld+json">`, escaped the way Next does it. */
@@ -91,7 +92,18 @@ export function JsonLd(): ReactElement {
     description:
       "Smash burger sliders from a Hollywood counter — two patties, two slices of cheese, a buttered Martin's potato roll, every topping free.",
     slogan: brand.tagline,
-    sameAs: [brand.igUrl, storeUrl],
+    // The listings that already carry the reviews, photos and menus search
+    // engines use to reconcile "Chris N Eddy's" into one entity. Without these
+    // the 699 reviews on Yelp and the delivery listings are evidence about a
+    // business the graph has no way to know is this one.
+    sameAs: [
+      brand.igUrl,
+      storeUrl,
+      "https://www.yelp.com/biz/chris-n-eddy-s-los-angeles",
+      "https://www.tripadvisor.com/Restaurant_Review-g32655-d27967767-Reviews-Chris_N_Eddy_s-Los_Angeles_California.html",
+      ...deliveryPlatforms.map((p) => p.url),
+      cateringPlatform.url,
+    ],
     foundingDate: String(brand.founded),
     telephone: brand.phone,
     email: brand.email,
@@ -136,7 +148,10 @@ export function JsonLd(): ReactElement {
     paymentAccepted: "Cash, Credit Card, Debit Card, Apple Pay",
     image: RESTAURANT_IMAGES,
     hasMenu: { "@id": ID.menu },
-    telephone: brand.phone,
+    // Only the counter that answers it. Three addresses across two cities
+    // sharing one number is the pattern local search treats as a virtual
+    // office — and Glendale and Van Nuys have no line to answer yet.
+    telephone: loc.isOpen ? brand.phone : undefined,
     email: brand.email,
     address: {
       "@type": "PostalAddress",
@@ -157,11 +172,15 @@ export function JsonLd(): ReactElement {
         opens: spec.opens,
         closes: spec.closes,
       })) ?? undefined,
-    // Only Hollywood has a live storefront; claiming an order action for a
+    // Only an open counter gets order actions at all — claiming one for a
     // counter that has not opened would send searchers to a dead end.
-    potentialAction:
-      loc.id === "hollywood"
-        ? {
+    // Pickup direct from the storefront, then each delivery platform that
+    // carries the counter. Listing them separately is what lets a result
+    // offer "order delivery" as well as "order pickup"; before this the only
+    // stated way to buy was pickup, which is not what most people want at 1AM.
+    potentialAction: loc.isOpen
+      ? [
+          {
             "@type": "OrderAction",
             target: {
               "@type": "EntryPoint",
@@ -172,8 +191,22 @@ export function JsonLd(): ReactElement {
               ],
             },
             deliveryMethod: "http://purl.org/goodrelations/v1#DirectPickup",
-          }
-        : undefined,
+          },
+          ...deliveryPlatforms.map((platform) => ({
+            "@type": "OrderAction",
+            name: `Order delivery on ${platform.name}`,
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: platform.url,
+              actionPlatform: [
+                "http://schema.org/DesktopWebPlatform",
+                "http://schema.org/MobileWebPlatform",
+              ],
+            },
+            deliveryMethod: "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+          })),
+        ]
+      : undefined,
     isAccessibleForFree: false,
     acceptsReservations: false,
   }));

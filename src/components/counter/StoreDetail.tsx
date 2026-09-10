@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
 import { brand } from "@/data/brand";
-import { storeUrl } from "@/lib/otter";
+import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
 import { OpenStatus } from "@/components/shared/OpenStatus";
@@ -76,7 +76,7 @@ export function StoreDetail({
 
           <div className="cne-loc-btns">
             {loc.id === "hollywood" && (
-              <a className="cne-mini is-red" href={storeUrl} target="_blank" rel="noopener noreferrer">
+              <a className="cne-mini is-red" href={orderUrl("location-page")} target="_blank" rel="noopener noreferrer">
                 ORDER
               </a>
             )}

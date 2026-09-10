@@ -7,6 +7,7 @@ import { HollywoodCard } from "@/components/counter/HollywoodCard";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
+import { HERO } from "@/lib/heroImage";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -41,7 +42,14 @@ export default function HomePage() {
      the preload scanner only reaches it after the stylesheet. React hoists this
      into <head>, where it starts with the document. Home only — no other page
      shows it, and preloading it there would be a wasted 30 KB. */
-  preload("/hero-still.webp", { as: "image", fetchPriority: "high" });
+  preload(HERO.src, {
+    as: "image",
+    fetchPriority: "high",
+    // Must mirror the <img> exactly, or the browser preloads one file and then
+    // downloads a different one.
+    imageSrcSet: HERO.srcSet,
+    imageSizes: HERO.sizes,
+  });
 
   return (
     <>

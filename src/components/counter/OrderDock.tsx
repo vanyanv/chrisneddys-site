@@ -1,6 +1,6 @@
 "use client";
 
-import { storeUrl } from "@/lib/otter";
+import { orderUrl } from "@/lib/otter";
 import { statusLabel, statusDetail, type StoreStatus } from "@/lib/hours";
 import { useStoreStatus } from "@/lib/useStoreStatus";
 
@@ -18,7 +18,7 @@ export function OrderDock() {
         <div className="t">{headline}</div>
         <div className="s">{status ? statusDetail(status) : " "}</div>
       </div>
-      <a className="cne-dockbtn" href={storeUrl} target="_blank" rel="noopener noreferrer">
+      <a className="cne-dockbtn" data-surface="dock" href={orderUrl("dock")} target="_blank" rel="noopener noreferrer">
         ORDER →
       </a>
     </div>

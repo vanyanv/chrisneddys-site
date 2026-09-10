@@ -13,6 +13,7 @@ import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
+import { TrackEvents } from "@/components/shared/TrackEvents";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -38,11 +39,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smash Burgers & Sliders in Los Angeles`,
+    default: `${brand.name} — Smash Burger Sliders in LA, Open Till 2AM`,
     template: `%s · ${brand.name}`,
   },
   description:
-    "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
+    "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
@@ -64,14 +65,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smash Burgers & Sliders in Los Angeles`,
-    description: "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
+    title: `${brand.name} — Smash Burger Sliders in LA, Open Till 2AM`,
+    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Craving the best smash burgers in Los Angeles? See why locals love Chris N Eddy’s — two smashed patties, two slices of cheese, a buttered Martin’s roll.",
+    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open till 2AM.",
     images: [OG_IMAGE.url],
   },
   alternates: {
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd />
         <NightMode />
         <RevealRoot />
+        <TrackEvents />
         <SiteHeader />
         <LastCall />
         <main id="main">{children}</main>

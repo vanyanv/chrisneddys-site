@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { MenuItem } from "@/data/menu";
 import type { WayId } from "./ItemSheet";
+import { track } from "@/lib/track";
 
 /**
  * Sheet state, shared by the menu and the home page's featured cards.
@@ -34,6 +35,10 @@ export function useItemSheet() {
   const openItem = useCallback((next: MenuItem) => {
     setItem(next);
     setOpen(true);
+    // Opening a sheet is someone choosing food rather than reading a page. It
+    // is the step before the handoff, and the only place a drop-off between
+    // "looked at the Quad" and "went to buy the Quad" becomes visible.
+    track("menu_item_open", { item: next.id, price: next.price });
   }, []);
   const close = useCallback(() => setOpen(false), []);
 

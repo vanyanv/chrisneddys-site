@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { menu } from "@/data/menu";
-import { storeUrl } from "@/lib/otter";
+import { SLIDER_PRICE, COMBO_FROM_PRICE } from "@/data/menu";
+import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
+import { storeUrl, orderUrl } from "@/lib/otter";
 import { googleDirections } from "@/lib/directions";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -41,7 +42,27 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Do you deliver?",
-    a: "Ordering on this site is pickup from the Hollywood counter. Delivery is available through the third-party apps that carry us, at their own prices.",
+    a: "Yes — DoorDash, Uber Eats and Grubhub all deliver from the Hollywood counter, and each is linked on this page. Ordering direct on our own storefront is pickup only, and it is the cheaper way to buy: the delivery apps set their own prices and add their own fees.",
+  },
+  {
+    q: "How late are you open?",
+    a: "Late. The Hollywood counter serves until 1AM Monday through Thursday and until 2AM Friday, Saturday and Sunday — the kitchen is still smashing patties long after most burger counters in Hollywood have closed for the night.",
+  },
+  {
+    q: "Do the toppings cost extra?",
+    a: "No. Every topping is free — CNE sauce, lettuce, tomato, raw onions, grilled onions and pickles. Order it Chris's Way or Eddy's Way and you pay the price on the menu. Extra cheese is $1 and making it halal is $2; nothing else is a surcharge.",
+  },
+  {
+    q: "Do you cater?",
+    a: "Yes. Office and event catering runs through ezCater, linked on this page. For anything it does not cover — a large order, a private event, a press or partnership question — use the form on our contact page or call (323) 544-3600.",
+  },
+  {
+    q: "Is there parking?",
+    a: "There is street parking along W. Sunset Blvd and the residential streets just off it. The counter is a walk-up on Sunset between Western and Normandie, so a pickup order is usually quicker to collect than it is to find a space for a sit-down meal.",
+  },
+  {
+    q: "Do you have anything vegetarian?",
+    a: "The grilled cheese — two slices of cheese in a buttered, reverse-toasted Martin's potato bun — plus chris-cut fries, cheese fries and the shakes. Everything else on the menu is beef.",
   },
   {
     q: "Can I order from the Glendale or Van Nuys locations?",
@@ -49,7 +70,6 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
 ];
 
-const cheapestSlider = Math.min(...menu.combos.map((i) => i.price));
 
 export default function OrderPage() {
   const faqLd = {
@@ -89,11 +109,11 @@ export default function OrderPage() {
           <Link href="/menu/" style={{ textDecoration: "underline", color: "inherit" }}>
             our menu
           </Link>{" "}
-          — combos from ${cheapestSlider.toFixed(2)}, and every topping free. Rather talk to
-          someone? Call {brand.phone}.
+          — sliders from ${SLIDER_PRICE.toFixed(2)}, combos from ${COMBO_FROM_PRICE.toFixed(2)}, and
+          every topping free. Rather talk to someone? Call {brand.phone}.
         </p>
         <div className="cne-loc-btns" style={{ marginTop: 16 }}>
-          <a className="cne-mini is-red" href={storeUrl} target="_blank" rel="noopener noreferrer">
+          <a className="cne-mini is-red" href={orderUrl("order-page")} target="_blank" rel="noopener noreferrer">
             ORDER ONLINE
           </a>
           <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
@@ -131,7 +151,7 @@ export default function OrderPage() {
                   {loc.id === "hollywood" && (
                     <a
                       className="cne-mini is-red"
-                      href={storeUrl}
+                      href={orderUrl("location-card")}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -161,6 +181,49 @@ export default function OrderPage() {
             </Link>
           </div>
         ))}
+      </section>
+
+      <section className="cne-sec cne-rv">
+        <div className="cne-eyebrow">If you would rather not move</div>
+        <h2>Delivery.</h2>
+        <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
+          Three apps deliver from the Hollywood counter. They set their own prices and add
+          their own fees, so ordering direct above is the cheaper way to eat the same food —
+          but at 1AM in the rain, this is why we are on all three.
+        </p>
+        <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
+          {deliveryPlatforms.map((platform) => (
+            <a
+              key={platform.id}
+              className="cne-mini is-plain"
+              href={platform.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {platform.name.toUpperCase()}
+            </a>
+          ))}
+        </div>
+
+        <h3 style={{ marginTop: 28, fontSize: 14 }}>Catering and large orders</h3>
+        <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
+          Office lunches and events run through {cateringPlatform.name}. For anything it does
+          not cover — a private event, a press or partnership question — the{" "}
+          <Link href="/contact/" style={{ textDecoration: "underline", color: "inherit" }}>
+            contact page
+          </Link>{" "}
+          reaches a real person.
+        </p>
+        <div className="cne-loc-btns" style={{ marginTop: 12 }} data-surface="order-page">
+          <a
+            className="cne-mini is-plain"
+            href={cateringPlatform.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CATERING ON {cateringPlatform.name.toUpperCase()}
+          </a>
+        </div>
       </section>
 
       <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>

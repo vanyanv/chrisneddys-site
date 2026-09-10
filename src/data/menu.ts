@@ -36,6 +36,15 @@ export type MenuItem = {
 
 export type MenuCategoryKey = "combos" | "sides" | "secret" | "drinks";
 
+/**
+ * The date this file was last reconciled against the Otter storefront.
+ *
+ * Read by the sitemap so `lastmod` on /menu/ reflects when the prices actually
+ * changed rather than when the site happened to be rebuilt, and shown on the
+ * menu itself so a guest can see the prices are current.
+ */
+export const MENU_UPDATED = "2026-09-08";
+
 export const categoryTitles: Record<MenuCategoryKey, string> = {
   combos: "Slider & Fries Combos",
   sides: "On The Side",
@@ -359,3 +368,48 @@ export const extras = [
   { name: "Extra Cheese", price: 1 },
   { name: "Make it Halal", price: 2 },
 ] as const;
+
+/**
+ * The two prices the site quotes outside the menu itself — in the hero, in
+ * search snippets, on the order page.
+ *
+ * They are derived here rather than typed into copy because they had already
+ * drifted apart once: the hero said sliders start at $7.49 while the menu's
+ * meta description promised $6.49, so the snippet undercut the landing page by
+ * a dollar at the moment of arrival.
+ *
+ * "The slider" means the signature two-patty slider, which is what someone
+ * picturing a Chris N Eddy's slider is picturing. The $6.49 single-patty is a
+ * smaller thing wearing a similar name, and quoting it as the entry price
+ * misdescribes what arrives in the bag.
+ */
+const signatureSlider = menu.sides.find((i) => i.id === "chris-n-eddy-s-slider");
+
+/** The signature slider's price. Every "sliders from" figure on the site. */
+export const SLIDER_PRICE = signatureSlider ? signatureSlider.price : 7.49;
+
+/** The cheapest slider-and-fries combo. */
+export const COMBO_FROM_PRICE = Math.min(...menu.combos.map((i) => i.price));
+
+/**
+ * The items that get a page of their own under /menu/.
+ *
+ * Not every item: 31 near-identical pages would be thin content competing with
+ * each other and with /menu/ itself. These are the ones people search by name —
+ * the signature three, plus the three that carry the "how much food is it"
+ * questions the counter actually gets asked.
+ *
+ * `id` is already a URL-safe slug, so it doubles as the route segment.
+ */
+export const featuredItemIds = [
+  "chris-n-eddy-s-slider",
+  "2-sliders-and-fries",
+  "the-quad",
+  "triple-patty-slider",
+  "loaded-fries",
+  "the-family-box",
+] as const;
+
+export const featuredItems: MenuItem[] = featuredItemIds
+  .map((id) => allItems.find((i) => i.id === id))
+  .filter((i): i is MenuItem => Boolean(i));

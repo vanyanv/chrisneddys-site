@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactElement } from "react";
 import { brand } from "@/data/brand";
+import { track } from "@/lib/track";
 
 /**
  * The contact form, drawn as a diner guest check.
@@ -164,6 +165,9 @@ export function GuestCheck(): ReactElement {
 
       setSent({ ticket, stamp, name, email, topic });
       setStatus("sent");
+      // Fired only once the form is genuinely delivered, not on submit — a
+      // conversion that counts attempts counts its own failures as successes.
+      track("contact_submit", { topic });
     } catch {
       setStatus("error");
       setFailure("That didn't go through.");

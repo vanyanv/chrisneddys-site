@@ -1,0 +1,581 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-10T22:28:53.049Z",
+  "title": "Design System: Chris N Eddy's",
+  "extensions": {
+    "colorMeta": {
+      "counter-red": {
+        "role": "primary",
+        "displayName": "Counter Red",
+        "canonical": "#e63027",
+        "tonalRamp": [
+          "#2b0805",
+          "#4d0f09",
+          "#7a1710",
+          "#a81f16",
+          "#cf2820",
+          "#e63027",
+          "#ef6a60",
+          "#fbc0ba"
+        ]
+      },
+      "counter-red-cta": {
+        "role": "primary",
+        "displayName": "Signal Red",
+        "canonical": "#d0281c",
+        "tonalRamp": [
+          "#260805",
+          "#460e08",
+          "#6f160f",
+          "#9a1e15",
+          "#bd241a",
+          "#d0281c",
+          "#e56b60",
+          "#f7bdb7"
+        ]
+      },
+      "neon-red": {
+        "role": "primary",
+        "displayName": "Neon Red",
+        "canonical": "#ff3b2f",
+        "tonalRamp": [
+          "#2e0603",
+          "#560c07",
+          "#84150d",
+          "#b21e14",
+          "#dd291d",
+          "#ff3b2f",
+          "#ff7c72",
+          "#ffc2bd"
+        ]
+      },
+      "marquee-yellow": {
+        "role": "secondary",
+        "displayName": "Marquee Yellow",
+        "canonical": "#f5b82e",
+        "tonalRamp": [
+          "#2e1f00",
+          "#4f3600",
+          "#7a5400",
+          "#a87400",
+          "#d09300",
+          "#f5b82e",
+          "#f9d179",
+          "#fdeec8"
+        ]
+      },
+      "marquee-yellow-ink": {
+        "role": "secondary",
+        "displayName": "Marquee Yellow Ink",
+        "canonical": "#ffd633",
+        "tonalRamp": [
+          "#2e1f00",
+          "#4f3600",
+          "#7a5400",
+          "#a87400",
+          "#d09300",
+          "#f5b82e",
+          "#f9d179",
+          "#fdeec8"
+        ]
+      },
+      "sodium-gold": {
+        "role": "secondary",
+        "displayName": "Sodium Gold",
+        "canonical": "#ffd53d",
+        "tonalRamp": [
+          "#2f2300",
+          "#523f00",
+          "#7d6000",
+          "#a98100",
+          "#d2a300",
+          "#ffd53d",
+          "#ffe589",
+          "#fff5cf"
+        ]
+      },
+      "butcher-paper": {
+        "role": "neutral",
+        "displayName": "Butcher Paper",
+        "canonical": "#fff8e7",
+        "tonalRamp": [
+          "#2b2718",
+          "#4a4330",
+          "#6e6549",
+          "#948a68",
+          "#bcb18d",
+          "#ddd3b4",
+          "#f2ead1",
+          "#fff8e7"
+        ]
+      },
+      "counter-cream": {
+        "role": "neutral",
+        "displayName": "Counter Cream",
+        "canonical": "#fff2c9",
+        "tonalRamp": [
+          "#2b2415",
+          "#4a3f27",
+          "#6d5e3c",
+          "#948155",
+          "#bda875",
+          "#dcc99a",
+          "#f0e0b6",
+          "#fff2c9"
+        ]
+      },
+      "card-white": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "#fffdf6",
+        "tonalRamp": [
+          "#2b2718",
+          "#4a4330",
+          "#6e6549",
+          "#948a68",
+          "#bcb18d",
+          "#ddd3b4",
+          "#f2ead1",
+          "#fff8e7"
+        ]
+      },
+      "griddle-ink": {
+        "role": "neutral",
+        "displayName": "Griddle Ink",
+        "canonical": "#1a1612",
+        "tonalRamp": [
+          "#0a0806",
+          "#1a1612",
+          "#2e2820",
+          "#463d31",
+          "#615544",
+          "#8a7c66",
+          "#b8ab92",
+          "#e5dbc6"
+        ]
+      },
+      "rule-line": {
+        "role": "neutral",
+        "displayName": "Rule Line",
+        "canonical": "#e3d8bc",
+        "tonalRamp": [
+          "#2b2415",
+          "#4a3f27",
+          "#6d5e3c",
+          "#948155",
+          "#bda875",
+          "#dcc99a",
+          "#f0e0b6",
+          "#fff2c9"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#7a6f5e",
+        "tonalRamp": [
+          "#0a0806",
+          "#1a1612",
+          "#2e2820",
+          "#463d31",
+          "#615544",
+          "#8a7c66",
+          "#b8ab92",
+          "#e5dbc6"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#0d0b09",
+        "tonalRamp": [
+          "#050403",
+          "#0d0b09",
+          "#1c1815",
+          "#2e2822",
+          "#443c33",
+          "#5f5548",
+          "#847761",
+          "#b0a288"
+        ]
+      },
+      "night-card": {
+        "role": "neutral",
+        "displayName": "Night Card",
+        "canonical": "#171310",
+        "tonalRamp": [
+          "#050403",
+          "#0d0b09",
+          "#1c1815",
+          "#2e2822",
+          "#443c33",
+          "#5f5548",
+          "#847761",
+          "#b0a288"
+        ]
+      },
+      "night-rule": {
+        "role": "neutral",
+        "displayName": "Night Rule",
+        "canonical": "#2b2620",
+        "tonalRamp": [
+          "#050403",
+          "#0d0b09",
+          "#1c1815",
+          "#2e2822",
+          "#443c33",
+          "#5f5548",
+          "#847761",
+          "#b0a288"
+        ]
+      },
+      "ticket-green": {
+        "role": "tertiary",
+        "displayName": "Ticket Green",
+        "canonical": "#2f6b43",
+        "tonalRamp": [
+          "#08170e",
+          "#0f2b1b",
+          "#193f28",
+          "#245536",
+          "#2f6b43",
+          "#468f5e",
+          "#6fbe8b",
+          "#b4e2c6"
+        ]
+      },
+      "night-green": {
+        "role": "tertiary",
+        "displayName": "Night Green",
+        "canonical": "#6fbe8b",
+        "tonalRamp": [
+          "#08170e",
+          "#0f2b1b",
+          "#193f28",
+          "#245536",
+          "#2f6b43",
+          "#468f5e",
+          "#6fbe8b",
+          "#b4e2c6"
+        ]
+      },
+      "map-water": {
+        "role": "tertiary",
+        "displayName": "Map Water",
+        "canonical": "#bcd3dd",
+        "tonalRamp": [
+          "#0a1a20",
+          "#12313b",
+          "#1b4a58",
+          "#256477",
+          "#4e8a9c",
+          "#84b2c2",
+          "#bcd3dd",
+          "#e4eef2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only, one per page. Carries a hard ink text-shadow by day, a red glow at night."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles. Always paired with the yellow scroll-in underline."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Location names, item sheet titles, card headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Document baseline at 14px/1.6. Prose capped at 65-75ch."
+      },
+      "body-lede": {
+        "displayName": "Lede",
+        "purpose": "Hero subtitle and shop intro. The 24px desktop size is the WCAG large-text threshold, not a style choice."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrows, field labels, pills, chips. Always uppercase mono, tracked 0.16-0.2em."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Prices, hours, addresses, map annotation. Tabular numerals wherever figures change."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Every actionable label. Bowlby One uppercase at 0.05em."
+      }
+    },
+    "shadows": [
+      {
+        "name": "nudge",
+        "value": "2px 2px 0 #1a1612",
+        "purpose": "Nav order button and bag button. Small, tight, always present."
+      },
+      {
+        "name": "raised",
+        "value": "3px 3px 0 #1a1612",
+        "purpose": "Featured rows, selected chips, small cards."
+      },
+      {
+        "name": "standard",
+        "value": "4px 4px 0 #1a1612",
+        "purpose": "Default lifted surface. Location cards, phone primary buttons, menu cards."
+      },
+      {
+        "name": "anchor",
+        "value": "7px 7px 0 #1a1612",
+        "purpose": "Hero image and desktop buttons and cards at rest."
+      },
+      {
+        "name": "hover-extension",
+        "value": "12px 12px 0 #1a1612",
+        "purpose": "Paired with translate(-3px,-3px) on hover. The element lifts and the shadow grows to match."
+      },
+      {
+        "name": "night-glow",
+        "value": "0 0 22px rgba(255, 59, 47, 0.45)",
+        "purpose": "The 2AM replacement for every offset shadow. Exposed as --a-glow."
+      },
+      {
+        "name": "night-glow-strong",
+        "value": "0 0 34px rgba(255, 59, 47, 0.42)",
+        "purpose": "Hero-scale night elevation: the hero image, primary CTA at desktop."
+      },
+      {
+        "name": "float",
+        "value": "0 5px 18px rgba(0, 0, 0, 0.3)",
+        "purpose": "The only blurred shadow allowed. Lifted sticky header, bag drawer, order dock. Nothing else."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-brand",
+        "value": "cubic-bezier(0.2, 0.7, 0.3, 1)",
+        "purpose": "Default ease-out for reveals, underline wipes, thumbnail scale."
+      },
+      {
+        "name": "ease-hero",
+        "value": "cubic-bezier(0.2, 0.8, 0.3, 1)",
+        "purpose": "Hero entrance stagger at 0s / 0.12s / 0.17s / 0.22s."
+      },
+      {
+        "name": "ease-press",
+        "value": "cubic-bezier(0.5, 0, 0.5, 1)",
+        "purpose": "The 0.08s tactile press on hover-lift and hover-grow elements."
+      },
+      {
+        "name": "ease-stamp",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Overshoot for the chip stamp and bag bump. The only place overshoot is allowed."
+      },
+      {
+        "name": "ease-tab",
+        "value": "cubic-bezier(0.35, 1.3, 0.4, 1)",
+        "purpose": "The tab indicator slide, 0.34s."
+      },
+      {
+        "name": "duration-press",
+        "value": "0.12s",
+        "purpose": "Button transform and shadow on press. Fast enough to feel mechanical."
+      },
+      {
+        "name": "duration-mode",
+        "value": "0.5s",
+        "purpose": "The day to 2AM crossfade on background and color."
+      },
+      {
+        "name": "duration-reveal",
+        "value": "0.7s",
+        "purpose": "Scroll reveals and the section underline wipe."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "390px"
+      },
+      {
+        "name": "small",
+        "value": "480px"
+      },
+      {
+        "name": "desktop",
+        "value": "901px"
+      },
+      {
+        "name": "wide",
+        "value": "1280px"
+      },
+      {
+        "name": "shell-max",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The order CTA. Yellow fill, ink border, and a hard offset shadow it falls into when pressed.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">ORDER ONLINE →</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; letter-spacing: 0.05em; line-height: 1; text-decoration: none; background: #f5b82e; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px 34px; box-shadow: 7px 7px 0 #1a1612; transition: transform 0.14s, box-shadow 0.14s; cursor: pointer; } .ds-btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 10px 10px 0 #1a1612; } .ds-btn-primary:focus-visible { outline: 3px solid #1a1612; outline-offset: 2px; } .ds-btn-primary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #1a1612; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The non-committal action beside the CTA. Same geometry, cream fill, no color of its own.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">SEE THE MENU</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; letter-spacing: 0.05em; line-height: 1; text-decoration: none; background: #fff2c9; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px 34px; box-shadow: 7px 7px 0 #1a1612; transition: transform 0.14s, box-shadow 0.14s; cursor: pointer; } .ds-btn-secondary:hover { transform: translate(-2px, -2px); box-shadow: 10px 10px 0 #1a1612; } .ds-btn-secondary:focus-visible { outline: 3px solid #1a1612; outline-offset: 2px; } .ds-btn-secondary:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #1a1612; }"
+    },
+    {
+      "name": "Nav Order Button",
+      "kind": "button",
+      "refersTo": "button-order",
+      "description": "The miniature of the primary button, pinned to the right of the sticky header.",
+      "html": "<a class=\"ds-btn-order\" href=\"#\">ORDER</a>",
+      "css": ".ds-btn-order { display: inline-block; white-space: nowrap; font-family: 'Bowlby One', Impact, sans-serif; font-size: 11px; letter-spacing: 0.05em; line-height: 1; text-decoration: none; background: #f5b82e; color: #1a1612; border: 2px solid #1a1612; border-radius: 0; padding: 8px 11px; box-shadow: 2px 2px 0 #1a1612; transition: transform 0.12s, box-shadow 0.12s; cursor: pointer; } .ds-btn-order:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #1a1612; } .ds-btn-order:focus-visible { outline: 3px solid #1a1612; outline-offset: 2px; } .ds-btn-order:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1a1612; }"
+    },
+    {
+      "name": "Store Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Live open/closed state in the header. The only rounded rectangle in the system, and the dot pulses.",
+      "html": "<span class=\"ds-stat\"><i class=\"ds-stat-dot\"></i>OPEN TIL 2</span>",
+      "css": ".ds-stat { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 74px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; line-height: 1; white-space: nowrap; background: #fff2c9; color: #1a1612; border: 1.5px solid #1a1612; border-radius: 20px; padding: 5px 9px; } .ds-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b43; flex: none; animation: ds-stat-pulse 2.2s ease-in-out infinite; } @keyframes ds-stat-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } } @media (prefers-reduced-motion: reduce) { .ds-stat-dot { animation: none; } }"
+    },
+    {
+      "name": "Topic Chip",
+      "kind": "chip",
+      "refersTo": "chip-topic",
+      "description": "Radio group as pills on the contact check. Selection lands like a rubber stamp, with rotation.",
+      "html": "<label class=\"ds-chip\"><input type=\"radio\" name=\"ds-topic\" checked><span>CATERING</span></label><label class=\"ds-chip\"><input type=\"radio\" name=\"ds-topic\"><span>PRESS</span></label>",
+      "css": ".ds-chip { position: relative; display: inline-flex; margin-right: 8px; } .ds-chip input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; } .ds-chip span { display: inline-flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; padding: 8px 12px; border: 2px solid #e3d8bc; border-radius: 999px; color: #7a6f5e; cursor: pointer; transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s, color 0.18s, background 0.18s; } .ds-chip input:focus-visible + span { outline: 3px solid #1a1612; outline-offset: 3px; } .ds-chip input:checked + span { background: #d0281c; border-color: #d0281c; color: #fff2c9; box-shadow: 3px 3px 0 #1a1612; animation: ds-chip-stamp 0.34s cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-chip input:checked + span::before { content: '\\2713'; font-size: 11px; } @keyframes ds-chip-stamp { 0% { transform: scale(1.16) rotate(-3.5deg); } 60% { transform: scale(0.97) rotate(1.2deg); } 100% { transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-chip input:checked + span { animation: none; } }"
+    },
+    {
+      "name": "Location Card",
+      "kind": "card",
+      "refersTo": "card-location",
+      "description": "A store. Square, heavy ink border, offset shadow. Unopened stores use the same border dashed and drop the shadow entirely.",
+      "html": "<article class=\"ds-card\"><h3>HOLLYWOOD</h3><p class=\"ds-card-meta\">5539 W. SUNSET BLVD</p><p class=\"ds-card-body\">Open til 2AM Friday and Saturday. Every topping free.</p></article>",
+      "css": ".ds-card { display: block; background: #fffdf6; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px; box-shadow: 6px 6px 0 #1a1612; transition: transform 0.2s, box-shadow 0.2s, border-color 0.25s; } .ds-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #e63027; border-color: #e63027; } .ds-card h3 { font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; line-height: 1; margin: 0 0 8px; } .ds-card-meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; color: #7a6f5e; margin: 0 0 10px; } .ds-card-body { font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.6; margin: 0; }"
+    },
+    {
+      "name": "Ruled Input",
+      "kind": "input",
+      "refersTo": "input-ruled",
+      "description": "No box. A mono label over a ruled line, with a red underline that wipes in from the left on focus.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-name\">Name</label><span class=\"ds-field-line\"><input class=\"ds-field-input\" id=\"ds-name\" type=\"text\" placeholder=\"Who should we ask for?\"><span class=\"ds-field-rule\"></span></span></div>",
+      "css": ".ds-field { position: relative; display: grid; gap: 5px; max-width: 420px; } .ds-field-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7a6f5e; transition: color 0.2s; } .ds-field:focus-within .ds-field-label { color: #d0281c; } .ds-field-line { position: relative; display: block; } .ds-field-input { font-family: Inter, system-ui, sans-serif; font-size: 16px; color: #1a1612; background: transparent; border: 0; border-bottom: 2px solid #e3d8bc; border-radius: 0; padding: 8px 2px; width: 100%; appearance: none; } .ds-field-input::placeholder { color: #7a6f5e; opacity: 0.75; } .ds-field-input:focus { outline: none; border-bottom-color: transparent; } .ds-field-rule { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #d0281c; transform: scaleX(0); transform-origin: left; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1); pointer-events: none; } .ds-field:focus-within .ds-field-rule { transform: scaleX(1); } @media (prefers-reduced-motion: reduce) { .ds-field-rule { transition: none; } }"
+    },
+    {
+      "name": "Tab Strip",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Full-width equal tabs on Signal Red, with a yellow indicator that slides on an overshoot curve. State is carried twice: indicator position and label opacity.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab\" href=\"#\" aria-current=\"page\">MENU</a><a class=\"ds-tab\" href=\"#\">LOCATIONS</a><a class=\"ds-tab\" href=\"#\">OUR STORY</a><span class=\"ds-tabind\"></span></nav>",
+      "css": ".ds-tabs { display: flex; position: relative; background: #d0281c; border-bottom: 3px solid #1a1612; } .ds-tab { flex: 1; font-family: 'Bowlby One', Impact, sans-serif; font-size: 10px; letter-spacing: 0.11em; padding: 10px 4px; text-align: center; text-decoration: none; white-space: nowrap; color: #fff2c9; display: block; line-height: normal; transition: opacity 0.25s, color 0.25s; } .ds-tab[aria-current='page'] { color: #fffdf6; } .ds-tab:focus-visible { outline: 2px solid #f5b82e; outline-offset: -3px; } .ds-tabind { position: absolute; bottom: 0; height: 4px; background: #f5b82e; width: calc(100% / 3 * 0.66); left: calc(100% / 3 * (1 - 0.66) / 2); transition: transform 0.34s cubic-bezier(0.35, 1.3, 0.4, 1); }"
+    },
+    {
+      "name": "Halftone Panel",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The signature surface. Flat spot red under a tiled dot field at 0.16 opacity, which is what makes the color read as printed rather than as a CSS background. The dots go to zero opacity at 2AM.",
+      "html": "<section class=\"ds-panel\"><span class=\"ds-panel-dots\" aria-hidden=\"true\"></span><h1 class=\"ds-panel-h\">LA’S <span>SMASH</span><br>HIT.</h1></section>",
+      "css": ".ds-panel { position: relative; overflow: hidden; background: #e63027; color: #fff2c9; padding: 34px 22px; } .ds-panel-dots { position: absolute; inset: 0; background-image: radial-gradient(#1a1612 1.15px, transparent 1.25px); background-size: 9px 9px; opacity: 0.16; pointer-events: none; } .ds-panel-h { position: relative; font-family: 'Bowlby One', Impact, sans-serif; font-size: 56px; line-height: 0.86; letter-spacing: 0.4px; margin: 0; text-shadow: 4px 4px 0 #1a1612; } .ds-panel-h span { color: #ffd633; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Counter at 2AM",
+    "overview": "This is one physical place rendered under two lights. By day it is a bright counter on Sunset Blvd: warm paper, spot-color red and yellow laid down flat, everything outlined in near-black ink like a sign someone painted by hand and a printer reproduced badly on purpose. After midnight the paper is taken away and the same room is lit only by its own signage. The ink borders go dark, the flat shadows are replaced by emitted glow, and red and gold become the only things in the room giving off light. This is not a light theme with a dark variant bolted on. It is one restaurant, twice, and the switch between them is the system's central idea.\n\nThe register is brand: design is the product here. The site exists to send a hungry person to the order button, and it earns that by being unmistakably a specific place rather than a generic food page. Density is high and deliberately unrefined. Type is oversized past the point of comfort, borders are thick enough to read as physical edges, and nothing is soft. The visual vocabulary is roadside and printed: halftone dot fields, hard offset shadows in ink, a marquee that never stops, oversized display caps with a painted drop shadow behind them.\n\nWhat this system explicitly rejects: the delivery-app aesthetic it links out to, with its rounded stock-photo cards and sterile grids. Corporate chain polish, regionless and committee-approved. Upscale-restaurant minimalism with thin serifs and stone neutrals. And the hipster craft-burger kit of kraft paper, chalkboards and distressed textures, which performs handmade instead of being loud.",
+    "keyCharacteristics": [
+      "Two complete palettes on a single data-mode attribute, day and 2AM, both first-class.",
+      "Zero rounding by default. Sharp corners everywhere except pills and one status capsule.",
+      "Shadows with no blur: solid ink offsets that read as printed registration, not lighting.",
+      "Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.",
+      "Flat spot color. No gradients, no tints, no glass. A surface is one color.",
+      "Every interactive element travels physically on press."
+    ],
+    "rules": [
+      {
+        "name": "The Two Rooms Rule",
+        "body": "Every color decision must answer in both modes. A component that only works in day mode is unfinished. Day gets ink borders and hard shadows; night gets --a-line borders and glow. Never ship one without the other.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fill-Is-Not-Text Rule",
+        "body": "Counter Red and Marquee Yellow are fill colors. When either must carry text, it is swapped for its contrast-corrected cut: Signal Red for red surfaces under text, Marquee Yellow Ink for yellow text on red. Using the display cut for a text surface is prohibited.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reserved Meaning Rule",
+        "body": "Yellow means price and primary action. Green means free or open. Red means the brand. A color used decoratively outside its meaning weakens every other use of it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Jobs Rule",
+        "body": "Bowlby One shouts, Inter explains, JetBrains Mono annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in Inter.",
+        "section": "typography"
+      },
+      {
+        "name": "The 16px Floor Rule",
+        "body": "Any input a user types into is 16px minimum, because iOS Safari zooms the viewport below that and never zooms back. Everything else on the page may be smaller.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Shout Rule",
+        "body": "One Display-scale element per page. A second one is not emphasis, it is noise, and it makes the first one meaningless.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Blur Rule",
+        "body": "In day mode, box-shadow blur is zero and the color is the ink. A blurred grey drop shadow on a card is the single fastest way to make this site look like every other food site. If it looks soft, it is wrong.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Falling Rule",
+        "body": "Pressable elements sit above their shadow and fall into it. :active translates the element by the shadow's offset and shrinks the shadow to match, so the element ends flush with the page. This is why offsets and translate distances are always the same number.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glow Is Night-Only Rule",
+        "body": "Emitted light belongs to 2AM. A glow in day mode reads as a mistake, and an offset shadow at night reads as a hole.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do answer both modes for every component. Day gets a Griddle Ink border and a zero-blur offset shadow; 2AM gets a #2b2620 border and a red glow.",
+      "Do use zero-blur ink shadows at the documented offsets (2 / 3 / 4 / 6 / 7 / 10 / 14px). Size means importance.",
+      "Do make the travel distance on :active equal the shadow offset, so the element lands flat.",
+      "Do swap Counter Red for Signal Red (#d0281c) the moment text sits on it, and Marquee Yellow for #ffd633 the moment yellow becomes text on red.",
+      "Do set every input at 16px minimum.",
+      "Do keep Bowlby One for shouting, Inter for explaining, JetBrains Mono for annotating.",
+      "Do use tabular-nums on any figure that changes: prices, counts, hours, distances.",
+      "Do give every motion a prefers-reduced-motion exit.",
+      "Do carry state on two cues, not one.",
+      "Do keep prose to 65ch to 75ch, and the hero lede to 32ch."
+    ],
+    "donts": [
+      "Don't use a blurred or grey drop shadow in day mode. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.",
+      "Don't round corners. Square by default, 999px for pills, 20px for the status capsule, and nothing else.",
+      "Don't introduce a gradient, a tint, a glass surface or a backdrop-filter as decoration. Surfaces are one flat color.",
+      "Don't use background-clip: text with a gradient. The display face is already the emphasis.",
+      "Don't use border-left or border-right greater than 1px as a colored accent stripe on a card, row or callout.",
+      "Don't ship an identical card grid of icon plus heading plus paragraph.",
+      "Don't nest a card inside a card.",
+      "Don't reach for a modal. The site uses an item sheet, a bag drawer and inline expansion, in that order.",
+      "Don't look like the delivery app the order button links to: rounded stock-photo cards, sterile grids, neutral grey chrome.",
+      "Don't look like a corporate chain: regionless, committee-approved, safe.",
+      "Don't look like an upscale minimalist restaurant: thin serifs, stone neutrals, acres of whitespace, reservation-first.",
+      "Don't look like a hipster craft-burger shop: kraft paper textures, chalkboards, letterpress cliches, distressed overlays, the word artisan.",
+      "Don't use #000 or #fff. Every neutral in this system is warmed toward the brand.",
+      "Don't put a second Display-scale headline on a page.",
+      "Don't use em dashes in interface copy."
+    ]
+  }
+}

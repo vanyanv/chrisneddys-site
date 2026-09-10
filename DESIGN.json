@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-10T22:28:53.049Z",
+  "generatedAt": "2026-09-10T23:06:49.314618+00:00",
   "title": "Design System: Chris N Eddy's",
   "extensions": {
     "colorMeta": {
@@ -34,21 +34,6 @@
           "#f7bdb7"
         ]
       },
-      "neon-red": {
-        "role": "primary",
-        "displayName": "Neon Red",
-        "canonical": "#ff3b2f",
-        "tonalRamp": [
-          "#2e0603",
-          "#560c07",
-          "#84150d",
-          "#b21e14",
-          "#dd291d",
-          "#ff3b2f",
-          "#ff7c72",
-          "#ffc2bd"
-        ]
-      },
       "marquee-yellow": {
         "role": "secondary",
         "displayName": "Marquee Yellow",
@@ -77,21 +62,6 @@
           "#f5b82e",
           "#f9d179",
           "#fdeec8"
-        ]
-      },
-      "sodium-gold": {
-        "role": "secondary",
-        "displayName": "Sodium Gold",
-        "canonical": "#ffd53d",
-        "tonalRamp": [
-          "#2f2300",
-          "#523f00",
-          "#7d6000",
-          "#a98100",
-          "#d2a300",
-          "#ffd53d",
-          "#ffe589",
-          "#fff5cf"
         ]
       },
       "butcher-paper": {
@@ -184,70 +154,10 @@
           "#e5dbc6"
         ]
       },
-      "night-ground": {
-        "role": "neutral",
-        "displayName": "Night Ground",
-        "canonical": "#0d0b09",
-        "tonalRamp": [
-          "#050403",
-          "#0d0b09",
-          "#1c1815",
-          "#2e2822",
-          "#443c33",
-          "#5f5548",
-          "#847761",
-          "#b0a288"
-        ]
-      },
-      "night-card": {
-        "role": "neutral",
-        "displayName": "Night Card",
-        "canonical": "#171310",
-        "tonalRamp": [
-          "#050403",
-          "#0d0b09",
-          "#1c1815",
-          "#2e2822",
-          "#443c33",
-          "#5f5548",
-          "#847761",
-          "#b0a288"
-        ]
-      },
-      "night-rule": {
-        "role": "neutral",
-        "displayName": "Night Rule",
-        "canonical": "#2b2620",
-        "tonalRamp": [
-          "#050403",
-          "#0d0b09",
-          "#1c1815",
-          "#2e2822",
-          "#443c33",
-          "#5f5548",
-          "#847761",
-          "#b0a288"
-        ]
-      },
       "ticket-green": {
         "role": "tertiary",
         "displayName": "Ticket Green",
         "canonical": "#2f6b43",
-        "tonalRamp": [
-          "#08170e",
-          "#0f2b1b",
-          "#193f28",
-          "#245536",
-          "#2f6b43",
-          "#468f5e",
-          "#6fbe8b",
-          "#b4e2c6"
-        ]
-      },
-      "night-green": {
-        "role": "tertiary",
-        "displayName": "Night Green",
-        "canonical": "#6fbe8b",
         "tonalRamp": [
           "#08170e",
           "#0f2b1b",
@@ -278,7 +188,7 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Hero headline only, one per page. Carries a hard ink text-shadow by day, a red glow at night."
+        "purpose": "Hero headline only, one per page. Carries a hard ink text-shadow."
       },
       "headline": {
         "displayName": "Headline",
@@ -336,19 +246,9 @@
         "purpose": "Paired with translate(-3px,-3px) on hover. The element lifts and the shadow grows to match."
       },
       {
-        "name": "night-glow",
-        "value": "0 0 22px rgba(255, 59, 47, 0.45)",
-        "purpose": "The 2AM replacement for every offset shadow. Exposed as --a-glow."
-      },
-      {
-        "name": "night-glow-strong",
-        "value": "0 0 34px rgba(255, 59, 47, 0.42)",
-        "purpose": "Hero-scale night elevation: the hero image, primary CTA at desktop."
-      },
-      {
         "name": "float",
         "value": "0 5px 18px rgba(0, 0, 0, 0.3)",
-        "purpose": "The only blurred shadow allowed. Lifted sticky header, bag drawer, order dock. Nothing else."
+        "purpose": "The only blurred shadow allowed. Lifted sticky header, bag drawer, order dock. Nothing else in the system is allowed blur, and nothing emits light."
       }
     ],
     "motion": [
@@ -381,11 +281,6 @@
         "name": "duration-press",
         "value": "0.12s",
         "purpose": "Button transform and shadow on press. Fast enough to feel mechanical."
-      },
-      {
-        "name": "duration-mode",
-        "value": "0.5s",
-        "purpose": "The day to 2AM crossfade on background and color."
       },
       {
         "name": "duration-reveal",
@@ -485,16 +380,16 @@
       "name": "Halftone Panel",
       "kind": "custom",
       "refersTo": null,
-      "description": "The signature surface. Flat spot red under a tiled dot field at 0.16 opacity, which is what makes the color read as printed rather than as a CSS background. The dots go to zero opacity at 2AM.",
+      "description": "The signature surface. Flat spot red under a tiled dot field at 0.16 opacity, which is what makes the color read as printed rather than as a CSS background.",
       "html": "<section class=\"ds-panel\"><span class=\"ds-panel-dots\" aria-hidden=\"true\"></span><h1 class=\"ds-panel-h\">LA’S <span>SMASH</span><br>HIT.</h1></section>",
       "css": ".ds-panel { position: relative; overflow: hidden; background: #e63027; color: #fff2c9; padding: 34px 22px; } .ds-panel-dots { position: absolute; inset: 0; background-image: radial-gradient(#1a1612 1.15px, transparent 1.25px); background-size: 9px 9px; opacity: 0.16; pointer-events: none; } .ds-panel-h { position: relative; font-family: 'Bowlby One', Impact, sans-serif; font-size: 56px; line-height: 0.86; letter-spacing: 0.4px; margin: 0; text-shadow: 4px 4px 0 #1a1612; } .ds-panel-h span { color: #ffd633; }"
     }
   ],
   "narrative": {
-    "northStar": "The Counter at 2AM",
-    "overview": "This is one physical place rendered under two lights. By day it is a bright counter on Sunset Blvd: warm paper, spot-color red and yellow laid down flat, everything outlined in near-black ink like a sign someone painted by hand and a printer reproduced badly on purpose. After midnight the paper is taken away and the same room is lit only by its own signage. The ink borders go dark, the flat shadows are replaced by emitted glow, and red and gold become the only things in the room giving off light. This is not a light theme with a dark variant bolted on. It is one restaurant, twice, and the switch between them is the system's central idea.\n\nThe register is brand: design is the product here. The site exists to send a hungry person to the order button, and it earns that by being unmistakably a specific place rather than a generic food page. Density is high and deliberately unrefined. Type is oversized past the point of comfort, borders are thick enough to read as physical edges, and nothing is soft. The visual vocabulary is roadside and printed: halftone dot fields, hard offset shadows in ink, a marquee that never stops, oversized display caps with a painted drop shadow behind them.\n\nWhat this system explicitly rejects: the delivery-app aesthetic it links out to, with its rounded stock-photo cards and sterile grids. Corporate chain polish, regionless and committee-approved. Upscale-restaurant minimalism with thin serifs and stone neutrals. And the hipster craft-burger kit of kraft paper, chalkboards and distressed textures, which performs handmade instead of being loud.",
+    "northStar": "The Sunset Blvd Sign",
+    "overview": "This is roadside signage you can order from. Warm paper, two spot colors laid down flat, everything outlined in near-black ink like a sign someone painted by hand and a printer reproduced badly on purpose. There is one palette and one light: daylight on Sunset Blvd. Nothing here dims, glows, or switches with the clock.\n\nThe register is brand: design is the product here. The site exists to send a hungry person to the order button, and it earns that by being unmistakably a specific place rather than a generic food page. Density is high and deliberately unrefined. Type is oversized past the point of comfort, borders are thick enough to read as physical edges, and nothing is soft.\n\nWhat this system explicitly rejects: the delivery-app aesthetic it links out to, corporate chain polish, upscale-restaurant minimalism, and the hipster craft-burger kit of kraft paper and distressed textures.",
     "keyCharacteristics": [
-      "Two complete palettes on a single data-mode attribute, day and 2AM, both first-class.",
+      "One palette, one light. No theme switch, no dark variant, no time-of-day behavior.",
       "Zero rounding by default. Sharp corners everywhere except pills and one status capsule.",
       "Shadows with no blur: solid ink offsets that read as printed registration, not lighting.",
       "Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.",
@@ -503,13 +398,8 @@
     ],
     "rules": [
       {
-        "name": "The Two Rooms Rule",
-        "body": "Every color decision must answer in both modes. A component that only works in day mode is unfinished. Day gets ink borders and hard shadows; night gets --a-line borders and glow. Never ship one without the other.",
-        "section": "colors"
-      },
-      {
         "name": "The Fill-Is-Not-Text Rule",
-        "body": "Counter Red and Marquee Yellow are fill colors. When either must carry text, it is swapped for its contrast-corrected cut: Signal Red for red surfaces under text, Marquee Yellow Ink for yellow text on red. Using the display cut for a text surface is prohibited.",
+        "body": "Counter Red and Marquee Yellow are fill colors. When either must carry text, it is swapped for its contrast-corrected cut: Signal Red for red surfaces under text, Marquee Yellow Ink for yellow text on red. Using the display cut for a text surface is prohibited. The hero learned this the hard way: cream on Counter Red tops out at 4.35:1, so nothing set on it at body size can pass.",
         "section": "colors"
       },
       {
@@ -534,7 +424,7 @@
       },
       {
         "name": "The No-Blur Rule",
-        "body": "In day mode, box-shadow blur is zero and the color is the ink. A blurred grey drop shadow on a card is the single fastest way to make this site look like every other food site. If it looks soft, it is wrong.",
+        "body": "box-shadow blur is zero and the color is the ink. A blurred grey drop shadow on a card is the single fastest way to make this site look like every other food site. If it looks soft, it is wrong.",
         "section": "elevation"
       },
       {
@@ -543,13 +433,17 @@
         "section": "elevation"
       },
       {
-        "name": "The Glow Is Night-Only Rule",
-        "body": "Emitted light belongs to 2AM. A glow in day mode reads as a mistake, and an offset shadow at night reads as a hole.",
+        "name": "The One Light Rule",
+        "body": "This system has a single palette. There is no dark mode, no theme attribute, no time-of-day switch. A component that introduces a second set of colors is not a variant, it is a second design system.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Glow Rule",
+        "body": "Nothing on this site emits light. No neon, no bloom, no colored box-shadow with a blur radius. Depth is ink on paper.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do answer both modes for every component. Day gets a Griddle Ink border and a zero-blur offset shadow; 2AM gets a #2b2620 border and a red glow.",
       "Do use zero-blur ink shadows at the documented offsets (2 / 3 / 4 / 6 / 7 / 10 / 14px). Size means importance.",
       "Do make the travel distance on :active equal the shadow offset, so the element lands flat.",
       "Do swap Counter Red for Signal Red (#d0281c) the moment text sits on it, and Marquee Yellow for #ffd633 the moment yellow becomes text on red.",
@@ -558,10 +452,13 @@
       "Do use tabular-nums on any figure that changes: prices, counts, hours, distances.",
       "Do give every motion a prefers-reduced-motion exit.",
       "Do carry state on two cues, not one.",
-      "Do keep prose to 65ch to 75ch, and the hero lede to 32ch."
+      "Do keep prose to 65ch to 75ch, and the hero lede to 32ch.",
+      "Do lift a figure inside a mono row with weight, not with a second color."
     ],
     "donts": [
-      "Don't use a blurred or grey drop shadow in day mode. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.",
+      "Don't add a dark mode, a theme toggle, or any time-of-day color behavior. This was removed deliberately.",
+      "Don't use a blurred or grey drop shadow. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.",
+      "Don't emit light. No glow, no neon, no colored shadow with a blur radius.",
       "Don't round corners. Square by default, 999px for pills, 20px for the status capsule, and nothing else.",
       "Don't introduce a gradient, a tint, a glass surface or a backdrop-filter as decoration. Surfaces are one flat color.",
       "Don't use background-clip: text with a gradient. The display face is already the emphasis.",

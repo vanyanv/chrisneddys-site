@@ -32,7 +32,7 @@ A neighborhood counter with a big voice. The volume is hospitality, not exclusiv
 
 The voice is direct and unhedged. Short sentences, real facts, no restaurant-marketing vocabulary. It says "every topping free" rather than "complimentary artisanal accompaniments." It never uses the words artisan, elevated, curated, journey or craft.
 
-Emotionally the site should produce appetite first and recognition second. The 2AM mode is part of the hospitality: it says we are still here when everything else has closed.
+Emotionally the site should produce appetite first and recognition second. Being open when everything else has closed is part of the hospitality, and the site says so in words and hours rather than in a change of costume.
 
 ## Anti-references
 
@@ -62,7 +62,7 @@ Emotionally the site should produce appetite first and recognition second. The 2
 
 - **Contrast.** All text meets 4.5:1, or 3:1 where it qualifies as large text. The palette carries contrast-corrected variants specifically for this: a deeper red for any red surface under text, a brighter yellow for yellow set as text on red. The display cuts of red and yellow are fill colors and are never used as text backgrounds.
 - **Motion.** Every animation, hover transform, parallax effect, marquee and scroll-driven reveal has a `prefers-reduced-motion: reduce` exit. New motion joins that block or it does not ship.
-- **Keyboard.** Every interactive element is reachable and has a visible focus indicator: a 3px ink outline at 2px offset on light surfaces, yellow on dark ones.
+- **Keyboard.** Every interactive element is reachable and has a visible focus indicator: a 3px ink outline at 2px offset, switching to yellow where the surface is ink or red.
 - **Color independence.** State is never carried by color alone. Open and closed differ by dot color and label text; the active tab differs by indicator position and opacity; a location that has not opened yet differs by border style, not by a colored badge.
 - **Input handling.** Text inputs are 16px minimum so iOS Safari does not zoom on focus. Errors are announced with `aria-invalid` and `aria-describedby`, not signalled by color alone.
 - **Content.** Decorative layers (halftone fields, separators, ornamental marks) are `aria-hidden`. Anything where an icon carries the meaning also carries visually hidden text.

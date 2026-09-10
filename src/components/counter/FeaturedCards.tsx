@@ -58,7 +58,7 @@ export function FeaturedCards() {
                 <span className="cne-card-pr">{formatPrice(it.price)}</span>
                 <span className="cne-card-cta" aria-hidden="true">
                   <span className="cne-only-phone">&rsaquo;</span>
-                  <span className="cne-only-desk-i">ORDER &rarr;</span>
+                  <span className="cne-only-desk-i">PICK YOURS &rarr;</span>
                 </span>
               </span>
             </span>

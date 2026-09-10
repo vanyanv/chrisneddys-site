@@ -1,4 +1,6 @@
+import { Fragment } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
@@ -6,48 +8,125 @@ import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
 /**
  * The footer is the only place every page of the site is linked from. That is
  * what a crawler reads a site's shape off, and what the sitelinks under a brand
- * result are drawn from — so the whole tree is here, in one row, by name.
+ * result are drawn from — so the whole tree is here, in one block, by name.
+ *
+ * The eight links are split into two named groups rather than run together.
+ * That is the same eight links, not more: padding a sitewide footer out to
+ * thirty is what gets the whole block discounted as boilerplate.
  */
-const NAV = [
+const EAT = [
   { href: "/menu/", label: "Menu" },
   { href: "/order/", label: "Order online" },
-  { href: "/locations/", label: "Locations" },
-  ...locations.map((loc) => ({
-    href: `/locations/${slugFor(loc)}/`,
-    label: neighbourhoodFor(loc),
-  })),
+  { href: "/shop/", label: "Shop" },
   { href: "/about/", label: "Our story" },
   { href: "/contact/", label: "Contact" },
 ];
 
+const COUNTER_LINKS = [
+  { href: "/locations/", label: "All locations" },
+  ...locations.map((loc) => ({
+    href: `/locations/${slugFor(loc)}/`,
+    label: neighbourhoodFor(loc),
+  })),
+];
+
+/**
+ * Whether a counter prints an address is `isOpen`, the same flag the live
+ * open/closed pill and the JSON-LD `openingHoursSpecification` are built from.
+ * A store that is not serving gets its name and "Coming soon" and nothing else:
+ * a street address under a counter nobody can walk into is a claim the business
+ * cannot honour, and it is the same claim the opening-hours spec already
+ * refuses to make. Glendale and Van Nuys fill in when their flag flips.
+ *
+ * The phone is a second, narrower gate. Three addresses sharing the Hollywood
+ * number is the pattern local search reads as a virtual office, so a counter
+ * prints a number only once it answers its own.
+ */
 export function SiteFooter() {
   return (
     <footer className="cne-foot">
-      <div>
-        <b>CHRIS N EDDY&rsquo;S</b> — Smashed sliders, done right. Pop-up in 2020, Hollywood
-        since 2021.
-      </div>
-      <nav className="cne-foot-nav" aria-label="Footer">
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href} style={linkStyle}>
-            {item.label}
+      <div className="cne-foot-top">
+        <div className="cne-foot-brand">
+          <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
+            <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} />
           </Link>
+          <p>
+            Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.
+          </p>
+          <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">
+            {brand.ig}
+          </a>
+        </div>
+
+        <div className="cne-foot-group">
+          <p className="cne-foot-h">Eat</p>
+          <nav aria-label="Eat">
+            <ul>
+              {EAT.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <div className="cne-foot-group">
+          <p className="cne-foot-h">Counters</p>
+          <nav aria-label="Counters">
+            <ul>
+              {COUNTER_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div className="cne-foot-counters">
+        {locations.map((loc) => (
+          <div className="cne-foot-counter" key={loc.id}>
+            {/* A label, not a link: this counter is already linked by name in
+                the Counters column above, and two anchors on one URL in one
+                block is the kind of duplication that makes a footer read as
+                padded rather than as a map. */}
+            <p className="cne-foot-h">{neighbourhoodFor(loc)}</p>
+            {loc.isOpen ? (
+              <>
+                <address>
+                  {loc.address}
+                  <br />
+                  {loc.city}, {loc.region} {loc.postal}
+                  {loc.phone && loc.phoneTel ? (
+                    <>
+                      <br />
+                      <a href={`tel:${loc.phoneTel}`}>{loc.phone}</a>
+                    </>
+                  ) : null}
+                </address>
+                <div className="cne-foot-hours">
+                  {loc.hours.map(([days, time]) => (
+                    <Fragment key={days}>
+                      <span>{days}</span>
+                      <span>{time}</span>
+                    </Fragment>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="cne-foot-soon">Coming soon</p>
+            )}
+          </div>
         ))}
-      </nav>
-      <div>
-        {/* No phone number here on purpose: the sitewide footer is on every page,
-            and the only number we have is the Hollywood counter's. Showing it
-            under a Glendale or Van Nuys page reads as that store's line. The
-            number lives on the pages that name a store instead. */}
-        Hollywood · Glendale · Van Nuys ·{" "}
-        <a href={brand.igUrl} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-          {brand.ig}
-        </a>
+      </div>
+
+      <div className="cne-foot-legal">
+        <span>
+          © {new Date().getFullYear()} {brand.name}
+        </span>
       </div>
     </footer>
   );
 }
-
-// Underline comes from counter.css (.cne-foot a) so the link is identifiable
-// without relying on colour alone.
-const linkStyle = { color: "var(--a-yel)" };

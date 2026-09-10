@@ -14,17 +14,17 @@ const PRESS = [
   {
     quote:
       "The Brendan Fraser of the LA smashburger scene — it might have been a minute since you’ve heard their name, but they clearly can still bring it.",
-    cite: "— THE INFATUATION · 7.6/10",
+    cite: "THE INFATUATION · 7.6/10",
   },
   {
     quote:
       "Co-owned by Poghosyan and his childhood friend, Chris Karimian, who’ve known each other since they were about 13 years old.",
-    cite: "— NBC LOS ANGELES · FEB 2026",
+    cite: "NBC LOS ANGELES · FEB 2026",
   },
   {
     quote:
       "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
-    cite: "— THE INFATUATION",
+    cite: "THE INFATUATION",
   },
 ];
 
@@ -59,7 +59,7 @@ export default function HomePage() {
       <section className="cne-sec is-band cne-rv">
         <div className="cne-sec-hd">
           <div>
-            <div className="cne-eyebrow">★ One tap to order</div>
+            <div className="cne-eyebrow">★ The three we sell most</div>
             <h2>Start here.</h2>
           </div>
           <div className="cne-sec-note">

@@ -523,7 +523,12 @@ body {
 .cne-row-name { flex: 1; min-width: 0; }
 .cne-row-name .n { font-size: 13.5px; font-weight: 800; line-height: 1.22; }
 .cne-row-name .d {
-  font-size: 10.5px;
+  /* Was 10.5px, which Lighthouse counted as illegible and which put the food
+     descriptions — the copy that actually sells the burger — below the 12px
+     floor on the one page people read closely. The desktop breakpoint was
+     already 13px, so this brings the phone toward the design's own intent
+     rather than inventing a new step. */
+  font-size: 12.5px;
   line-height: 1.35;
   color: var(--a-sub);
   margin-top: 3px;
@@ -1613,7 +1618,8 @@ body {
 .cne-cat-h::after { content: none; }
 .cne-menu-fine {
   font-family: var(--font-mono);
-  font-size: 10px;
+  /* 12px is the floor for anything that is a sentence rather than a label. */
+  font-size: 12px;
   color: var(--a-sub);
   margin: 0;
   line-height: 1.6;
@@ -1621,7 +1627,7 @@ body {
 .cne-menu-foot {
   padding: 6px 15px 18px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   color: var(--a-sub);
   margin: 0;

@@ -45,7 +45,7 @@ export function StoryColumns(): ReactElement {
           founders actually eat it.
         </p>
         <p>
-          Order either one at the counter by name. Extra cheese is a dollar, halal is two, and
+          Order either one by name. Extra cheese is a dollar, halal is two, and
           nothing else costs anything.
         </p>
         <div className="cne-facts">

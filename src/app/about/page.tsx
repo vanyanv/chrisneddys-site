@@ -10,7 +10,7 @@ import { brand } from "@/data/brand";
 
 const title = "Our Story — A Parking Lot to Sunset Blvd";
 const description =
-  "At Chris N Eddy’s we are two childhood friends who turned a 2020 parking-lot pop-up into a Sunset Blvd counter. Nine months of testing, one smashed slider.";
+  "At Chris N Eddy’s we are two childhood friends who turned a 2020 parking-lot pop-up into a permanent spot on Sunset Blvd. Nine months of testing, one smashed slider.";
 
 export const metadata: Metadata = {
   title,

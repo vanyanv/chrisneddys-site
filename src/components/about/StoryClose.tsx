@@ -15,7 +15,7 @@ export function StoryClose(): ReactElement {
       <div className="cne-eyebrow">So, then</div>
       <h2>WHOSE SIDE ARE YOU ON?</h2>
       <p className="cne-close-p">
-        Pick one and the menu opens with it already selected. You can switch at the counter.
+        Pick one and the menu opens with it already selected. You can switch when you get here.
         They do.
       </p>
       <div className="cne-cta">

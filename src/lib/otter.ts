@@ -51,7 +51,7 @@ export type OrderSurface =
  * Tags an outbound order link so the order it produces can be traced back here.
  *
  * Without this the site is invisible in Otter's reporting: a website order and
- * a walk-in who scanned the counter QR arrive looking identical. Verified
+ * a walk-in who scanned the in-store QR arrive looking identical. Verified
  * against the live storefront on 2026-09-09 — Otter ignores the extra query
  * parameters and still opens the right store and the right item.
  */

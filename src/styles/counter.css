@@ -562,7 +562,7 @@ body {
   border-color: var(--a-red);
 }
 .cne-loc.is-soon { border-style: dashed; box-shadow: none; }
-/* The dashed border and the missing shadow are how a counter that has not
+/* The dashed border and the missing shadow are how a location that has not
    opened reads as structurally different. A tag still casting one inside it
    puts the shadow back. */
 .cne-loc.is-soon .cne-stat { box-shadow: none; }
@@ -1292,7 +1292,7 @@ body {
   }
   .cne-foot-top { grid-template-columns: 1.3fr 0.8fr 0.8fr; gap: 40px; align-items: start; }
   .cne-foot-mark img { height: 38px; }
-  /* Same tracks as the row above, so each counter sits under a column rather
+  /* Same tracks as the row above, so each location sits under a column rather
      than floating in a third of the page. A fourth store wraps to a second
      row here; the phone rule above stays auto-fit for any count. */
   .cne-foot-counters { grid-template-columns: 1.3fr 0.8fr 0.8fr; gap: 40px; }

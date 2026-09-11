@@ -101,7 +101,7 @@ export function StoreDetail({
 
       <section className="cne-sec cne-rv">
         <div className="cne-eyebrow">What we serve in {hood}</div>
-        <h2>The same counter, the same menu.</h2>
+        <h2>Same menu everywhere.</h2>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
           Every Chris N Eddy&rsquo;s runs the same short menu: a slider is two smashed patties on
           two slices of cheese in a buttered, toasted Martin&rsquo;s potato roll. Order it
@@ -124,7 +124,7 @@ export function StoreDetail({
 
       <section className="cne-sec cne-rv" style={{ paddingBottom: 30 }}>
         <div className="cne-eyebrow">Also nearby</div>
-        <h2>Our other counters.</h2>
+        <h2>Our other locations.</h2>
         {others.map((o) => (
           <Link
             key={o.id}

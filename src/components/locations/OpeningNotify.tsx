@@ -7,7 +7,7 @@ import { track } from "@/lib/track";
 /**
  * "Tell me when this one opens", on the Glendale and Van Nuys pages.
  *
- * Those pages currently answer a real question — where the next counter is —
+ * Those pages currently answer a real question — where the next location is —
  * and then collect nothing from the person who asked. Two neighbourhoods of
  * pre-launch demand arrive, read an address, and leave with no way for us to
  * tell them the doors are open.
@@ -88,7 +88,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
     return (
       <div className="cne-loc-note" role="status" style={{ marginTop: 14 }}>
         <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood}{" "}
-        counter is serving — nothing else.
+        location is serving — nothing else.
       </div>
     );
   }

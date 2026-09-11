@@ -16,7 +16,7 @@
  * and that it is one size. Fabric weights, shipping rates, delivery windows and
  * a returns window are not known, so they are not here and they are not on the
  * page. A specification nobody has confirmed is a promise to a customer that
- * someone behind the counter has to keep.
+ * someone at the store has to keep.
  *
  * There is deliberately no stock count either. "Limited quantity" is honest
  * without one; a number that isn't decremented by a real till is a lie with a
@@ -101,9 +101,9 @@ export const merch: MerchProduct[] = [
     displayName: ["CHRIS N EDDY’S", "BALL-CAP"],
     price: 48,
     description:
-      "A limited-run ball-cap from Chris N Eddy's, the smash-burger counter on Sunset in Hollywood. One size fits all.",
+      "A limited-run ball-cap from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. One size fits all.",
     metaDescription:
-      "Chris N Eddy’s Ball-Cap — $48, one size fits all, limited quantity. A limited run from the Hollywood smash-burger counter.",
+      "Chris N Eddy’s Ball-Cap — $48, one size fits all, limited quantity. A limited run from the Hollywood smash-burger location.",
     limitedNote: "Limited quantity. Once they’re gone, they’re gone.",
     oneSize: true,
     photo: "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf",

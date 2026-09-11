@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const full = `${title} · ${brand.name}`;
   const description = `${item.desc} ${formatPrice(
     item.price,
-  )} for pickup from our Hollywood counter at 5539 W. Sunset Blvd, open late. Every topping free.`;
+  )} for pickup from our Hollywood location at 5539 W. Sunset Blvd, open late. Every topping free.`;
 
   return {
     title,
@@ -182,7 +182,7 @@ export default async function MenuItemPage({ params }: Params) {
       {hollywood && (
         <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>
           <div className="cne-eyebrow">Where to get it</div>
-          <h2>Hollywood counter.</h2>
+          <h2>Hollywood location.</h2>
           <address className="cne-loc-addr" style={{ fontStyle: "normal", marginTop: 8 }}>
             {hollywood.address}
             <br />

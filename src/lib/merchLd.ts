@@ -12,7 +12,7 @@ import { SHOP_OPEN, type MerchProduct } from "@/data/merch";
  * and the returns window have not been decided, and the shop cannot take money.
  *
  * Fabricating them to win the listing would put a shipping price and a returns
- * promise into a search result that nobody behind the counter has agreed to
+ * promise into a search result that nobody at the store has agreed to
  * honour. It is also the exact shape of misrepresentation that earns a manual
  * action. So the node states the name, the price and the size, and stops.
  *

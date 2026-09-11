@@ -397,7 +397,7 @@ export const COMBO_FROM_PRICE = Math.min(...menu.combos.map((i) => i.price));
  * Not every item: 31 near-identical pages would be thin content competing with
  * each other and with /menu/ itself. These are the ones people search by name —
  * the signature three, plus the three that carry the "how much food is it"
- * questions the counter actually gets asked.
+ * questions we actually get asked.
  *
  * `id` is already a URL-safe slug, so it doubles as the route segment.
  */

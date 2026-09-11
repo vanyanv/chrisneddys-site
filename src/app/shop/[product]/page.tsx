@@ -146,7 +146,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         <div className="cne-eyebrow">While you’re here</div>
         <h2>Come eat.</h2>
         <p>
-          The cap is from the counter at 5539 W. Sunset Blvd — smashed sliders, two patties,
+          The cap is from 5539 W. Sunset Blvd — smashed sliders, two patties,
           two slices of cheese, every topping free.{" "}
           <Link href="/menu/">See the menu</Link> or{" "}
           <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}

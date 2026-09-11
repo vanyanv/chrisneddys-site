@@ -10,7 +10,7 @@ import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 
-const title = "Order Now — Pickup From Our Hollywood Counter";
+const title = "Order Now — Pickup From Our Hollywood Location";
 const description =
   "Order Chris N Eddy's smash burgers online for pickup in Hollywood, or call (323) 544-3600. Live menu prices, open till 1AM weeknights and 2AM Fri–Sun.";
 
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
 const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "How do I order from Chris N Eddy's?",
-    a: "Order online from our Hollywood counter at 5539 W. Sunset Blvd through our Otter storefront, or call (323) 544-3600. Every item on this site links straight to its page on the storefront with the add-to-cart sheet already open.",
+    a: "Order online from our Hollywood location at 5539 W. Sunset Blvd through our Otter storefront, or call (323) 544-3600. Every item on this site links straight to its page on the storefront with the add-to-cart sheet already open.",
   },
   {
     q: "What time does Chris N Eddy's close?",
-    a: "The Hollywood counter is open 10AM to 1AM Monday through Thursday, and 10AM to 2AM Friday, Saturday and Sunday.",
+    a: "The Hollywood location is open 10AM to 1AM Monday through Thursday, and 10AM to 2AM Friday, Saturday and Sunday.",
   },
   {
     q: "What is a Chris N Eddy's slider?",
@@ -42,11 +42,11 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Do you deliver?",
-    a: "Yes — DoorDash, Uber Eats and Grubhub all deliver from the Hollywood counter, and each is linked on this page. Ordering direct on our own storefront is pickup only, and it is the cheaper way to buy: the delivery apps set their own prices and add their own fees.",
+    a: "Yes — DoorDash, Uber Eats and Grubhub all deliver from the Hollywood location, and each is linked on this page. Ordering direct on our own storefront is pickup only, and it is the cheaper way to buy: the delivery apps set their own prices and add their own fees.",
   },
   {
     q: "How late are you open?",
-    a: "Late. The Hollywood counter serves until 1AM Monday through Thursday and until 2AM Friday, Saturday and Sunday — the kitchen is still smashing patties long after most burger counters in Hollywood have closed for the night.",
+    a: "Late. The Hollywood location serves until 1AM Monday through Thursday and until 2AM Friday, Saturday and Sunday — the kitchen is still smashing patties long after most places in Hollywood have closed for the night.",
   },
   {
     q: "Do the toppings cost extra?",
@@ -58,7 +58,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is there parking?",
-    a: "There is street parking along W. Sunset Blvd and the residential streets just off it. The counter is a walk-up on Sunset between Western and Normandie, so a pickup order is usually quicker to collect than it is to find a space for a sit-down meal.",
+    a: "There is street parking along W. Sunset Blvd and the residential streets just off it. We're a walk-up on Sunset between Western and Normandie, so a pickup order is usually quicker to collect than it is to find a space for a sit-down meal.",
   },
   {
     q: "Do you have anything vegetarian?",
@@ -66,7 +66,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Can I order from the Glendale or Van Nuys locations?",
-    a: "Not yet — those counters have not opened. Until they do, every order runs through Hollywood.",
+    a: "Not yet — those locations have not opened. Until they do, every order runs through Hollywood.",
   },
 ];
 
@@ -104,7 +104,7 @@ export default function OrderPage() {
         <div className="cne-eyebrow">Pickup from Hollywood</div>
         <h1>Order now.</h1>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-          Online ordering runs through our Otter storefront at the Hollywood counter, 5539 W.
+          Online ordering runs through our Otter storefront at the Hollywood location, 5539 W.
           Sunset Blvd. Prices there are the pickup prices you see on{" "}
           <Link href="/menu/" style={{ textDecoration: "underline", color: "inherit" }}>
             our menu
@@ -124,7 +124,7 @@ export default function OrderPage() {
 
       <section className="cne-sec cne-rv">
         <div className="cne-eyebrow">Where it comes from</div>
-        <h2>Pick your counter.</h2>
+        <h2>Pick your location.</h2>
         {locations.map((loc) => (
           <div
             key={loc.id}
@@ -174,7 +174,7 @@ export default function OrderPage() {
                 </div>
               </>
             ) : (
-              // No hours, no phone and no order link for a counter that is not
+              // No hours, no phone and no order link for a location that is not
               // serving yet — every one of them would be a dead end.
               <div className="cne-loc-note">Opening date to be announced.</div>
             )}
@@ -189,7 +189,7 @@ export default function OrderPage() {
         <div className="cne-eyebrow">If you would rather not move</div>
         <h2>Delivery.</h2>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-          Three apps deliver from the Hollywood counter. They set their own prices and add
+          Three apps deliver from the Hollywood location. They set their own prices and add
           their own fees, so ordering direct above is the cheaper way to eat the same food —
           but at 1AM in the rain, this is why we are on all three.
         </p>

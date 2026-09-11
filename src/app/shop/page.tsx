@@ -9,7 +9,7 @@ import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 
 const title = "Shop — Chris N Eddy's Merch";
 const description =
-  "Merch from Chris N Eddy's, the smash-burger counter on Sunset in Hollywood. The Ball-Cap, $48, one size fits all, limited quantity.";
+  "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Ball-Cap, $48, one size fits all, limited quantity.";
 
 export const metadata: Metadata = {
   title,
@@ -57,7 +57,7 @@ export default function ShopPage() {
         <div className="cne-eyebrow">Merch</div>
         <h1>The shop.</h1>
         <p className="cne-shop-lede">
-          Small runs from the counter at 5539 W. Sunset Blvd. When they’re gone they’re gone.
+          Small runs from 5539 W. Sunset Blvd. When they’re gone they’re gone.
         </p>
 
         <div className="cne-drops">

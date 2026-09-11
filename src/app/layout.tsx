@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     template: `%s · ${brand.name}`,
   },
   description:
-    "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
   applicationName: brand.name,
   keywords: [
     "smash burger",
@@ -66,13 +66,13 @@ export const metadata: Metadata = {
     url: brand.siteUrl,
     siteName: brand.name,
     title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
-    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name}`,
-    description: "Smash burger sliders from our Hollywood counter — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE.url],
   },
   alternates: {

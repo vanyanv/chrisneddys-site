@@ -65,7 +65,7 @@ const menuStub = {
 };
 
 /**
- * The sitewide graph: who we are, what the site is, and where the counters are.
+ * The sitewide graph: who we are, what the site is, and where the locations are.
  *
  * `WebSite` is what Google reads for the site name it prints above a result,
  * and `Organization.logo` for the favicon beside it — neither is inferred from
@@ -90,7 +90,7 @@ export function JsonLd(): ReactElement {
     },
     image: RESTAURANT_IMAGES,
     description:
-      "Smash burger sliders from a Hollywood counter — two patties, two slices of cheese, a buttered Martin's potato roll, every topping free.",
+      "Smash burger sliders from a Hollywood location — two patties, two slices of cheese, a buttered Martin's potato roll, every topping free.",
     slogan: brand.tagline,
     // The listings that already carry the reviews, photos and menus search
     // engines use to reconcile "Chris N Eddy's" into one entity. Without these
@@ -148,7 +148,7 @@ export function JsonLd(): ReactElement {
     paymentAccepted: "Cash, Credit Card, Debit Card, Apple Pay",
     image: RESTAURANT_IMAGES,
     hasMenu: { "@id": ID.menu },
-    // Only the counter that answers it. Three addresses across two cities
+    // Only the location that answers it. Three addresses across two cities
     // sharing one number is the pattern local search treats as a virtual
     // office — and Glendale and Van Nuys have no line to answer yet.
     telephone: loc.phone,
@@ -172,10 +172,10 @@ export function JsonLd(): ReactElement {
         opens: spec.opens,
         closes: spec.closes,
       })) ?? undefined,
-    // Only an open counter gets order actions at all — claiming one for a
-    // counter that has not opened would send searchers to a dead end.
+    // Only an open location gets order actions at all — claiming one for a
+    // location that has not opened would send searchers to a dead end.
     // Pickup direct from the storefront, then each delivery platform that
-    // carries the counter. Listing them separately is what lets a result
+    // carries the location. Listing them separately is what lets a result
     // offer "order delivery" as well as "order pickup"; before this the only
     // stated way to buy was pickup, which is not what most people want at 1AM.
     potentialAction: loc.isOpen

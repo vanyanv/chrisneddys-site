@@ -1,5 +1,5 @@
 /**
- * The third-party platforms that carry the Hollywood counter.
+ * The third-party platforms that carry the Hollywood location.
  *
  * Every one of these was opened in a real browser and confirmed to resolve to
  * the 5539 W. Sunset Blvd store on 2026-09-09. They are hard to check from a

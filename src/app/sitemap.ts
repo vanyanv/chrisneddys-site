@@ -18,7 +18,7 @@ export const dynamic = "force-static";
  */
 const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 
-/** When the location set — addresses, hours, which counters are open — last moved. */
+/** When the location set — addresses, hours, which locations are open — last moved. */
 const LOCATIONS_UPDATED = "2026-09-09";
 /** When the site's copy and structure last changed. */
 const SITE_UPDATED = "2026-09-09";

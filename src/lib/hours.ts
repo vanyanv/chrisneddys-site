@@ -79,7 +79,7 @@ export type StoreStatus =
 const LAST_CALL_MINUTES = 45;
 
 /**
- * A time of day, written the way the counter says it out loud.
+ * A time of day, written the way we say it out loud.
  *
  * On the hour the zeroes are noise, and the header has no width to spend on
  * noise: "1 AM", not "1:00 AM". Minutes survive whenever they are not zero, so

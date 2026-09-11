@@ -9,7 +9,7 @@ const PHONE = [
   "since 2020 ★",
 ];
 
-/** Desktop runs a shorter reel that ends on the three counters. */
+/** Desktop runs a shorter reel that ends on the three locations. */
 const DESK = [
   "sliders ★",
   "shakes ★",

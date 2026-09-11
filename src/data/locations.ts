@@ -5,7 +5,7 @@ export type Location = {
   name: string;
   sub: string;
   /**
-   * The line this counter answers itself. A store only gets a CALL button and a
+   * The line this location answers itself. A store only gets a CALL button and a
    * `telephone` in its JSON-LD once it has one — three addresses across two
    * cities sharing the Hollywood number is the pattern local search reads as a
    * virtual office. Glendale and Van Nuys get theirs when they open.
@@ -68,7 +68,7 @@ export const locations: Location[] = [
     hours: [["Launch", "Date to be announced"]],
     // No openingSpec until it opens: it is what the live open/closed pill and
     // the JSON-LD openingHoursSpecification are both built from, and neither
-    // should claim hours for a counter that is not serving.
+    // should claim hours for a location that is not serving.
   },
   {
     id: "vannuys",

@@ -24,8 +24,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!loc) return {};
 
   const hood = neighbourhoodFor(loc);
-  // Late night is the one thing this counter has that the Hollywood smashburger
-  // field mostly does not — For The Win shuts at 9PM — so the open counter says
+  // Late night is the one thing this location has that the Hollywood smashburger
+  // field mostly does not — For The Win shuts at 9PM — so the open location says
   // so in its title rather than burying it in the hours table.
   const title = loc.isOpen
     ? `${hood} Smash Burgers, Open Late`
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const full = `${title} · ${brand.name}`;
   const description = loc.isOpen
     ? `Looking for the best burgers in ${hood}? Chris N Eddy’s is at ${loc.address} — smashed sliders and chris-cut fries, 10AM till 1AM weeknights, 2AM Fri–Sun.`
-    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}: the same smashed sliders, chris-cut fries and Secret Menu we serve at our Hollywood counter.`;
+    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}: the same smashed sliders, chris-cut fries and Secret Menu we serve at our Hollywood location.`;
 
   return {
     title,
@@ -79,7 +79,7 @@ export default async function LocationPage({ params }: Params) {
           <div className="cne-eyebrow">Not open yet</div>
           <h2>First to know.</h2>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            The {hood} counter is being built. We do not have a date to give you yet, and we
+            The {hood} location is being built. We do not have a date to give you yet, and we
             would rather say that than invent one — leave an email and you will hear from us
             the day it starts serving.
           </p>
@@ -91,8 +91,8 @@ export default async function LocationPage({ params }: Params) {
           <div className="cne-eyebrow">After everyone else has closed</div>
           <h2>Open late.</h2>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            The counter serves until 1AM Monday through Thursday and until 2AM Friday,
-            Saturday and Sunday. Most burger counters around {hood} are dark by ten, which is
+            We serve until 1AM Monday through Thursday and until 2AM Friday,
+            Saturday and Sunday. Most places around {hood} are dark by ten, which is
             why so much of what we smash goes out after midnight — to people coming off a
             shift, out of a show on Sunset, or off the 101 with nowhere else still cooking.
           </p>

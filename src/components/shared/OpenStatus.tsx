@@ -91,7 +91,7 @@ export function StatusTag({
   );
 }
 
-/** A counter that has not opened yet. One cell, no clock, no promise. */
+/** A location that has not opened yet. One cell, no clock, no promise. */
 export function ComingSoonTag() {
   return (
     <StatusTag

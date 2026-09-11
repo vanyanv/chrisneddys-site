@@ -30,11 +30,11 @@ export const metadata: Metadata = {
 const DEFLECT: Array<{ q: string; a: string }> = [
   {
     q: "Do you deliver?",
-    a: "Ordering on this site is pickup from the Hollywood counter. Delivery is available through the third-party apps that carry us, at their own prices.",
+    a: "Ordering on this site is pickup from the Hollywood location. Delivery is available through the third-party apps that carry us, at their own prices.",
   },
   {
     q: "Can I order from Glendale or Van Nuys?",
-    a: "Not yet — those counters have not opened. Until they do, every order runs through Hollywood.",
+    a: "Not yet — those locations have not opened. Until they do, every order runs through Hollywood.",
   },
   {
     q: "What time do you close?",

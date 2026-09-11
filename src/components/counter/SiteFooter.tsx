@@ -31,15 +31,15 @@ const COUNTER_LINKS = [
 ];
 
 /**
- * Whether a counter prints an address is `isOpen`, the same flag the live
+ * Whether a location prints an address is `isOpen`, the same flag the live
  * open/closed pill and the JSON-LD `openingHoursSpecification` are built from.
  * A store that is not serving gets its name and "Coming soon" and nothing else:
- * a street address under a counter nobody can walk into is a claim the business
+ * a street address under a location nobody can walk into is a claim the business
  * cannot honour, and it is the same claim the opening-hours spec already
  * refuses to make. Glendale and Van Nuys fill in when their flag flips.
  *
  * The phone is a second, narrower gate. Three addresses sharing the Hollywood
- * number is the pattern local search reads as a virtual office, so a counter
+ * number is the pattern local search reads as a virtual office, so a location
  * prints a number only once it answers its own.
  */
 export function SiteFooter() {
@@ -72,8 +72,8 @@ export function SiteFooter() {
         </div>
 
         <div className="cne-foot-group">
-          <p className="cne-foot-h">Counters</p>
-          <nav aria-label="Counters">
+          <p className="cne-foot-h">Locations</p>
+          <nav aria-label="Locations">
             <ul>
               {COUNTER_LINKS.map((item) => (
                 <li key={item.href}>
@@ -88,8 +88,8 @@ export function SiteFooter() {
       <div className="cne-foot-counters">
         {locations.map((loc) => (
           <div className="cne-foot-counter" key={loc.id}>
-            {/* A label, not a link: this counter is already linked by name in
-                the Counters column above, and two anchors on one URL in one
+            {/* A label, not a link: this location is already linked by name in
+                the Locations column above, and two anchors on one URL in one
                 block is the kind of duplication that makes a footer read as
                 padded rather than as a map. */}
             <p className="cne-foot-h">{neighbourhoodFor(loc)}</p>

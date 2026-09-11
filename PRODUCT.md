@@ -18,7 +18,7 @@ brand
 
 Send people to the order button.
 
-The site's job is to convert attention into an online order at the Otter storefront, and everything else on it is in service of that: the menu exists so people know what to order, the locations page exists so they know which counter is serving them, the story exists so they care enough to choose this burger over the one next to it, and the shop exists so the brand can travel past the counter.
+The site's job is to convert attention into an online order at the Otter storefront, and everything else on it is in service of that: the menu exists so people know what to order, the locations page exists so they know which location is serving them, the story exists so they care enough to choose this burger over the one next to it, and the shop exists so the brand can travel past Sunset Blvd.
 
 Success is a visitor who lands on any page, gets the fact they came for in under five seconds, and taps through to order without needing a second page. Failure is a beautiful page that sends nobody anywhere.
 
@@ -28,7 +28,7 @@ Because the register is **brand**, the design is not a neutral container for tha
 
 **Loud, warm, unpretentious.**
 
-A neighborhood counter with a big voice. The volume is hospitality, not exclusivity: this is a place that shouts a welcome across the room, not one that makes you feel lucky to be let in. Confident about the burger, never precious about it. Two friends, a flat-top, and no interest in explaining the concept.
+A neighborhood burger shop with a big voice. The volume is hospitality, not exclusivity: this is a place that shouts a welcome across the room, not one that makes you feel lucky to be let in. Confident about the burger, never precious about it. Two friends, a flat-top, and no interest in explaining the concept.
 
 The voice is direct and unhedged. Short sentences, real facts, no restaurant-marketing vocabulary. It says "every topping free" rather than "complimentary artisanal accompaniments." It never uses the words artisan, elevated, curated, journey or craft.
 

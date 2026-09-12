@@ -20,11 +20,9 @@ import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 export function StoreDetail({
   loc,
   hood,
-  fullAddress,
 }: {
   loc: Location;
   hood: string;
-  fullAddress: string;
 }) {
   const [apple, setApple] = useState(false);
   useEffect(() => setApple(prefersAppleMaps()), []);

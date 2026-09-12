@@ -50,7 +50,6 @@ export default async function LocationPage({ params }: Params) {
   if (!loc) notFound();
 
   const hood = neighbourhoodFor(loc);
-  const fullAddress = `${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim();
 
   const jsonLd = breadcrumbLd([
     { name: "Locations", path: "/locations/" },
@@ -75,7 +74,7 @@ export default async function LocationPage({ params }: Params) {
           / {hood}
         </div>
       </nav>
-      <StoreDetail loc={loc} hood={hood} fullAddress={fullAddress} />
+      <StoreDetail loc={loc} hood={hood} />
       {!loc.isOpen && (
         <section className="cne-sec cne-rv">
           <div className="cne-eyebrow">Not open yet</div>

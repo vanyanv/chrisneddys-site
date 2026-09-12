@@ -85,7 +85,6 @@ export function Analytics() {
   return (
     <script
       id="ga4-init"
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: GA_INIT }}
     />
   );

@@ -97,7 +97,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Set before first paint so scroll-reveal sections start hidden and
             animate in. Without it they would flash visible, then hide. */}
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
         />
         <Analytics />
@@ -114,7 +113,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             what the browser reports as LCP. The transition still runs, so the
             animation is unchanged; it just starts when the page does. */}
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }}
         />
         <SiteFooter />

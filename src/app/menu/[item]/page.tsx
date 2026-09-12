@@ -142,7 +142,6 @@ export default async function MenuItemPage({ params }: Params) {
               overflow: "hidden",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/menu/${item.photo}.webp`}
               srcSet={`/menu/${item.photo}-thumb.webp 200w, /menu/${item.photo}.webp 720w`}

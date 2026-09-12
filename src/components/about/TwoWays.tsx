@@ -53,6 +53,14 @@ export function TwoWays() {
 
   return (
     <>
+      {/* These two lines used to be `<h2>`s, which put two headings above the
+          page's `<h1>` — the seam line in `StorySeam`, which is the story and
+          the thing the page should be found for. They are the labels on a pair
+          of buttons, not sections of the document, so they are now plain
+          elements and the h1 is the first heading on the page.
+
+          Their type is set by `.cne-side .cne-side-h` in counter.css, next to
+          the rest of `.cne-side`. */}
       <section className="cne-split cne-rv" aria-label="The two Ways" style={style}>
         {SIDES.map((side) => {
           const taps = ways.find((w) => w.id === side.id)?.taps ?? [];
@@ -66,11 +74,11 @@ export function TwoWays() {
               aria-pressed={picked === side.id}
               onClick={() => setPicked((p) => (p === side.id ? null : side.id))}
             >
-              <h2>
+              <div className="cne-side-h">
                 {side.heading[0]}
                 <br />
                 {side.heading[1]}
-              </h2>
+              </div>
               <div className="cne-side-who">{side.who}</div>
               <div className="cne-taps">
                 {taps.map((tap) => (

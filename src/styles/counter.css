@@ -2218,7 +2218,7 @@ h3 { font-weight: 700; }
   opacity: 0.78;
   margin-bottom: 10px;
 }
-.cne-side h2 {
+.cne-side .cne-side-h {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(34px, 12vw, 52px);
@@ -2226,8 +2226,8 @@ h3 { font-weight: 700; }
   margin: 0 0 16px;
   text-shadow: 4px 4px 0 var(--a-ink);
 }
-.cne-side.is-chris h2 { color: var(--sp-a-accent); }
-.cne-side.is-eddy h2 { color: var(--sp-b-fg); }
+.cne-side.is-chris .cne-side-h { color: var(--sp-a-accent); }
+.cne-side.is-eddy .cne-side-h { color: var(--sp-b-fg); }
 
 .cne-taps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
 .cne-taps span {
@@ -2398,7 +2398,7 @@ h3 { font-weight: 700; }
   .cne-side { padding: 56px 44px 48px; min-height: 0; }
   .cne-side + .cne-side { border-top: 0; }
   .cne-side-who { font-size: 12px; letter-spacing: 0.24em; margin-bottom: 16px; }
-  .cne-side h2 {
+  .cne-side .cne-side-h {
     font-size: clamp(40px, 4.6vw, 68px);
     margin-bottom: 24px;
     text-shadow: 6px 6px 0 var(--a-ink);

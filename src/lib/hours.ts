@@ -44,8 +44,10 @@ export function losAngelesNow(at: Date = new Date()): LaClock {
 }
 
 const toMinutes = (hhmm: string): number => {
+  // Malformed input already produced NaN before this fallback (undefined * 60
+  // is NaN); the fallback only satisfies the type, it doesn't change the result.
   const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
+  return (h ?? NaN) * 60 + (m ?? NaN);
 };
 
 type Window = { open: number; close: number };
@@ -63,11 +65,13 @@ function windowFor(loc: Location, weekday: string): Window | null {
   return { open, close };
 }
 
+// `% 7` always lands in range for the 7-entry WEEKDAYS tuple; the fallback to
+// WEEKDAYS[0] only satisfies the type for a dynamic index and is never hit.
 const dayBefore = (weekday: string): string =>
-  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 6) % 7];
+  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 6) % 7] ?? WEEKDAYS[0];
 
 const dayAfter = (weekday: string): string =>
-  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 1) % 7];
+  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 1) % 7] ?? WEEKDAYS[0];
 
 export type StoreStatus =
   | { state: "open"; minutesLeft: number; closesAt: string }

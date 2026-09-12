@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, money } from "@/data/merch";
+import { TERMS_PENDING, merch, money, firstView } from "@/data/merch";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { shopListLd } from "@/lib/merchLd";
@@ -67,7 +67,7 @@ export default function ShopPage() {
               <div className="cne-drop-art">
                 <ProductShot
                   product={product}
-                  view={product.views[0]}
+                  view={firstView(product)}
                   sizes="(min-width: 901px) 700px, 100vw"
                   priority
                 />

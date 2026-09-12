@@ -75,7 +75,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       const outside = !(active instanceof Node) || !sheet.contains(active);
       if (e.shiftKey ? active === first || outside : active === last || outside) {
         e.preventDefault();
-        (e.shiftKey ? last : first).focus();
+        // `stops.length === 0` returned above, so first/last are defined here.
+        (e.shiftKey ? last : first)?.focus();
       }
     };
     document.addEventListener("keydown", onKey);

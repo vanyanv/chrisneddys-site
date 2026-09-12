@@ -94,6 +94,17 @@ export const MERCH_UPDATED = "2026-09-10";
 export const TERMS_PENDING =
   "Shipping, delivery times and returns are still being worked out. They’ll be on this page before the shop opens.";
 
+/**
+ * A product's first view — the gallery's default and what card art uses.
+ * Every product in the catalogue below is defined with at least one view;
+ * this only throws if that contract is ever broken.
+ */
+export function firstView(product: MerchProduct): MerchView {
+  const view = product.views[0];
+  if (!view) throw new Error(`${product.slug} has no views`);
+  return view;
+}
+
 export const merch: MerchProduct[] = [
   {
     slug: "ball-cap",

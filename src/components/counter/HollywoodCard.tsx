@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { locations } from "@/data/locations";
+import { locations, DEFAULT_LOCATION } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
@@ -9,7 +9,7 @@ import { OpenStatus } from "@/components/shared/OpenStatus";
 
 /** The Hollywood store card the prototype puts on the home page. */
 export function HollywoodCard() {
-  const loc = locations.find((l) => l.id === "hollywood") ?? locations[0];
+  const loc = locations.find((l) => l.id === "hollywood") ?? DEFAULT_LOCATION;
   const [apple, setApple] = useState(false);
   useEffect(() => setApple(prefersAppleMaps()), []);
 

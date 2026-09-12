@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { locations, type Location } from "@/data/locations";
+import { locations, DEFAULT_LOCATION, type Location } from "@/data/locations";
 import { orderUrl } from "@/lib/otter";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import {
@@ -36,7 +36,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
     return () => clearInterval(id);
   }, []);
 
-  const selected = locations.find((l) => l.id === sel) ?? locations[0];
+  const selected = locations.find((l) => l.id === sel) ?? DEFAULT_LOCATION;
   const calloutState = !selected.isOpen
     ? "Opening soon"
     : now

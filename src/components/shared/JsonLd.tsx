@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
-import { locations, type Location } from "@/data/locations";
+import { locations, DEFAULT_LOCATION, type Location } from "@/data/locations";
 import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl } from "@/lib/otter";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
@@ -173,7 +173,7 @@ export function restaurantLd(loc: Location) {
  * page, the menu and the order page all describe it by name.
  */
 export function flagshipRestaurantLd() {
-  return restaurantLd(locations.find((l) => l.id === "hollywood") ?? locations[0]);
+  return restaurantLd(locations.find((l) => l.id === "hollywood") ?? DEFAULT_LOCATION);
 }
 
 /**
@@ -185,7 +185,7 @@ export function flagshipRestaurantLd() {
  * see `restaurantNode`, which the pages that are about a store emit themselves.
  */
 export function JsonLd(): ReactElement {
-  const flagship = locations.find((l) => l.id === "hollywood") ?? locations[0];
+  const flagship = locations.find((l) => l.id === "hollywood") ?? DEFAULT_LOCATION;
 
   const organization = {
     "@type": "Organization",

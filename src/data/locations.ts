@@ -85,3 +85,11 @@ export const locations: Location[] = [
     hours: [["Launch", "Date to be announced"]],
   },
 ];
+
+/**
+ * Fallback for a `find` by id that should always succeed but is typed as
+ * possibly missing. Hollywood is first above and the array is never empty,
+ * so this is safe — kept as a named constant instead of a bare `locations[0]`
+ * at each call site.
+ */
+export const DEFAULT_LOCATION: Location = locations[0]!; // literal array above is non-empty

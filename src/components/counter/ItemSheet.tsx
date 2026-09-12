@@ -193,11 +193,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
 
   return (
     <>
-      <div
-        className={`cne-scrim${open ? " is-open" : ""}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className={`cne-scrim${open ? " is-open" : ""}`} onClick={onClose} aria-hidden="true" />
       <div
         ref={sheetRef}
         className={`cne-sheet${open ? " is-open" : ""}${dragging ? " is-dragging" : ""}`}
@@ -287,9 +283,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
               >
                 ADD ON OTTER · {formatPrice(item.price)} →
               </a>
-              <p className="cne-fine">
-                Opens this exact item on our ordering page, ready to add.
-              </p>
+              <p className="cne-fine">Opens this exact item on our ordering page, ready to add.</p>
             </>
           )}
         </div>
@@ -342,8 +336,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
                     <span className="v">{formatPrice(item.price)}</span>
                   </div>
                   <p className="cne-ticket-note">
-                    Toppings can&rsquo;t be pre-set from a link, so they get ticked on the
-                    next screen. All free.
+                    Toppings can&rsquo;t be pre-set from a link, so they get ticked on the next
+                    screen. All free.
                   </p>
                   <div className="cne-ticket-extra">
                     <span className="l">Also on the next screen</span>

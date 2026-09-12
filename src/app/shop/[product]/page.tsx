@@ -16,11 +16,7 @@ export function generateStaticParams(): Params[] {
   return merch.map((p) => ({ product: p.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { product: slug } = await params;
   const product = productBySlug(slug);
   if (!product) return {};
@@ -118,8 +114,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             {/* The break is the design; the space is so the two lines extract
                 as two words and not as "CHRIS N EDDY’SBALL-CAP". */}
             <h1>
-              {product.displayName[0]}{" "}
-              <br />
+              {product.displayName[0]} <br />
               {product.displayName[1]}
             </h1>
 
@@ -152,9 +147,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         <div className="cne-eyebrow">While you’re here</div>
         <h2>Come eat.</h2>
         <p>
-          The cap is from 5539 W. Sunset Blvd — smashed sliders, two patties,
-          two slices of cheese, every topping free.{" "}
-          <Link href="/menu/">See the menu</Link> or{" "}
+          The cap is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices of cheese,
+          every topping free. <Link href="/menu/">See the menu</Link> or{" "}
           <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
           <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
         </p>

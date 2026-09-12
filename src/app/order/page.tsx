@@ -70,7 +70,6 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
 ];
 
-
 export default function OrderPage() {
   const faqLd = {
     "@context": "https://schema.org",
@@ -115,7 +114,12 @@ export default function OrderPage() {
           every topping free. Rather talk to someone? Call {brand.phone}.
         </p>
         <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
-          <a className="cne-mini is-red" href={orderUrl("order-page")} target="_blank" rel="noopener noreferrer">
+          <a
+            className="cne-mini is-red"
+            href={orderUrl("order-page")}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             ORDER ONLINE
           </a>
           <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
@@ -193,9 +197,9 @@ export default function OrderPage() {
         <div className="cne-eyebrow">If you would rather not move</div>
         <h2>Delivery.</h2>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-          Three apps deliver from the Hollywood location. They set their own prices and add
-          their own fees, so ordering direct above is the cheaper way to eat the same food —
-          but at 1AM in the rain, this is why we are on all three.
+          Three apps deliver from the Hollywood location. They set their own prices and add their
+          own fees, so ordering direct above is the cheaper way to eat the same food — but at 1AM in
+          the rain, this is why we are on all three.
         </p>
         <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
           {deliveryPlatforms.map((platform) => (
@@ -213,8 +217,8 @@ export default function OrderPage() {
 
         <h3 style={{ marginTop: 28, fontSize: 14 }}>Catering and large orders</h3>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-          Office lunches and events run through {cateringPlatform.name}. For anything it does
-          not cover — a private event, a press or partnership question — the{" "}
+          Office lunches and events run through {cateringPlatform.name}. For anything it does not
+          cover — a private event, a press or partnership question — the{" "}
           <Link href="/contact/" style={{ textDecoration: "underline", color: "inherit" }}>
             contact page
           </Link>{" "}

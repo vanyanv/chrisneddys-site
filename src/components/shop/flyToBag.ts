@@ -27,8 +27,7 @@ const DURATION = 620;
 
 export function flyToBag(source: HTMLElement | null, onArrive: () => void) {
   const reduced =
-    typeof window === "undefined" ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (!source || reduced || typeof document === "undefined") {
     onArrive();

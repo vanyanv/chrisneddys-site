@@ -58,7 +58,13 @@ export function SiteHeader() {
               control that means different things on different pages is one
               people stop trusting. */}
           <BagButton />
-          <a className="cne-orderbtn" data-surface="header" href={orderUrl("header")} target="_blank" rel="noopener noreferrer">
+          <a
+            className="cne-orderbtn"
+            data-surface="header"
+            href={orderUrl("header")}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             ORDER<span className="cne-only-desk-i"> ONLINE →</span>
           </a>
         </div>

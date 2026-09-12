@@ -28,7 +28,9 @@ describe("clean", () => {
   });
 
   it("clamps a quantity above MAX_PER_ORDER instead of dropping the line", () => {
-    expect(clean([{ slug: "ball-cap", qty: 999 }])).toEqual([{ slug: "ball-cap", qty: MAX_PER_ORDER }]);
+    expect(clean([{ slug: "ball-cap", qty: 999 }])).toEqual([
+      { slug: "ball-cap", qty: MAX_PER_ORDER },
+    ]);
   });
 
   it("floors a fractional quantity", () => {

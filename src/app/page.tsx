@@ -21,18 +21,29 @@ const PRESS = [
     cite: "NBC LOS ANGELES · FEB 2026",
   },
   {
-    quote:
-      "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
+    quote: "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
     cite: "THE INFATUATION",
   },
 ];
 
 const GRAM = [
-  { src: "/photos/ig-pile.webp", alt: "A pile of Chris N Eddy’s smash sliders against red graffiti neon" },
-  { src: "/photos/ig-neon.webp", alt: "Three Chris N Eddy’s sliders in hand with the shop neon glowing behind" },
-  { src: "/photos/ig-monster.webp", alt: "Stacked sliders in front of Chris N Eddy’s monster mural" },
+  {
+    src: "/photos/ig-pile.webp",
+    alt: "A pile of Chris N Eddy’s smash sliders against red graffiti neon",
+  },
+  {
+    src: "/photos/ig-neon.webp",
+    alt: "Three Chris N Eddy’s sliders in hand with the shop neon glowing behind",
+  },
+  {
+    src: "/photos/ig-monster.webp",
+    alt: "Stacked sliders in front of Chris N Eddy’s monster mural",
+  },
   { src: "/photos/ig-pyramid.webp", alt: "Three sliders stacked on wax paper with loaded fries" },
-  { src: "/photos/ig-stack.webp", alt: "A towering Chris N Eddy’s smash burger with pickles and sauce" },
+  {
+    src: "/photos/ig-stack.webp",
+    alt: "A towering Chris N Eddy’s smash burger with pickles and sauce",
+  },
   { src: "/photos/double.webp", alt: "The signature Chris N Eddy’s double slider" },
 ];
 

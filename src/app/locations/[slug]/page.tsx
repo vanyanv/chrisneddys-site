@@ -4,11 +4,7 @@ import Link from "next/link";
 import { brand } from "@/data/brand";
 import { breadcrumbLd, openGraphFor, twitterFor } from "@/lib/seo";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
-import {
-  allLocationSlugs,
-  locationBySlug,
-  neighbourhoodFor,
-} from "@/lib/locationSlug";
+import { allLocationSlugs, locationBySlug, neighbourhoodFor } from "@/lib/locationSlug";
 import { StoreDetail } from "@/components/counter/StoreDetail";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 
@@ -27,9 +23,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // Late night is the one thing this location has that the Hollywood smashburger
   // field mostly does not — For The Win shuts at 9PM — so the open location says
   // so in its title rather than burying it in the hours table.
-  const title = loc.isOpen
-    ? `${hood} Smash Burgers, Open Late`
-    : `${hood} Smash Burgers & Sliders`;
+  const title = loc.isOpen ? `${hood} Smash Burgers, Open Late` : `${hood} Smash Burgers & Sliders`;
   const full = `${title} · ${brand.name}`;
   const description = loc.isOpen
     ? `Chris N Eddy’s smash burger sliders in ${hood}, at ${loc.address}. Chris-cut fries, every topping free, 10AM till 1AM weeknights and 2AM Fri–Sun.`
@@ -80,9 +74,9 @@ export default async function LocationPage({ params }: Params) {
           <div className="cne-eyebrow">Not open yet</div>
           <h2>First to know.</h2>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            The {hood} location is being built. We do not have a date to give you yet, and we
-            would rather say that than invent one — leave an email and you will hear from us
-            the day it starts serving.
+            The {hood} location is being built. We do not have a date to give you yet, and we would
+            rather say that than invent one — leave an email and you will hear from us the day it
+            starts serving.
           </p>
           <OpeningNotify hood={hood} />
         </section>
@@ -92,14 +86,14 @@ export default async function LocationPage({ params }: Params) {
           <div className="cne-eyebrow">After everyone else has closed</div>
           <h2>Open late.</h2>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            We serve until 1AM Monday through Thursday and until 2AM Friday,
-            Saturday and Sunday. Most places around {hood} are dark by ten, which is
-            why so much of what we smash goes out after midnight — to people coming off a
-            shift, out of a show on Sunset, or off the 101 with nowhere else still cooking.
+            We serve until 1AM Monday through Thursday and until 2AM Friday, Saturday and Sunday.
+            Most places around {hood} are dark by ten, which is why so much of what we smash goes
+            out after midnight — to people coming off a shift, out of a show on Sunset, or off the
+            101 with nowhere else still cooking.
           </p>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            The full menu runs the whole time. Nothing is pulled at midnight, and the fries
-            are cut the same at 1AM as they are at noon.
+            The full menu runs the whole time. Nothing is pulled at midnight, and the fries are cut
+            the same at 1AM as they are at noon.
           </p>
         </section>
       )}

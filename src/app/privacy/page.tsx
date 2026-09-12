@@ -68,22 +68,21 @@ export default function PrivacyPage() {
           <h2>The short version</h2>
           <p>
             This site has no accounts, takes no payments and sells nothing about you. Two forms
-            collect what you type into them and email it to us. Two analytics tools count pages
-            and taps. A hat you put in the bag stays in your own browser. That is the whole list.
+            collect what you type into them and email it to us. Two analytics tools count pages and
+            taps. A hat you put in the bag stays in your own browser. That is the whole list.
           </p>
         </div>
 
         <section className="cne-lg-sec" aria-labelledby="p-send">
           <h2 id="p-send">What you send us on purpose</h2>
-          <p>
-            Two forms on this site send us anything, and both only when you submit them.
-          </p>
+          <p>Two forms on this site send us anything, and both only when you submit them.</p>
           <p>
             The <a href="/contact/">contact form</a> collects your <strong>name</strong>,{" "}
-            <strong>email address</strong>, a <strong>phone number if you choose to give one</strong>,
-            the <strong>topic</strong> you picked, and your <strong>message</strong>. The opening
-            list on a location page that has not opened yet collects your{" "}
-            <strong>email address</strong> and <strong>which neighbourhood</strong> you asked about.
+            <strong>email address</strong>, a{" "}
+            <strong>phone number if you choose to give one</strong>, the <strong>topic</strong> you
+            picked, and your <strong>message</strong>. The opening list on a location page that has
+            not opened yet collects your <strong>email address</strong> and{" "}
+            <strong>which neighbourhood</strong> you asked about.
           </p>
           <p>
             Both are delivered by <strong>Web3Forms</strong>, a form-relay service that turns the
@@ -120,9 +119,9 @@ export default function PrivacyPage() {
           </p>
           <p className="cne-lg-note">
             An analytics event never carries your name, email address, phone number or message. When
-            a form fails, the event says only <em>why</em> — a fixed word like{" "}
-            <code>network</code> or <code>rejected</code> — and never what you had typed. This is
-            deliberate and it is enforced in the code, not by policy.
+            a form fails, the event says only <em>why</em> — a fixed word like <code>network</code>{" "}
+            or <code>rejected</code> — and never what you had typed. This is deliberate and it is
+            enforced in the code, not by policy.
           </p>
         </section>
 
@@ -162,7 +161,10 @@ export default function PrivacyPage() {
         <section className="cne-lg-sec" aria-labelledby="p-never">
           <h2 id="p-never">What we do not do</h2>
           <ul>
-            <li>We do not sell or rent your personal information, and we do not share it for cross-context behavioural advertising.</li>
+            <li>
+              We do not sell or rent your personal information, and we do not share it for
+              cross-context behavioural advertising.
+            </li>
             <li>We do not run ads on this site or build an advertising profile of you.</li>
             <li>There are no accounts, so there is no password of yours to lose.</li>
             <li>This site takes no payments, so we never hold a card number.</li>
@@ -192,8 +194,8 @@ export default function PrivacyPage() {
           </p>
           <p>
             In practice the personal information we hold is whatever you sent us through one of the
-            two forms, so &ldquo;delete my data&rdquo; means deleting that correspondence, and we can
-            do it on request.
+            two forms, so &ldquo;delete my data&rdquo; means deleting that correspondence, and we
+            can do it on request.
           </p>
         </section>
 

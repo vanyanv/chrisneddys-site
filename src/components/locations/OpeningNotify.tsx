@@ -119,11 +119,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
       track("notify_error", {
         location,
         reason:
-          err instanceof HttpError
-            ? err.rejected
-              ? "rejected"
-              : `http_${err.status}`
-            : "network",
+          err instanceof HttpError ? (err.rejected ? "rejected" : `http_${err.status}`) : "network",
       });
     }
   }
@@ -131,8 +127,8 @@ export function OpeningNotify({ hood }: { hood: string }) {
   if (status === "sent") {
     return (
       <div className="cne-loc-note" role="status" style={{ marginTop: 14 }}>
-        <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood}{" "}
-        location is serving — nothing else.
+        <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood} location is
+        serving — nothing else.
       </div>
     );
   }

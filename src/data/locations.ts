@@ -37,7 +37,7 @@ export const locations: Location[] = [
     isOpen: true,
     phone: brand.phone,
     phoneTel: brand.phoneTel,
-    lat: 34.0980,
+    lat: 34.098,
     lng: -118.3099,
     hours: [
       ["Mon–Thu", "10:00 AM – 1:00 AM"],
@@ -64,7 +64,7 @@ export const locations: Location[] = [
     status: "Opening soon",
     isOpen: false,
     lat: 34.1393,
-    lng: -118.2380,
+    lng: -118.238,
     hours: [["Launch", "Date to be announced"]],
     // No openingSpec until it opens: it is what the live open/closed pill and
     // the JSON-LD openingHoursSpecification are both built from, and neither

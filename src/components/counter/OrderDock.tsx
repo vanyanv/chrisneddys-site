@@ -32,7 +32,13 @@ export function OrderDock() {
         <div className="t">Hollywood</div>
         <div className="s">{status ? statusLabel(status) : " "}</div>
       </div>
-      <a className="cne-dockbtn" data-surface="dock" href={orderUrl("dock")} target="_blank" rel="noopener noreferrer">
+      <a
+        className="cne-dockbtn"
+        data-surface="dock"
+        href={orderUrl("dock")}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         ORDER →
       </a>
     </div>

@@ -54,7 +54,8 @@ export const metadata: Metadata = {
     url: brand.siteUrl,
     siteName: brand.name,
     title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
-    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    description:
+      "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE],
   },
   twitter: {
@@ -62,7 +63,8 @@ export const metadata: Metadata = {
     // The same line as og:title. A card that says only the brand name where the
     // Facebook one says what the brand sells is a worse card for no reason.
     title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
-    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    description:
+      "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE.url],
   },
   alternates: {
@@ -112,9 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             holding the largest text sits at opacity 0 for all of it, which is
             what the browser reports as LCP. The transition still runs, so the
             animation is unchanged; it just starts when the page does. */}
-        <script
-          dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }} />
         <SiteFooter />
         {/* Sitewide, because the bag is: someone who put a cap in it and then
             wandered off to the menu should still be able to open it. Renders

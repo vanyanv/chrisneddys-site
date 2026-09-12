@@ -10,10 +10,7 @@ import { ID } from "@/lib/seo";
 /** One `<script type="application/ld+json">`, escaped the way Next does it. */
 export function JsonLdScript({ data }: { data: object }): ReactElement {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
   );
 }
 

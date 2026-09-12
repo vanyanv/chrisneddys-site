@@ -98,8 +98,8 @@ export default function ContactPage() {
             <p className="cne-ct-eyebrow">Contact</p>
             <h1 id="ct-h1">Get in touch</h1>
             <p className="cne-ct-lede">
-              Catering, press, a burger that showed up wrong — it all lands in the same inbox,
-              and a real person reads it.
+              Catering, press, a burger that showed up wrong — it all lands in the same inbox, and a
+              real person reads it.
             </p>
           </div>
         </div>
@@ -118,9 +118,7 @@ export default function ContactPage() {
                 <li className="cne-ct-loc" key={loc.id}>
                   <a href={`/locations/${slugFor(loc)}/`}>
                     <span className="cne-ct-locn">{neighbourhoodFor(loc)}</span>
-                    <span className="cne-ct-loca">
-                      {loc.isOpen ? loc.address : loc.status}
-                    </span>
+                    <span className="cne-ct-loca">{loc.isOpen ? loc.address : loc.status}</span>
                   </a>
                   <span className={`cne-ct-tag${loc.isOpen ? " is-open" : ""}`}>
                     {loc.isOpen ? "Open" : "Soon"}

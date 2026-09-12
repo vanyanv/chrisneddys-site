@@ -52,9 +52,7 @@ export function SiteFooter() {
           <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
             <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} />
           </Link>
-          <p>
-            Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.
-          </p>
+          <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>
           <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">
             {brand.ig}
           </a>

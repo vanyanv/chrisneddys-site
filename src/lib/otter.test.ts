@@ -20,14 +20,18 @@ describe("withUtm", () => {
 
   it("does not double-encode a url that already carries utm params", () => {
     const url = withUtm(`${storeUrl}?utm_source=old`, "header");
-    expect(url).toBe(`${storeUrl}?utm_source=old&utm_source=site&utm_medium=referral&utm_campaign=header`);
+    expect(url).toBe(
+      `${storeUrl}?utm_source=old&utm_source=site&utm_medium=referral&utm_campaign=header`,
+    );
     expect(url).not.toContain("%3D");
     expect(url).not.toContain("%26");
   });
 
   it("itemOrderUrl tags the item link with the surface when one is given", () => {
     const url = itemOrderUrl({ name: "Double Slider", otterId: "abc123" }, "menu-item");
-    expect(url).toBe(`${storeUrl}/Double%20Slider/abc123?utm_source=site&utm_medium=referral&utm_campaign=menu-item`);
+    expect(url).toBe(
+      `${storeUrl}/Double%20Slider/abc123?utm_source=site&utm_medium=referral&utm_campaign=menu-item`,
+    );
   });
 
   it("itemOrderUrl leaves the link untagged when no surface is given", () => {

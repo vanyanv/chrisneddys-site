@@ -194,11 +194,7 @@ export function GuestCheck(): ReactElement {
       track("contact_error", {
         topic,
         reason:
-          err instanceof HttpError
-            ? err.rejected
-              ? "rejected"
-              : `http_${err.status}`
-            : "network",
+          err instanceof HttpError ? (err.rejected ? "rejected" : `http_${err.status}`) : "network",
       });
     }
   }

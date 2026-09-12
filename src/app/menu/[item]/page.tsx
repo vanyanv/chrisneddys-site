@@ -42,9 +42,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   const title = `${item.name} — ${formatPrice(item.price)}`;
   const full = `${title} · ${brand.name}`;
-  const tail = `${formatPrice(
-    item.price,
-  )}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
+  const tail = `${formatPrice(item.price)}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
   const description = `${clampToWord(item.desc, DESC_LIMIT - tail.length - 1)} ${tail}`;
 
   return {
@@ -174,8 +172,8 @@ export default async function MenuItemPage({ params }: Params) {
           <div className="cne-eyebrow">Free either way</div>
           <h2>Pick a way.</h2>
           <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            Every topping is free. Order it one of the two house ways, or build it yourself
-            from the same list — the price on this page does not change either way.
+            Every topping is free. Order it one of the two house ways, or build it yourself from the
+            same list — the price on this page does not change either way.
           </p>
           <div className="cne-loc-hrs" style={{ marginTop: 12, maxWidth: "42ch" }}>
             {ways.map((w) => (

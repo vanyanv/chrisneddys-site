@@ -17,7 +17,14 @@ export function HollywoodCard() {
     // Both declared on the card rather than on each button: the surface and
     // the store are properties of where the link sits, not of the link.
     <div className="cne-loc is-live" data-surface="location-card" data-location={slugFor(loc)}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 8,
+        }}
+      >
         <h3>{loc.name.toUpperCase()}</h3>
         <OpenStatus locationId={loc.id} />
       </div>
@@ -35,7 +42,12 @@ export function HollywoodCard() {
         ))}
       </div>
       <div className="cne-loc-btns">
-        <a className="cne-mini is-red" href={orderUrl("location-card")} target="_blank" rel="noopener noreferrer">
+        <a
+          className="cne-mini is-red"
+          href={orderUrl("location-card")}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           ORDER
         </a>
         <a

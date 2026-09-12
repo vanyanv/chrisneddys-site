@@ -35,9 +35,7 @@ type LaClock = { weekday: string; minutes: number };
 
 /** The wall clock in Los Angeles, whatever clock the visitor is on. */
 export function losAngelesNow(at: Date = new Date()): LaClock {
-  const parts = Object.fromEntries(
-    LA_TIME.formatToParts(at).map((p) => [p.type, p.value]),
-  );
+  const parts = Object.fromEntries(LA_TIME.formatToParts(at).map((p) => [p.type, p.value]));
   // Some engines render midnight as "24" under hour12: false.
   const hour = Number(parts.hour) % 24;
   return { weekday: String(parts.weekday), minutes: hour * 60 + Number(parts.minute) };

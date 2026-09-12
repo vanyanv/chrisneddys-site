@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+pnpm-lock.yaml
+public/
+*.png
+*.jpg
+*.webp
+*.svg
+tsconfig.tsbuildinfo
+# Generated geometry blob (~92 KB); scripts/build-map-base.mjs parses this
+# file's source with regex expecting single-line `export const NAME = "...";`
+# and `d: "..."` entries, so it must not be reflowed.
+src/data/laGeoPaths.ts

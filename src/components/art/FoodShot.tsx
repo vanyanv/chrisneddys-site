@@ -4,12 +4,60 @@ export type FoodVariant = "double" | "fries" | "tots" | "shake" | "parking" | "n
 export type FoodTone = "red" | "cream" | "charcoal" | "bright" | "warm" | "studio";
 
 const palettes: Record<FoodTone, Record<string, string>> = {
-  red:      { bg1: "#B2241A", bg2: "#8F1A12", bun: "#C98742", meat: "#3E1A0E", cheese: "#E8A84A", sauce: "#D83B2A", ink: "#F5ECD6" },
-  cream:    { bg1: "#E8DBB8", bg2: "#D4C393", bun: "#B87838", meat: "#3E1A0E", cheese: "#D99232", sauce: "#C1261C", ink: "#1a1713" },
-  charcoal: { bg1: "#2a2623", bg2: "#141210", bun: "#A86A2E", meat: "#2E130A", cheese: "#D99232", sauce: "#D83B2A", ink: "#F5ECD6" },
-  bright:   { bg1: "#F7EBC8", bg2: "#E8D9A8", bun: "#C98742", meat: "#3E1A0E", cheese: "#E8A84A", sauce: "#D83B2A", ink: "#1a1713" },
-  warm:     { bg1: "#3d2418", bg2: "#1f1612", bun: "#C98742", meat: "#3E1A0E", cheese: "#E8A84A", sauce: "#D83B2A", ink: "#F5ECD6" },
-  studio:   { bg1: "#2a1410", bg2: "#0a0504", bun: "#E0A857", meat: "#3E1A0E", cheese: "#FFC34A", sauce: "#E63027", ink: "#F5ECD6" },
+  red: {
+    bg1: "#B2241A",
+    bg2: "#8F1A12",
+    bun: "#C98742",
+    meat: "#3E1A0E",
+    cheese: "#E8A84A",
+    sauce: "#D83B2A",
+    ink: "#F5ECD6",
+  },
+  cream: {
+    bg1: "#E8DBB8",
+    bg2: "#D4C393",
+    bun: "#B87838",
+    meat: "#3E1A0E",
+    cheese: "#D99232",
+    sauce: "#C1261C",
+    ink: "#1a1713",
+  },
+  charcoal: {
+    bg1: "#2a2623",
+    bg2: "#141210",
+    bun: "#A86A2E",
+    meat: "#2E130A",
+    cheese: "#D99232",
+    sauce: "#D83B2A",
+    ink: "#F5ECD6",
+  },
+  bright: {
+    bg1: "#F7EBC8",
+    bg2: "#E8D9A8",
+    bun: "#C98742",
+    meat: "#3E1A0E",
+    cheese: "#E8A84A",
+    sauce: "#D83B2A",
+    ink: "#1a1713",
+  },
+  warm: {
+    bg1: "#3d2418",
+    bg2: "#1f1612",
+    bun: "#C98742",
+    meat: "#3E1A0E",
+    cheese: "#E8A84A",
+    sauce: "#D83B2A",
+    ink: "#F5ECD6",
+  },
+  studio: {
+    bg1: "#2a1410",
+    bg2: "#0a0504",
+    bun: "#E0A857",
+    meat: "#3E1A0E",
+    cheese: "#FFC34A",
+    sauce: "#E63027",
+    ink: "#F5ECD6",
+  },
 };
 
 export function FoodShot({
@@ -164,10 +212,26 @@ export function FoodShot({
           <rect y="280" width="600" height="200" fill="#1a1713" opacity="0.6" />
           <rect y="275" width="600" height="5" fill={p.sauce} />
           {[0, 1, 2, 3].map((i) => (
-            <rect key={i} x={60 + i * 130} y="180" width="80" height="90" fill={p.cheese} opacity="0.3" />
+            <rect
+              key={i}
+              x={60 + i * 130}
+              y="180"
+              width="80"
+              height="90"
+              fill={p.cheese}
+              opacity="0.3"
+            />
           ))}
           {[0, 1, 2, 3, 4].map((i) => (
-            <rect key={i} x={50 + i * 110} y="360" width="3" height="60" fill={p.cheese} opacity="0.7" />
+            <rect
+              key={i}
+              x={50 + i * 110}
+              y="360"
+              width="3"
+              height="60"
+              fill={p.cheese}
+              opacity="0.7"
+            />
           ))}
           <rect x="180" y="240" width="240" height="100" fill={p.sauce} />
           <rect x="180" y="240" width="240" height="18" fill="#6a1208" />

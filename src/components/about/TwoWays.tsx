@@ -28,16 +28,14 @@ const SIDES = [
     heading: ["CHRIS’S", "WAY"],
     who: "Founder, and the one who moved",
     // Placeholder, written in his voice — Chris still has to confirm it.
-    quote:
-      "If you’re going to put something on it, make it do work. Raw onion does work.",
+    quote: "If you’re going to put something on it, make it do work. Raw onion does work.",
   },
   {
     id: "eddy" as const,
     heading: ["EDDY’S", "WAY"],
     who: "Founder, and the one who called",
     // Placeholder, written in his voice — Eddy still has to confirm it.
-    quote:
-      "Two things. You spent nine months on the patty — let people taste it.",
+    quote: "Two things. You spent nine months on the patty — let people taste it.",
   },
 ];
 

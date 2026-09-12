@@ -17,13 +17,7 @@ import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
  * location pages that only link up to the index gives search engines no signal
  * about how they relate.
  */
-export function StoreDetail({
-  loc,
-  hood,
-}: {
-  loc: Location;
-  hood: string;
-}) {
+export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
   const [apple, setApple] = useState(false);
   useEffect(() => setApple(prefersAppleMaps()), []);
   const others = locations.filter((l) => l.id !== loc.id);
@@ -54,11 +48,7 @@ export function StoreDetail({
             <p className="cne-loc-h" style={{ font: "inherit", margin: 0, padding: 0 }}>
               {loc.name.toUpperCase()}
             </p>
-            {loc.isOpen ? (
-              <OpenStatus locationId={loc.id} />
-            ) : (
-              <ComingSoonTag />
-            )}
+            {loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
           </div>
 
           <address className="cne-loc-addr" style={{ fontStyle: "normal" }}>
@@ -80,7 +70,12 @@ export function StoreDetail({
 
           <div className="cne-loc-btns">
             {loc.id === "hollywood" && (
-              <a className="cne-mini is-red" href={orderUrl("location-page")} target="_blank" rel="noopener noreferrer">
+              <a
+                className="cne-mini is-red"
+                href={orderUrl("location-page")}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 ORDER
               </a>
             )}
@@ -114,8 +109,8 @@ export function StoreDetail({
           Every Chris N Eddy&rsquo;s runs the same short menu: a slider is two smashed patties on
           two slices of cheese in a buttered, toasted Martin&rsquo;s potato roll. Order it
           Chris&rsquo;s Way with lettuce, tomato, sauce and raw onion, or Eddy&rsquo;s Way with
-          sauce and grilled onion — every topping is free either way. Alongside them,
-          chris-cut fries, cheese fries, loaded fries, shakes, and the Secret Menu.
+          sauce and grilled onion — every topping is free either way. Alongside them, chris-cut
+          fries, cheese fries, loaded fries, shakes, and the Secret Menu.
         </p>
         <div className="cne-loc-btns" style={{ maxWidth: 420, flexWrap: "wrap" }}>
           <Link className="cne-mini is-red" href="/menu/">

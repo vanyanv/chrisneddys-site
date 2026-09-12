@@ -115,7 +115,10 @@ export function addToBag(slug: string, qty = 1) {
 export function setBagQty(slug: string, qty: number) {
   const n = Math.max(0, Math.min(MAX_PER_ORDER, Math.floor(qty)));
   set({
-    lines: n === 0 ? state.lines.filter((l) => l.slug !== slug) : state.lines.map((l) => (l.slug === slug ? { ...l, qty: n } : l)),
+    lines:
+      n === 0
+        ? state.lines.filter((l) => l.slug !== slug)
+        : state.lines.map((l) => (l.slug === slug ? { ...l, qty: n } : l)),
   });
 }
 

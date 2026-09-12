@@ -3,14 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CapArt } from "./CapArt";
-import {
-  bagSubtotal,
-  closeBag,
-  removeFromBag,
-  setBagQty,
-  useBag,
-  type BagLine,
-} from "./bagStore";
+import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
 import { MAX_PER_ORDER, TERMS_PENDING, money, productBySlug } from "@/data/merch";
 import { track, type TrackItem } from "@/lib/track";
 
@@ -210,9 +203,7 @@ function BagRow({
       </div>
       <div className="cne-li-b">
         <span className="n">{product.displayName[1]}</span>
-        <span className="v">
-          LIMITED RUN{product.oneSize ? " · ONE SIZE" : ""}
-        </span>
+        <span className="v">LIMITED RUN{product.oneSize ? " · ONE SIZE" : ""}</span>
         <div className="cne-li-ft">
           <div className="cne-qty-sm">
             <button

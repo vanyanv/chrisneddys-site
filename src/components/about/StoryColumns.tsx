@@ -15,13 +15,12 @@ export function StoryColumns(): ReactElement {
         <div className="cne-eyebrow">The part they agreed on</div>
         <h2>THE PATTY ISN&rsquo;T UP FOR DEBATE.</h2>
         <p>
-          Two patties, smashed thin, on two slices of American, on a buttered Martin&rsquo;s
-          roll. <b>Nine months of daily tastings</b> got them there, and nothing has changed it
-          since.
+          Two patties, smashed thin, on two slices of American, on a buttered Martin&rsquo;s roll.{" "}
+          <b>Nine months of daily tastings</b> got them there, and nothing has changed it since.
         </p>
         <p>
-          It went into a Hollywood parking lot in late {brand.founded}, into the Sunset flagship
-          in 2021, and onto the festival road after that.
+          It went into a Hollywood parking lot in late {brand.founded}, into the Sunset flagship in
+          2021, and onto the festival road after that.
         </p>
         <div className="cne-facts">
           <div>
@@ -45,8 +44,8 @@ export function StoryColumns(): ReactElement {
           founders actually eat it.
         </p>
         <p>
-          Order either one by name. Extra cheese is a dollar, halal is two, and
-          nothing else costs anything.
+          Order either one by name. Extra cheese is a dollar, halal is two, and nothing else costs
+          anything.
         </p>
         <div className="cne-facts">
           <div>

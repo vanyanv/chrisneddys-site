@@ -97,8 +97,8 @@ export default function ShopPage() {
         <div className="cne-eyebrow">Before you buy</div>
         <h2>Still being sorted.</h2>
         <p className="cne-shop-lede">
-          {TERMS_PENDING} Want to know when it opens?{" "}
-          <Link href="/contact/">Get in touch</Link> or call {brand.phone}.
+          {TERMS_PENDING} Want to know when it opens? <Link href="/contact/">Get in touch</Link> or
+          call {brand.phone}.
         </p>
       </section>
     </>

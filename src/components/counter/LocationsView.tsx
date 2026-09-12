@@ -5,12 +5,7 @@ import Link from "next/link";
 import { locations, DEFAULT_LOCATION, type Location } from "@/data/locations";
 import { orderUrl } from "@/lib/otter";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
-import {
-  MapPinArt,
-  pinClass,
-  TWO_MILES,
-  mapOverlayStyle,
-} from "@/components/locations/MapPins";
+import { MapPinArt, pinClass, TWO_MILES, mapOverlayStyle } from "@/components/locations/MapPins";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
@@ -130,13 +125,16 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               }
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: 8,
+              }}
+            >
               <h2 className="cne-loc-name">{loc.name.toUpperCase()}</h2>
-              {loc.isOpen ? (
-                <OpenStatus locationId={loc.id} />
-              ) : (
-                <ComingSoonTag />
-              )}
+              {loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
             </div>
             <div className="cne-loc-addr">
               {loc.address}
@@ -157,7 +155,12 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                 {loc.sub && <div className="cne-loc-note">{loc.sub}</div>}
                 <div className="cne-loc-btns">
                   {loc.id === "hollywood" && (
-                    <a className="cne-mini is-red" href={orderUrl("locations-map")} target="_blank" rel="noopener noreferrer">
+                    <a
+                      className="cne-mini is-red"
+                      href={orderUrl("locations-map")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       ORDER
                     </a>
                   )}

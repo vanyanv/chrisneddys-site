@@ -59,10 +59,5 @@ document.head.appendChild(s);
 export function Analytics() {
   if (!GA_ID) return null;
 
-  return (
-    <script
-      id="ga4-init"
-      dangerouslySetInnerHTML={{ __html: GA_INIT }}
-    />
-  );
+  return <script id="ga4-init" dangerouslySetInnerHTML={{ __html: GA_INIT }} />;
 }

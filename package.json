@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-order-links.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "^15.5.25",
@@ -25,6 +28,8 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.15.0",
     "eslint-config-next": "^15.0.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
     "prettier": "^3.4.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
@@ -33,5 +38,12 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@12.4.1"
+  "packageManager": "pnpm@12.4.1",
+  "lint-staged": {
+    "*.{ts,tsx,mjs,js}": [
+      "eslint --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,css,md,yml,yaml}": "prettier --write"
+  }
 }

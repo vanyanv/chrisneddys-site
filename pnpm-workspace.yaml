@@ -1,0 +1,25 @@
+# Security overrides: transitive dependencies pinned to their patched releases.
+#
+# None of these reach the browser — the site is a static export, so postcss and
+# nanoid run only while Tailwind builds the stylesheet, js-yaml and
+# brace-expansion only inside ESLint, and sharp not at all (next/image is
+# `unoptimized`). They are pinned anyway so `pnpm audit` stays clean and a real
+# finding is not lost in a wall of known noise.
+#
+# brace-expansion resolves to the 5.x line for everything, including the
+# minimatch 3.x that ESLint's config loader still uses -- minimatch 3.1.5
+# widened its range to accept it, so there is no 1.x consumer left to strand.
+overrides:
+  postcss: '>=8.5.23'
+  nanoid: '>=3.3.18'
+  js-yaml: '>=4.3.2'
+  brace-expansion: '>=5.0.9'
+  sharp: '>=0.35.4'
+
+# pnpm 12 refuses to install until every dependency with a postinstall script is
+# named here, and exits 1 while any is unanswered -- which fails the deploy, not
+# just the local install. unrs-resolver is a native-speed module resolver ESLint
+# uses; it falls back to its JavaScript path when unbuilt, so it is declined
+# rather than handed a compile step no production artifact depends on.
+allowBuilds:
+  unrs-resolver: false

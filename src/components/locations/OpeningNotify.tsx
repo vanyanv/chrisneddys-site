@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { brand } from "@/data/brand";
+import { locations } from "@/data/locations";
+import { neighbourhoodFor, slugFor } from "@/lib/locationSlug";
 import { track } from "@/lib/track";
 
 /**
@@ -28,7 +30,32 @@ const ACCESS_KEY = process.env.NEXT_PUBLIC_W3F_KEY ?? "";
 /** Deliberately loose. A rejected address is worse than a bounced one. */
 const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 
+/**
+ * The reporting name for this store, which is the URL slug — `van-nuys`, not
+ * "van nuys". The component is handed a neighbourhood to print, so the slug is
+ * looked back up rather than derived from the display string; a display name
+ * that changes must not quietly split the signup history in two.
+ */
+function slugForHood(hood: string): string {
+  const match = locations.find((l) => neighbourhoodFor(l) === hood);
+  return match ? slugFor(match) : hood.trim().toLowerCase().replace(/\s+/g, "-");
+}
+
 type Status = "idle" | "sending" | "sent" | "error";
+
+/**
+ * Carries the status code out of the `try` so the failure event can say
+ * whether Web3Forms rejected the request or the network never reached it.
+ */
+class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    /** True when Web3Forms answered 200 but its own body said `success: false`. */
+    readonly rejected: boolean,
+  ) {
+    super(`HTTP ${status}`);
+  }
+}
 
 export function OpeningNotify({ hood }: { hood: string }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -51,9 +78,15 @@ export function OpeningNotify({ hood }: { hood: string }) {
     setError("");
     setStatus("sending");
 
+    const location = slugForHood(hood);
+
     if (!ACCESS_KEY) {
       setStatus("error");
       setError("Not wired up yet — email us instead.");
+      // A form that cannot send is indistinguishable from a form nobody used,
+      // unless it says so. The reason is a fixed token — never the address, and
+      // never the provider's message.
+      track("notify_error", { location, reason: "no_key" });
       return;
     }
 
@@ -72,15 +105,26 @@ export function OpeningNotify({ hood }: { hood: string }) {
         }),
       });
       const body: { success?: boolean } = await res.json().catch(() => ({}));
-      if (!res.ok || !body.success) throw new Error("rejected");
+      if (!res.ok || !body.success) throw new HttpError(res.status, res.ok);
 
       setStatus("sent");
-      // Only once it is genuinely delivered — a signup that counts attempts
-      // counts its own failures as successes.
-      track("contact_submit", { topic: `opening-list-${hood.toLowerCase()}` });
-    } catch {
+      // Its own event, not `contact_submit`: pre-launch demand for a store that
+      // has not opened is a different question from "someone wrote to us", and
+      // folding the two together inflated the contact key event while hiding
+      // the signup as a metric of its own.
+      track("notify_signup", { location });
+    } catch (err) {
       setStatus("error");
       setError("That didn't go through.");
+      track("notify_error", {
+        location,
+        reason:
+          err instanceof HttpError
+            ? err.rejected
+              ? "rejected"
+              : `http_${err.status}`
+            : "network",
+      });
     }
   }
 

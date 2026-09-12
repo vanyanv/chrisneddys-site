@@ -44,7 +44,11 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
       : "";
 
   return (
-    <div className="cne-locs">
+    /* `data-surface` sits on the whole view, not on one button row: every
+       outbound link below it — the map's own order link, DIRECTIONS, CALL —
+       belongs to the same surface, and `orderUrl("locations-map")` already
+       tags the Otter side the same way. */
+    <div className="cne-locs" data-surface="locations-map">
       <div className="cne-mapwrap">
         <div style={{ position: "relative", width: "100%" }}>
           {mapCanvas}
@@ -108,6 +112,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
         {locations.map((loc) => (
           <div
             key={loc.id}
+            data-location={slugFor(loc)}
             className={[
               "cne-loc",
               loc.isOpen ? "is-live" : "is-soon",

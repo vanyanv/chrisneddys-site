@@ -36,6 +36,22 @@ type Topic = (typeof TOPICS)[number];
 type Sent = { ticket: string; stamp: string; name: string; email: string; topic: Topic };
 type Status = "idle" | "sending" | "sent" | "error";
 
+/**
+ * Carries the status code out of the `try` so the failure event can say
+ * whether Web3Forms rejected the request or the network never reached it.
+ * The provider's own message is deliberately not carried: it is free text
+ * from a third party and has no business becoming a GA4 dimension.
+ */
+class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    /** True when Web3Forms answered 200 but its own body said `success: false`. */
+    readonly rejected: boolean,
+  ) {
+    super(`HTTP ${status}`);
+  }
+}
+
 /** Field-level messages, keyed by input name. */
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
 
@@ -137,6 +153,10 @@ export function GuestCheck(): ReactElement {
     if (!ACCESS_KEY) {
       setStatus("error");
       setFailure("The form isn't wired up yet.");
+      // A key that was never set looks exactly like a form nobody used. The
+      // reason is one of three fixed tokens — never the message, the name, the
+      // email or the phone number.
+      track("contact_error", { topic, reason: "no_key" });
       return;
     }
 
@@ -161,16 +181,25 @@ export function GuestCheck(): ReactElement {
       });
 
       const body: { success?: boolean; message?: string } = await res.json().catch(() => ({}));
-      if (!res.ok || !body.success) throw new Error(body.message || `HTTP ${res.status}`);
+      if (!res.ok || !body.success) throw new HttpError(res.status, res.ok);
 
       setSent({ ticket, stamp, name, email, topic });
       setStatus("sent");
       // Fired only once the form is genuinely delivered, not on submit — a
       // conversion that counts attempts counts its own failures as successes.
       track("contact_submit", { topic });
-    } catch {
+    } catch (err) {
       setStatus("error");
       setFailure("That didn't go through.");
+      track("contact_error", {
+        topic,
+        reason:
+          err instanceof HttpError
+            ? err.rejected
+              ? "rejected"
+              : `http_${err.status}`
+            : "network",
+      });
     }
   }
 
@@ -346,7 +375,7 @@ export function GuestCheck(): ReactElement {
         />
 
         {status === "error" && (
-          <p className="cne-ck-fail" role="alert">
+          <p className="cne-ck-fail" role="alert" data-surface="contact">
             <strong>{failure}</strong> Email us straight at{" "}
             <a href={`mailto:${brand.email}`}>{brand.email}</a> or call{" "}
             <a href={`tel:${brand.phoneTel}`}>{brand.phone}</a> — we&rsquo;ll pick up.

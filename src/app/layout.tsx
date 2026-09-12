@@ -45,18 +45,6 @@ export const metadata: Metadata = {
   description:
     "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
   applicationName: brand.name,
-  keywords: [
-    "smash burger",
-    "sliders",
-    "Hollywood burgers",
-    "Los Angeles burgers",
-    "best burgers in Los Angeles",
-    "Chris N Eddy's",
-    "Sunset Blvd",
-    "late night burgers",
-    "burgers near me",
-    "fast casual",
-  ],
   authors: [{ name: brand.name, url: brand.siteUrl }],
   creator: brand.name,
   publisher: brand.name,
@@ -71,7 +59,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${brand.name}`,
+    // The same line as og:title. A card that says only the brand name where the
+    // Facebook one says what the brand sells is a worse card for no reason.
+    title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
     description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
     images: [OG_IMAGE.url],
   },
@@ -110,6 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
         />
+        <Analytics />
         <JsonLd />
         <RevealRoot />
         <TrackEvents />
@@ -138,7 +129,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://plausible.io/js/script.outbound-links.js"
           strategy="afterInteractive"
         />
-        <Analytics />
       </body>
     </html>
   );

@@ -20,9 +20,9 @@ import { platformByHost } from "@/data/delivery";
  *
  * Nothing here calls `preventDefault`, so navigation is never delayed or
  * blocked by analytics. The trade is that a click leaving the page may lose the
- * beacon on a slow connection; GA4 and Plausible both send these over the
- * browser's keepalive transport, which is the mitigation, and undercounting is
- * the right failure direction for an intent metric anyway.
+ * hit; `track()` asks GA4 for `transport_type: 'beacon'`, which is what keeps a
+ * hit alive across an unload, and undercounting is the right failure direction
+ * for an intent metric anyway.
  */
 export function TrackEvents() {
   useEffect(() => {
@@ -38,13 +38,26 @@ export function TrackEvents() {
 
       // The surface is declared by the nearest ancestor that claims one, so a
       // button inside the dock reports "dock" without the dock knowing which
-      // link it wraps.
+      // link it wraps. A link with no declared surface sends no `surface` at
+      // all: the pathname used to be substituted here, which put `/menu/` and
+      // `dock` in the same dimension and made it impossible to read. GA4
+      // already records the path as `page_location`.
       const surface =
         (anchor.closest("[data-surface]") as HTMLElement | null)?.dataset.surface || undefined;
-      const item = anchor.dataset.item || undefined;
+      // Which store this link belongs to, declared the same way. All three
+      // locations share one phone number today, so `call_click` cannot say
+      // which counter was rung — and each store gets its own number as it
+      // opens, at which point the answer has to already be in the history.
+      const locationId =
+        (anchor.closest("[data-location]") as HTMLElement | null)?.dataset.location || undefined;
+      const itemId = anchor.dataset.item || undefined;
 
       let event: TrackEvent | null = null;
-      const props: Record<string, string | undefined> = { surface, item };
+      const props: Record<string, string | undefined> = {
+        surface,
+        location: locationId,
+        item_id: itemId,
+      };
 
       if (raw.startsWith("tel:")) {
         event = "call_click";
@@ -59,9 +72,10 @@ export function TrackEvents() {
 
         if (host === "order.tryotter.com") {
           event = "order_click";
-          // The campaign baked into the href is the same value Otter's own
-          // report will show, so sending it makes the two joinable by hand.
-          props.campaign = url.searchParams.get("utm_campaign") || undefined;
+          // No `campaign` param: the `utm_campaign` baked into the href is the
+          // surface by another name, and now that every order link declares a
+          // `data-surface` the two were the same column twice. Otter's own
+          // report still shows it, which is what it was for.
         } else if (host in platformByHost) {
           event = "delivery_click";
           props.platform = platformByHost[host];
@@ -76,8 +90,6 @@ export function TrackEvents() {
       }
 
       if (!event) return;
-      // The page is worth more than the surface on a link that declares none.
-      if (!props.surface) props.surface = window.location.pathname;
       track(event, props);
     };
 

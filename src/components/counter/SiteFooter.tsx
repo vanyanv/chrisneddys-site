@@ -44,7 +44,9 @@ const COUNTER_LINKS = [
  */
 export function SiteFooter() {
   return (
-    <footer className="cne-foot">
+    // Declared once on the whole footer: the only tracked links down here are
+    // the per-store phone numbers, and every one of them belongs to "footer".
+    <footer className="cne-foot" data-surface="footer">
       <div className="cne-foot-top">
         <div className="cne-foot-brand">
           <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
@@ -87,7 +89,9 @@ export function SiteFooter() {
 
       <div className="cne-foot-counters">
         {locations.map((loc) => (
-          <div className="cne-foot-counter" key={loc.id}>
+          // The phone number inside reports which counter it rings. All three
+          // share the Hollywood number today; two of them stop as they open.
+          <div className="cne-foot-counter" key={loc.id} data-location={slugFor(loc)}>
             {/* A label, not a link: this location is already linked by name in
                 the Locations column above, and two anchors on one URL in one
                 block is the kind of duplication that makes a footer read as

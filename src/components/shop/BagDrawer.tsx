@@ -12,6 +12,7 @@ import {
   type BagLine,
 } from "./bagStore";
 import { MAX_PER_ORDER, TERMS_PENDING, money, productBySlug } from "@/data/merch";
+import { track, type TrackItem } from "@/lib/track";
 
 /** How long the remove animation runs before the line actually leaves the store. */
 const REMOVE_MS = 280;
@@ -67,6 +68,28 @@ export function BagDrawer() {
       cancelAnimationFrame(id);
     };
   }, [open, dismiss]);
+
+  // Opening the bag is the closest thing this shop has to a checkout step
+  // while payment is still off, so it is worth a baseline. Keyed on `open`
+  // alone: changing a quantity while the drawer is up is not a second view.
+  useEffect(() => {
+    if (!open) return;
+    const items: TrackItem[] = lines.flatMap((line) => {
+      const product = productBySlug(line.slug);
+      return product
+        ? [
+            {
+              item_id: product.slug,
+              item_name: product.name,
+              price: product.price,
+              quantity: line.qty,
+            },
+          ]
+        : [];
+    });
+    track("view_cart", { currency: "USD", value: bagSubtotal(lines), items });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // The page behind a modal must not scroll under it.
   useEffect(() => {

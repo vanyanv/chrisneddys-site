@@ -65,6 +65,7 @@ export function MobileNavToggle({ activePath }: { activePath: string }) {
           role="dialog"
           aria-modal="true"
           aria-label="Primary navigation"
+          data-surface="nav"
           style={{
             position: "fixed",
             inset: 0,

@@ -36,7 +36,12 @@ export function StoreDetail({
         <div className="cne-eyebrow">{loc.isOpen ? "Open now" : "Opening soon"}</div>
         <h1>{hood}.</h1>
 
-        <div className={`cne-loc ${loc.isOpen ? "is-live" : "is-soon"}`} style={{ marginTop: 14 }}>
+        <div
+          className={`cne-loc ${loc.isOpen ? "is-live" : "is-soon"}`}
+          style={{ marginTop: 14 }}
+          data-surface="location-page"
+          data-location={slugFor(loc)}
+        >
           <div
             style={{
               display: "flex",
@@ -45,7 +50,12 @@ export function StoreDetail({
               gap: 8,
             }}
           >
-            <h2 style={{ font: "inherit", margin: 0, padding: 0 }}>{loc.name.toUpperCase()}</h2>
+            {/* Not an `<h2>`: the page's own `<h1>` above already names this
+                store by neighbourhood, so a heading repeating it in caps is a
+                redundant node in the outline, not a second section. */}
+            <p className="cne-loc-h" style={{ font: "inherit", margin: 0, padding: 0 }}>
+              {loc.name.toUpperCase()}
+            </p>
             {loc.isOpen ? (
               <OpenStatus locationId={loc.id} />
             ) : (

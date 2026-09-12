@@ -1,9 +1,20 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { addToBag, openBag } from "./bagStore";
 import { flyToBag } from "./flyToBag";
 import { MAX_PER_ORDER, money, type MerchProduct } from "@/data/merch";
+import { track, type TrackItem } from "@/lib/track";
+
+/** GA4's ecommerce line item, from a product. */
+function lineItem(product: MerchProduct, quantity: number): TrackItem {
+  return {
+    item_id: product.slug,
+    item_name: product.name,
+    price: product.price,
+    quantity,
+  };
+}
 
 /**
  * The buy controls, split in two because they live in two places on the page:
@@ -45,11 +56,31 @@ export function BuyProvider({
   const [qty, setQtyRaw] = useState(1);
   const [added, setAdded] = useState(false);
 
+  // The product page is server-rendered apart from this provider, so this is
+  // the first client code that knows which product is on screen. GA4's own
+  // `view_item` name is used rather than a custom one so that the day the shop
+  // takes money, the funnel it feeds already has history in it.
+  useEffect(() => {
+    track("view_item", {
+      currency: "USD",
+      value: product.price,
+      items: [lineItem(product, 1)],
+    });
+  }, [product]);
+
   const setQty = useCallback((n: number) => {
     setQtyRaw(Math.max(1, Math.min(MAX_PER_ORDER, n)));
   }, []);
 
   const add = useCallback(() => {
+    // Reported on the tap rather than inside `flyToBag`'s callback: the buyer
+    // decided here, and an animation that is cut short by a navigation must not
+    // be able to lose the event.
+    track("add_to_cart", {
+      currency: "USD",
+      value: product.price * qty,
+      items: [lineItem(product, qty)],
+    });
     // The bag is updated on arrival, not on click: the flying cap and the
     // counter incrementing are the same event, and splitting them reads as two.
     const source = document.getElementById("cne-pdp-shot");
@@ -60,7 +91,7 @@ export function BuyProvider({
       setQtyRaw(1);
       openBag();
     });
-  }, [product.slug, qty]);
+  }, [product, qty]);
 
   const value = useMemo(
     () => ({ product, qty, setQty, add, added }),

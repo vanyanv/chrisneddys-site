@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { locations } from "@/data/locations";
+import { slugFor } from "@/lib/locationSlug";
 import { orderUrl } from "@/lib/otter";
 import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
 import { OpenStatus } from "@/components/shared/OpenStatus";
@@ -13,7 +14,9 @@ export function HollywoodCard() {
   useEffect(() => setApple(prefersAppleMaps()), []);
 
   return (
-    <div className="cne-loc is-live">
+    // Both declared on the card rather than on each button: the surface and
+    // the store are properties of where the link sits, not of the link.
+    <div className="cne-loc is-live" data-surface="location-card" data-location={slugFor(loc)}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <h3>{loc.name.toUpperCase()}</h3>
         <OpenStatus locationId={loc.id} />

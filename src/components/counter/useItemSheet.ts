@@ -38,7 +38,7 @@ export function useItemSheet() {
     // Opening a sheet is someone choosing food rather than reading a page. It
     // is the step before the handoff, and the only place a drop-off between
     // "looked at the Quad" and "went to buy the Quad" becomes visible.
-    track("menu_item_open", { item: next.id, price: next.price });
+    track("menu_item_open", { item_id: next.id, price: next.price });
   }, []);
   const close = useCallback(() => setOpen(false), []);
 

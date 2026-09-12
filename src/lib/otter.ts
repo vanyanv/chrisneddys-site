@@ -45,7 +45,17 @@ export type OrderSurface =
   | "order-page"
   | "location-card"
   | "location-page"
-  | "locations-map";
+  | "locations-map"
+  // No caller passes this to `orderUrl` — there is no order link in the
+  // footer — but `data-surface="footer"` is set on the `<footer>` itself in
+  // SiteFooter.tsx so the per-store tel: links inside it report `call_click`
+  // with a surface. Kept here so that attribute's value still has a home in
+  // the union it is drawn from.
+  | "footer"
+  // The tel: fallback printed under a failed guest-check submission
+  // (GuestCheck.tsx `.cne-ck-fail`) — not an order link either, but the same
+  // `data-surface`-driven `call_click` tracking applies.
+  | "contact";
 
 /**
  * Tags an outbound order link so the order it produces can be traced back here.

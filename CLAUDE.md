@@ -41,4 +41,4 @@ link, following Keep a Changelog format.
 
 When a batch of fixes is deployed: bump `version` in `package.json`, move the
 `Unreleased` section into a new dated section, and tag the release
-`vX.Y.Z`.
+`vX.Y.Z`, then start a fresh empty `## [Unreleased]` section for the next fix.

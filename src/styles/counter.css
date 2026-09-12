@@ -32,6 +32,15 @@
   --a-shadow: #1a1612;
   /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
   --a-red-cta: #d0281c;
+  /* How much of the top of the viewport the sticky header owns, plus air: the
+     header is 85px with the tab strip on a phone and 76px once the desktop
+     one collapses to a single row. The surplus is not padding for its own
+     sake — the section headings are Bowlby One at line-height 1, and that face
+     puts ink above its own line box, so a heading whose *box* clears the
+     header by 8px still reads as clipped. Anything that sticks below the
+     header, and every anchor the page scrolls to, measures from this, so the
+     two cannot drift apart. */
+  --cne-stuck: 104px;
   /* The one positive colour on the site — free shipping, and the bag meter. */
   --a-ok: #2f6b43;
   /* map */
@@ -51,8 +60,18 @@
 }
 
 
+/* Above 901px the tab strip folds into the nav row and the header loses 9px. */
+@media (min-width: 901px) {
+  :root { --cne-stuck: 95px; }
+}
+
 html {
   background: var(--a-bg);
+  /* Every in-page anchor on the site stops short of the sticky header. Without
+     this, `#menu-secret` puts its own heading, its rule and its first row
+     behind the header and drops you two items into a section you cannot see
+     the name of. */
+  scroll-padding-top: var(--cne-stuck);
 }
 
 body {
@@ -251,7 +270,10 @@ body {
 }
 /* The yellow indicator under the strip is the state; this is the second cue. */
 .cne-tab[aria-current="page"] { opacity: 1; color: #fffdf6; }
-.cne-tab:focus-visible { outline: 2px solid var(--a-yel); outline-offset: -3px; }
+/* The display yellow reads 2.94:1 on Signal Red, just under the 3:1 a focus
+   ring owes its surface. This is exactly the case --a-yel-ink exists for —
+   yellow that has to be read rather than filled — and it lands at 3.73:1. */
+.cne-tab:focus-visible { outline: 2px solid var(--a-yel-ink); outline-offset: -3px; }
 .cne-tabind {
   /* Width of the bar as a share of one tab, per the prototype: 22% of a
      three-tab strip is roughly two thirds of a tab. */
@@ -1879,16 +1901,25 @@ body {
    sections keep the `.cne-sec` rhythm they had. The desktop grid is below. */
 .cne-menu { display: block; }
 .cne-menu-jump { display: none; }
-.cne-cat-rule { display: none; }
+/* The phone gets the rule too, at the phone's border weight. Five screens of
+   menu with the section names set smaller than the item names left the
+   boundaries as the faintest thing on a page built for scanning. */
+.cne-cat-rule { display: block; height: 2.5px; background: var(--a-ink); margin-bottom: 9px; }
+/* The category sections are the page's anchor targets. `.cne-rv` reveals by
+   lifting 14px, and the browser measures the *transformed* box when it scrolls
+   to a hash — so a section caught mid-reveal lands 14px high and then settles
+   there, eating the clearance --cne-stuck just bought. These fade without
+   travelling. Every other revealed section on the site keeps its lift. */
+.js .cne-cat.cne-rv { transform: none; }
 /* The category label: a mono eyebrow on the phone, a display heading on desktop. */
 .cne-cat-h {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
   color: var(--a-red-cta);
-  margin: 0 0 3px;
+  margin: 0 0 5px;
   line-height: 1.6;
 }
 .cne-cat-h::after { content: none; }
@@ -1909,6 +1940,34 @@ body {
   margin: 0;
 }
 
+/* The crawlable list of named items under the browser. It was eight inline
+   styles and a hairline in `var(--a-rule, #e2d8c7)` — a token that is defined
+   nowhere, so the fallback always won, and the fallback was a near-miss for
+   the real rule line at #e3d8bc. */
+.cne-menu-named {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  max-width: 48ch;
+}
+.cne-menu-named li { border-top: 1px solid var(--a-line); }
+.cne-menu-named a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  color: inherit;
+  text-decoration: none;
+  font-size: 14px;
+}
+.cne-menu-named .n { font-weight: 700; }
+.cne-menu-named .p {
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.cne-menu-named a:hover .n { color: var(--a-red-cta); }
+
 @media (min-width: 901px) {
   .cne-menu {
     display: grid;
@@ -1918,7 +1977,10 @@ body {
     align-items: start;
   }
   /* The rail follows you down the item list rather than scrolling away. */
-  .cne-menu-side { position: sticky; top: 0; padding: 0; }
+  /* The site header is sticky at 76px. A rail sticking at 0 parks its own
+     eyebrow and headline underneath it; --cne-stuck is the one number both
+     this and the anchor targets read, so they cannot drift apart. */
+  .cne-menu-side { position: sticky; top: var(--cne-stuck); padding: 0; }
   .cne-menu-side h1 { font-size: 38px; margin: 0 0 18px; line-height: 0.95; padding-bottom: 0; }
   .cne-menu-side h1::after { content: none; }
   .cne-menu-side .cne-eyebrow { margin-bottom: 6px; }
@@ -1973,12 +2035,12 @@ h3 { font-weight: 700; }
 .cne-cat h2.cne-cat-h {
   position: static;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
   color: var(--a-red-cta);
-  margin: 0 0 3px;
+  margin: 0 0 5px;
   line-height: 1.6;
   padding-bottom: 0;
 }

@@ -8,7 +8,7 @@ import { GuestCheck } from "@/components/contact/GuestCheck";
 
 const title = "Contact Us — Catering, Press & Questions";
 const description =
-  "Get in touch with Chris N Eddy's. Catering and events, press, partnerships or a problem with an order — one form, answered by a real person. Or call (323) 544-3600.";
+  "Catering, press, partnerships or a problem with an order — one form at Chris N Eddy’s, answered by a real person. Or call (323) 544-3600.";
 
 export const metadata: Metadata = {
   title,
@@ -64,12 +64,12 @@ export default function ContactPage() {
       name: brand.name,
       url: brand.siteUrl,
       email: brand.email,
-      telephone: brand.phone,
+      telephone: brand.phoneIntl,
       contactPoint: [
         {
           "@type": "ContactPoint",
           contactType: "customer service",
-          telephone: brand.phone,
+          telephone: brand.phoneIntl,
           email: brand.email,
           areaServed: "US",
           availableLanguage: "English",

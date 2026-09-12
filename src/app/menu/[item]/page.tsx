@@ -6,7 +6,7 @@ import { locations } from "@/data/locations";
 import { featuredItems, itemById, ways, toppings, extras } from "@/data/menu";
 import { itemOrderUrl, itemPhotoAlt, formatPrice } from "@/lib/otter";
 import { googleDirections } from "@/lib/directions";
-import { JsonLdScript } from "@/components/shared/JsonLd";
+import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 
 type Params = { params: Promise<{ item: string }> };
@@ -26,6 +26,20 @@ export function generateStaticParams() {
   return featuredItems.map((i) => ({ item: i.id }));
 }
 
+/**
+ * Google prints about 155 characters of a description and cuts the rest
+ * mid-word. The tail below is fixed, so the item's own line gets whatever is
+ * left and is trimmed back to a word boundary if it does not fit — a cut this
+ * page makes on purpose reads better than one the SERP makes for it.
+ */
+const DESC_LIMIT = 155;
+
+function clampToWord(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:—-]+$/, "")}…`;
+}
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { item: slug } = await params;
   const item = itemById(slug);
@@ -33,9 +47,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   const title = `${item.name} — ${formatPrice(item.price)}`;
   const full = `${title} · ${brand.name}`;
-  const description = `${item.desc} ${formatPrice(
+  const tail = `${formatPrice(
     item.price,
-  )} for pickup from our Hollywood location at 5539 W. Sunset Blvd, open late. Every topping free.`;
+  )}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
+  const description = `${clampToWord(item.desc, DESC_LIMIT - tail.length - 1)} ${tail}`;
 
   return {
     title,
@@ -87,6 +102,10 @@ export default async function MenuItemPage({ params }: Params) {
         ])}
       />
       <JsonLdScript data={itemLd} />
+      {/* The Offer above references the Hollywood Restaurant node by @id; this
+          page is not otherwise about a store, so the node has to be emitted
+          here too or the reference resolves to nothing. */}
+      <JsonLdScript data={flagshipRestaurantLd()} />
 
       <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">

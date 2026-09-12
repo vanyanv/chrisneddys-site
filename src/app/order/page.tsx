@@ -7,10 +7,10 @@ import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { storeUrl, orderUrl } from "@/lib/otter";
 import { googleDirections } from "@/lib/directions";
 import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
-import { JsonLdScript } from "@/components/shared/JsonLd";
+import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 
-const title = "Order Now — Pickup From Our Hollywood Location";
+const title = "Order Now — Hollywood Pickup, Open Late";
 const description =
   "Order Chris N Eddy's smash burgers online for pickup in Hollywood, or call (323) 544-3600. Live menu prices, open till 1AM weeknights and 2AM Fri–Sun.";
 
@@ -85,6 +85,8 @@ export default function OrderPage() {
   return (
     <>
       <JsonLdScript data={breadcrumbLd([{ name: "Order", path: "/order/" }])} />
+      {/* The store this page orders from. */}
+      <JsonLdScript data={flagshipRestaurantLd()} />
       <JsonLdScript data={faqLd} />
       <JsonLdScript
         data={{
@@ -112,7 +114,7 @@ export default function OrderPage() {
           — sliders from ${SLIDER_PRICE.toFixed(2)}, combos from ${COMBO_FROM_PRICE.toFixed(2)}, and
           every topping free. Rather talk to someone? Call {brand.phone}.
         </p>
-        <div className="cne-loc-btns" style={{ marginTop: 16 }}>
+        <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
           <a className="cne-mini is-red" href={orderUrl("order-page")} target="_blank" rel="noopener noreferrer">
             ORDER ONLINE
           </a>
@@ -130,6 +132,8 @@ export default function OrderPage() {
             key={loc.id}
             className={`cne-loc ${loc.isOpen ? "is-live" : "is-soon"}`}
             style={{ marginTop: 14 }}
+            data-surface="location-card"
+            data-location={slugFor(loc)}
           >
             <h3>{neighbourhoodFor(loc).toUpperCase()}</h3>
             <address className="cne-loc-addr" style={{ fontStyle: "normal" }}>

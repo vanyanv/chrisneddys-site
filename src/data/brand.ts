@@ -3,6 +3,12 @@ export const brand = {
   tagline: "LA’s Smash Hit",
   phone: "(323) 544-3600",
   phoneTel: "+13235443600",
+  /**
+   * The same line in the form Google's LocalBusiness documentation asks for:
+   * country code first. Used for every `telephone` in structured data, while
+   * `phone` stays the string people read and `phoneTel` the one `tel:` dials.
+   */
+  phoneIntl: "+1 323-544-3600",
   email: "chris@chrisneddys.com",
   ig: "@chrisneddys",
   igUrl: "https://www.instagram.com/chrisneddys/",

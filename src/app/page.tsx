@@ -1,4 +1,3 @@
-import { preload } from "react-dom";
 import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
 import { Marquee } from "@/components/counter/Marquee";
@@ -7,7 +6,7 @@ import { HollywoodCard } from "@/components/counter/HollywoodCard";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
-import { HERO } from "@/lib/heroImage";
+import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -37,22 +36,28 @@ const GRAM = [
   { src: "/photos/double.webp", alt: "The signature Chris N Eddy’s double slider" },
 ];
 
-export default function HomePage() {
-  /* The hero poster is this page's largest paint and it is a plain <img>, so
-     the preload scanner only reaches it after the stylesheet. React hoists this
-     into <head>, where it starts with the document. Home only — no other page
-     shows it, and preloading it there would be a wasted 30 KB. */
-  preload(HERO.src, {
-    as: "image",
-    fetchPriority: "high",
-    // Must mirror the <img> exactly, or the browser preloads one file and then
-    // downloads a different one.
-    imageSrcSet: HERO.srcSet,
-    imageSizes: HERO.sizes,
-  });
+/* There used to be a `preload(HERO.src, …)` here, guarded by a comment saying
+   "Home only — no other page shows it, and preloading it there would be a
+   wasted 30 KB." The guard did not hold. React serialises a Float preload into
+   this route's RSC payload, and the header links to `/` from every page, so the
+   moment Next prefetched home from anywhere else the directive was hoisted into
+   *that* document's head. Measured on /menu/: a 56 KB hero fetch at high
+   priority, on a page whose entire transfer was 67 KB, competing with the menu
+   thumbnails and never painted. The console said so on every load.
 
+   The hero `<img>` in `Hero.tsx` already ships eagerly with fetchPriority
+   ="high", and the preload scanner reads raw markup ahead of the parser rather
+   than waiting on the stylesheet, so home keeps its head start and the other
+   five pages stop paying for it. */
+
+export default function HomePage() {
   return (
     <>
+      {/* The home page is about the Hollywood store — it carries its hours, its
+          address and its order buttons — so it is one of the four pages that
+          states the Restaurant node. The two locations that have not opened
+          state nothing anywhere until they do. */}
+      <JsonLdScript data={flagshipRestaurantLd()} />
       <Hero />
       <Marquee />
 

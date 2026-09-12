@@ -17,11 +17,3 @@ export const locationBySlug = (slug: string): Location | undefined =>
   locations.find((l) => SLUGS[l.id] === slug);
 
 export const allLocationSlugs = (): string[] => locations.map(slugFor);
-
-/**
- * @deprecated The business rule now lives on the data: read `loc.neighbourhood`
- * directly. Kept only because `src/app/contact/page.tsx` — owned by another
- * worker in this pass — still imports it; every caller in this file's scope
- * has been switched to the field.
- */
-export const neighbourhoodFor = (loc: Location): string => loc.neighbourhood;

@@ -194,3 +194,50 @@ export function statusLabel(status: StoreStatus): string {
   const fact = time.lead ? `${time.lead} ${time.value}` : time.value;
   return status.state === "open" ? `${word} ${fact}` : `${word} · ${fact}`;
 }
+
+/**
+ * A run of consecutive days, said the way a person says a range out loud: one
+ * day is just itself, two days are "X and Y", three or more become
+ * "X through Y" — the same shape `openingSpec` already groups its days into,
+ * so this never has to know which days those are.
+ */
+function dayRangeLabel(days: readonly string[]): string {
+  const first = days[0];
+  const last = days[days.length - 1];
+  if (days.length <= 1) return first ?? "";
+  if (days.length === 2) return `${first} and ${last}`;
+  return `${first} through ${last}`;
+}
+
+/**
+ * The hours prose that used to be hand-typed at every site that mentions when
+ * the kitchen closes — FAQs, metadata descriptions, store copy. Derived from
+ * `loc.openingSpec` (the same groups `windowFor` reads for open/closed logic)
+ * so the wording can never drift from the data the live status pill uses.
+ *
+ * A location with no `openingSpec` yet (not open) has nothing to summarize,
+ * so this returns "" rather than a sentence claiming hours it doesn't have —
+ * callers only reach for it once `loc.isOpen` is true.
+ */
+export function closingSummary(loc: Location): string {
+  const groups = loc.openingSpec ?? [];
+  return groups
+    .map((g) => `${clockLabel(toMinutes(g.closes))} ${dayRangeLabel(g.dayOfWeek)}`)
+    .join(", ");
+}
+
+/**
+ * The fuller line for the surfaces that want both ends of the window, not
+ * just the close — a metadata description or a "what time are you open" FAQ
+ * answer. Reads as a clause to be dropped into a sentence ("is open
+ * <this>."), not a standalone sentence, so callers keep control of the verb.
+ */
+export function hoursSentence(loc: Location): string {
+  const groups = loc.openingSpec ?? [];
+  return groups
+    .map(
+      (g) =>
+        `${clockLabel(toMinutes(g.opens))} to ${clockLabel(toMinutes(g.closes))} ${dayRangeLabel(g.dayOfWeek)}`,
+    )
+    .join(", and ");
+}

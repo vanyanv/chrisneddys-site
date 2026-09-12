@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { neighbourhoodFor, slugFor } from "@/lib/locationSlug";
+import { sharedFaq } from "@/data/faq";
+import { slugFor } from "@/lib/locationSlug";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { GuestCheck } from "@/components/contact/GuestCheck";
@@ -13,28 +14,15 @@ const description =
 export const metadata: Metadata = pageMetadata({ title, description, path: "/contact/" });
 
 /**
- * The three questions people send us that the page can answer itself. Kept in
- * the sender's words, and lifted from /order/'s FAQ so the two pages can never
- * drift into two different answers.
+ * The three questions people send us that the page can answer itself, in
+ * `src/data/faq.ts` so /order/'s FAQ and this page can never drift into two
+ * different answers — both import the same `sharedFaq`.
  *
  * No FAQPage node is emitted for them. /order/ already owns that markup for the
  * same three answers, and two URLs claiming the same Q&A entities compete with
  * each other for a result neither would win twice.
  */
-const DEFLECT: Array<{ q: string; a: string }> = [
-  {
-    q: "Do you deliver?",
-    a: "Ordering on this site is pickup from the Hollywood location. Delivery is available through the third-party apps that carry us, at their own prices.",
-  },
-  {
-    q: "Can I order from Glendale or Van Nuys?",
-    a: "Not yet — those locations have not opened. Until they do, every order runs through Hollywood.",
-  },
-  {
-    q: "What time do you close?",
-    a: "1AM Monday through Thursday. 2AM Friday, Saturday and Sunday.",
-  },
-];
+const DEFLECT = sharedFaq;
 
 export default function ContactPage() {
   /**
@@ -111,7 +99,7 @@ export default function ContactPage() {
               {locations.map((loc) => (
                 <li className="cne-ct-loc" key={loc.id}>
                   <a href={`/locations/${slugFor(loc)}/`}>
-                    <span className="cne-ct-locn">{neighbourhoodFor(loc)}</span>
+                    <span className="cne-ct-locn">{loc.neighbourhood}</span>
                     <span className="cne-ct-loca">{loc.isOpen ? loc.address : loc.status}</span>
                   </a>
                   <span className={`cne-ct-tag${loc.isOpen ? " is-open" : ""}`}>

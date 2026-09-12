@@ -25,7 +25,11 @@ export async function generateMetadata({
   const product = productBySlug(slug);
   if (!product) return {};
 
-  const title = `${product.displayName.join(" ")} — ${money(product.price)}`;
+  // Title case, from the product's real name rather than the all-caps display
+  // pair — a SERP title in block capitals reads as shouting. The parenthetical
+  // is what the page says in its own "limited run" line, so the title spends
+  // its 60 characters on the name and the price.
+  const title = `${product.name.replace(/\s*\(.*\)\s*$/, "")} — ${money(product.price)}`;
   const description = product.metaDescription;
   const path = `/shop/${product.slug}/`;
 
@@ -111,8 +115,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
           <div className="cne-pdp-buy">
             <div className="cne-eyebrow">Limited run</div>
+            {/* The break is the design; the space is so the two lines extract
+                as two words and not as "CHRIS N EDDY’SBALL-CAP". */}
             <h1>
-              {product.displayName[0]}
+              {product.displayName[0]}{" "}
               <br />
               {product.displayName[1]}
             </h1>

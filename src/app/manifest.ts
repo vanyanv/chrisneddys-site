@@ -18,6 +18,10 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/apple-icon.png", sizes: "180x180", type: "image/png" },
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      // Android crops a maskable icon to its own shape, so it needs the mark
+      // inside the safe circle. The wordmark already sits well within it — it
+      // spans the middle 65% of the canvas on cream — so the same file serves.
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

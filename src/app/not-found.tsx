@@ -3,7 +3,15 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page not found",
-  robots: { index: false, follow: false },
+  // Next injects `<meta name="robots" content="noindex">` on this route itself.
+  // `robots: null` drops the layout's `index, follow` pair rather than adding a
+  // second, contradictory tag beside it — which is what declaring `noindex`
+  // here again would do.
+  robots: null,
+  // `canonical: null` drops the root canonical this page would otherwise
+  // inherit from the layout — a 404 pointing every missing URL at the home
+  // page is an invitation to index it as the home page.
+  alternates: { canonical: null },
 };
 
 export default function NotFound() {

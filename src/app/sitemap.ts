@@ -48,11 +48,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       path: "/",
       priority: 1.0,
       updated: SITE_UPDATED,
+      // The files the page actually serves, which is what an image result has
+      // to be able to fetch: the `.jpg` originals listed here before are only
+      // ever referenced from structured data, and one of them (`fries.jpg`) is
+      // not on the page at all. Every one of these carries alt text in `GRAM`.
       images: [
         `${brand.siteUrl}/hero-still.webp`,
-        `${brand.siteUrl}/photos/ig-pile.jpg`,
-        `${brand.siteUrl}/photos/double.jpg`,
-        `${brand.siteUrl}/photos/fries.jpg`,
+        `${brand.siteUrl}/photos/ig-pile.webp`,
+        `${brand.siteUrl}/photos/ig-neon.webp`,
+        `${brand.siteUrl}/photos/ig-monster.webp`,
+        `${brand.siteUrl}/photos/ig-pyramid.webp`,
+        `${brand.siteUrl}/photos/ig-stack.webp`,
+        `${brand.siteUrl}/photos/double.webp`,
       ],
     },
     { path: "/menu/", priority: 0.9, updated: MENU_UPDATED, images: uniqueMenuImages },

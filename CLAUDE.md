@@ -11,12 +11,15 @@ documented in `DEPLOY.md`; brand and layout rules in `DESIGN.md`.
 pnpm install
 pnpm dev          # local server
 pnpm typecheck    # tsc --noEmit
-pnpm lint         # next lint
+pnpm lint         # eslint .
+pnpm test         # vitest run
+pnpm format:check # prettier --check (pre-commit hook formats staged files)
 pnpm build        # runs scripts/build-map-base.mjs first, then next build -> out/
 pnpm check:links  # verifies order links
 ```
 
-Run `pnpm typecheck` and `pnpm lint` before reporting any change as done.
+Run `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, and `pnpm test` before
+reporting any change as done.
 
 ## Working in orchestrator mode
 

@@ -33,6 +33,10 @@ Use `subagent_type: "general-purpose"` for anything that edits files and
    the acceptance criteria. Reject with specific notes, not "try again".
 5. **Keep the tracker current.** Move each item through the tracker states below
    at the moment the state changes, not at the end.
+6. **Commit by explicit path.** Workers share one working tree, and a worker
+   may have staged files (for example with `git rm`). Never `git add -A` or
+   `git commit -a` while another worker is running; name the files for the
+   item you just reviewed, and check `git diff --cached --stat` first.
 
 ## Worker prompt template
 

@@ -1,0 +1,8 @@
+# Netlify and Cloudflare Pages read this file; S3 + CloudFront does not, and
+# ignores it harmlessly — there the same rule is the viewer-request function in
+# DEPLOY.md.
+#
+# www is the canonical host: every canonical tag in the HTML points at it, so
+# the apex redirects to www and not the other way round. `301!` forces the
+# redirect even when a file exists at the path.
+https://chrisneddys.com/*  https://www.chrisneddys.com/:splat  301!

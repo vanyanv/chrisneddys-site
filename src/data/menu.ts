@@ -195,7 +195,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa",
       name: "The Family Box",
       desc: "Four doubles with two sides of chris-cut fries.",
-      price: 37.20,
+      price: 37.2,
       takesToppings: true,
     },
     {
@@ -303,7 +303,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "1d36f305-06ca-4bfe-bbc7-c01aa67757f5",
       name: "Mexican Sprite 500ml",
       desc: "",
-      price: 4.20,
+      price: 4.2,
     },
     {
       id: "mexican-fanta-500ml",
@@ -311,7 +311,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "6e108101-0671-4280-a3f9-69d5738349b7",
       name: "Mexican Fanta 500ml",
       desc: "",
-      price: 4.20,
+      price: 4.2,
     },
     {
       id: "bottle-of-water",
@@ -352,6 +352,7 @@ export const ways = [
 ] as const;
 
 export type Way = (typeof ways)[number];
+export type WayId = Way["id"];
 
 /** Free topping modifiers, as Otter lists them. */
 export const toppings = [

@@ -36,14 +36,17 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-mono-jb",
 });
 
+const SITE_TITLE = `${brand.name} — Smash Burger Sliders in LA, Open Late`;
+const SITE_DESCRIPTION =
+  "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),
   title: {
-    default: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
+    default: SITE_TITLE,
     template: `%s · ${brand.name}`,
   },
-  description:
-    "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+  description: SITE_DESCRIPTION,
   applicationName: brand.name,
   authors: [{ name: brand.name, url: brand.siteUrl }],
   creator: brand.name,
@@ -53,16 +56,16 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: brand.siteUrl,
     siteName: brand.name,
-    title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
-    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     // The same line as og:title. A card that says only the brand name where the
     // Facebook one says what the brand sells is a worse card for no reason.
-    title: `${brand.name} — Smash Burger Sliders in LA, Open Late`,
-    description: "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [OG_IMAGE.url],
   },
   alternates: {
@@ -97,7 +100,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Set before first paint so scroll-reveal sections start hidden and
             animate in. Without it they would flash visible, then hide. */}
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
         />
         <Analytics />
@@ -113,10 +115,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             holding the largest text sits at opacity 0 for all of it, which is
             what the browser reports as LCP. The transition still runs, so the
             animation is unchanged; it just starts when the page does. */}
-        <script
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_ABOVE_FOLD }} />
         <SiteFooter />
         {/* Sitewide, because the bag is: someone who put a cap in it and then
             wandered off to the menu should still be able to open it. Renders

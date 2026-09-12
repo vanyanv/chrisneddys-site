@@ -1,5 +1,6 @@
 import { brand } from "@/data/brand";
 import { ID } from "@/lib/seo";
+import { priceString } from "@/lib/otter";
 import { SHOP_OPEN, type MerchProduct } from "@/data/merch";
 
 /**
@@ -64,7 +65,7 @@ export function productLd(product: MerchProduct) {
       "@id": `${url}#offer`,
       url,
       priceCurrency: "USD",
-      price: product.price.toFixed(2),
+      price: priceString(product.price),
       itemCondition: "https://schema.org/NewCondition",
       seller: { "@id": ID.org },
       // Stated only once the shop can take money. Until then the price is a

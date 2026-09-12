@@ -5,20 +5,14 @@ import { StoryColumns } from "@/components/about/StoryColumns";
 import { StoryPress } from "@/components/about/StoryPress";
 import { StoryClose } from "@/components/about/StoryClose";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { brand } from "@/data/brand";
 
 const title = "Our Story — A Parking Lot to Sunset Blvd";
 const description =
   "Two childhood friends turned a 2020 parking-lot pop-up into a permanent spot on Sunset Blvd. Nine months of testing, one smashed slider.";
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/about/" },
-  openGraph: openGraphFor({ title: `${title} · Chris N Eddy's`, description, path: "/about/" }),
-  twitter: twitterFor({ title: `${title} · Chris N Eddy's`, description }),
-};
+export const metadata: Metadata = pageMetadata({ title, description, path: "/about/" });
 
 /**
  * The founders are half of what people search when they search the brand, and

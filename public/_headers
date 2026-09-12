@@ -1,0 +1,40 @@
+# Netlify and Cloudflare Pages read this file; S3 + CloudFront does not, and
+# ignores it harmlessly. See DEPLOY.md -> Security headers for what each header
+# is for, and for the CloudFront equivalent.
+#
+# Rules are most-general first: both hosts apply every matching block, so the
+# specific cache rules below add to the security headers rather than replacing
+# them.
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://api.web3forms.com https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; upgrade-insecure-requests
+
+# Content-hashed by the build, so a new build is a new filename and these can
+# never go stale.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Not hashed, but they change rarely.
+/*.webp
+  Cache-Control: public, max-age=604800
+/*.jpg
+  Cache-Control: public, max-age=604800
+/*.png
+  Cache-Control: public, max-age=604800
+/*.svg
+  Cache-Control: public, max-age=604800
+
+# The menu and its prices live in the HTML. A stale price is a support call.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/sitemap.xml
+  Cache-Control: public, max-age=0, must-revalidate
+/robots.txt
+  Cache-Control: public, max-age=0, must-revalidate

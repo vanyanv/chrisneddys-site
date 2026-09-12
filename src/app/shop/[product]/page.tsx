@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, money, productBySlug } from "@/data/merch";
+import { TERMS_PENDING, merch, productBySlug } from "@/data/merch";
+import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { productLd, socialCard } from "@/lib/merchLd";
-import { breadcrumbLd, twitterFor } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
 type Params = { product: string };
 
@@ -16,11 +17,7 @@ export function generateStaticParams(): Params[] {
   return merch.map((p) => ({ product: p.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { product: slug } = await params;
   const product = productBySlug(slug);
   if (!product) return {};
@@ -29,37 +26,23 @@ export async function generateMetadata({
   // pair — a SERP title in block capitals reads as shouting. The parenthetical
   // is what the page says in its own "limited run" line, so the title spends
   // its 60 characters on the name and the price.
-  const title = `${product.name.replace(/\s*\(.*\)\s*$/, "")} — ${money(product.price)}`;
+  const title = `${product.name.replace(/\s*\(.*\)\s*$/, "")} — ${formatPrice(product.price)}`;
   const description = product.metaDescription;
   const path = `/shop/${product.slug}/`;
 
-  return {
+  // Not the shared burger card — a product page shared into a group chat
+  // should show the product.
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: path },
-    // Not `openGraphFor` — that one carries the burger card, and a product page
-    // shared into a group chat should show the product.
-    openGraph: {
-      title: `${title} · ${brand.name}`,
-      description,
-      url: path,
-      siteName: brand.name,
-      type: "website",
-      locale: "en_US",
-      images: [
-        {
-          url: socialCard(product.slug),
-          width: 1200,
-          height: 630,
-          alt: `${product.name} — ${money(product.price)}`,
-        },
-      ],
+    path,
+    image: {
+      url: socialCard(product.slug),
+      width: 1200,
+      height: 630,
+      alt: `${product.name} — ${formatPrice(product.price)}`,
     },
-    twitter: {
-      ...twitterFor({ title: `${title} · ${brand.name}`, description }),
-      images: [socialCard(product.slug)],
-    },
-  };
+  });
 }
 
 /**
@@ -97,7 +80,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       <div className="cne-mq" aria-hidden="true">
         <div className="cne-mq-track">
           {[...Array(2)].flatMap((_, pass) =>
-            ["limited run", "★", "one size fits all", "★", money(product.price), "★"].map(
+            ["limited run", "★", "one size fits all", "★", formatPrice(product.price), "★"].map(
               (word, i) => <span key={`${pass}-${i}`}>{word}</span>,
             ),
           )}
@@ -118,13 +101,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             {/* The break is the design; the space is so the two lines extract
                 as two words and not as "CHRIS N EDDY’SBALL-CAP". */}
             <h1>
-              {product.displayName[0]}{" "}
-              <br />
+              {product.displayName[0]} <br />
               {product.displayName[1]}
             </h1>
 
             <div className="cne-pdp-price">
-              <span className="cne-price p">{money(product.price)}</span>
+              <span className="cne-price p">{formatPrice(product.price)}</span>
             </div>
 
             {/* One size fits all, so there is no variant grid at all. The
@@ -152,9 +134,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         <div className="cne-eyebrow">While you’re here</div>
         <h2>Come eat.</h2>
         <p>
-          The cap is from 5539 W. Sunset Blvd — smashed sliders, two patties,
-          two slices of cheese, every topping free.{" "}
-          <Link href="/menu/">See the menu</Link> or{" "}
+          The cap is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices of cheese,
+          every topping free. <Link href="/menu/">See the menu</Link> or{" "}
           <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
           <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
         </p>

@@ -53,7 +53,9 @@ export default function NotFound() {
         >
           NOT ON THE MENU.
         </h1>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 18, opacity: 0.95, marginBottom: 32 }}>
+        <p
+          style={{ fontFamily: "var(--font-body)", fontSize: 18, opacity: 0.95, marginBottom: 32 }}
+        >
           The page you’re looking for has left the building. Here’s where to go instead.
         </p>
         <Link

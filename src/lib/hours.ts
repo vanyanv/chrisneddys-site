@@ -35,17 +35,17 @@ type LaClock = { weekday: string; minutes: number };
 
 /** The wall clock in Los Angeles, whatever clock the visitor is on. */
 export function losAngelesNow(at: Date = new Date()): LaClock {
-  const parts = Object.fromEntries(
-    LA_TIME.formatToParts(at).map((p) => [p.type, p.value]),
-  );
+  const parts = Object.fromEntries(LA_TIME.formatToParts(at).map((p) => [p.type, p.value]));
   // Some engines render midnight as "24" under hour12: false.
   const hour = Number(parts.hour) % 24;
   return { weekday: String(parts.weekday), minutes: hour * 60 + Number(parts.minute) };
 }
 
 const toMinutes = (hhmm: string): number => {
+  // Malformed input already produced NaN before this fallback (undefined * 60
+  // is NaN); the fallback only satisfies the type, it doesn't change the result.
   const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
+  return (h ?? NaN) * 60 + (m ?? NaN);
 };
 
 type Window = { open: number; close: number };
@@ -63,11 +63,13 @@ function windowFor(loc: Location, weekday: string): Window | null {
   return { open, close };
 }
 
+// `% 7` always lands in range for the 7-entry WEEKDAYS tuple; the fallback to
+// WEEKDAYS[0] only satisfies the type for a dynamic index and is never hit.
 const dayBefore = (weekday: string): string =>
-  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 6) % 7];
+  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 6) % 7] ?? WEEKDAYS[0];
 
 const dayAfter = (weekday: string): string =>
-  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 1) % 7];
+  WEEKDAYS[(WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) + 1) % 7] ?? WEEKDAYS[0];
 
 export type StoreStatus =
   | { state: "open"; minutesLeft: number; closesAt: string }
@@ -191,4 +193,51 @@ export function statusLabel(status: StoreStatus): string {
   if (!time.value) return word;
   const fact = time.lead ? `${time.lead} ${time.value}` : time.value;
   return status.state === "open" ? `${word} ${fact}` : `${word} · ${fact}`;
+}
+
+/**
+ * A run of consecutive days, said the way a person says a range out loud: one
+ * day is just itself, two days are "X and Y", three or more become
+ * "X through Y" — the same shape `openingSpec` already groups its days into,
+ * so this never has to know which days those are.
+ */
+function dayRangeLabel(days: readonly string[]): string {
+  const first = days[0];
+  const last = days[days.length - 1];
+  if (days.length <= 1) return first ?? "";
+  if (days.length === 2) return `${first} and ${last}`;
+  return `${first} through ${last}`;
+}
+
+/**
+ * The hours prose that used to be hand-typed at every site that mentions when
+ * the kitchen closes — FAQs, metadata descriptions, store copy. Derived from
+ * `loc.openingSpec` (the same groups `windowFor` reads for open/closed logic)
+ * so the wording can never drift from the data the live status pill uses.
+ *
+ * A location with no `openingSpec` yet (not open) has nothing to summarize,
+ * so this returns "" rather than a sentence claiming hours it doesn't have —
+ * callers only reach for it once `loc.isOpen` is true.
+ */
+export function closingSummary(loc: Location): string {
+  const groups = loc.openingSpec ?? [];
+  return groups
+    .map((g) => `${clockLabel(toMinutes(g.closes))} ${dayRangeLabel(g.dayOfWeek)}`)
+    .join(", ");
+}
+
+/**
+ * The fuller line for the surfaces that want both ends of the window, not
+ * just the close — a metadata description or a "what time are you open" FAQ
+ * answer. Reads as a clause to be dropped into a sentence ("is open
+ * <this>."), not a standalone sentence, so callers keep control of the verb.
+ */
+export function hoursSentence(loc: Location): string {
+  const groups = loc.openingSpec ?? [];
+  return groups
+    .map(
+      (g) =>
+        `${clockLabel(toMinutes(g.opens))} to ${clockLabel(toMinutes(g.closes))} ${dayRangeLabel(g.dayOfWeek)}`,
+    )
+    .join(", and ");
 }

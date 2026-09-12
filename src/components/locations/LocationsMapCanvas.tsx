@@ -5,15 +5,11 @@ import { namedStreets, shields } from "@/data/laGeoPaths";
 const TWO_MILES = 3.2187 * pxPerKm;
 
 /** Store labels win; a street name never sits underneath one. */
-const storeLabelAnchors = locations.map(
-  (l) => [projectX(l.lng), projectY(l.lat) - 13] as const,
-);
+const storeLabelAnchors = locations.map((l) => [projectX(l.lng), projectY(l.lat) - 13] as const);
 
 function labelIsClear(x: number, y: number): boolean {
   if (x < 12 || x > mapBox.w - 12 || y < 9 || y > mapBox.h - 20) return false;
-  return !storeLabelAnchors.some(
-    ([cx, cy]) => Math.abs(cx - x) < 34 && Math.abs(cy - y) < 9,
-  );
+  return !storeLabelAnchors.some(([cx, cy]) => Math.abs(cx - x) < 34 && Math.abs(cy - y) < 9);
 }
 
 /** The lettering layer sits over the geometry and under the pins. */
@@ -67,12 +63,7 @@ export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
       <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={lettering}>
         {namedStreets.map((s) =>
           labelIsClear(s.label[0], s.label[1]) ? (
-            <text
-              key={`l-${s.name}`}
-              className="cne-map-label"
-              x={s.label[0]}
-              y={s.label[1] - 2.6}
-            >
+            <text key={`l-${s.name}`} className="cne-map-label" x={s.label[0]} y={s.label[1] - 2.6}>
               {s.name}
             </text>
           ) : null,

@@ -1,20 +1,14 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { locations, type Location } from "@/data/locations";
-import { orderUrl } from "@/lib/otter";
+import { locations, flagship, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
-import {
-  MapPinArt,
-  pinClass,
-  TWO_MILES,
-  mapOverlayStyle,
-} from "@/components/locations/MapPins";
-import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
+import { MapPinArt, pinClass, TWO_MILES, mapOverlayStyle } from "@/components/locations/MapPins";
+import { MapCallout } from "@/components/locations/MapCallout";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
-import { storeStatus, statusLabel } from "@/lib/hours";
+import { LocationCard } from "@/components/locations/LocationCard";
 
 type LocationId = Location["id"];
 
@@ -25,23 +19,8 @@ type LocationId = Location["id"];
  */
 export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
   const [sel, setSel] = useState<LocationId>("hollywood");
-  const [apple, setApple] = useState(false);
-  const [now, setNow] = useState<Date | null>(null);
 
-  useEffect(() => setApple(prefersAppleMaps()), []);
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    tick();
-    const id = setInterval(tick, 60_000);
-    return () => clearInterval(id);
-  }, []);
-
-  const selected = locations.find((l) => l.id === sel) ?? locations[0];
-  const calloutState = !selected.isOpen
-    ? "Opening soon"
-    : now
-      ? statusLabel(storeStatus(selected, now))
-      : "";
+  const selected = locations.find((l) => l.id === sel) ?? flagship;
 
   return (
     /* `data-surface` sits on the whole view, not on one button row: every
@@ -91,18 +70,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               </g>
             ))}
           </svg>
-          {calloutState && (
-            <div
-              className="cne-callout"
-              style={{
-                left: `${(projectX(selected.lng) / mapBox.w) * 100}%`,
-                top: `${(projectY(selected.lat) / mapBox.h) * 100}%`,
-              }}
-            >
-              {selected.name.toUpperCase()}
-              <small>{calloutState}</small>
-            </div>
-          )}
+          <MapCallout locationId={sel} />
         </div>
       </div>
 
@@ -130,68 +98,42 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               }
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-              <h2 className="cne-loc-name">{loc.name.toUpperCase()}</h2>
-              {loc.isOpen ? (
-                <OpenStatus locationId={loc.id} />
-              ) : (
-                <ComingSoonTag />
-              )}
-            </div>
-            <div className="cne-loc-addr">
-              {loc.address}
-              <br />
-              {loc.city}, {loc.region} {loc.postal}
-            </div>
-
-            {loc.isOpen ? (
-              <>
-                <div className="cne-loc-hrs">
-                  {loc.hours.map(([day, hrs]) => (
-                    <div className="r" key={day}>
-                      <span>{day.toUpperCase()}</span>
-                      <b>{hrs}</b>
-                    </div>
-                  ))}
-                </div>
-                {loc.sub && <div className="cne-loc-note">{loc.sub}</div>}
-                <div className="cne-loc-btns">
-                  {loc.id === "hollywood" && (
-                    <a className="cne-mini is-red" href={orderUrl("locations-map")} target="_blank" rel="noopener noreferrer">
-                      ORDER
-                    </a>
-                  )}
-                  <a
-                    className="cne-mini is-plain"
-                    href={apple ? appleDirections(loc) : googleDirections(loc)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    DIRECTIONS
-                  </a>
-                  {loc.phoneTel && (
-                    <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
-                      CALL
-                    </a>
-                  )}
-                </div>
-                {loc.id !== "hollywood" && (
-                  <div className="cne-loc-note">
-                    Online ordering for this store isn&rsquo;t live on Otter yet.
-                  </div>
-                )}
-                <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
-                  {loc.name} details &amp; directions &rarr;
-                </Link>
-              </>
-            ) : (
-              <>
-                <div className="cne-loc-note">Opening date to be announced.</div>
-                <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
-                  {loc.name} details &rarr;
-                </Link>
-              </>
-            )}
+            <LocationCard
+              loc={loc}
+              surface="locations-map"
+              headingTag="h2"
+              headingClassName="cne-loc-name"
+              status={loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
+              footer={
+                loc.isOpen ? (
+                  <>
+                    {!loc.otter && (
+                      <div className="cne-loc-note">
+                        Online ordering for this store isn&rsquo;t live on Otter yet.
+                      </div>
+                    )}
+                    <Link
+                      href={`/locations/${slugFor(loc)}/`}
+                      className="cne-loc-note cne-loc-more"
+                    >
+                      {loc.name} details &amp; directions &rarr;
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <div className="cne-loc-note">Opening date to be announced.</div>
+                    <Link
+                      href={`/locations/${slugFor(loc)}/`}
+                      className="cne-loc-note cne-loc-more"
+                    >
+                      {loc.name} details &rarr;
+                    </Link>
+                  </>
+                )
+              }
+            >
+              {loc.sub && <div className="cne-loc-note">{loc.sub}</div>}
+            </LocationCard>
           </div>
         ))}
       </div>

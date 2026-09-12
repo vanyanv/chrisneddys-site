@@ -36,7 +36,6 @@ export function ProductShot({
 
   return (
     <div className={`cne-capshot is-photo ${className}`.trim()}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         srcSet={`/menu/${product.photo}-thumb.webp 200w, ${src} 720w`}

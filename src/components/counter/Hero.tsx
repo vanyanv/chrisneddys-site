@@ -61,7 +61,6 @@ export function Hero() {
           {/* The loop this replaces was decoration, so it was loaded conditionally and
               never counted as the LCP. A still *is* the LCP: it ships eagerly, at high
               priority, and is preloaded from `page.tsx`. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={HERO.src}
             srcSet={HERO.srcSet}

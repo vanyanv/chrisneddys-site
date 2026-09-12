@@ -3,8 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { neighbourhoodFor, slugFor } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
 import { track } from "@/lib/track";
+import { HttpError, emailLooksSendable, hasWeb3FormsKey, submitWeb3Form } from "@/lib/web3forms";
 
 /**
  * "Tell me when this one opens", on the Glendale and Van Nuys pages.
@@ -24,12 +25,6 @@ import { track } from "@/lib/track";
  * the guest check uses.
  */
 
-const ENDPOINT = "https://api.web3forms.com/submit";
-const ACCESS_KEY = process.env.NEXT_PUBLIC_W3F_KEY ?? "";
-
-/** Deliberately loose. A rejected address is worse than a bounced one. */
-const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-
 /**
  * The reporting name for this store, which is the URL slug — `van-nuys`, not
  * "van nuys". The component is handed a neighbourhood to print, so the slug is
@@ -37,25 +32,11 @@ const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
  * that changes must not quietly split the signup history in two.
  */
 function slugForHood(hood: string): string {
-  const match = locations.find((l) => neighbourhoodFor(l) === hood);
+  const match = locations.find((l) => l.neighbourhood === hood);
   return match ? slugFor(match) : hood.trim().toLowerCase().replace(/\s+/g, "-");
 }
 
 type Status = "idle" | "sending" | "sent" | "error";
-
-/**
- * Carries the status code out of the `try` so the failure event can say
- * whether Web3Forms rejected the request or the network never reached it.
- */
-class HttpError extends Error {
-  constructor(
-    readonly status: number,
-    /** True when Web3Forms answered 200 but its own body said `success: false`. */
-    readonly rejected: boolean,
-  ) {
-    super(`HTTP ${status}`);
-  }
-}
 
 export function OpeningNotify({ hood }: { hood: string }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -69,7 +50,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
     const data = new FormData(form);
     const email = String(data.get("email") ?? "").trim();
 
-    if (!looksLikeEmail(email)) {
+    if (!emailLooksSendable(email)) {
       setError("That email doesn't look right.");
       form.querySelector<HTMLElement>('[name="email"]')?.focus();
       return;
@@ -80,7 +61,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
 
     const location = slugForHood(hood);
 
-    if (!ACCESS_KEY) {
+    if (!hasWeb3FormsKey()) {
       setStatus("error");
       setError("Not wired up yet — email us instead.");
       // A form that cannot send is indistinguishable from a form nobody used,
@@ -91,21 +72,13 @@ export function OpeningNotify({ hood }: { hood: string }) {
     }
 
     try {
-      const res = await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: ACCESS_KEY,
-          subject: `[Opening list — ${hood}] ${email}`,
-          from_name: `${brand.name} website`,
-          replyto: email,
-          botcheck: String(data.get("botcheck") ?? ""),
-          email,
-          location: hood,
-        }),
+      await submitWeb3Form({
+        subject: `[Opening list — ${hood}] ${email}`,
+        replyto: email,
+        botcheck: String(data.get("botcheck") ?? ""),
+        email,
+        location: hood,
       });
-      const body: { success?: boolean } = await res.json().catch(() => ({}));
-      if (!res.ok || !body.success) throw new HttpError(res.status, res.ok);
 
       setStatus("sent");
       // Its own event, not `contact_submit`: pre-launch demand for a store that
@@ -119,11 +92,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
       track("notify_error", {
         location,
         reason:
-          err instanceof HttpError
-            ? err.rejected
-              ? "rejected"
-              : `http_${err.status}`
-            : "network",
+          err instanceof HttpError ? (err.rejected ? "rejected" : `http_${err.status}`) : "network",
       });
     }
   }
@@ -131,8 +100,8 @@ export function OpeningNotify({ hood }: { hood: string }) {
   if (status === "sent") {
     return (
       <div className="cne-loc-note" role="status" style={{ marginTop: 14 }}>
-        <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood}{" "}
-        location is serving — nothing else.
+        <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood} location is
+        serving — nothing else.
       </div>
     );
   }

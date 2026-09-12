@@ -154,6 +154,7 @@ The register is **brand**: design is the product here. The site exists to send a
 What this system explicitly rejects: the delivery-app aesthetic it links out to, with its rounded stock-photo cards and sterile grids. Corporate chain polish, regionless and committee-approved. Upscale-restaurant minimalism with thin serifs and stone neutrals. And the hipster craft-burger kit of kraft paper, chalkboards and distressed textures, which performs handmade instead of being loud.
 
 **Key Characteristics:**
+
 - One palette, one light. No theme switch, no dark variant, no time-of-day behavior.
 - Zero rounding by default. Sharp corners everywhere except pills.
 - Shadows with no blur: solid ink offsets that read as printed registration, not lighting.
@@ -166,14 +167,17 @@ What this system explicitly rejects: the delivery-app aesthetic it links out to,
 Two flat spot colors and a near-black, used the way a sign painter uses them: one color per surface, no blending, no gradients. Red and yellow each carry a second, contrast-corrected cut that exists purely so text can sit on them legally.
 
 ### Primary
+
 - **Counter Red** (`#e63027`): the brand's display red. The header bar, map pins, the accent on selected location cards. This is a fill color, not a text color, and not a background for anything smaller than a headline.
 - **Signal Red** (`#d0281c`): the same red taken one step deeper so cream text clears 4.5:1 on it. Every red that carries text uses this: the hero panel, the tab strip, section eyebrows, the focused input underline, selected topic chips, the order button. Both edges of the tab strip and the hero are ink rules, which is what makes the step down from Counter Red invisible.
 
 ### Secondary
+
 - **Marquee Yellow** (`#f5b82e`): the second spot color and the site's affirmative. Primary buttons, the tab indicator, the section-heading underline, freeway lines on the map, the marquee text on ink. Reserved by convention for price and for the primary action, so its meaning stays legible.
-- **Marquee Yellow Ink** (`#ffd633`): a brighter cut used only when yellow must be *read as text* on red, where the fill yellow sits at 2.45:1. Carries the accent word in the hero headline.
+- **Marquee Yellow Ink** (`#ffd633`): a brighter cut used only when yellow must be _read as text_ on red, where the fill yellow sits at 2.45:1. Carries the accent word in the hero headline.
 
 ### Neutral
+
 - **Butcher Paper** (`#fff8e7`): the page ground. Warm, slightly yellowed, never white.
 - **Counter Cream** (`#fff2c9`): a deeper paper used for banded sections, secondary buttons, and as the text color on every red and ink surface.
 - **Card White** (`#fffdf6`): the lifted surface. The only near-white in the system, and it is still warm.
@@ -182,6 +186,7 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 - **Muted Ink** (`#7a6f5e`): secondary and annotation text.
 
 ### Tertiary
+
 - **Ticket Green** (`#2f6b43`): the one positive color in the system. Free shipping, the bag's free-shipping meter, the open indicator. Nowhere else.
 - **Map Paper** (`#f4ecd8`) and **Map Water** (`#bcd3dd`): the locations map only. Map Water is the single non-brand hue on the site, used for the Pacific and the LA River.
 
@@ -202,6 +207,7 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 **Character:** Bowlby One is a fat, closed, uncompromising display face that only exists at one weight, which is the point: there is no dial to turn down. Inter carries every sentence that needs to be read rather than seen. JetBrains Mono handles anything that behaves like data, and its presence is what keeps the system from reading as pure poster: prices, hours, addresses, distances and map labels all look measured rather than shouted.
 
 ### Hierarchy
+
 - **Display** (Bowlby One 400, 38px phone to 88px desktop, line-height 0.86 to 0.84, letter-spacing 0.4px to 1px): hero headline only, one per page. Carries a hard 3px to 6px ink text-shadow.
 - **Headline** (Bowlby One 400, 23px to 52px, line-height 1 to 0.95): section titles. Always followed by the yellow underline that wipes out to 46px on scroll.
 - **Title** (Bowlby One 400, 19px to 20px, line-height 1): location names, item sheet titles, card headings.
@@ -225,6 +231,7 @@ Depth in this system is printed, not lit. Shadows are solid ink offsets with **z
 Blurred shadows exist in exactly three places, all of them genuinely floating layers: the lifted sticky header, the bag drawer, and the order dock. Nothing else in the system is allowed blur, and nothing in the system emits light.
 
 ### Shadow Vocabulary
+
 - **Nudge** (`box-shadow: 2px 2px 0 #1a1612`): the nav order button and the bag button. Small, tight, always present.
 - **Raised** (`box-shadow: 3px 3px 0 var(--a-ink)`): featured rows, selected chips, small cards.
 - **Standard** (`box-shadow: 4px 4px 0 var(--a-ink)`): the default lifted surface. Location cards, primary buttons on phone, menu cards.
@@ -243,6 +250,7 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 ## 5. Components
 
 ### Buttons
+
 - **Shape:** Square. Zero radius (`0`), no exceptions.
 - **Primary:** Marquee Yellow fill, Griddle Ink text, Bowlby One uppercase at 12px phone / 19px desktop with 0.05em tracking, 2.5px ink border on phone and 4px on desktop, 13px 10px padding growing to 22px 34px. Shadow: Standard on phone, Anchor on desktop.
 - **Secondary:** Counter Cream fill, ink text, otherwise identical geometry.
@@ -250,12 +258,14 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 - **Nav Order Button:** the miniature. Yellow fill, 11px display type, 2px border, Nudge shadow, 8px 11px padding. Its `:active` collapses the shadow to zero and moves the button 2px, so it lands flat on the nav.
 
 ### Chips
+
 - **Style:** Pill (`999px`), 2px rule-colored border, transparent fill, JetBrains Mono 700 at 10.5px uppercase with 0.09em tracking, 8px 12px padding, muted ink text.
 - **Selected:** fills with Signal Red, text goes cream, gains a Raised shadow, prepends a check glyph, and plays a 0.34s stamp animation that overshoots to 1.16 scale with a 3.5-degree rotation before settling. The rotation is the character: it lands like a rubber stamp, not like a toggle.
 - **Status Tag:** a two-cell punch card, square like everything else. The left cell names the state in Bowlby One on Counter Cream and carries the pulsing dot; the right cell carries the fact that state implies — the closing time, the minutes left, the hour it opens — in JetBrains Mono reversed out on Griddle Ink, so the number people came for is the highest-contrast thing in the header after the order button. An ink rule divides the cells and swaps to cream when the tag goes dark. Ink border and hard offset shadow one step under the button beside it: 2px and 2px on a card, 3px and 3px in the header, against the button's 3px and 5px. State is carried three ways — dot color, fill and the words — so it survives greyscale. The tag sits at exactly the order button's height at every breakpoint: 31px on a phone, 48.8px from 901 to 1339, 58px above that.
 - **How the tag narrows:** by giving up words, never by shrinking type past reading size. The connective ("TILL", "OPENS") goes first, then the qualifier ("LAST CALL" to "LAST"), then the state word itself once the dot and the fill are already saying it. What it may occupy is half the viewport less half the wordmark — 127px at 375, 91px at 320 — and the widest state is the closed one. Only the header's tag steps down; the tags on location cards have a card to sit in and keep their words at every size.
 
 ### Cards / Containers
+
 - **Corner Style:** Square (`0`).
 - **Background:** Card White at rest, Counter Cream when live or featured.
 - **Border:** 2.5px Griddle Ink, rising to 4px on desktop. Locations that have not opened yet use the same border `dashed` and drop their shadow entirely, so the difference between open and coming-soon is structural rather than a badge.
@@ -264,26 +274,31 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 - **Nested cards are forbidden.** A card inside a card does not exist in this system.
 
 ### Inputs / Fields
+
 - **Style:** No box. Each field is a single 2px ruled line under a transparent input, with an uppercase mono label above it. Inter at 16px, 8px 2px padding, zero radius.
 - **Focus:** the 2px rule goes transparent and a 3px Signal Red underline wipes in from the left over 0.3s. The label above simultaneously shifts from muted ink to Signal Red. No outline, no glow, no box: the ruled line is the entire affordance.
 - **Error:** the same underline stays at full width in Counter Red, with a 12px semibold message below it in Signal Red.
 - The underline lives in its own wrapper element pinned to the input's bottom edge, so an error message appearing below does not drag the rule down with it.
 
 ### Navigation
+
 - **Style:** a two-row sticky header. The top row is Counter Red with a 3px ink bottom rule, the status tag hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the tag's label changes.
 - **Tab Strip:** below it, on Signal Red, full-width equal tabs in Bowlby One at 10px with 0.11em tracking. State is carried twice: a 4px Marquee Yellow indicator that slides on a `cubic-bezier(0.35, 1.3, 0.4, 1)` overshoot, and full opacity on the current label.
 - **Focus:** 3px Griddle Ink outline at 2px offset globally, switching to Marquee Yellow on dark surfaces.
 - **Mobile:** identical structure. This system is phone-first and the desktop layout is the variant, not the reverse.
 
 ### Signature: The Halftone Field
+
 Every red panel carries a dot field: `radial-gradient` at 1.15px to 1.9px, tiled at 9px to 19px, held at 0.1 to 0.18 opacity, absolutely positioned and `aria-hidden`. On the hero the dots are ink; on the marquee band they are yellow. This is the single texture in the system and it is what makes flat spot color read as printed rather than as a CSS background.
 
 ### Signature: The Section Underline
+
 Every section heading carries a 4px Marquee Yellow bar that animates from 0 to 46px width over 0.7s when the section enters the viewport, 6px and 0.75s on desktop. It is the system's only entrance flourish that is not a fade, and it is applied uniformly, which is what makes it read as a rule of the page rather than as decoration.
 
 ## 6. Do's and Don'ts
 
 ### Do:
+
 - **Do** use zero-blur ink shadows at the documented offsets (2 / 3 / 4 / 6 / 7 / 10 / 14px). Size means importance.
 - **Do** make the travel distance on `:active` equal the shadow offset, so the element lands flat.
 - **Do** swap Counter Red for Signal Red (`#d0281c`) the moment text sits on it, and Marquee Yellow for `#ffd633` the moment yellow becomes text on red.
@@ -296,6 +311,7 @@ Every section heading carries a 4px Marquee Yellow bar that animates from 0 to 4
 - **Do** keep prose to 65ch to 75ch, and the hero lede to 32ch.
 
 ### Don't:
+
 - **Don't** add a dark mode, a theme toggle, or any time-of-day color behavior. This was removed deliberately.
 - **Don't** use a blurred or grey drop shadow. If it looks soft, it is wrong. Blur is reserved for the header, drawer and dock.
 - **Don't** emit light. No glow, no neon, no colored shadow with a blur radius.

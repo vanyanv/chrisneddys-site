@@ -3,15 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CapArt } from "./CapArt";
-import {
-  bagSubtotal,
-  closeBag,
-  removeFromBag,
-  setBagQty,
-  useBag,
-  type BagLine,
-} from "./bagStore";
-import { MAX_PER_ORDER, TERMS_PENDING, money, productBySlug } from "@/data/merch";
+import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
+import { MAX_PER_ORDER, TERMS_PENDING, productBySlug } from "@/data/merch";
+import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 
 /** How long the remove animation runs before the line actually leaves the store. */
@@ -162,7 +156,7 @@ export function BagDrawer() {
           <div className="cne-tot">
             <div className="grand">
               <span>Subtotal</span>
-              <span>{money(subtotal)}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
           </div>
           <p className="cne-dr-note is-terms">{TERMS_PENDING}</p>
@@ -210,9 +204,7 @@ function BagRow({
       </div>
       <div className="cne-li-b">
         <span className="n">{product.displayName[1]}</span>
-        <span className="v">
-          LIMITED RUN{product.oneSize ? " · ONE SIZE" : ""}
-        </span>
+        <span className="v">LIMITED RUN{product.oneSize ? " · ONE SIZE" : ""}</span>
         <div className="cne-li-ft">
           <div className="cne-qty-sm">
             <button
@@ -232,7 +224,7 @@ function BagRow({
               +
             </button>
           </div>
-          <span className="cne-price">{money(product.price * line.qty)}</span>
+          <span className="cne-price">{formatPrice(product.price * line.qty)}</span>
         </div>
         <button type="button" className="cne-li-rm" onClick={onRemove}>
           Remove

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ProductShot } from "./ProductShot";
-import type { MerchProduct } from "@/data/merch";
+import { firstView, type MerchProduct } from "@/data/merch";
 
 /**
  * The product gallery.
@@ -19,7 +19,7 @@ import type { MerchProduct } from "@/data/merch";
  */
 export function ProductGallery({ product }: { product: MerchProduct }) {
   const [active, setActive] = useState(0);
-  const view = product.views[active];
+  const view = product.views[active] ?? firstView(product);
   const hasStrip = product.views.length > 1;
 
   return (

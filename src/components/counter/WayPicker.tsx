@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ways } from "@/data/menu";
-import type { WayId } from "./ItemSheet";
+import { ways, type WayId } from "@/data/menu";
 
 /**
  * The two Ways, as a radio group.
@@ -52,7 +51,10 @@ export function WayPicker({
           : e.key === "ArrowRight" || e.key === "ArrowDown"
             ? (i + 1) % ways.length
             : (i - 1 + ways.length) % ways.length;
-    onChange(ways[next].id);
+    // `next` is always a valid index into `ways` (computed mod its length).
+    const nextWay = ways[next];
+    if (!nextWay) return;
+    onChange(nextWay.id);
     groupRef.current?.querySelectorAll<HTMLButtonElement>(".cne-way")[next]?.focus();
   };
 

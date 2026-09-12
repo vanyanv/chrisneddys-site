@@ -59,10 +59,11 @@
   --sp-b-accent: #e63027;
 }
 
-
 /* Above 901px the tab strip folds into the nav row and the header loses 9px. */
 @media (min-width: 901px) {
-  :root { --cne-stuck: 95px; }
+  :root {
+    --cne-stuck: 95px;
+  }
 }
 
 html {
@@ -92,7 +93,9 @@ body {
   z-index: 30;
   transition: box-shadow 0.3s;
 }
-.cne-header.is-lifted { box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3); }
+.cne-header.is-lifted {
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
+}
 .cne-nav {
   display: flex;
   align-items: center;
@@ -130,7 +133,9 @@ body {
 }
 /* `display: contents` promotes the pill and the button to children of the row,
    so `justify-content: space-between` sends one to each end around the logo. */
-.cne-nav-right { display: contents; }
+.cne-nav-right {
+  display: contents;
+}
 
 .cne-orderbtn {
   font-family: var(--font-display);
@@ -143,12 +148,17 @@ body {
   line-height: 1;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--a-ink);
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
   text-decoration: none;
   display: inline-block;
   white-space: nowrap;
 }
-.cne-orderbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--a-ink); }
+.cne-orderbtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
 
 /* ---- the status tag ------------------------------------------------------
    A two-cell punch card, not a capsule. The left cell names the state in the
@@ -196,6 +206,8 @@ body {
   --stat-inv-text: var(--a-yel-ink);
 }
 
+/* The clock is unknown until mount — the site is a static export. Both cells
+   hold their width so the header does not jump when the answer arrives. */
 .cne-stat-a {
   display: inline-flex;
   align-items: center;
@@ -206,7 +218,11 @@ body {
   font-family: var(--font-display);
   font-size: 9.5px;
   letter-spacing: 0.02em;
-  transition: background 0.3s, color 0.3s;
+  transition:
+    background 0.3s,
+    color 0.3s;
+  min-width: 42px;
+  justify-content: center;
 }
 .cne-stat-b {
   display: inline-flex;
@@ -219,24 +235,42 @@ body {
   font-weight: 700;
   font-size: 9px;
   letter-spacing: 0.05em;
-  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+  min-width: 44px;
+  justify-content: center;
 }
-/* The clock is unknown until mount — the site is a static export. Both cells
-   hold their width so the header does not jump when the answer arrives. */
-.cne-stat-a { min-width: 42px; justify-content: center; }
-.cne-stat-b { min-width: 44px; justify-content: center; }
 
 /* "TILL" and "OPENS" are the first words to go. A location card never shows
    them: it lists the whole week directly underneath. */
-.cne-stat-lead { display: none; }
+.cne-stat-lead {
+  display: none;
+}
 
-.cne-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--stat-dot); flex: none; }
+.cne-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stat-dot);
+  flex: none;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .cne-dot { animation: cne-pulse 2.2s ease-in-out infinite; }
+  .cne-dot {
+    animation: cne-pulse 2.2s ease-in-out infinite;
+  }
 }
 @keyframes cne-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 /* tab bar */
@@ -263,17 +297,25 @@ body {
   cursor: pointer;
   border: none;
   background: none;
-  transition: opacity 0.25s, color 0.25s;
+  transition:
+    opacity 0.25s,
+    color 0.25s;
   text-decoration: none;
   display: block;
   line-height: normal;
 }
 /* The yellow indicator under the strip is the state; this is the second cue. */
-.cne-tab[aria-current="page"] { opacity: 1; color: #fffdf6; }
+.cne-tab[aria-current="page"] {
+  opacity: 1;
+  color: #fffdf6;
+}
 /* The display yellow reads 2.94:1 on Signal Red, just under the 3:1 a focus
    ring owes its surface. This is exactly the case --a-yel-ink exists for —
    yellow that has to be read rather than filled — and it lands at 3.73:1. */
-.cne-tab:focus-visible { outline: 2px solid var(--a-yel-ink); outline-offset: -3px; }
+.cne-tab:focus-visible {
+  outline: 2px solid var(--a-yel-ink);
+  outline-offset: -3px;
+}
 .cne-tabind {
   /* Width of the bar as a share of one tab, per the prototype: 22% of a
      three-tab strip is roughly two thirds of a tab. */
@@ -317,7 +359,10 @@ body {
   opacity: 0.16;
   transition: opacity 0.5s;
 }
-.cne-hero-in { position: relative; z-index: 2; }
+.cne-hero-in {
+  position: relative;
+  z-index: 2;
+}
 .cne-hero h1 {
   font-family: var(--font-display);
   font-size: 38px;
@@ -330,13 +375,22 @@ body {
      column edge the subtitle and buttons share. */
   text-align: center;
 }
-.cne-hero h1 .y { color: var(--a-yel-ink); }
+.cne-hero h1 .y {
+  color: var(--a-yel-ink);
+}
 /* The paragraph carried `opacity: .94`, which took cream on the hero red from 3.9:1 down
    to about 3.6:1. The two lifted phrases need to sit *above* the running text, so the dimming
    is gone and the lift is full-strength cream at 700 — brightness and weight, not a second hue.
    Yellow stays reserved for price, which is the only thing it means anywhere in this hero. */
-.cne-hero-sub { font-size: 13px; line-height: 1.45; margin-top: 11px; }
-.cne-hero-sub b { color: #fffdf6; font-weight: 700; }
+.cne-hero-sub {
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 11px;
+}
+.cne-hero-sub b {
+  color: #fffdf6;
+  font-weight: 700;
+}
 
 .cne-hero-meta {
   display: flex;
@@ -352,14 +406,27 @@ body {
      WCAG note on `.cne-hero-sub` at the desktop breakpoint. Only the separators fade. */
   color: #fff2c9;
 }
-.cne-hero-meta b { color: #fff2c9; font-weight: 700; }
-.cne-hero-dot { opacity: 0.45; }
+.cne-hero-meta b {
+  color: #fff2c9;
+  font-weight: 700;
+}
+.cne-hero-dot {
+  opacity: 0.45;
+}
 /* The three facts don't fit one phone line, and left to itself the row wraps after a
    separator — a dot dangling off the end of line one. So the break is placed rather than
    allowed: the address takes its own row and the separator before it goes. */
-.cne-hero-meta .cne-hero-addr { flex-basis: 100%; }
-.cne-hero-meta .cne-hero-dot.is-addr { display: none; }
-.cne-cta { display: flex; gap: 8px; margin-top: 15px; }
+.cne-hero-meta .cne-hero-addr {
+  flex-basis: 100%;
+}
+.cne-hero-meta .cne-hero-dot.is-addr {
+  display: none;
+}
+.cne-cta {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
 
 .cne-big {
   font-family: var(--font-display);
@@ -371,15 +438,28 @@ body {
   cursor: pointer;
   line-height: 1;
   box-shadow: 4px 4px 0 #1a1612;
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
 }
-.cne-big:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #1a1612; }
-.cne-big.is-primary { background: var(--a-yel); color: #1a1612; flex: 1.7; }
-.cne-big.is-secondary { background: #fff2c9; color: #1a1612; flex: 1; }
+.cne-big:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #1a1612;
+}
+.cne-big.is-primary {
+  background: var(--a-yel);
+  color: #1a1612;
+  flex: 1.7;
+}
+.cne-big.is-secondary {
+  background: #fff2c9;
+  color: #1a1612;
+  flex: 1;
+}
 
 .cne-heromedia {
   position: relative;
@@ -395,7 +475,12 @@ body {
   transform: rotate(-1deg);
   will-change: transform;
 }
-.cne-heromedia img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cne-heromedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* ---- marquee ------------------------------------------------------------ */
 .cne-mq {
@@ -414,17 +499,30 @@ body {
   letter-spacing: 0.08em;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .cne-mq-track { animation: cne-marquee 24s linear infinite; }
+  .cne-mq-track {
+    animation: cne-marquee 24s linear infinite;
+  }
 }
-.cne-mq:hover .cne-mq-track { animation-play-state: paused; }
+.cne-mq:hover .cne-mq-track {
+  animation-play-state: paused;
+}
 @keyframes cne-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
-.cne-mq-track span { padding: 0 14px; white-space: nowrap; }
+.cne-mq-track span {
+  padding: 0 14px;
+  white-space: nowrap;
+}
 
 /* ---- sections ----------------------------------------------------------- */
-.cne-sec { padding: 16px 15px 4px; }
+.cne-sec {
+  padding: 16px 15px 4px;
+}
 .cne-eyebrow {
   font-family: var(--font-mono);
   font-size: 9.5px;
@@ -455,7 +553,9 @@ body {
   transition: width 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.15s;
 }
 .cne-sec.is-in h1::after,
-.cne-sec.is-in h2::after { width: 46px; }
+.cne-sec.is-in h2::after {
+  width: 46px;
+}
 
 /* ---- menu rows ---------------------------------------------------------- */
 .cne-row {
@@ -474,7 +574,9 @@ body {
   font: inherit;
   color: inherit;
 }
-.cne-row:last-child { border-bottom: none; }
+.cne-row:last-child {
+  border-bottom: none;
+}
 .cne-row.is-star {
   background: var(--a-cream);
   border: 2.5px solid var(--a-ink);
@@ -500,10 +602,16 @@ body {
   line-height: 1.1;
   padding: 3px;
 }
-.cne-row:hover .cne-row-thumb { transform: scale(1.05); }
+.cne-row:hover .cne-row-thumb {
+  transform: scale(1.05);
+}
 /* With a photo the square is filled edge to edge; the padding and centring
    below only exist for the text fallback when an item has no photo. */
-.cne-row-thumb:has(img) { padding: 0; display: block; background-color: var(--a-bg); }
+.cne-row-thumb:has(img) {
+  padding: 0;
+  display: block;
+  background-color: var(--a-bg);
+}
 .cne-row-thumb img {
   width: 100%;
   height: 100%;
@@ -517,8 +625,10 @@ body {
      which do the same thing for the same photographs. */
   mix-blend-mode: multiply;
 }
-.cne-row-name { flex: 1; min-width: 0; }
-.cne-row-name .n { font-size: 13.5px; font-weight: 800; line-height: 1.22; }
+.cne-row-name {
+  flex: 1;
+  min-width: 0;
+}
 .cne-row-name .d {
   /* Was 10.5px, which Lighthouse counted as illegible and which put the food
      descriptions — the copy that actually sells the burger — below the 12px
@@ -560,14 +670,20 @@ body {
   justify-content: center;
   transition: transform 0.16s;
 }
-.cne-row:hover .cne-chev { transform: translateX(3px); }
+.cne-row:hover .cne-chev {
+  transform: translateX(3px);
+}
 /* No focus rule here on purpose. The global ink ring in globals.css is the
    system's rule — 3px ink at 2px offset, 16.99:1 on paper. The yellow ring
    that used to live here cleared the page ground at 1.68:1, which is not a
    focus indicator; yellow is only legible where the surface is ink. */
 
 /* ---- ways --------------------------------------------------------------- */
-.cne-ways { display: flex; gap: 7px; margin: 0 0 8px; }
+.cne-ways {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 8px;
+}
 .cne-way {
   flex: 1;
   border: 2px solid var(--a-ink);
@@ -577,21 +693,44 @@ body {
   cursor: pointer;
   text-align: center;
   line-height: 1.3;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   font: inherit;
 }
 /* Blocks, but spans: a button's content model is phrasing content, so the
    `<div>`s these used to be were never valid inside it. */
-.cne-way .t { display: block; font-family: var(--font-display); font-size: 11px; letter-spacing: 0.05em; }
+.cne-way .t {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
 /* Was 9px. This is prose — "Lettuce, tomato, sauce, raw onion" — not a mono
    label, so the 9.5px label floor never covered it. Same reasoning that took
    the row description to 12.5px; the sheet is where people actually decide. */
-.cne-way .s { display: block; font-size: 12px; line-height: 1.35; color: var(--a-sub); margin-top: 4px; }
-.cne-way[aria-checked="true"] { background: var(--a-ink); color: #fff2c9; }
-.cne-way[aria-checked="true"] .s { color: rgba(255, 242, 201, 0.72); }
+.cne-way .s {
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--a-sub);
+  margin-top: 4px;
+}
+.cne-way[aria-checked="true"] {
+  background: var(--a-ink);
+  color: #fff2c9;
+}
+.cne-way[aria-checked="true"] .s {
+  color: rgba(255, 242, 201, 0.72);
+}
 /* Ink on paper, yellow only where the surface has gone ink. */
-.cne-way:focus-visible { outline: 3px solid var(--a-ink); outline-offset: 2px; }
-.cne-way[aria-checked="true"]:focus-visible { outline-color: var(--a-yel); }
+.cne-way:focus-visible {
+  outline: 3px solid var(--a-ink);
+  outline-offset: 2px;
+}
+.cne-way[aria-checked="true"]:focus-visible {
+  outline-color: var(--a-yel);
+}
 
 /* ---- locations cards ---------------------------------------------------- */
 .cne-loc {
@@ -600,19 +739,29 @@ body {
   box-shadow: 4px 4px 0 var(--a-ink);
   padding: 13px;
   margin-bottom: 13px;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.25s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.25s;
 }
-.cne-loc.is-live { background: var(--a-cream); }
+.cne-loc.is-live {
+  background: var(--a-cream);
+}
 .cne-loc.is-selected {
   transform: translate(-2px, -2px);
   box-shadow: 7px 7px 0 var(--a-red);
   border-color: var(--a-red);
 }
-.cne-loc.is-soon { border-style: dashed; box-shadow: none; }
+.cne-loc.is-soon {
+  border-style: dashed;
+  box-shadow: none;
+}
 /* The dashed border and the missing shadow are how a location that has not
    opened reads as structurally different. A tag still casting one inside it
    puts the shadow back. */
-.cne-loc.is-soon .cne-stat { box-shadow: none; }
+.cne-loc.is-soon .cne-stat {
+  box-shadow: none;
+}
 .cne-loc h3,
 .cne-loc h2.cne-loc-name {
   font-family: var(--font-display);
@@ -622,7 +771,9 @@ body {
   position: static;
   padding-bottom: 0;
 }
-.cne-loc h2.cne-loc-name::after { content: none; }
+.cne-loc h2.cne-loc-name::after {
+  content: none;
+}
 
 /* The "details & directions" link: 9px type gives a 14px tap target, under the
    24px minimum. The padding buys the height without moving the text. */
@@ -633,7 +784,11 @@ body {
   min-height: 24px;
   box-sizing: border-box;
 }
-.cne-loc-addr { font-size: 12.5px; line-height: 1.45; margin-top: 7px; }
+.cne-loc-addr {
+  font-size: 12.5px;
+  line-height: 1.45;
+  margin-top: 7px;
+}
 .cne-loc-hrs {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -641,7 +796,10 @@ body {
   margin-top: 8px;
   color: var(--a-sub);
 }
-.cne-loc-hrs .r { display: flex; justify-content: space-between; }
+.cne-loc-hrs .r {
+  display: flex;
+  justify-content: space-between;
+}
 .cne-loc-note {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -650,7 +808,11 @@ body {
   color: var(--a-sub);
   margin-top: 7px;
 }
-.cne-loc-btns { display: flex; gap: 7px; margin-top: 11px; }
+.cne-loc-btns {
+  display: flex;
+  gap: 7px;
+  margin-top: 11px;
+}
 .cne-mini {
   flex: 1;
   font-family: var(--font-display);
@@ -665,12 +827,26 @@ body {
   display: block;
   color: var(--a-fg);
 }
-.cne-mini.is-red { background: var(--a-red-cta); color: #fff2c9; }
-.cne-mini.is-plain { background: var(--a-card); }
+.cne-mini.is-red {
+  background: var(--a-red-cta);
+  color: #fff2c9;
+}
+.cne-mini.is-plain {
+  background: var(--a-card);
+}
 
 /* ---- press + instagram -------------------------------------------------- */
-.cne-quote { border-left: 4px solid var(--a-yel); padding: 2px 0 2px 11px; margin-bottom: 13px; }
-.cne-quote p { font-size: 13px; font-weight: 700; line-height: 1.35; margin: 0; }
+.cne-quote {
+  border-left: 4px solid var(--a-yel);
+  padding: 2px 0 2px 11px;
+  margin-bottom: 13px;
+}
+.cne-quote p {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+}
 .cne-quote cite {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -694,9 +870,16 @@ body {
   vertical-align: 0.32em;
   letter-spacing: 0;
 }
-.cne-iglink:hover { color: var(--a-red-cta); }
+.cne-iglink:hover {
+  color: var(--a-red-cta);
+}
 
-.cne-ig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 0 15px 16px; }
+.cne-ig {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0 15px 16px;
+}
 .cne-ig > * {
   aspect-ratio: 1;
   background: var(--a-line) center / cover no-repeat;
@@ -705,8 +888,15 @@ body {
   display: block;
   overflow: hidden;
 }
-.cne-ig > *:hover { transform: scale(1.06); }
-.cne-ig img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cne-ig > *:hover {
+  transform: scale(1.06);
+}
+.cne-ig img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* ---- last-call banner + sticky dock ------------------------------------- */
 .cne-lastcall {
@@ -725,12 +915,26 @@ body {
   animation: cne-drop 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
 }
 @keyframes cne-drop {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: none; opacity: 1; }
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
 }
-.cne-lastcall i { width: 8px; height: 8px; border-radius: 50%; background: #e63027; flex: none; }
+.cne-lastcall i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e63027;
+  flex: none;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .cne-lastcall i { animation: cne-pulse 1.1s ease-in-out infinite; }
+  .cne-lastcall i {
+    animation: cne-pulse 1.1s ease-in-out infinite;
+  }
 }
 
 .cne-dock {
@@ -745,7 +949,10 @@ body {
   color: #fff2c9;
   border-top: 3px solid var(--a-ink);
 }
-.cne-dock-msg { flex: 1; min-width: 0; }
+.cne-dock-msg {
+  flex: 1;
+  min-width: 0;
+}
 .cne-dock-msg .t {
   font-family: var(--font-mono);
   font-size: 8.5px;
@@ -786,7 +993,10 @@ body {
   transition: opacity 0.3s;
   z-index: 50;
 }
-.cne-scrim.is-open { opacity: 1; pointer-events: auto; }
+.cne-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .cne-sheet {
   position: fixed;
@@ -803,15 +1013,20 @@ body {
      on the one screen that links out to that app. The grab bar is a working
      handle now, so the rounding is not what says "drag me" either. */
   border-radius: 0;
-  transform: translateY(102%);  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
+  transform: translateY(102%);
+  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
 }
 /* While a finger is on the grab bar the sheet follows it, so the transition
    has to be off — otherwise every move is chasing a 0.42s tail. */
-.cne-sheet.is-dragging { transition: none; }
-.cne-sheet.is-open { transform: translateY(var(--cne-drag, 0px)); }
+.cne-sheet.is-dragging {
+  transition: none;
+}
+.cne-sheet.is-open {
+  transform: translateY(var(--cne-drag, 0px));
+}
 
 /* The grab bar is a real handle now, not a picture of one: press it and the
    sheet follows your finger, release past a third of its height and it goes.
@@ -831,24 +1046,35 @@ body {
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
-.cne-sheet.is-dragging .cne-sheet-grab { cursor: grabbing; }
+.cne-sheet.is-dragging .cne-sheet-grab {
+  cursor: grabbing;
+}
 .cne-sheet-grab::before {
   content: "";
   width: 42px;
   height: 4.5px;
   border-radius: 4px;
   background: var(--a-line);
-  transition: background 0.2s, width 0.2s;
+  transition:
+    background 0.2s,
+    width 0.2s;
 }
 .cne-sheet-grab:hover::before,
-.cne-sheet.is-dragging .cne-sheet-grab::before { background: var(--a-ink); width: 54px; }
+.cne-sheet.is-dragging .cne-sheet-grab::before {
+  background: var(--a-ink);
+  width: 54px;
+}
 /* Grows into spare height, never shrinks. The sheet's content does not fit a
    phone — hero, price, Ways, button and an open ticket come to about 980px
    against 88vh — so something has to give, and it must not be this. The burger
    and the price are why the sheet was opened; the ticket is the part that was
    one tap down to begin with. So the body keeps its full height and the ticket
    below absorbs the overflow by scrolling inside itself. */
-.cne-sheet-body { flex: 1 0 auto; overflow-y: auto; padding: 0 0 4px; }
+.cne-sheet-body {
+  flex: 1 0 auto;
+  overflow-y: auto;
+  padding: 0 0 4px;
+}
 .cne-sheet-foot {
   flex: none;
   padding: 13px 15px;
@@ -884,10 +1110,18 @@ body {
   right: 11px;
   top: 11px;
   z-index: 3;
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
 }
-.cne-xbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--a-ink); }
-.cne-sheet-hero { position: relative; flex: none; }
+.cne-xbtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
+.cne-sheet-hero {
+  position: relative;
+  flex: none;
+}
 /* Was 150px. The photograph is the strongest thing this sheet has and it was
    the fifth-largest element in it. A 42vh hero is the one change here with
    category evidence behind it: DoorDash reports items carrying a photo take up
@@ -978,7 +1212,10 @@ body {
   color: var(--a-fg);
   max-width: 44ch;
 }
-.cne-ways.cne-ways-sheet { padding: 15px 15px 17px; margin: 0; }
+.cne-ways.cne-ways-sheet {
+  padding: 15px 15px 17px;
+  margin: 0;
+}
 
 /* ---- the ticket ----------------------------------------------------------
    What the dashed tap card, its two-sentence note and the add-on chip row
@@ -1042,7 +1279,12 @@ body {
 }
 /* Plus becomes minus. State is carried twice over — by this and by the count
    beside it — so it survives greyscale, per the colour-independence rule. */
-.cne-ticket-btn .s { position: relative; width: 13px; height: 13px; flex: none; }
+.cne-ticket-btn .s {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
 .cne-ticket-btn .s::before,
 .cne-ticket-btn .s::after {
   content: "";
@@ -1052,13 +1294,18 @@ body {
   background: var(--a-ink);
   transform: translate(-50%, -50%);
 }
-.cne-ticket-btn .s::before { width: 13px; height: 2.5px; }
+.cne-ticket-btn .s::before {
+  width: 13px;
+  height: 2.5px;
+}
 .cne-ticket-btn .s::after {
   width: 2.5px;
   height: 13px;
   transition: transform 0.26s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
-.cne-ticket.is-open .cne-ticket-btn .s::after { transform: translate(-50%, -50%) scaleY(0); }
+.cne-ticket.is-open .cne-ticket-btn .s::after {
+  transform: translate(-50%, -50%) scaleY(0);
+}
 
 /* `grid-template-rows` rather than height: height cannot animate to `auto`,
    and animating a layout property is what this system does not do. */
@@ -1071,11 +1318,20 @@ body {
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.32s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
-.cne-ticket.is-open .cne-ticket-wrap { grid-template-rows: 1fr; }
-.cne-ticket-panel { overflow: hidden; min-height: 0; }
+.cne-ticket.is-open .cne-ticket-wrap {
+  grid-template-rows: 1fr;
+}
+.cne-ticket-panel {
+  overflow: hidden;
+  min-height: 0;
+}
 /* A Family Box is eleven lines plus a total. The ticket scrolls inside
    whatever height it was left with rather than pushing anything off screen. */
-.cne-ticket-pad { height: 100%; padding: 0 15px 14px; overflow-y: auto; }
+.cne-ticket-pad {
+  height: 100%;
+  padding: 0 15px 14px;
+  overflow-y: auto;
+}
 
 .cne-tl {
   display: flex;
@@ -1086,13 +1342,29 @@ body {
   font-family: var(--font-mono);
   font-size: 12px;
 }
-.cne-tl .q { min-width: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.cne-tl .n { flex: 1; text-transform: uppercase; letter-spacing: 0.04em; }
-.cne-tl .v { font-weight: 700; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.cne-tl .q {
+  min-width: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cne-tl .n {
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cne-tl .v {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
 /* Signal Red, not Counter Red: this is text on paper, and the display cut sits
    at 4.28:1 here. The Fill-Is-Not-Text Rule. */
-.cne-tl.is-free .q { color: var(--a-red-cta); }
-.cne-tl.is-free .v { color: var(--a-ok); }
+.cne-tl.is-free .q {
+  color: var(--a-red-cta);
+}
+.cne-tl.is-free .v {
+  color: var(--a-ok);
+}
 .cne-tl.is-total {
   margin-top: 8px;
   padding-top: 9px;
@@ -1105,8 +1377,14 @@ body {
    only: the stamp overshoot that used to be on the tap chips was involuntary
    motion fired on open, and this is the same class of thing. */
 @keyframes cne-print {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .cne-ticket.is-open .cne-tl.is-free {
   animation: cne-print 0.26s cubic-bezier(0.2, 0.85, 0.25, 1) both;
@@ -1117,7 +1395,12 @@ body {
   line-height: 1.5;
   color: var(--a-sub);
 }
-.cne-ticket-extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.cne-ticket-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
 .cne-ticket-extra .l {
   width: 100%;
   font-family: var(--font-mono);
@@ -1153,9 +1436,14 @@ body {
   box-shadow: 4px 4px 0 var(--a-ink);
   padding: 16px 15px;
   text-decoration: none;
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
 }
-.cne-otter:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--a-ink); }
+.cne-otter:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
 .cne-fine {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1166,31 +1454,49 @@ body {
 }
 
 /* ---- scroll reveal ------------------------------------------------------ */
-.cne-rv { opacity: 1; }
-.js .cne-rv { opacity: 0; transform: translateY(14px); }
+.cne-rv {
+  opacity: 1;
+}
+.js .cne-rv {
+  opacity: 0;
+  transform: translateY(14px);
+}
 .js .cne-rv.is-in {
   opacity: 1;
   transform: none;
-  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .js .cne-rv { opacity: 1 !important; transform: none !important; }
+  .js .cne-rv {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 
   /* The item sheet and everything it carries. A full-height panel sliding up,
      plus four chips scaling in on a stagger, is the exact motion class this
      query exists to suppress — and the chips are involuntary, they fire on
      open rather than on hover. The scrim keeps its opacity fade: a cross-fade
      is the accepted substitute, not the thing being opted out of. */
-  .cne-sheet { transition: none !important; }
-  .cne-sheet-grab::before { transition: none !important; }
+  .cne-sheet {
+    transition: none !important;
+  }
+  .cne-sheet-grab::before {
+    transition: none !important;
+  }
 
   /* The ticket. Its collapse is a `grid-template-rows` transition and the free
      lines print in on a stagger — involuntary motion, fired by opening the row
      or by changing the Way rather than by hovering, which is exactly what this
      query is for. The open and shut states stay; only the travel between them
      goes. The plus/minus still turns, it just turns instantly. */
-  .cne-ticket-wrap { transition: none !important; }
-  .cne-ticket-btn .s::after { transition: none !important; }
+  .cne-ticket-wrap {
+    transition: none !important;
+  }
+  .cne-ticket-btn .s::after {
+    transition: none !important;
+  }
   .cne-ticket.is-open .cne-tl.is-free {
     animation: none !important;
     opacity: 1 !important;
@@ -1201,11 +1507,15 @@ body {
   .cne-row-thumb,
   .cne-chev,
   .cne-way,
-  .cne-menu-jump a { transition: none !important; }
+  .cne-menu-jump a {
+    transition: none !important;
+  }
   .cne-row:hover .cne-row-thumb,
   .cne-row:hover .cne-chev,
   .cne-way:hover,
-  .cne-menu-jump a:hover { transform: none !important; }
+  .cne-menu-jump a:hover {
+    transform: none !important;
+  }
 }
 
 /* ---- footer ------------------------------------------------------------- */
@@ -1222,17 +1532,34 @@ body {
 }
 /* Every link in the footer is the brand yellow, as it was when the colour
    lived in an inline style on each anchor. 9.4:1 on the ink ground. */
-.cne-foot a { color: var(--a-yel); }
+.cne-foot a {
+  color: var(--a-yel);
+}
 
 /* Phone stacks; the desktop block turns this into three columns. */
 .cne-foot-top {
   display: grid;
   gap: 22px;
 }
-.cne-foot-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.cne-foot-brand p { margin: 0; max-width: 34ch; }
-.cne-foot-mark { display: block; line-height: 0; }
-.cne-foot-mark img { height: 30px; width: auto; display: block; }
+.cne-foot-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.cne-foot-brand p {
+  margin: 0;
+  max-width: 34ch;
+}
+.cne-foot-mark {
+  display: block;
+  line-height: 0;
+}
+.cne-foot-mark img {
+  height: 30px;
+  width: auto;
+  display: block;
+}
 
 /* The group labels are styled headings, not <h*>: the footer sits under every
    page's own outline and has no business adding levels to it. */
@@ -1245,7 +1572,11 @@ body {
   color: #a99a78;
 }
 .cne-foot-group ul,
-.cne-foot-group li { list-style: none; margin: 0; padding: 0; }
+.cne-foot-group li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 /* The padding is what turns an 11px link into a 24px tap target. */
 .cne-foot-group a {
   display: inline-block;
@@ -1263,8 +1594,14 @@ body {
   border-top: 1px solid #2b2620;
   padding-top: 20px;
 }
-.cne-foot-counter address { font-style: normal; display: block; }
-.cne-foot-soon { margin: 0; color: #a99a78; }
+.cne-foot-counter address {
+  font-style: normal;
+  display: block;
+}
+.cne-foot-soon {
+  margin: 0;
+  color: #a99a78;
+}
 .cne-foot-hours {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -1272,13 +1609,29 @@ body {
   margin-top: 8px;
   font-variant-numeric: tabular-nums;
 }
-.cne-foot-hours span:nth-child(odd) { color: #a99a78; }
+.cne-foot-hours span:nth-child(odd) {
+  color: #a99a78;
+}
 
 .cne-foot-legal {
   border-top: 1px solid #2b2620;
   padding-top: 14px;
   color: #a99a78;
   font-size: 10px;
+  /* Wraps rather than crushing on a 320px handset, where the copyright line and
+     the policy link together outrun the column. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+}
+.cne-foot-legal a {
+  color: #a99a78;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cne-foot-legal a:hover {
+  color: var(--a-yel);
 }
 
 /* Six tabs on a narrow phone. SHOP is short, but it still takes a sixth of the
@@ -1286,10 +1639,18 @@ body {
    the floor. The second step is for 360px handsets, where a sixth of the strip
    is 60px and the tracking has to go entirely. */
 @media (max-width: 480px) {
-  .cne-tab { font-size: 8.5px; letter-spacing: 0.02em; padding: 10px 1px; }
+  .cne-tab {
+    font-size: 8.5px;
+    letter-spacing: 0.02em;
+    padding: 10px 1px;
+  }
 }
 @media (max-width: 390px) {
-  .cne-tab { font-size: 7.5px; letter-spacing: 0; padding: 10px 0; }
+  .cne-tab {
+    font-size: 7.5px;
+    letter-spacing: 0;
+    padding: 10px 0;
+  }
 }
 
 /* The status tag on a phone, stepping down the same way.
@@ -1306,22 +1667,50 @@ body {
 @media (max-width: 480px) {
   /* "LAST CALL" becomes "LAST". The tag is yellow with a deep red dot by then,
      and the cell beside it is counting minutes down. */
-  .cne-stat.is-head .cne-stat-rest { display: none; }
+  .cne-stat.is-head .cne-stat-rest {
+    display: none;
+  }
 }
 @media (max-width: 390px) {
-  .cne-stat.is-head .cne-stat-a { font-size: 8.5px; padding: 9.5px 7px; gap: 4px; min-width: 38px; }
-  .cne-stat.is-head .cne-stat-b { font-size: 8px; padding: 9.5px 7px; min-width: 40px; }
-  .cne-stat.is-head .cne-dot { width: 5px; height: 5px; }
+  .cne-stat.is-head .cne-stat-a {
+    font-size: 8.5px;
+    padding: 9.5px 7px;
+    gap: 4px;
+    min-width: 38px;
+  }
+  .cne-stat.is-head .cne-stat-b {
+    font-size: 8px;
+    padding: 9.5px 7px;
+    min-width: 40px;
+  }
+  .cne-stat.is-head .cne-dot {
+    width: 5px;
+    height: 5px;
+  }
 }
 @media (max-width: 360px) {
-  .cne-stat.is-head .cne-stat-a { padding-left: 6px; padding-right: 6px; gap: 0; min-width: 0; }
-  .cne-stat.is-head .cne-stat-b { padding-left: 5px; padding-right: 5px; letter-spacing: 0.03em; min-width: 0; }
+  .cne-stat.is-head .cne-stat-a {
+    padding-left: 6px;
+    padding-right: 6px;
+    gap: 0;
+    min-width: 0;
+  }
+  .cne-stat.is-head .cne-stat-b {
+    padding-left: 5px;
+    padding-right: 5px;
+    letter-spacing: 0.03em;
+    min-width: 0;
+  }
   /* Last stop. The state cell keeps the dot and loses its word: a green dot on
      cream has never needed to be told it means open. */
-  .cne-stat.is-head .cne-stat-word { display: none; }
+  .cne-stat.is-head .cne-stat-word {
+    display: none;
+  }
   /* Closed is the exception. "10 AM" under a red dot could be a closing time,
      so the word it gives up is bought back here. */
-  .cne-stat.is-head.is-shut .cne-stat-lead { display: inline; }
+  .cne-stat.is-head.is-shut .cne-stat-lead {
+    display: inline;
+  }
 }
 
 /* =========================================================================
@@ -1337,20 +1726,50 @@ body {
     background: var(--a-navsurf);
     border-bottom: 4px solid var(--a-ink);
   }
-  .cne-nav { display: contents; }
+  .cne-nav {
+    display: contents;
+  }
   /* Centred against the header rather than the row, and by the same means. */
-  .cne-logo { left: 50%; top: 50%; transform: translate(-50%, -50%); }
-  .cne-nav img { height: 44px; filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.28)); }
-  .cne-nav-right { display: flex; align-items: center; order: 3; margin-left: auto; gap: 14px; }
+  .cne-logo {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .cne-nav img {
+    height: 44px;
+    filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.28));
+  }
+  .cne-nav-right {
+    display: flex;
+    align-items: center;
+    order: 3;
+    margin-left: auto;
+    gap: 14px;
+  }
 
-  .cne-stat-a { font-size: 12px; padding: 11px 13px; gap: 8px; min-width: 0; }
-  .cne-stat-b { font-size: 11px; padding: 11px 13px; min-width: 0; }
-  .cne-dot { width: 9px; height: 9px; }
+  .cne-stat-a {
+    font-size: 12px;
+    padding: 11px 13px;
+    gap: 8px;
+    min-width: 0;
+  }
+  .cne-stat-b {
+    font-size: 11px;
+    padding: 11px 13px;
+    min-width: 0;
+  }
+  .cne-dot {
+    width: 9px;
+    height: 9px;
+  }
 
   /* The header's tag runs one step up from the ones on the cards: 3px rule and
      3px shadow against the order button's 3px and 5px, so it reads as the same
      kind of object one rank down, rather than as a badge floated on the bar. */
-  .cne-stat.is-head { border-width: 3px; box-shadow: 3px 3px 0 var(--a-ink); }
+  .cne-stat.is-head {
+    border-width: 3px;
+    box-shadow: 3px 3px 0 var(--a-ink);
+  }
   .cne-stat.is-head .cne-stat-a {
     font-size: 14px;
     padding: 15px 14px;
@@ -1364,15 +1783,22 @@ body {
     letter-spacing: 0.08em;
     min-width: 96px;
   }
-  .cne-stat.is-head .cne-stat-lead { display: inline; }
+  .cne-stat.is-head .cne-stat-lead {
+    display: inline;
+  }
   .cne-orderbtn {
     font-size: 15px;
     padding: 14px 22px;
     border-width: 3px;
     box-shadow: 5px 5px 0 var(--a-ink);
-    transition: transform 0.13s, box-shadow 0.13s;
+    transition:
+      transform 0.13s,
+      box-shadow 0.13s;
   }
-  .cne-orderbtn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--a-ink); }
+  .cne-orderbtn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--a-ink);
+  }
 
   /* The tab bar becomes inline nav links inside the header. */
   .cne-tabs {
@@ -1382,7 +1808,9 @@ body {
     flex: none;
     gap: 3px;
   }
-  .cne-tabind { display: none; }
+  .cne-tabind {
+    display: none;
+  }
   .cne-tab {
     flex: none;
     font-size: 13px;
@@ -1396,9 +1824,14 @@ body {
     padding: 10px 7px;
     opacity: 1;
     border: 3px solid transparent;
-    transition: background 0.2s, color 0.2s, transform 0.14s;
+    transition:
+      background 0.2s,
+      color 0.2s,
+      transform 0.14s;
   }
-  .cne-tab:hover { transform: translateY(-2px); }
+  .cne-tab:hover {
+    transform: translateY(-2px);
+  }
   .cne-tab[aria-current="page"] {
     background: #fff2c9;
     color: var(--a-red-cta);
@@ -1464,26 +1897,41 @@ body {
     animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
   }
   /* There's room for one row here, so the placed break is undone. */
-  .cne-hero-meta .cne-hero-addr { flex-basis: auto; }
-  .cne-hero-meta .cne-hero-dot.is-addr { display: inline; }
+  .cne-hero-meta .cne-hero-addr {
+    flex-basis: auto;
+  }
+  .cne-hero-meta .cne-hero-dot.is-addr {
+    display: inline;
+  }
   .cne-cta {
     gap: 16px;
     margin-top: 34px;
     animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.22s both;
   }
   @keyframes cne-heroin {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: none; }
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
   .cne-big {
     font-size: 19px;
     padding: 22px 34px;
     border-width: 4px;
     box-shadow: 7px 7px 0 #1a1612;
-    transition: transform 0.14s, box-shadow 0.14s;
+    transition:
+      transform 0.14s,
+      box-shadow 0.14s;
     flex: none;
   }
-  .cne-big:hover { transform: translate(-2px, -2px); box-shadow: 10px 10px 0 #1a1612; }
+  .cne-big:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0 #1a1612;
+  }
 
   .cne-heromedia {
     margin-top: 0;
@@ -1496,28 +1944,60 @@ body {
     animation: cne-mediain 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) 0.1s both;
   }
   @keyframes cne-mediain {
-    from { opacity: 0; transform: rotate(-7deg) scale(0.9); }
-    to { opacity: 1; transform: rotate(-1.4deg) scale(1); }
+    from {
+      opacity: 0;
+      transform: rotate(-7deg) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: rotate(-1.4deg) scale(1);
+    }
   }
-  .cne-mq { padding: 13px 0; border-top: none; border-bottom-width: 4px; }
-  .cne-mq-track { font-size: 24px; }
+  .cne-mq {
+    padding: 13px 0;
+    border-top: none;
+    border-bottom-width: 4px;
+  }
+  .cne-mq-track {
+    font-size: 24px;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    .cne-mq-track { animation-duration: 30s; }
+    .cne-mq-track {
+      animation-duration: 30s;
+    }
   }
-  .cne-mq-track span { padding: 0 26px; }
+  .cne-mq-track span {
+    padding: 0 26px;
+  }
 
-  .cne-sec { padding: 56px 44px; }
+  .cne-sec {
+    padding: 56px 44px;
+  }
   .cne-sec.is-band {
     background: var(--a-cream);
     border-bottom: 4px solid var(--a-ink);
   }
-  .cne-eyebrow { font-size: 13px; letter-spacing: 0.24em; }
+  .cne-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.24em;
+  }
   .cne-sec h1,
-  .cne-sec h2 { font-size: 52px; margin: 8px 0 0; line-height: 0.95; padding-bottom: 14px; }
+  .cne-sec h2 {
+    font-size: 52px;
+    margin: 8px 0 0;
+    line-height: 0.95;
+    padding-bottom: 14px;
+  }
   .cne-sec h1::after,
-  .cne-sec h2::after { height: 6px; transition-duration: 0.75s; transition-delay: 0.18s; }
+  .cne-sec h2::after {
+    height: 6px;
+    transition-duration: 0.75s;
+    transition-delay: 0.18s;
+  }
   .cne-sec.is-in h1::after,
-  .cne-sec.is-in h2::after { width: 78px; }
+  .cne-sec.is-in h2::after {
+    width: 78px;
+  }
   .cne-sec-hd {
     display: flex;
     align-items: flex-end;
@@ -1526,44 +2006,152 @@ body {
     margin-bottom: 30px;
   }
 
-  .cne-row { gap: 16px; padding: 15px 0; border-bottom-width: 2px; }
-  .cne-row.is-star { padding: 15px 0; margin-bottom: 0; border: none; border-bottom: 2px solid var(--a-line); background: none; box-shadow: none; }
-  .cne-row-thumb { width: 76px; height: 76px; border-width: 3px; font-size: 11px; padding: 4px; }
-  .cne-row:hover .cne-row-thumb { transform: scale(1.06) rotate(-1.5deg); }
-  .cne-row-name .n { font-size: 17px; line-height: 1.2; }
-  .cne-row-name .d { font-size: 13px; margin-top: 4px; line-height: 1.4; }
-  .cne-row-price { font-size: 19px; }
+  .cne-row {
+    gap: 16px;
+    padding: 15px 0;
+    border-bottom-width: 2px;
+  }
+  .cne-row.is-star {
+    padding: 15px 0;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: 2px solid var(--a-line);
+    background: none;
+    box-shadow: none;
+  }
+  .cne-row-thumb {
+    width: 76px;
+    height: 76px;
+    border-width: 3px;
+    font-size: 11px;
+    padding: 4px;
+  }
+  .cne-row:hover .cne-row-thumb {
+    transform: scale(1.06) rotate(-1.5deg);
+  }
+  .cne-row-name .n {
+    font-size: 17px;
+    line-height: 1.2;
+  }
+  .cne-row-name .d {
+    font-size: 13px;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .cne-row-price {
+    font-size: 19px;
+  }
 
-  .cne-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; }
+  .cne-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 34px;
+  }
 
-  .cne-ways { flex-direction: column; gap: 10px; margin-bottom: 22px; }
-  .cne-way { padding: 14px 16px; text-align: left; border-width: 3px; transition: background 0.2s, color 0.2s, transform 0.14s; }
-  .cne-way:hover { transform: translateX(3px); }
-  .cne-way .t { font-size: 16px; }
-  .cne-way .s { font-size: 13px; margin-top: 4px; }
+  .cne-ways {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .cne-way {
+    padding: 14px 16px;
+    text-align: left;
+    border-width: 3px;
+    transition:
+      background 0.2s,
+      color 0.2s,
+      transform 0.14s;
+  }
+  .cne-way:hover {
+    transform: translateX(3px);
+  }
+  .cne-way .t {
+    font-size: 16px;
+  }
+  .cne-way .s {
+    font-size: 13px;
+    margin-top: 4px;
+  }
 
-  .cne-loc { border-width: 4px; box-shadow: 6px 6px 0 var(--a-ink); padding: 22px; margin-top: 20px; margin-bottom: 0; }
-  .cne-loc.is-selected { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--a-red); }
+  .cne-loc {
+    border-width: 4px;
+    box-shadow: 6px 6px 0 var(--a-ink);
+    padding: 22px;
+    margin-top: 20px;
+    margin-bottom: 0;
+  }
+  .cne-loc.is-selected {
+    transform: translate(-3px, -3px);
+    box-shadow: 11px 11px 0 var(--a-red);
+  }
   .cne-loc h3,
-  .cne-loc h2.cne-loc-name { font-size: 26px; }
-  .cne-loc-addr { font-size: 15px; margin-top: 10px; line-height: 1.5; }
-  .cne-loc-hrs { font-size: 12.5px; line-height: 2; margin-top: 12px; }
-  .cne-loc-note { font-size: 11px; margin-top: 9px; }
-  .cne-loc-btns { gap: 10px; margin-top: 16px; }
-  .cne-mini { font-size: 13px; border-width: 3px; padding: 13px 8px; }
+  .cne-loc h2.cne-loc-name {
+    font-size: 26px;
+  }
+  .cne-loc-addr {
+    font-size: 15px;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .cne-loc-hrs {
+    font-size: 12.5px;
+    line-height: 2;
+    margin-top: 12px;
+  }
+  .cne-loc-note {
+    font-size: 11px;
+    margin-top: 9px;
+  }
+  .cne-loc-btns {
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .cne-mini {
+    font-size: 13px;
+    border-width: 3px;
+    padding: 13px 8px;
+  }
 
-  .cne-quote { border-left-width: 6px; padding: 4px 0 4px 20px; margin-bottom: 0; }
-  .cne-quote p { font-size: 21px; line-height: 1.3; }
-  .cne-quote cite { font-size: 12px; letter-spacing: 0.16em; margin-top: 12px; }
-  .cne-pressrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .cne-quote {
+    border-left-width: 6px;
+    padding: 4px 0 4px 20px;
+    margin-bottom: 0;
+  }
+  .cne-quote p {
+    font-size: 21px;
+    line-height: 1.3;
+  }
+  .cne-quote cite {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    margin-top: 12px;
+  }
+  .cne-pressrow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+  }
 
-  .cne-ig { grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 0 44px 56px; }
-  .cne-ig > * { border-width: 3px; }
-  .cne-ig > *:hover { transform: scale(1.07); }
+  .cne-ig {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    padding: 0 44px 56px;
+  }
+  .cne-ig > * {
+    border-width: 3px;
+  }
+  .cne-ig > *:hover {
+    transform: scale(1.07);
+  }
 
   /* The dock is a phone pattern; desktop keeps ORDER in the header. */
-  .cne-dock { display: none; }
-  .cne-lastcall { font-size: 13px; padding: 12px 44px; }
+  .cne-dock {
+    display: none;
+  }
+  .cne-lastcall {
+    font-size: 13px;
+    padding: 12px 44px;
+  }
 
   /* The sheet becomes a right-hand drawer. */
   .cne-sheet {
@@ -1580,14 +2168,29 @@ body {
     transition: transform 0.44s cubic-bezier(0.2, 0.85, 0.25, 1);
     box-shadow: -16px 0 44px rgba(0, 0, 0, 0.22);
   }
-  .cne-sheet.is-open { transform: none; }
-  .cne-sheet-grab { display: none; }
-  .cne-sheet-body { flex: 1 0 auto; }
-  .cne-sheet-foot { padding: 20px 26px; border-top-width: 4px; border-top-color: var(--a-ink); }
-  .cne-sheet:not(:has(.cne-ticket)) .cne-sheet-foot { padding-bottom: 26px; }
+  .cne-sheet.is-open {
+    transform: none;
+  }
+  .cne-sheet-grab {
+    display: none;
+  }
+  .cne-sheet-body {
+    flex: 1 0 auto;
+  }
+  .cne-sheet-foot {
+    padding: 20px 26px;
+    border-top-width: 4px;
+    border-top-color: var(--a-ink);
+  }
+  .cne-sheet:not(:has(.cne-ticket)) .cne-sheet-foot {
+    padding-bottom: 26px;
+  }
   /* The drawer is full height, so the hero is not competing with anything for
      it and the clamp's viewport term stops being the right measure. */
-  .cne-sheet-shot { max-height: 46vh; border-bottom-width: 4px; }
+  .cne-sheet-shot {
+    max-height: 46vh;
+    border-bottom-width: 4px;
+  }
   .cne-sheet-name {
     left: 18px;
     bottom: -24px;
@@ -1596,23 +2199,53 @@ body {
     padding: 11px 15px 12px;
     box-shadow: 6px 6px 0 var(--a-yel);
   }
-  .cne-sheet-hd { padding: 46px 26px 0; gap: 16px; }
-  .cne-sheet-hd .w { font-size: 12px; }
-  .cne-sheet-hd .p { font-size: 36px; }
-  .cne-sheet-desc { padding: 13px 26px 0; font-size: 15px; line-height: 1.55; }
-  .cne-ways.cne-ways-sheet { padding: 20px 26px 22px; }
+  .cne-sheet-hd {
+    padding: 46px 26px 0;
+    gap: 16px;
+  }
+  .cne-sheet-hd .w {
+    font-size: 12px;
+  }
+  .cne-sheet-hd .p {
+    font-size: 36px;
+  }
+  .cne-sheet-desc {
+    padding: 13px 26px 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .cne-ways.cne-ways-sheet {
+    padding: 20px 26px 22px;
+  }
 
-  .cne-ticket-btn { padding: 16px 26px; }
+  .cne-ticket-btn {
+    padding: 16px 26px;
+  }
   .cne-ticket-btn .t,
-  .cne-ticket-btn .c { font-size: 12px; }
+  .cne-ticket-btn .c {
+    font-size: 12px;
+  }
   /* Open from the start up here, and there is height for all of it, so the
      phone's scroll cap comes off. */
-  .cne-ticket-pad { padding: 0 26px 22px; }
-  .cne-tl { font-size: 13px; padding: 7px 0; }
-  .cne-tl .q { min-width: 30px; }
-  .cne-tl.is-total { font-size: 15px; }
-  .cne-ticket-note { font-size: 13px; }
-  .cne-ticket-extra .x { font-size: 12px; }
+  .cne-ticket-pad {
+    padding: 0 26px 22px;
+  }
+  .cne-tl {
+    font-size: 13px;
+    padding: 7px 0;
+  }
+  .cne-tl .q {
+    min-width: 30px;
+  }
+  .cne-tl.is-total {
+    font-size: 15px;
+  }
+  .cne-ticket-note {
+    font-size: 13px;
+  }
+  .cne-ticket-extra .x {
+    font-size: 12px;
+  }
 
   .cne-otter {
     font-size: 17px;
@@ -1620,21 +2253,37 @@ body {
     box-shadow: 6px 6px 0 var(--a-ink);
     padding: 19px;
   }
-  .cne-otter:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--a-ink); }
-  .cne-fine { font-size: 12px; }
+  .cne-otter:active {
+    transform: translate(6px, 6px);
+    box-shadow: 0 0 0 var(--a-ink);
+  }
+  .cne-fine {
+    font-size: 12px;
+  }
 
   .cne-foot {
     padding: 36px 44px;
     gap: 26px;
     font-size: 13px;
   }
-  .cne-foot-top { grid-template-columns: 1.3fr 0.8fr 0.8fr; gap: 40px; align-items: start; }
-  .cne-foot-mark img { height: 38px; }
+  .cne-foot-top {
+    grid-template-columns: 1.3fr 0.8fr 0.8fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .cne-foot-mark img {
+    height: 38px;
+  }
   /* Same tracks as the row above, so each location sits under a column rather
      than floating in a third of the page. A fourth store wraps to a second
      row here; the phone rule above stays auto-fit for any count. */
-  .cne-foot-counters { grid-template-columns: 1.3fr 0.8fr 0.8fr; gap: 40px; }
-  .cne-foot-legal { font-size: 11px; }
+  .cne-foot-counters {
+    grid-template-columns: 1.3fr 0.8fr 0.8fr;
+    gap: 40px;
+  }
+  .cne-foot-legal {
+    font-size: 11px;
+  }
 }
 
 /* ---- featured cards ------------------------------------------------------
@@ -1667,7 +2316,9 @@ body {
   padding: 9px;
   margin-bottom: 8px;
 }
-.cne-card-body { display: contents; }
+.cne-card-body {
+  display: contents;
+}
 .cne-card-img {
   grid-column: 1;
   grid-row: 1 / 3;
@@ -1679,10 +2330,20 @@ body {
   position: relative;
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
-.cne-card:hover .cne-card-img { transform: scale(1.05); }
-.cne-card-img:has(img) { background-color: var(--a-bg); }
+.cne-card:hover .cne-card-img {
+  transform: scale(1.05);
+}
+.cne-card-img:has(img) {
+  background-color: var(--a-bg);
+}
 /* The white sweep becomes paper. See `.cne-row-thumb img`. */
-.cne-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; mix-blend-mode: multiply; }
+.cne-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  mix-blend-mode: multiply;
+}
 .cne-card h3 {
   grid-column: 2;
   grid-row: 1;
@@ -1724,7 +2385,7 @@ body {
   height: 26px;
   flex: none;
   border-radius: 50%;
-  background: var(--a-red);
+  background: var(--a-red-cta);
   color: #fff2c9;
   border: 2px solid var(--a-ink);
   font-size: 13px;
@@ -1735,13 +2396,22 @@ body {
   transition: transform 0.16s;
   overflow: hidden;
 }
-  .cne-card-cta { background: var(--a-red-cta); }
-.cne-card:hover .cne-card-cta { transform: translateX(3px); }
-.cne-card-rib { display: none; }
-.cne-cardgrid { display: block; }
+.cne-card:hover .cne-card-cta {
+  transform: translateX(3px);
+}
+.cne-card-rib {
+  display: none;
+}
+.cne-cardgrid {
+  display: block;
+}
 
 @media (min-width: 901px) {
-  .cne-cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .cne-cardgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
   .cne-card {
     display: flex;
     flex-direction: column;
@@ -1751,11 +2421,28 @@ body {
     overflow: hidden;
     padding: 0;
     margin: 0;
-    transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s;
+    transition:
+      transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1),
+      box-shadow 0.2s;
   }
-  .cne-card.is-star { background: var(--a-card); box-shadow: 7px 7px 0 var(--a-ink); padding: 0; margin: 0; border: 4px solid var(--a-ink); }
-  .cne-card:hover { transform: translate(-3px, -3px); box-shadow: 12px 12px 0 var(--a-ink); }
-  .cne-card-body { display: flex; flex-direction: column; gap: 6px; flex: 1; padding: 18px; }
+  .cne-card.is-star {
+    background: var(--a-card);
+    box-shadow: 7px 7px 0 var(--a-ink);
+    padding: 0;
+    margin: 0;
+    border: 4px solid var(--a-ink);
+  }
+  .cne-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 12px 12px 0 var(--a-ink);
+  }
+  .cne-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    padding: 18px;
+  }
   .cne-card-img {
     width: 100%;
     height: auto;
@@ -1763,13 +2450,37 @@ body {
     border: none;
     border-bottom: 4px solid var(--a-ink);
   }
-  .cne-card:hover .cne-card-img { transform: none; }
-  .cne-card:hover .cne-card-img img { transform: scale(1.08); }
-  .cne-card-img img { transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1); }
-  .cne-card h3 { font-family: var(--font-display); font-size: 20px; line-height: 1.08; font-weight: 700; }
-  .cne-card p { font-size: 14px; line-height: 1.45; flex: 1; -webkit-line-clamp: 4; line-clamp: 4; margin: 0; }
-  .cne-card-ft { justify-content: space-between; margin-top: 8px; gap: 12px; }
-  .cne-card-pr { font-size: 24px; }
+  .cne-card:hover .cne-card-img {
+    transform: none;
+  }
+  .cne-card:hover .cne-card-img img {
+    transform: scale(1.08);
+  }
+  .cne-card-img img {
+    transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .cne-card h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 1.08;
+    font-weight: 700;
+  }
+  .cne-card p {
+    font-size: 14px;
+    line-height: 1.45;
+    flex: 1;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    margin: 0;
+  }
+  .cne-card-ft {
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 12px;
+  }
+  .cne-card-pr {
+    font-size: 24px;
+  }
   .cne-card-cta {
     width: auto;
     height: auto;
@@ -1782,7 +2493,9 @@ body {
     box-shadow: 4px 4px 0 var(--a-ink);
     overflow: visible;
   }
-  .cne-card:hover .cne-card-cta { transform: none; }
+  .cne-card:hover .cne-card-cta {
+    transform: none;
+  }
   .cne-card-rib {
     display: block;
     position: absolute;
@@ -1797,20 +2510,30 @@ body {
     padding: 6px 12px;
     transition: transform 0.28s cubic-bezier(0.2, 1.3, 0.4, 1);
   }
-  .cne-card:hover .cne-card-rib { transform: translateX(5px); }
+  .cne-card:hover .cne-card-rib {
+    transform: translateX(5px);
+  }
   .cne-split {
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-top: 4px solid var(--a-ink);
     border-bottom: 4px solid var(--a-ink);
   }
-  .cne-split-l { padding: 52px 44px; background: var(--a-cream); }
-  .cne-split-r { position: relative; background: var(--a-bg); }
+  .cne-split-l {
+    padding: 52px 44px;
+    background: var(--a-cream);
+  }
+  .cne-split-r {
+    position: relative;
+    background: var(--a-bg);
+  }
 }
 
 /* The right-hand note beside a section heading — desktop only, as in the
    prototype, where it explains the pricing under "Start here." */
-.cne-sec-note { display: none; }
+.cne-sec-note {
+  display: none;
+}
 @media (min-width: 901px) {
   .cne-sec-note {
     display: block;
@@ -1822,12 +2545,21 @@ body {
     line-height: 1.5;
   }
   /* The map fills its half of the split and crops rather than letterboxes. */
-  .cne-split-r svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cne-split-r svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 /* On a phone the split is one column and the map is decoration we can drop. */
 @media (max-width: 900px) {
-  .cne-split-r { display: none; }
-  .cne-split-l { padding: 16px 15px 4px; }
+  .cne-split-r {
+    display: none;
+  }
+  .cne-split-l {
+    padding: 16px 15px 4px;
+  }
 }
 
 /* ---- locations ---------------------------------------------------------- */
@@ -1837,7 +2569,11 @@ body {
   border-bottom: 3px solid var(--a-ink);
   overflow: hidden;
 }
-.cne-mapwrap svg { display: block; width: 100%; height: auto; }
+.cne-mapwrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 .cne-callout {
   position: absolute;
   background: var(--a-ink);
@@ -1852,8 +2588,18 @@ body {
   white-space: nowrap;
   z-index: 2;
 }
-.cne-callout small { display: block; font-weight: 400; opacity: 0.7; font-size: 8.5px; margin-top: 2px; }
-.cne-notify { display: flex; gap: 7px; margin-top: 11px; }
+.cne-callout small {
+  display: block;
+  font-weight: 400;
+  opacity: 0.7;
+  font-size: 8.5px;
+  margin-top: 2px;
+}
+.cne-notify {
+  display: flex;
+  gap: 7px;
+  margin-top: 11px;
+}
 .cne-notify input {
   flex: 1;
   border: 2px solid var(--a-ink);
@@ -1866,7 +2612,11 @@ body {
 }
 
 @media (min-width: 901px) {
-  .cne-locs { display: grid; grid-template-columns: 1.25fr 0.75fr; align-items: stretch; }
+  .cne-locs {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: stretch;
+  }
   .cne-mapwrap {
     border-bottom: none;
     border-right: 4px solid var(--a-ink);
@@ -1875,12 +2625,27 @@ body {
     justify-content: center;
     padding: 26px;
   }
-  .cne-locs-list { padding: 38px 34px; }
+  .cne-locs-list {
+    padding: 38px 34px;
+  }
   .cne-locs-list h1,
-  .cne-locs-list h2 { font-family: var(--font-display); font-size: 38px; margin: 0 0 6px; line-height: 0.95; padding-bottom: 0; }
-  .cne-locs-list h1::after { content: none; }
-  .cne-callout { font-size: 12px; padding: 9px 13px; }
-  .cne-callout small { font-size: 11px; }
+  .cne-locs-list h2 {
+    font-family: var(--font-display);
+    font-size: 38px;
+    margin: 0 0 6px;
+    line-height: 0.95;
+    padding-bottom: 0;
+  }
+  .cne-locs-list h1::after {
+    content: none;
+  }
+  .cne-callout {
+    font-size: 12px;
+    padding: 9px 13px;
+  }
+  .cne-callout small {
+    font-size: 11px;
+  }
 }
 
 /* ---- /about ------------------------------------------------------------- */
@@ -1897,20 +2662,40 @@ body {
 }
 
 /* ---- menu page ---------------------------------------------------------- */
+/* The lede paragraph under a section heading — item pages, mostly. Named for
+   what it is rather than which page it is on, since nothing else about it is
+   page-specific. */
+.cne-lede {
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
 /* A phone reads the menu as one column, so the wrapper is inert here and the
    sections keep the `.cne-sec` rhythm they had. The desktop grid is below. */
-.cne-menu { display: block; }
-.cne-menu-jump { display: none; }
+.cne-menu {
+  display: block;
+}
+.cne-menu-jump {
+  display: none;
+}
 /* The phone gets the rule too, at the phone's border weight. Five screens of
    menu with the section names set smaller than the item names left the
    boundaries as the faintest thing on a page built for scanning. */
-.cne-cat-rule { display: block; height: 2.5px; background: var(--a-ink); margin-bottom: 9px; }
+.cne-cat-rule {
+  display: block;
+  height: 2.5px;
+  background: var(--a-ink);
+  margin-bottom: 9px;
+}
 /* The category sections are the page's anchor targets. `.cne-rv` reveals by
    lifting 14px, and the browser measures the *transformed* box when it scrolls
    to a hash — so a section caught mid-reveal lands 14px high and then settles
    there, eating the clearance --cne-stuck just bought. These fade without
    travelling. Every other revealed section on the site keeps its lift. */
-.js .cne-cat.cne-rv { transform: none; }
+.js .cne-cat.cne-rv {
+  transform: none;
+}
 /* The category label: a mono eyebrow on the phone, a display heading on desktop. */
 .cne-cat-h {
   font-family: var(--font-mono);
@@ -1922,7 +2707,9 @@ body {
   margin: 0 0 5px;
   line-height: 1.6;
 }
-.cne-cat-h::after { content: none; }
+.cne-cat-h::after {
+  content: none;
+}
 .cne-menu-fine {
   font-family: var(--font-mono);
   /* 12px is the floor for anything that is a sentence rather than a label. */
@@ -1950,7 +2737,9 @@ body {
   margin: 12px 0 0;
   max-width: 48ch;
 }
-.cne-menu-named li { border-top: 1px solid var(--a-line); }
+.cne-menu-named li {
+  border-top: 1px solid var(--a-line);
+}
 .cne-menu-named a {
   display: flex;
   justify-content: space-between;
@@ -1960,13 +2749,17 @@ body {
   text-decoration: none;
   font-size: 14px;
 }
-.cne-menu-named .n { font-weight: 700; }
+.cne-menu-named .n {
+  font-weight: 700;
+}
 .cne-menu-named .p {
   white-space: nowrap;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
-.cne-menu-named a:hover .n { color: var(--a-red-cta); }
+.cne-menu-named a:hover .n {
+  color: var(--a-red-cta);
+}
 
 @media (min-width: 901px) {
   .cne-menu {
@@ -1980,10 +2773,23 @@ body {
   /* The site header is sticky at 76px. A rail sticking at 0 parks its own
      eyebrow and headline underneath it; --cne-stuck is the one number both
      this and the anchor targets read, so they cannot drift apart. */
-  .cne-menu-side { position: sticky; top: var(--cne-stuck); padding: 0; }
-  .cne-menu-side h1 { font-size: 38px; margin: 0 0 18px; line-height: 0.95; padding-bottom: 0; }
-  .cne-menu-side h1::after { content: none; }
-  .cne-menu-side .cne-eyebrow { margin-bottom: 6px; }
+  .cne-menu-side {
+    position: sticky;
+    top: var(--cne-stuck);
+    padding: 0;
+  }
+  .cne-menu-side h1 {
+    font-size: 38px;
+    margin: 0 0 18px;
+    line-height: 0.95;
+    padding-bottom: 0;
+  }
+  .cne-menu-side h1::after {
+    content: none;
+  }
+  .cne-menu-side .cne-eyebrow {
+    margin-bottom: 6px;
+  }
 
   .cne-menu-jump {
     display: flex;
@@ -2000,14 +2806,27 @@ body {
     color: var(--a-sub);
     text-decoration: none;
     padding: 7px 0;
-    transition: color 0.2s, transform 0.2s;
+    transition:
+      color 0.2s,
+      transform 0.2s;
   }
-  .cne-menu-jump a:hover { color: var(--a-red); transform: translateX(4px); }
+  .cne-menu-jump a:hover {
+    color: var(--a-red);
+    transform: translateX(4px);
+  }
 
-  .cne-menu-fine { font-size: 12px; margin: 18px 0 13px; }
+  .cne-menu-fine {
+    font-size: 12px;
+    margin: 18px 0 13px;
+  }
 
-  .cne-menu-main { min-width: 0; }
-  .cne-cat { padding: 0; margin-bottom: 38px; }
+  .cne-menu-main {
+    min-width: 0;
+  }
+  .cne-cat {
+    padding: 0;
+    margin-bottom: 38px;
+  }
   .cne-cat-h {
     font-family: var(--font-display);
     font-size: 28px;
@@ -2019,8 +2838,16 @@ body {
     line-height: 1;
   }
 
-  .cne-cat-rule { display: block; height: 4px; background: var(--a-ink); margin-bottom: 12px; }
-  .cne-menu-foot { padding: 0; font-size: 12px; }
+  .cne-cat-rule {
+    display: block;
+    height: 4px;
+    background: var(--a-ink);
+    margin-bottom: 12px;
+  }
+  .cne-menu-foot {
+    padding: 0;
+    font-size: 12px;
+  }
 }
 
 /* ---- display headings --------------------------------------------------- */
@@ -2029,7 +2856,9 @@ body {
    slightly heavier stroke than 400, and visible at hero sizes. Matching it. */
 h1,
 h2,
-h3 { font-weight: 700; }
+h3 {
+  font-weight: 700;
+}
 
 /* Beats `.cne-sec h2`, which the category sections also match. */
 .cne-cat h2.cne-cat-h {
@@ -2055,12 +2884,18 @@ h3 { font-weight: 700; }
     line-height: 1;
     padding-bottom: 0;
   }
-  .cne-menu-side .cne-eyebrow { margin-bottom: 0; }
+  .cne-menu-side .cne-eyebrow {
+    margin-bottom: 0;
+  }
 }
 /* The prototype's Way buttons never inherit the page leading. */
-.cne-way { line-height: 1.3; }
+.cne-way {
+  line-height: 1.3;
+}
 @media (min-width: 901px) {
-  .cne-way { line-height: normal; }
+  .cne-way {
+    line-height: normal;
+  }
 }
 
 /* ---- copy that changes at the breakpoint -------------------------------- */
@@ -2069,13 +2904,25 @@ h3 { font-weight: 700; }
    in the HTML and the breakpoint picks one. */
 .cne-only-desk,
 .cne-only-desk-i,
-.cne-mq-desk { display: none; }
+.cne-mq-desk {
+  display: none;
+}
 @media (min-width: 901px) {
-  .cne-only-phone { display: none; }
-  .cne-only-desk { display: block; }
-  .cne-only-desk-i { display: inline; }
-  .cne-mq-phone { display: none; }
-  .cne-mq-desk { display: flex; }
+  .cne-only-phone {
+    display: none;
+  }
+  .cne-only-desk {
+    display: block;
+  }
+  .cne-only-desk-i {
+    display: inline;
+  }
+  .cne-mq-phone {
+    display: none;
+  }
+  .cne-mq-desk {
+    display: flex;
+  }
 }
 
 /* ---- desktop chrome: values the port had rounded off -------------------- */
@@ -2083,10 +2930,17 @@ h3 { font-weight: 700; }
   /* The prototype's desktop pill and buttons take the page's 1.6 leading.
      Only the phone versions set line-height 1, which is what the base carries. */
   .cne-stat-a,
-  .cne-stat-b { line-height: 1.6; }
-  .cne-orderbtn { line-height: 1.6; letter-spacing: 0.06em; }
+  .cne-stat-b {
+    line-height: 1.6;
+  }
+  .cne-orderbtn {
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+  }
   .cne-big,
-  .cne-mini { letter-spacing: 0.06em; }
+  .cne-mini {
+    letter-spacing: 0.06em;
+  }
 }
 
 /* ---- more desktop values the port had rounded off ----------------------- */
@@ -2094,38 +2948,67 @@ h3 { font-weight: 700; }
   /* `.cne-big.is-primary` carries the phone's 1.7 flex ratio, which out-weighs
      the `.cne-big { flex: none }` beside it. Desktop sizes both to their label. */
   .cne-big.is-primary,
-  .cne-big.is-secondary { flex: none; }
+  .cne-big.is-secondary {
+    flex: none;
+  }
 
   /* The prototype tightens prices only on the phone. */
   .cne-card-pr,
-  .cne-row-price { letter-spacing: normal; }
+  .cne-row-price {
+    letter-spacing: normal;
+  }
 
-  .cne-card-cta { font-weight: 400; line-height: 1; }
+  .cne-card-cta {
+    font-weight: 400;
+    line-height: 1;
+  }
 
-  .cne-br-desk { display: inline; }
+  .cne-br-desk {
+    display: inline;
+  }
 }
-.cne-br-desk { display: none; }
+.cne-br-desk {
+  display: none;
+}
 
 /* /about predates the design system and sizes its body copy by inheritance,
    so it keeps the 16px base the rest of the site no longer uses. */
-.cne-legacy-theme { font-size: 16px; }
+.cne-legacy-theme {
+  font-size: 16px;
+}
 
 /* The prototype's item name is a block, so the description wraps to the name
    column rather than running under the price. */
-.cne-row-name .n { display: block; }
+.cne-row-name .n {
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.22;
+  display: block;
+}
 
 /* `.dway` is a bare <button>: it never inherits the page size, it takes the
    UA's 13.333px. Its labels are sized explicitly, so this only sets the box. */
-.cne-way { font-size: 13.3333px; }
+.cne-way {
+  font-size: 13.3333px;
+}
 
-.cne-menu-side { padding-top: 14px; }
+.cne-menu-side {
+  padding-top: 14px;
+}
 @media (min-width: 901px) {
-  .cne-menu-side { padding-top: 0; }
+  .cne-menu-side {
+    padding-top: 0;
+  }
 }
 
 @media (min-width: 901px) {
   /* Only the phone clamps the description; desktop has the column for it. */
-  .cne-row-name .d { display: block; -webkit-line-clamp: none; line-clamp: none; overflow: visible; }
+  .cne-row-name .d {
+    display: block;
+    -webkit-line-clamp: none;
+    line-clamp: none;
+    overflow: visible;
+  }
 }
 
 /* The prototype only ever rendered at 1440, where the item grid has ~480px a
@@ -2133,7 +3016,9 @@ h3 { font-weight: 700; }
    padding are out, so between the desktop breakpoint and 1280 the grid runs as
    one column rather than pushing the page sideways. */
 @media (min-width: 901px) and (max-width: 1279px) {
-  .cne-menu-grid { grid-template-columns: 1fr; }
+  .cne-menu-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---- desktop header, 901–1339 ------------------------------------------- */
@@ -2143,20 +3028,46 @@ h3 { font-weight: 700; }
    from 1340px up. The ceiling moved with /contact, and again with /shop: each
    tab added is ~40px the run has to find before it reaches the wordmark. */
 @media (min-width: 901px) and (max-width: 1339px) {
-  .cne-header { gap: 12px; padding: 0 18px; }
-  .cne-nav img { height: 34px; }
-  .cne-tabs { gap: 1px; }
-  .cne-tab { font-size: 9.5px; letter-spacing: 0.01em; padding: 8px 3px; }
+  .cne-header {
+    gap: 12px;
+    padding: 0 18px;
+  }
+  .cne-nav img {
+    height: 34px;
+  }
+  .cne-tabs {
+    gap: 1px;
+  }
+  .cne-tab {
+    font-size: 9.5px;
+    letter-spacing: 0.01em;
+    padding: 8px 3px;
+  }
   /* 12.2px, not 12: the order button in this band is 48.8px tall (13px on 1.6
      leading, 11px padding, 3px rule) and the tag sits level with it or it is
      back to being a badge floated on the bar. */
-  .cne-stat.is-head .cne-stat-a { font-size: 11.5px; padding: 12.2px 11px; min-width: 66px; }
-  .cne-stat.is-head .cne-stat-b { font-size: 10.5px; padding: 12.2px 11px; min-width: 78px; }
+  .cne-stat.is-head .cne-stat-a {
+    font-size: 11.5px;
+    padding: 12.2px 11px;
+    min-width: 66px;
+  }
+  .cne-stat.is-head .cne-stat-b {
+    font-size: 10.5px;
+    padding: 12.2px 11px;
+    min-width: 78px;
+  }
   /* Below 1340 the tabs are already down to 9.5px. "TILL" is what the tag can
      spare before the run reaches the wordmark. */
-  .cne-stat.is-head .cne-stat-lead { display: none; }
-  .cne-orderbtn { font-size: 13px; padding: 11px 14px; }
-  .cne-orderbtn .cne-only-desk-i { display: none; }
+  .cne-stat.is-head .cne-stat-lead {
+    display: none;
+  }
+  .cne-orderbtn {
+    font-size: 13px;
+    padding: 11px 14px;
+  }
+  .cne-orderbtn .cne-only-desk-i {
+    display: none;
+  }
 }
 
 /* =========================================================================
@@ -2167,7 +3078,9 @@ h3 { font-weight: 700; }
    class not in this block is the system's own; this is the only CSS the story
    page adds, and it reuses the hero's halftone rather than inventing a texture.
    ========================================================================= */
-.cne-story .cne-sec p { margin: 0 0 13px; }
+.cne-story .cne-sec p {
+  margin: 0 0 13px;
+}
 
 /* ---- the split ---------------------------------------------------------- */
 .cne-split {
@@ -2191,13 +3104,26 @@ h3 { font-weight: 700; }
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  transition: filter 0.45s ease, opacity 0.45s ease;
+  transition:
+    filter 0.45s ease,
+    opacity 0.45s ease;
 }
-.cne-side + .cne-side { border-top: 3px solid var(--a-ink); }
-.cne-side.is-chris { background: var(--sp-a-bg); color: var(--sp-a-fg); }
-.cne-side.is-eddy { background: var(--sp-b-bg); color: var(--sp-b-fg); }
+.cne-side + .cne-side {
+  border-top: 3px solid var(--a-ink);
+}
+.cne-side.is-chris {
+  background: var(--sp-a-bg);
+  color: var(--sp-a-fg);
+}
+.cne-side.is-eddy {
+  background: var(--sp-b-bg);
+  color: var(--sp-b-fg);
+}
 /* The half you didn't pick steps back rather than leaving. */
-.cne-side.is-off { filter: saturate(0.5); opacity: 0.55; }
+.cne-side.is-off {
+  filter: saturate(0.5);
+  opacity: 0.55;
+}
 .cne-side.is-chris::before {
   content: "";
   position: absolute;
@@ -2207,7 +3133,10 @@ h3 { font-weight: 700; }
   background-size: 19px 19px;
   opacity: 0.1;
 }
-.cne-side > * { position: relative; z-index: 2; }
+.cne-side > * {
+  position: relative;
+  z-index: 2;
+}
 
 .cne-side-who {
   font-family: var(--font-mono);
@@ -2226,10 +3155,19 @@ h3 { font-weight: 700; }
   margin: 0 0 16px;
   text-shadow: 4px 4px 0 var(--a-ink);
 }
-.cne-side.is-chris .cne-side-h { color: var(--sp-a-accent); }
-.cne-side.is-eddy .cne-side-h { color: var(--sp-b-fg); }
+.cne-side.is-chris .cne-side-h {
+  color: var(--sp-a-accent);
+}
+.cne-side.is-eddy .cne-side-h {
+  color: var(--sp-b-fg);
+}
 
-.cne-taps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.cne-taps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
 .cne-taps span {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -2268,26 +3206,42 @@ h3 { font-weight: 700; }
   align-items: center;
   gap: 7px;
 }
-.cne-side[aria-pressed="true"] .cne-side-pick { opacity: 1; }
-.cne-side[aria-pressed="true"] .cne-side-pick::before { content: "\2713 "; }
+.cne-side[aria-pressed="true"] .cne-side-pick {
+  opacity: 1;
+}
+.cne-side[aria-pressed="true"] .cne-side-pick::before {
+  content: "\2713 ";
+}
 
 /* The halves arrive from opposite edges. `.cne-rv` is borrowed only to get
    `is-in` from RevealRoot — the container itself must not fade or the two
    animations fight over the same transform. */
 .js .cne-split.cne-rv,
-.js .cne-split.cne-rv.is-in { opacity: 1; transform: none; }
+.js .cne-split.cne-rv.is-in {
+  opacity: 1;
+  transform: none;
+}
 .js .cne-side.is-chris,
-.js .cne-side.is-eddy { transform: translateY(16px); opacity: 0; }
+.js .cne-side.is-eddy {
+  transform: translateY(16px);
+  opacity: 0;
+}
 .js .cne-split.is-in .cne-side {
   transform: none;
   opacity: 1;
-  transition: transform 0.75s cubic-bezier(0.2, 0.8, 0.25, 1), opacity 0.6s ease,
+  transition:
+    transform 0.75s cubic-bezier(0.2, 0.8, 0.25, 1),
+    opacity 0.6s ease,
     filter 0.45s ease;
 }
-.js .cne-split.is-in .cne-side.is-off { opacity: 0.55; }
+.js .cne-split.is-in .cne-side.is-off {
+  opacity: 0.55;
+}
 
 /* The seam is a desktop object: on a phone the halves stack, so there is none. */
-.cne-seam { display: none; }
+.cne-seam {
+  display: none;
+}
 
 .cne-evenbar {
   background: var(--a-ink);
@@ -2308,7 +3262,9 @@ h3 { font-weight: 700; }
   color: var(--a-yel);
   padding: 4px 6px;
 }
-.cne-evenbar button:hover { color: #fff; }
+.cne-evenbar button:hover {
+  color: #fff;
+}
 
 /* ---- the seam: the phone call ------------------------------------------- */
 .cne-band {
@@ -2320,8 +3276,13 @@ h3 { font-weight: 700; }
   position: relative;
   overflow: hidden;
 }
-.cne-band > * { position: relative; z-index: 2; }
-.cne-band .cne-eyebrow { color: var(--a-yel); }
+.cne-band > * {
+  position: relative;
+  z-index: 2;
+}
+.cne-band .cne-eyebrow {
+  color: var(--a-yel);
+}
 .cne-band-big {
   font-family: var(--font-display);
   font-weight: 400;
@@ -2331,7 +3292,10 @@ h3 { font-weight: 700; }
   margin: 8px auto 0;
   color: #fff2c9;
 }
-.cne-band-big em { font-style: normal; color: var(--a-yel); }
+.cne-band-big em {
+  font-style: normal;
+  color: var(--a-yel);
+}
 .cne-hair {
   height: 3px;
   background: var(--a-yel);
@@ -2340,7 +3304,9 @@ h3 { font-weight: 700; }
   transform: scaleX(0);
   transform-origin: center;
 }
-.js .cne-hair.cne-rv { opacity: 1; }
+.js .cne-hair.cne-rv {
+  opacity: 1;
+}
 .js .cne-hair.cne-rv.is-in {
   transform: scaleX(1);
   transition: transform 0.85s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -2354,9 +3320,18 @@ h3 { font-weight: 700; }
 }
 
 /* ---- what they agreed on, and what they didn't -------------------------- */
-.cne-twocol { display: grid; grid-template-columns: 1fr; }
-.cne-twocol > div + div { border-top: 1.5px solid var(--a-line); }
-.cne-facts { margin-top: 14px; display: flex; flex-direction: column; }
+.cne-twocol {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.cne-twocol > div + div {
+  border-top: 1.5px solid var(--a-line);
+}
+.cne-facts {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+}
 .cne-facts div {
   display: flex;
   gap: 10px;
@@ -2369,23 +3344,53 @@ h3 { font-weight: 700; }
   padding: 8px 0;
   color: var(--a-sub);
 }
-.cne-facts b { color: var(--a-red-cta); font-weight: 700; white-space: nowrap; }
+.cne-facts b {
+  color: var(--a-red-cta);
+  font-weight: 700;
+  white-space: nowrap;
+}
 
 /* ---- closing ------------------------------------------------------------ */
-.cne-close { text-align: center; padding-bottom: 26px; }
-.cne-close h2 { display: inline-block; }
-.cne-close h2::after { left: 50%; transform: translateX(-50%); }
-.cne-close .cne-cta { max-width: 420px; margin-left: auto; margin-right: auto; }
+.cne-close {
+  text-align: center;
+  padding-bottom: 26px;
+}
+.cne-close h2 {
+  display: inline-block;
+}
+.cne-close h2::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.cne-close .cne-cta {
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
 /* Beats `.cne-story .cne-sec p`, which resets the margin and would otherwise
    take the `auto` that centres this line under a centred heading. */
-.cne-story .cne-close p.cne-close-p { max-width: 44ch; margin: 14px auto 0; }
+.cne-story .cne-close p.cne-close-p {
+  max-width: 44ch;
+  margin: 14px auto 0;
+}
 
 /* The two Ways keep their own colours all the way to the buttons. */
-.cne-big.is-chris { background: var(--a-red-cta); color: #fff2c9; flex: 1; }
-.cne-big.is-eddy { background: var(--a-yel); color: #1a1612; flex: 1; }
+.cne-big.is-chris {
+  background: var(--a-red-cta);
+  color: #fff2c9;
+  flex: 1;
+}
+.cne-big.is-eddy {
+  background: var(--a-yel);
+  color: #1a1612;
+  flex: 1;
+}
 
 @media (min-width: 901px) {
-  .cne-story .cne-sec p { font-size: 16px; margin-bottom: 14px; }
+  .cne-story .cne-sec p {
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
 
   /* The two halves are one grid, so the seam between them can be re-weighted
      in a single transition when someone takes a side. */
@@ -2395,27 +3400,63 @@ h3 { font-weight: 700; }
     min-height: 560px;
     transition: grid-template-columns 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
   }
-  .cne-side { padding: 56px 44px 48px; min-height: 0; }
-  .cne-side + .cne-side { border-top: 0; }
-  .cne-side-who { font-size: 12px; letter-spacing: 0.24em; margin-bottom: 16px; }
+  .cne-side {
+    padding: 56px 44px 48px;
+    min-height: 0;
+  }
+  .cne-side + .cne-side {
+    border-top: 0;
+  }
+  .cne-side-who {
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    margin-bottom: 16px;
+  }
   .cne-side .cne-side-h {
     font-size: clamp(40px, 4.6vw, 68px);
     margin-bottom: 24px;
     text-shadow: 6px 6px 0 var(--a-ink);
   }
-  .cne-taps { gap: 8px; margin-bottom: 24px; }
-  .cne-taps span { font-size: 14px; gap: 11px; }
-  .cne-taps span::before { width: 12px; height: 12px; }
-  .cne-side-q { font-size: 19px; padding-top: 18px; border-top-width: 3px; }
-  .cne-side-pick { font-size: 12px; margin-top: 22px; }
+  .cne-taps {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .cne-taps span {
+    font-size: 14px;
+    gap: 11px;
+  }
+  .cne-taps span::before {
+    width: 12px;
+    height: 12px;
+  }
+  .cne-side-q {
+    font-size: 19px;
+    padding-top: 18px;
+    border-top-width: 3px;
+  }
+  .cne-side-pick {
+    font-size: 12px;
+    margin-top: 22px;
+  }
 
   /* Off the page rather than up it, once there is room either side.
      These come before the `is-in` rule below on purpose: same specificity,
      so source order is what decides, and the halves must end at `none`. */
-  .js .cne-side.is-chris { transform: translateX(-100%); opacity: 1; }
-  .js .cne-side.is-eddy { transform: translateX(100%); opacity: 1; }
-  .js .cne-split.is-in .cne-side { transform: none; opacity: 1; }
-  .js .cne-split.is-in .cne-side.is-off { opacity: 0.55; }
+  .js .cne-side.is-chris {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  .js .cne-side.is-eddy {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  .js .cne-split.is-in .cne-side {
+    transform: none;
+    opacity: 1;
+  }
+  .js .cne-split.is-in .cne-side.is-off {
+    opacity: 0.55;
+  }
 
   .cne-seam {
     display: flex;
@@ -2445,31 +3486,75 @@ h3 { font-weight: 700; }
     white-space: nowrap;
   }
 
-  .cne-evenbar { padding: 12px 44px; border-bottom-width: 4px; }
-  .cne-evenbar button { font-size: 11px; }
+  .cne-evenbar {
+    padding: 12px 44px;
+    border-bottom-width: 4px;
+  }
+  .cne-evenbar button {
+    font-size: 11px;
+  }
 
-  .cne-band { padding: 72px 44px; border-bottom-width: 4px; }
-  .cne-band-big { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.12; margin-top: 18px; }
-  .cne-hair { max-width: 520px; margin-top: 32px; height: 4px; }
-  .cne-band-after { font-size: 16px; margin-top: 26px; max-width: 52ch; }
+  .cne-band {
+    padding: 72px 44px;
+    border-bottom-width: 4px;
+  }
+  .cne-band-big {
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.12;
+    margin-top: 18px;
+  }
+  .cne-hair {
+    max-width: 520px;
+    margin-top: 32px;
+    height: 4px;
+  }
+  .cne-band-after {
+    font-size: 16px;
+    margin-top: 26px;
+    max-width: 52ch;
+  }
 
-  .cne-twocol { grid-template-columns: 1fr 1fr; }
-  .cne-twocol > div + div { border-top: 0; border-left: 4px solid var(--a-ink); }
-  .cne-facts { margin-top: 22px; }
-  .cne-facts div { font-size: 13px; padding: 11px 0; border-top-width: 2px; }
+  .cne-twocol {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cne-twocol > div + div {
+    border-top: 0;
+    border-left: 4px solid var(--a-ink);
+  }
+  .cne-facts {
+    margin-top: 22px;
+  }
+  .cne-facts div {
+    font-size: 13px;
+    padding: 11px 0;
+    border-top-width: 2px;
+  }
 
-  .cne-close { padding-bottom: 60px; }
+  .cne-close {
+    padding-bottom: 60px;
+  }
   /* Wide enough that "CHRIS'S WAY →" stays on one line at the desktop button
      size, which is bigger here than anywhere else on the site. */
-  .cne-close .cne-cta { max-width: 540px; }
+  .cne-close .cne-cta {
+    max-width: 540px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js .cne-side { transform: none !important; opacity: 1 !important; }
-  .js .cne-side.is-off { opacity: 0.55 !important; }
-  .cne-hair { transform: scaleX(1) !important; }
+  .js .cne-side {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .js .cne-side.is-off {
+    opacity: 0.55 !important;
+  }
+  .cne-hair {
+    transform: scaleX(1) !important;
+  }
   .cne-split,
-  .cne-seam { transition: none !important; }
+  .cne-seam {
+    transition: none !important;
+  }
 }
 
 /* =========================================================================
@@ -2531,7 +3616,10 @@ h3 { font-weight: 700; }
   margin: 0 auto;
   align-items: start;
 }
-.cne-ct-rail { display: grid; gap: 14px; }
+.cne-ct-rail {
+  display: grid;
+  gap: 14px;
+}
 
 /* ---- the check itself --------------------------------------------------- */
 .cne-ck {
@@ -2542,7 +3630,9 @@ h3 { font-weight: 700; }
   border: 3px solid var(--a-ink);
   box-shadow: 6px 6px 0 var(--a-shadow);
   padding: 0 18px 22px;
-  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.35s ease;
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+    opacity 0.35s ease;
 }
 
 /* The torn top edge. A repeating gradient rather than a border image, so it
@@ -2550,11 +3640,7 @@ h3 { font-weight: 700; }
 .cne-ct-wrap .cne-ck-perf {
   height: 11px;
   margin: 0 -3px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--a-ink) 0 8px,
-    transparent 8px 16px
-  );
+  background-image: repeating-linear-gradient(90deg, var(--a-ink) 0 8px, transparent 8px 16px);
   background-size: 16px 3px;
   background-position: 0 100%;
   background-repeat: repeat-x;
@@ -2587,10 +3673,18 @@ h3 { font-weight: 700; }
   white-space: nowrap;
 }
 
-.cne-ck-body { display: grid; gap: 18px; padding-top: 20px; }
+.cne-ck-body {
+  display: grid;
+  gap: 18px;
+  padding-top: 20px;
+}
 
 /* ---- one ruled line ----------------------------------------------------- */
-.cne-ck-field { position: relative; display: grid; gap: 5px; }
+.cne-ck-field {
+  position: relative;
+  display: grid;
+  gap: 5px;
+}
 .cne-ck-label {
   font-family: var(--font-mono);
   font-size: 9.5px;
@@ -2601,8 +3695,14 @@ h3 { font-weight: 700; }
   transition: color 0.2s;
   padding: 0;
 }
-.cne-ck-field:focus-within .cne-ck-label { color: var(--a-red-cta); }
-.cne-ck-opt { font-weight: 400; letter-spacing: 0.1em; opacity: 0.8; }
+.cne-ck-field:focus-within .cne-ck-label {
+  color: var(--a-red-cta);
+}
+.cne-ck-opt {
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
 
 .cne-ck-input {
   font-family: var(--font-body);
@@ -2618,15 +3718,29 @@ h3 { font-weight: 700; }
   width: 100%;
   appearance: none;
 }
-.cne-ck-input::placeholder { color: var(--a-sub); opacity: 0.75; }
-.cne-ck-input:focus { outline: none; border-bottom-color: transparent; }
-.cne-ck-area { resize: vertical; min-height: 112px; line-height: 1.6; display: block; }
+.cne-ck-input::placeholder {
+  color: var(--a-sub);
+  opacity: 0.75;
+}
+.cne-ck-input:focus {
+  outline: none;
+  border-bottom-color: transparent;
+}
+.cne-ck-area {
+  resize: vertical;
+  min-height: 112px;
+  line-height: 1.6;
+  display: block;
+}
 
 /* The input and its underline share a box of their own, so the underline sits
    on the input's bottom edge rather than the field's — otherwise an error
    message or the character counter pushes the field's bottom down and the rule
    goes with it, landing under the message instead of under the input. */
-.cne-ck-line { position: relative; display: block; }
+.cne-ck-line {
+  position: relative;
+  display: block;
+}
 
 /* Wipes in from the left on focus; sits under the 2px rule it replaces. */
 .cne-ck-underline {
@@ -2641,8 +3755,13 @@ h3 { font-weight: 700; }
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
   pointer-events: none;
 }
-.cne-ck-field:focus-within .cne-ck-underline { transform: scaleX(1); }
-.cne-ck-field.is-bad .cne-ck-underline { transform: scaleX(1); background: var(--a-red); }
+.cne-ck-field:focus-within .cne-ck-underline {
+  transform: scaleX(1);
+}
+.cne-ck-field.is-bad .cne-ck-underline {
+  transform: scaleX(1);
+  background: var(--a-red);
+}
 .cne-ck-err {
   margin: 0;
   font-size: 12px;
@@ -2661,12 +3780,29 @@ h3 { font-weight: 700; }
   font-variant-numeric: tabular-nums;
   transition: color 0.2s;
 }
-.cne-ck-count.is-warn { color: var(--a-red-cta); }
+.cne-ck-count.is-warn {
+  color: var(--a-red-cta);
+}
 
 /* ---- topic stamps ------------------------------------------------------- */
-.cne-ck-fs { border: 0; padding: 0; margin: 0; display: grid; gap: 5px; min-width: 0; }
-.cne-ck-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 3px; }
-.cne-ck-chip { position: relative; display: inline-flex; }
+.cne-ck-fs {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.cne-ck-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 3px;
+}
+.cne-ck-chip {
+  position: relative;
+  display: inline-flex;
+}
 .cne-ck-chip input {
   position: absolute;
   inset: 0;
@@ -2690,10 +3826,16 @@ h3 { font-weight: 700; }
   border-radius: 999px;
   color: var(--a-sub);
   cursor: pointer;
-  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s,
-    color 0.18s, background 0.18s;
+  transition:
+    transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.18s,
+    color 0.18s,
+    background 0.18s;
 }
-.cne-ck-chip input:focus-visible + span { outline: 3px solid var(--a-ink); outline-offset: 3px; }
+.cne-ck-chip input:focus-visible + span {
+  outline: 3px solid var(--a-ink);
+  outline-offset: 3px;
+}
 .cne-ck-chip input:checked + span {
   background: var(--a-red-cta);
   border-color: var(--a-red-cta);
@@ -2701,11 +3843,20 @@ h3 { font-weight: 700; }
   box-shadow: 3px 3px 0 var(--a-shadow);
   animation: cne-ck-stamp 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.cne-ck-chip input:checked + span::before { content: "✓"; font-size: 11px; }
+.cne-ck-chip input:checked + span::before {
+  content: "✓";
+  font-size: 11px;
+}
 @keyframes cne-ck-stamp {
-  0%   { transform: scale(1.16) rotate(-3.5deg); }
-  60%  { transform: scale(0.97) rotate(1.2deg); }
-  100% { transform: none; }
+  0% {
+    transform: scale(1.16) rotate(-3.5deg);
+  }
+  60% {
+    transform: scale(0.97) rotate(1.2deg);
+  }
+  100% {
+    transform: none;
+  }
 }
 
 /* ---- honeypot: gone from sight, from AT, and from the tab order --------- */
@@ -2730,9 +3881,15 @@ h3 { font-weight: 700; }
   font-size: 13px;
   line-height: 1.55;
 }
-.cne-ck-fail a { color: inherit; font-weight: 700; }
+.cne-ck-fail a {
+  color: inherit;
+  font-weight: 700;
+}
 
-.cne-ck-total { border-top: 2px dashed var(--ck-rule); padding-top: 18px; }
+.cne-ck-total {
+  border-top: 2px dashed var(--ck-rule);
+  padding-top: 18px;
+}
 .cne-ck-send {
   font-family: var(--font-display);
   font-size: 15px;
@@ -2748,13 +3905,28 @@ h3 { font-weight: 700; }
   align-items: center;
   gap: 9px;
   line-height: 1;
-  transition: transform 0.12s, box-shadow 0.12s, background 0.18s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background 0.18s;
 }
-.cne-ck-send:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--a-shadow); }
-.cne-ck-send:disabled { cursor: progress; opacity: 0.85; }
-.cne-ck-arrow { transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.cne-ck-send:hover:not(:disabled) { background: var(--a-red); }
-.cne-ck-send:hover:not(:disabled) .cne-ck-arrow { transform: translateX(4px); }
+.cne-ck-send:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--a-shadow);
+}
+.cne-ck-send:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+.cne-ck-arrow {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cne-ck-send:hover:not(:disabled) {
+  background: var(--a-red);
+}
+.cne-ck-send:hover:not(:disabled) .cne-ck-arrow {
+  transform: translateX(4px);
+}
 
 .cne-ck-spin {
   width: 14px;
@@ -2764,8 +3936,14 @@ h3 { font-weight: 700; }
   border-top-color: #fff2c9;
   animation: cne-ck-spin 0.7s linear infinite;
 }
-@keyframes cne-ck-spin { to { transform: rotate(360deg); } }
-.cne-ck.is-sending { opacity: 0.92; }
+@keyframes cne-ck-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cne-ck.is-sending {
+  opacity: 0.92;
+}
 
 /* ---- the receipt -------------------------------------------------------- */
 .cne-ck-receipt {
@@ -2773,10 +3951,18 @@ h3 { font-weight: 700; }
   padding-bottom: 26px;
   animation: cne-ck-land 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
-.cne-ck-receipt:focus { outline: none; }
+.cne-ck-receipt:focus {
+  outline: none;
+}
 @keyframes cne-ck-land {
-  0%   { opacity: 0; transform: translateY(22px) rotate(1.8deg) scale(0.98); }
-  100% { opacity: 1; transform: none; }
+  0% {
+    opacity: 0;
+    transform: translateY(22px) rotate(1.8deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 .cne-ck-mark {
   width: 54px;
@@ -2792,8 +3978,14 @@ h3 { font-weight: 700; }
   animation: cne-ck-pop 0.45s 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes cne-ck-pop {
-  0%   { opacity: 0; transform: scale(0) rotate(-32deg); }
-  100% { opacity: 1; transform: none; }
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-32deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 .cne-ck-up {
   font-family: var(--font-display);
@@ -2811,7 +4003,10 @@ h3 { font-weight: 700; }
   line-height: 1.6;
   color: var(--a-sub);
 }
-.cne-ck-lede strong { color: var(--a-fg); word-break: break-word; }
+.cne-ck-lede strong {
+  color: var(--a-fg);
+  word-break: break-word;
+}
 
 .cne-ck-sum {
   text-align: left;
@@ -2867,9 +4062,14 @@ h3 { font-weight: 700; }
   border-radius: 999px;
   padding: 8px 15px;
   cursor: pointer;
-  transition: color 0.18s, border-color 0.18s;
+  transition:
+    color 0.18s,
+    border-color 0.18s;
 }
-.cne-ck-again:hover { color: var(--a-fg); border-color: var(--a-fg); }
+.cne-ck-again:hover {
+  color: var(--a-fg);
+  border-color: var(--a-fg);
+}
 
 /* ---- rail: locations ---------------------------------------------------- */
 .cne-ct-card,
@@ -2878,7 +4078,9 @@ h3 { font-weight: 700; }
   box-shadow: 4px 4px 0 var(--a-shadow);
   padding: 17px;
 }
-.cne-ct-card { background: var(--a-card); }
+.cne-ct-card {
+  background: var(--a-card);
+}
 
 .cne-ct-cardh {
   font-family: var(--font-mono);
@@ -2890,7 +4092,12 @@ h3 { font-weight: 700; }
   margin: 0 0 11px;
 }
 
-.cne-ct-locs { list-style: none; margin: 0; padding: 0; display: grid; }
+.cne-ct-locs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
 .cne-ct-loc {
   display: flex;
   align-items: center;
@@ -2899,7 +4106,10 @@ h3 { font-weight: 700; }
   padding: 10px 0;
   border-bottom: 1px solid var(--a-line);
 }
-.cne-ct-loc:last-child { border-bottom: 0; padding-bottom: 0; }
+.cne-ct-loc:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
 .cne-ct-loc a {
   display: grid;
   gap: 1px;
@@ -2907,9 +4117,17 @@ h3 { font-weight: 700; }
   color: inherit;
   min-width: 0;
 }
-.cne-ct-loc a:hover .cne-ct-locn { text-decoration: underline; }
-.cne-ct-locn { font-weight: 700; font-size: 13.5px; }
-.cne-ct-loca { font-size: 12px; color: var(--a-sub); }
+.cne-ct-loc a:hover .cne-ct-locn {
+  text-decoration: underline;
+}
+.cne-ct-locn {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.cne-ct-loca {
+  font-size: 12px;
+  color: var(--a-sub);
+}
 .cne-ct-tag {
   flex: 0 0 auto;
   font-family: var(--font-mono);
@@ -2923,13 +4141,24 @@ h3 { font-weight: 700; }
   color: var(--a-sub);
   white-space: nowrap;
 }
-.cne-ct-tag.is-open { color: #1f7a43; }
+.cne-ct-tag.is-open {
+  color: #1f7a43;
+}
 
 /* ---- rail: the questions the form should never have to receive ---------- */
-.cne-ct-faq { background: var(--a-yel); color: #1a1612; }
-.cne-ct-faq .cne-ct-cardh { color: rgba(26, 22, 18, 0.62); }
-.cne-ct-faq details { border-top: 2px solid rgba(26, 22, 18, 0.18); }
-.cne-ct-faq details:first-of-type { border-top: 0; }
+.cne-ct-faq {
+  background: var(--a-yel);
+  color: #1a1612;
+}
+.cne-ct-faq .cne-ct-cardh {
+  color: rgba(26, 22, 18, 0.62);
+}
+.cne-ct-faq details {
+  border-top: 2px solid rgba(26, 22, 18, 0.18);
+}
+.cne-ct-faq details:first-of-type {
+  border-top: 0;
+}
 .cne-ct-faq summary {
   display: flex;
   align-items: center;
@@ -2943,7 +4172,9 @@ h3 { font-weight: 700; }
   line-height: 1.4;
   transition: opacity 0.18s;
 }
-.cne-ct-faq summary::-webkit-details-marker { display: none; }
+.cne-ct-faq summary::-webkit-details-marker {
+  display: none;
+}
 .cne-ct-faq summary::after {
   content: "+";
   font-family: var(--font-mono);
@@ -2953,8 +4184,12 @@ h3 { font-weight: 700; }
   flex: 0 0 auto;
   transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.cne-ct-faq details[open] summary::after { transform: rotate(135deg); }
-.cne-ct-faq summary:hover { opacity: 0.68; }
+.cne-ct-faq details[open] summary::after {
+  transform: rotate(135deg);
+}
+.cne-ct-faq summary:hover {
+  opacity: 0.68;
+}
 .cne-ct-faq details p {
   margin: 0 0 12px;
   padding-right: 24px;
@@ -2964,39 +4199,90 @@ h3 { font-weight: 700; }
   animation: cne-ck-unfold 0.3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 @keyframes cne-ck-unfold {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---- desktop ------------------------------------------------------------ */
 @media (min-width: 901px) {
-  .cne-ct-hero { padding: 56px 44px 62px; }
-  .cne-ct-eyebrow { font-size: 13px; letter-spacing: 0.24em; margin-bottom: 10px; }
-  .cne-ct-hero h1 { font-size: clamp(64px, 8vw, 104px); text-shadow: 6px 6px 0 var(--a-ink); }
-  .cne-ct-lede { font-size: 17px; }
+  .cne-ct-hero {
+    padding: 56px 44px 62px;
+  }
+  .cne-ct-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    margin-bottom: 10px;
+  }
+  .cne-ct-hero h1 {
+    font-size: clamp(64px, 8vw, 104px);
+    text-shadow: 6px 6px 0 var(--a-ink);
+  }
+  .cne-ct-lede {
+    font-size: 17px;
+  }
 
   .cne-ct-wrap {
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
     gap: 34px;
     padding: 52px 44px 18px;
   }
-  .cne-ct-rail { gap: 18px; }
+  .cne-ct-rail {
+    gap: 18px;
+  }
 
-  .cne-ck { padding: 0 30px 28px; box-shadow: 8px 8px 0 var(--a-shadow); }
-  .cne-ck-head { padding: 15px 0 13px; }
-  .cne-ck-title { font-size: 22px; }
-  .cne-ck-meta { font-size: 10px; }
-  .cne-ck-body { gap: 21px; padding-top: 24px; }
-  .cne-ck-label { font-size: 10px; }
-  .cne-ck-chip span { font-size: 11px; padding: 8px 13px; }
-  .cne-ck-send { font-size: 16px; padding: 14px 26px; box-shadow: 5px 5px 0 var(--a-shadow); }
-  .cne-ck-send:active:not(:disabled) { transform: translate(5px, 5px); }
-  .cne-ck-up { font-size: 42px; }
-  .cne-ck-lede { font-size: 14px; }
+  .cne-ck {
+    padding: 0 30px 28px;
+    box-shadow: 8px 8px 0 var(--a-shadow);
+  }
+  .cne-ck-head {
+    padding: 15px 0 13px;
+  }
+  .cne-ck-title {
+    font-size: 22px;
+  }
+  .cne-ck-meta {
+    font-size: 10px;
+  }
+  .cne-ck-body {
+    gap: 21px;
+    padding-top: 24px;
+  }
+  .cne-ck-label {
+    font-size: 10px;
+  }
+  .cne-ck-chip span {
+    font-size: 11px;
+    padding: 8px 13px;
+  }
+  .cne-ck-send {
+    font-size: 16px;
+    padding: 14px 26px;
+    box-shadow: 5px 5px 0 var(--a-shadow);
+  }
+  .cne-ck-send:active:not(:disabled) {
+    transform: translate(5px, 5px);
+  }
+  .cne-ck-up {
+    font-size: 42px;
+  }
+  .cne-ck-lede {
+    font-size: 14px;
+  }
 
   .cne-ct-card,
-  .cne-ct-faq { padding: 20px; box-shadow: 5px 5px 0 var(--a-shadow); }
-  .cne-ct-cardh { font-size: 10px; }
+  .cne-ct-faq {
+    padding: 20px;
+    box-shadow: 5px 5px 0 var(--a-shadow);
+  }
+  .cne-ct-cardh {
+    font-size: 10px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3011,7 +4297,9 @@ h3 { font-weight: 700; }
     animation: none !important;
     transition: none !important;
   }
-  .cne-ck-underline { transition: none !important; }
+  .cne-ck-underline {
+    transition: none !important;
+  }
 }
 
 /* =========================================================================
@@ -3167,7 +4455,10 @@ h3 { font-weight: 700; }
   color: var(--a-sub);
   margin: 0 0 18px;
 }
-.cne-drops { display: grid; gap: 16px; }
+.cne-drops {
+  display: grid;
+  gap: 16px;
+}
 .cne-drop {
   position: relative;
   display: grid;
@@ -3181,13 +4472,34 @@ h3 { font-weight: 700; }
     box-shadow 0.2s,
     border-color 0.2s;
 }
-.cne-drop:hover { transform: translate(-4px, -4px); box-shadow: 9px 9px 0 var(--a-red); border-color: var(--a-red); }
-.cne-drop:hover .cne-cap { transform: rotate(-4deg) scale(1.05); }
-.cne-drop:active { transform: translate(0, 0); box-shadow: 2px 2px 0 var(--a-shadow); }
-.cne-drop-art { --cne-mark: 20px; border-bottom: 2.5px solid var(--a-ink); }
-.cne-drop-art .cne-capshot { aspect-ratio: 4 / 3; }
-.cne-drop-art .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
-.cne-drop-b { padding: 17px 17px 19px; display: flex; flex-direction: column; gap: 6px; }
+.cne-drop:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 9px 9px 0 var(--a-red);
+  border-color: var(--a-red);
+}
+.cne-drop:hover .cne-cap {
+  transform: rotate(-4deg) scale(1.05);
+}
+.cne-drop:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--a-shadow);
+}
+.cne-drop-art {
+  --cne-mark: 20px;
+  border-bottom: 2.5px solid var(--a-ink);
+}
+.cne-drop-art .cne-capshot {
+  aspect-ratio: 4 / 3;
+}
+.cne-drop-art .cne-capshot.is-photo {
+  aspect-ratio: 720 / 411;
+}
+.cne-drop-b {
+  padding: 17px 17px 19px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .cne-drop-b h2 {
   font-family: var(--font-display);
   font-size: 21px;
@@ -3196,14 +4508,22 @@ h3 { font-weight: 700; }
   padding: 0;
 }
 /* The index card is a link, not a section — no yellow rule underneath it. */
-.cne-drop-b h2::after { content: none; }
+.cne-drop-b h2::after {
+  content: none;
+}
 .cne-drop-price {
   font-family: var(--font-mono);
   font-size: 19px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-.cne-drop-b p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--a-sub); max-width: 44ch; }
+.cne-drop-b p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--a-sub);
+  max-width: 44ch;
+}
 .cne-drop-go {
   margin-top: 8px;
   font-family: var(--font-mono);
@@ -3215,8 +4535,12 @@ h3 { font-weight: 700; }
   align-items: center;
   gap: 7px;
 }
-.cne-drop-go span { transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1); }
-.cne-drop:hover .cne-drop-go span { transform: translateX(5px); }
+.cne-drop-go span {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.cne-drop:hover .cne-drop-go span {
+  transform: translateX(5px);
+}
 .cne-drop-flag {
   position: absolute;
   right: -7px;
@@ -3244,11 +4568,27 @@ h3 { font-weight: 700; }
   color: var(--a-sub);
   line-height: 1.6;
 }
-.cne-drop-note span { flex: none; width: 26px; height: 2px; background: var(--a-line); }
+.cne-drop-note span {
+  flex: none;
+  width: 26px;
+  height: 2px;
+  background: var(--a-line);
+}
 
-.cne-shop-facts { display: grid; gap: 0; border: 2.5px solid var(--a-ink); background: var(--a-card); margin-top: 4px; }
-.cne-shop-facts > div { padding: 13px 15px 15px; border-bottom: 2px solid var(--a-line); }
-.cne-shop-facts > div:last-child { border-bottom: none; }
+.cne-shop-facts {
+  display: grid;
+  gap: 0;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-card);
+  margin-top: 4px;
+}
+.cne-shop-facts > div {
+  padding: 13px 15px 15px;
+  border-bottom: 2px solid var(--a-line);
+}
+.cne-shop-facts > div:last-child {
+  border-bottom: none;
+}
 .cne-shop-facts b {
   display: block;
   font-family: var(--font-mono);
@@ -3257,8 +4597,15 @@ h3 { font-weight: 700; }
   text-transform: uppercase;
   margin-bottom: 5px;
 }
-.cne-shop-facts span { font-size: 12.5px; line-height: 1.55; color: var(--a-sub); }
-.cne-shop-facts a { text-decoration: underline; color: inherit; }
+.cne-shop-facts span {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--a-sub);
+}
+.cne-shop-facts a {
+  text-decoration: underline;
+  color: inherit;
+}
 
 /* ---- product page ------------------------------------------------------- */
 .cne-pdp-crumb {
@@ -3269,20 +4616,59 @@ h3 { font-weight: 700; }
   color: var(--a-sub);
   padding: 14px 15px 0;
 }
-.cne-pdp-crumb a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
-.cne-pdp-crumb a:hover { color: var(--a-red-cta); }
+.cne-pdp-crumb a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cne-pdp-crumb a:hover {
+  color: var(--a-red-cta);
+}
 
-.cne-pdp { display: grid; gap: 18px; padding: 14px 15px 4px; }
-.cne-pdp-gal { display: flex; flex-direction: column; gap: 9px; }
-.cne-pdp-main { border: 3px solid var(--a-ink); }
-.cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; --cne-mark: 22px; }
-.cne-pdp-main .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
-.cne-pdp-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
-.cne-pdp-t { border: 2.5px solid var(--a-line); background: none; padding: 0; cursor: pointer; }
-.cne-pdp-t[aria-selected="true"] { border-color: var(--a-ink); }
-.cne-pdp-t .cne-capshot { aspect-ratio: 1 / 1; --cne-mark: 9px; }
-.cne-pdp-t .cne-cap { width: 78%; }
-.cne-pdp-t .cne-cap .mark small { display: none; }
+.cne-pdp {
+  display: grid;
+  gap: 18px;
+  padding: 14px 15px 4px;
+}
+.cne-pdp-gal {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.cne-pdp-main {
+  border: 3px solid var(--a-ink);
+}
+.cne-pdp-main .cne-capshot {
+  aspect-ratio: 4 / 3;
+  --cne-mark: 22px;
+}
+.cne-pdp-main .cne-capshot.is-photo {
+  aspect-ratio: 720 / 411;
+}
+.cne-pdp-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+.cne-pdp-t {
+  border: 2.5px solid var(--a-line);
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.cne-pdp-t[aria-selected="true"] {
+  border-color: var(--a-ink);
+}
+.cne-pdp-t .cne-capshot {
+  aspect-ratio: 1 / 1;
+  --cne-mark: 9px;
+}
+.cne-pdp-t .cne-cap {
+  width: 78%;
+}
+.cne-pdp-t .cne-cap .mark small {
+  display: none;
+}
 
 .cne-pdp-buy h1 {
   font-family: var(--font-display);
@@ -3291,10 +4677,28 @@ h3 { font-weight: 700; }
   margin: 5px 0 0;
   font-weight: 400;
 }
-.cne-pdp-price { display: flex; align-items: baseline; gap: 10px; margin: 12px 0 2px; flex-wrap: wrap; }
-.cne-price { font-family: var(--font-mono); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.cne-pdp-price .p { font-size: 26px; }
-.cne-pdp-price .s { font-family: var(--font-mono); font-size: 10px; color: var(--a-sub); font-weight: 500; }
+.cne-pdp-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0 2px;
+  flex-wrap: wrap;
+}
+.cne-price {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.cne-pdp-price .p {
+  font-size: 26px;
+}
+.cne-pdp-price .s {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--a-sub);
+  font-weight: 500;
+}
 
 /* The scarcity flag takes the space a size grid would have used. */
 .cne-limited {
@@ -3318,7 +4722,12 @@ h3 { font-weight: 700; }
   flex: none;
   transform: rotate(-2deg);
 }
-.cne-limited .txt { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; font-weight: 700; }
+.cne-limited .txt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 700;
+}
 
 .cne-pdp-lab {
   font-family: var(--font-mono);
@@ -3342,10 +4751,21 @@ h3 { font-weight: 700; }
   line-height: 1;
 }
 /* One size means there is nothing to choose — so it states, it does not offer. */
-.cne-chip.is-static { cursor: default; }
+.cne-chip.is-static {
+  cursor: default;
+}
 
-.cne-pdp-row { display: flex; gap: 9px; align-items: stretch; margin-top: 18px; }
-.cne-qty { display: flex; border: 3px solid var(--a-ink); flex: none; }
+.cne-pdp-row {
+  display: flex;
+  gap: 9px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+.cne-qty {
+  display: flex;
+  border: 3px solid var(--a-ink);
+  flex: none;
+}
 .cne-qty button {
   width: 38px;
   background: transparent;
@@ -3357,7 +4777,10 @@ h3 { font-weight: 700; }
   cursor: pointer;
   line-height: 1;
 }
-.cne-qty button:disabled { opacity: 0.3; cursor: not-allowed; }
+.cne-qty button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 .cne-qty > span {
   width: 34px;
   display: flex;
@@ -3370,7 +4793,10 @@ h3 { font-weight: 700; }
   border-right: 2px solid var(--a-line);
   font-variant-numeric: tabular-nums;
 }
-.cne-qty > span b { font-weight: 800; display: block; }
+.cne-qty > span b {
+  font-weight: 800;
+  display: block;
+}
 
 .cne-btn-primary {
   flex: 1;
@@ -3385,9 +4811,15 @@ h3 { font-weight: 700; }
   padding: 15px 12px;
   cursor: pointer;
   line-height: 1;
-  transition: transform 0.12s, box-shadow 0.12s, background 0.2s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background 0.2s;
 }
-.cne-btn-primary:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--a-shadow); }
+.cne-btn-primary:active {
+  transform: translate(4px, 4px);
+  box-shadow: 1px 1px 0 var(--a-shadow);
+}
 /* Payment is not connected yet, so the button reads as a placeholder rather
    than as something that failed. */
 .cne-btn-primary.is-dead,
@@ -3399,7 +4831,9 @@ h3 { font-weight: 700; }
   cursor: not-allowed;
   font-size: 11.5px;
 }
-.cne-btn-primary:disabled:active { transform: none; }
+.cne-btn-primary:disabled:active {
+  transform: none;
+}
 .cne-btn-ghost {
   display: block;
   width: 100%;
@@ -3441,15 +4875,35 @@ h3 { font-weight: 700; }
   background: var(--a-bg);
   border-top: 3px solid var(--a-ink);
 }
-.cne-pdp-sticky .p { font-size: 19px; flex: none; }
-.cne-pdp-sticky .cne-btn-primary { padding: 14px 12px; font-size: 12px; box-shadow: 3px 3px 0 var(--a-shadow); }
+.cne-pdp-sticky .p {
+  font-size: 19px;
+  flex: none;
+}
+.cne-pdp-sticky .cne-btn-primary {
+  padding: 14px 12px;
+  font-size: 12px;
+  box-shadow: 3px 3px 0 var(--a-shadow);
+}
 
-.cne-pdp-more { padding-top: 26px; }
-.cne-pdp-more p { max-width: 62ch; margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: var(--a-sub); }
-.cne-pdp-more a { text-decoration: underline; color: inherit; }
+.cne-pdp-more {
+  padding-top: 26px;
+}
+.cne-pdp-more p {
+  max-width: 62ch;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+.cne-pdp-more a {
+  text-decoration: underline;
+  color: inherit;
+}
 
 /* ---- the bag button, in the site header --------------------------------- */
-.cne-bag-slot { display: inline-flex; }
+.cne-bag-slot {
+  display: inline-flex;
+}
 .cne-bagbtn {
   display: inline-flex;
   align-items: center;
@@ -3466,11 +4920,22 @@ h3 { font-weight: 700; }
   line-height: 1;
   cursor: pointer;
   transform-origin: 70% 50%;
-  transition: transform 0.09s, box-shadow 0.09s;
+  transition:
+    transform 0.09s,
+    box-shadow 0.09s;
 }
-.cne-bagbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1a1612; }
-.cne-bagbtn svg { width: 12px; height: 12px; flex: none; }
-.cne-bagbtn-t { display: none; }
+.cne-bagbtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #1a1612;
+}
+.cne-bagbtn svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.cne-bagbtn-t {
+  display: none;
+}
 .cne-bagbtn-c {
   background: #1a1612;
   color: var(--a-yel);
@@ -3482,7 +4947,11 @@ h3 { font-weight: 700; }
   overflow: hidden;
   display: block;
 }
-.cne-bagbtn-c span { display: block; height: 14px; line-height: 14px; }
+.cne-bagbtn-c span {
+  display: block;
+  height: 14px;
+  line-height: 14px;
+}
 
 /* ---- the drawer --------------------------------------------------------- */
 .cne-bag-scrim {
@@ -3496,7 +4965,9 @@ h3 { font-weight: 700; }
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.cne-bag-scrim.is-in { opacity: 1; }
+.cne-bag-scrim.is-in {
+  opacity: 1;
+}
 .cne-drawer {
   position: fixed;
   top: auto;
@@ -3513,7 +4984,9 @@ h3 { font-weight: 700; }
   transform: translateY(101%);
   transition: transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
-.cne-drawer.is-in { transform: none; }
+.cne-drawer.is-in {
+  transform: none;
+}
 .cne-dr-head {
   display: flex;
   align-items: center;
@@ -3523,7 +4996,13 @@ h3 { font-weight: 700; }
   border-bottom: 3px solid var(--a-ink);
   background: var(--a-cream);
 }
-.cne-dr-head h2 { font-family: var(--font-display); font-size: 18px; margin: 0; font-weight: 400; line-height: 1; }
+.cne-dr-head h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1;
+}
 .cne-dr-x {
   background: none;
   border: none;
@@ -3535,19 +5014,69 @@ h3 { font-weight: 700; }
   line-height: 1;
   padding: 6px 8px;
 }
-.cne-dr-body { flex: 1; overflow: auto; padding: 15px 17px; -webkit-overflow-scrolling: touch; }
+.cne-dr-body {
+  flex: 1;
+  overflow: auto;
+  padding: 15px 17px;
+  -webkit-overflow-scrolling: touch;
+}
 
-.cne-bag-lines { list-style: none; margin: 0; padding: 0; }
-.cne-li { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1.5px solid var(--a-line); overflow: hidden; }
-.cne-li-art { width: 72px; flex: none; border: 2.5px solid var(--a-ink); }
-.cne-li-art .cne-capshot { aspect-ratio: 1 / 1; --cne-mark: 8px; }
-.cne-li-art .cne-cap { width: 80%; }
-.cne-li-b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.cne-li-b .n { font-family: var(--font-display); font-size: 13px; line-height: 1.1; }
-.cne-li-b .v { font-family: var(--font-mono); font-size: 9.5px; color: var(--a-sub); letter-spacing: 0.06em; }
-.cne-li-ft { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
-.cne-li-ft .cne-price { font-size: 14px; }
-.cne-qty-sm { display: flex; border: 2px solid var(--a-ink); }
+.cne-bag-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cne-li {
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1.5px solid var(--a-line);
+  overflow: hidden;
+}
+.cne-li-art {
+  width: 72px;
+  flex: none;
+  border: 2.5px solid var(--a-ink);
+}
+.cne-li-art .cne-capshot {
+  aspect-ratio: 1 / 1;
+  --cne-mark: 8px;
+}
+.cne-li-art .cne-cap {
+  width: 80%;
+}
+.cne-li-b {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cne-li-b .n {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.1;
+}
+.cne-li-b .v {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--a-sub);
+  letter-spacing: 0.06em;
+}
+.cne-li-ft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+}
+.cne-li-ft .cne-price {
+  font-size: 14px;
+}
+.cne-qty-sm {
+  display: flex;
+  border: 2px solid var(--a-ink);
+}
 .cne-qty-sm button {
   width: 26px;
   height: 26px;
@@ -3560,7 +5089,10 @@ h3 { font-weight: 700; }
   cursor: pointer;
   line-height: 1;
 }
-.cne-qty-sm button:disabled { opacity: 0.3; cursor: not-allowed; }
+.cne-qty-sm button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 .cne-qty-sm span {
   width: 26px;
   display: flex;
@@ -3585,16 +5117,47 @@ h3 { font-weight: 700; }
   cursor: pointer;
   padding: 4px 0;
 }
-.cne-li-rm:hover { color: var(--a-red); }
+.cne-li-rm:hover {
+  color: var(--a-red);
+}
 
-.cne-dr-foot { border-top: 3px solid var(--a-ink); padding: 14px 17px 16px; background: var(--a-cream); }
-.cne-tot { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-.cne-tot div { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-mono); font-size: 11px; }
-.cne-tot div span:last-child { font-weight: 800; font-variant-numeric: tabular-nums; }
-.cne-tot .sub span:last-child { font-size: 14px; }
-.cne-tot .muted { color: var(--a-sub); }
-.cne-tot .grand { border-top: 2px solid var(--a-ink); padding-top: 9px; margin-top: 4px; font-size: 13px; }
-.cne-tot .grand span:last-child { font-size: 19px; }
+.cne-dr-foot {
+  border-top: 3px solid var(--a-ink);
+  padding: 14px 17px 16px;
+  background: var(--a-cream);
+}
+.cne-tot {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.cne-tot div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cne-tot div span:last-child {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cne-tot .sub span:last-child {
+  font-size: 14px;
+}
+.cne-tot .muted {
+  color: var(--a-sub);
+}
+.cne-tot .grand {
+  border-top: 2px solid var(--a-ink);
+  padding-top: 9px;
+  margin-top: 4px;
+  font-size: 13px;
+}
+.cne-tot .grand span:last-child {
+  font-size: 19px;
+}
 .cne-dr-note.is-terms {
   margin: 10px 0 13px;
   text-align: left;
@@ -3626,86 +5189,239 @@ h3 { font-weight: 700; }
   justify-content: center;
   overflow: hidden;
 }
-.cne-flyer .cne-cap { width: 78%; max-width: none; }
+.cne-flyer .cne-cap {
+  width: 78%;
+  max-width: none;
+}
 
 /* ---- shop motion --------------------------------------------------------
    Everything decorative sits behind the reduced-motion guard; the flow works
    identically without a single one of them. */
 @media (prefers-reduced-motion: no-preference) {
-  .cne-bagbtn.is-new { animation: cne-bag-in 0.56s cubic-bezier(0.18, 1.5, 0.4, 1) both; }
-  .cne-bagbtn.is-bump { animation: cne-bag-bump 0.4s cubic-bezier(0.3, 1.5, 0.5, 1); }
-  .cne-bagbtn-c span { animation: cne-bag-roll 0.32s cubic-bezier(0.25, 0.9, 0.3, 1) both; }
-  .cne-qty > span b { animation: cne-qty-nudge 0.26s cubic-bezier(0.3, 1.4, 0.5, 1); }
-  .cne-drawer.is-in .cne-li { animation: cne-li-in 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both; animation-delay: calc(var(--cne-li-i, 0) * 70ms + 110ms); }
-  .cne-li.is-out { animation: cne-li-out 0.28s cubic-bezier(0.4, 0, 0.7, 0.2) both; }
-  .cne-capshot.is-swap { animation: cne-shot-in 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+  .cne-bagbtn.is-new {
+    animation: cne-bag-in 0.56s cubic-bezier(0.18, 1.5, 0.4, 1) both;
+  }
+  .cne-bagbtn.is-bump {
+    animation: cne-bag-bump 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .cne-bagbtn-c span {
+    animation: cne-bag-roll 0.32s cubic-bezier(0.25, 0.9, 0.3, 1) both;
+  }
+  .cne-qty > span b {
+    animation: cne-qty-nudge 0.26s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .cne-drawer.is-in .cne-li {
+    animation: cne-li-in 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+    animation-delay: calc(var(--cne-li-i, 0) * 70ms + 110ms);
+  }
+  .cne-li.is-out {
+    animation: cne-li-out 0.28s cubic-bezier(0.4, 0, 0.7, 0.2) both;
+  }
+  .cne-capshot.is-swap {
+    animation: cne-shot-in 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
 }
 @keyframes cne-bag-in {
-  0% { transform: scale(0.2) rotate(-22deg); opacity: 0; }
-  55% { transform: scale(1.18) rotate(5deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
+  0% {
+    transform: scale(0.2) rotate(-22deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.18) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
 }
 @keyframes cne-bag-bump {
-  0% { transform: scale(1); }
-  35% { transform: scale(1.2) rotate(-4deg); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.2) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
-@keyframes cne-bag-roll { from { transform: translateY(14px); } to { transform: translateY(0); } }
+@keyframes cne-bag-roll {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
 @keyframes cne-qty-nudge {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.35); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
-@keyframes cne-li-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
-@keyframes cne-li-out { to { opacity: 0; transform: translateX(38px); margin-bottom: -96px; filter: blur(2px); } }
-@keyframes cne-shot-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes cne-li-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cne-li-out {
+  to {
+    opacity: 0;
+    transform: translateX(38px);
+    margin-bottom: -96px;
+    filter: blur(2px);
+  }
+}
+@keyframes cne-shot-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .cne-drawer,
   .cne-bag-scrim,
   .cne-cap,
   .cne-drop,
-  .cne-drop-go span { transition: none !important; }
+  .cne-drop-go span {
+    transition: none !important;
+  }
 }
 
 /* ---- desktop ------------------------------------------------------------ */
 @media (min-width: 901px) {
-  .cne-shop-lede { font-size: 15px; margin-bottom: 22px; }
-  .cne-drops { gap: 20px; }
-  .cne-drop { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); box-shadow: 6px 6px 0 var(--a-shadow); }
-  .cne-drop-art { border-bottom: none; border-right: 2.5px solid var(--a-ink); }
-  .cne-drop-art { --cne-mark: 30px; }
-  .cne-drop-art .cne-capshot { aspect-ratio: auto; height: 100%; min-height: 270px; }
-  .cne-drop-art .cne-cap { width: 58%; max-width: 340px; }
-  .cne-drop-b { padding: 26px 28px; justify-content: center; gap: 7px; }
-  .cne-drop-b h2 { font-size: 25px; }
-  .cne-drop-price { font-size: 22px; }
-  .cne-drop-b p { font-size: 13px; }
-  .cne-drop-flag { font-size: 10.5px; padding: 7px 9px; top: 16px; right: -8px; }
+  .cne-shop-lede {
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+  .cne-drops {
+    gap: 20px;
+  }
+  .cne-drop {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    box-shadow: 6px 6px 0 var(--a-shadow);
+  }
+  .cne-drop-art {
+    border-bottom: none;
+    border-right: 2.5px solid var(--a-ink);
+  }
+  .cne-drop-art {
+    --cne-mark: 30px;
+  }
+  .cne-drop-art .cne-capshot {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 270px;
+  }
+  .cne-drop-art .cne-cap {
+    width: 58%;
+    max-width: 340px;
+  }
+  .cne-drop-b {
+    padding: 26px 28px;
+    justify-content: center;
+    gap: 7px;
+  }
+  .cne-drop-b h2 {
+    font-size: 25px;
+  }
+  .cne-drop-price {
+    font-size: 22px;
+  }
+  .cne-drop-b p {
+    font-size: 13px;
+  }
+  .cne-drop-flag {
+    font-size: 10.5px;
+    padding: 7px 9px;
+    top: 16px;
+    right: -8px;
+  }
 
-  .cne-shop-facts { grid-template-columns: repeat(4, 1fr); }
-  .cne-shop-facts > div { border-bottom: none; border-right: 2px solid var(--a-line); }
-  .cne-shop-facts > div:last-child { border-right: none; }
+  .cne-shop-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cne-shop-facts > div {
+    border-bottom: none;
+    border-right: 2px solid var(--a-line);
+  }
+  .cne-shop-facts > div:last-child {
+    border-right: none;
+  }
 
-  .cne-pdp-crumb { padding: 20px 30px 0; }
-  .cne-pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr); gap: 34px; padding: 18px 30px 8px; }
-  .cne-pdp-gal { gap: 10px; }
-  .cne-pdp-main .cne-capshot { aspect-ratio: 4 / 3; }
-  .cne-pdp-main .cne-capshot.is-photo { aspect-ratio: 720 / 411; }
-  .cne-pdp-main .cne-cap { width: 66%; max-width: 430px; }
-  .cne-pdp-thumbs { gap: 10px; }
-  .cne-pdp-buy h1 { font-size: 31px; }
-  .cne-pdp-price .p { font-size: 27px; }
-  .cne-btn-primary { font-size: 13.5px; padding: 16px; }
+  .cne-pdp-crumb {
+    padding: 20px 30px 0;
+  }
+  .cne-pdp {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    gap: 34px;
+    padding: 18px 30px 8px;
+  }
+  .cne-pdp-gal {
+    gap: 10px;
+  }
+  .cne-pdp-main .cne-capshot {
+    aspect-ratio: 4 / 3;
+  }
+  .cne-pdp-main .cne-capshot.is-photo {
+    aspect-ratio: 720 / 411;
+  }
+  .cne-pdp-main .cne-cap {
+    width: 66%;
+    max-width: 430px;
+  }
+  .cne-pdp-thumbs {
+    gap: 10px;
+  }
+  .cne-pdp-buy h1 {
+    font-size: 31px;
+  }
+  .cne-pdp-price .p {
+    font-size: 27px;
+  }
+  .cne-btn-primary {
+    font-size: 13.5px;
+    padding: 16px;
+  }
   /* The sticky bar is a phone answer to a phone problem. On a desktop the buy
      row is still on screen, so a second one would just be a second one. */
-  .cne-pdp-sticky { display: none; }
-  .cne-limited .txt { font-size: 10.5px; }
-  .cne-pending { font-size: 10.5px; }
-  .cne-pdp-more { padding-top: 34px; }
+  .cne-pdp-sticky {
+    display: none;
+  }
+  .cne-limited .txt {
+    font-size: 10.5px;
+  }
+  .cne-pending {
+    font-size: 10.5px;
+  }
+  .cne-pdp-more {
+    padding-top: 34px;
+  }
 
-  .cne-bagbtn { font-size: 10px; padding: 8px 11px; box-shadow: 2px 2px 0 #1a1612; }
-  .cne-bagbtn-t { display: inline; }
+  .cne-bagbtn {
+    font-size: 10px;
+    padding: 8px 11px;
+    box-shadow: 2px 2px 0 #1a1612;
+  }
+  .cne-bagbtn-t {
+    display: inline;
+  }
 
   /* Above the phone breakpoint the drawer comes in from the right, which is
      where a bag has lived since carts had corners. */
@@ -3720,9 +5436,155 @@ h3 { font-weight: 700; }
     transform: translateX(101%);
     transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
   }
-  .cne-drawer.is-in { transform: none; }
-  .cne-dr-head { padding: 15px 18px; }
-  .cne-dr-head h2 { font-size: 19px; }
-  .cne-dr-body { padding: 16px 18px; }
-  .cne-dr-foot { padding: 15px 18px 18px; }
+  .cne-drawer.is-in {
+    transform: none;
+  }
+  .cne-dr-head {
+    padding: 15px 18px;
+  }
+  .cne-dr-head h2 {
+    font-size: 19px;
+  }
+  .cne-dr-body {
+    padding: 16px 18px;
+  }
+  .cne-dr-foot {
+    padding: 15px 18px 18px;
+  }
+}
+
+/* ---- legal pages ---------------------------------------------------------
+   /privacy/ and anything else that is mostly prose. One measured column on the
+   paper ground rather than the red hero the marketing pages open with: a policy
+   is read, not scanned, and the display face at hero size above two thousand
+   words reads as a promotion of the thing it is disclosing.
+
+   The column is capped at 68ch. Body copy is 15px here rather than the site's
+   14px for the same reason — this is the one page on the site somebody reads
+   top to bottom. */
+.cne-lg {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: 34px 18px 64px;
+}
+.cne-lg-head {
+  border-bottom: 3px solid var(--a-ink);
+  padding-bottom: 18px;
+  margin-bottom: 26px;
+}
+.cne-lg-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-red);
+  margin: 0 0 8px;
+}
+.cne-lg-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 9vw, 46px);
+  line-height: 0.96;
+  margin: 0 0 10px;
+  color: var(--a-ink);
+  text-wrap: balance;
+}
+.cne-lg-date {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--a-sub);
+}
+
+/* The summary, boxed on cream so the one paragraph that answers the question
+   for most people is not the one they have to find. */
+.cne-lg-tldr {
+  background: var(--a-cream);
+  border: 3px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-shadow);
+  padding: 18px 20px;
+  margin-bottom: 34px;
+}
+.cne-lg-tldr h2 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin: 0 0 8px;
+  color: var(--a-ink);
+}
+.cne-lg-tldr p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.cne-lg-sec {
+  margin-bottom: 32px;
+}
+.cne-lg-sec h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  color: var(--a-ink);
+  /* Clears the sticky header when a heading is jumped to from the table of
+     contents a longer policy would grow, and from any anchor shared into it. */
+  scroll-margin-top: var(--cne-stuck);
+}
+.cne-lg-sec p,
+.cne-lg-sec li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--a-ink);
+}
+.cne-lg-sec p {
+  margin: 0 0 12px;
+}
+.cne-lg-sec ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+.cne-lg-sec li {
+  margin-bottom: 7px;
+}
+.cne-lg-sec strong {
+  font-weight: 700;
+}
+.cne-lg-sec a {
+  color: var(--a-red-cta);
+  text-underline-offset: 2px;
+}
+.cne-lg-sec code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--a-cream);
+  border: 1px solid var(--a-line);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* The one paragraph on the page making a claim about the code rather than about
+   policy, so it is marked as a statement of fact rather than of intent. */
+.cne-lg-note {
+  border-left: 4px solid var(--a-yel);
+  background: var(--a-card);
+  padding: 12px 14px;
+  margin: 0 0 12px;
+}
+
+.cne-lg-contact {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+@media (min-width: 768px) {
+  .cne-lg {
+    padding: 52px 24px 80px;
+  }
+  .cne-lg-tldr {
+    padding: 22px 26px;
+  }
+  .cne-lg-sec h2 {
+    font-size: 24px;
+  }
 }

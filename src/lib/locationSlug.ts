@@ -17,7 +17,3 @@ export const locationBySlug = (slug: string): Location | undefined =>
   locations.find((l) => SLUGS[l.id] === slug);
 
 export const allLocationSlugs = (): string[] => locations.map(slugFor);
-
-/** The neighbourhood people actually search, which isn't always `city`. */
-export const neighbourhoodFor = (loc: Location): string =>
-  loc.id === "hollywood" ? "Hollywood" : loc.id === "glendale" ? "Glendale" : "Van Nuys";

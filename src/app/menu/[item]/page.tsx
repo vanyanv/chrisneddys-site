@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { locations } from "@/data/locations";
+import { flagship } from "@/data/locations";
 import { featuredItems, itemById, ways, toppings, extras } from "@/data/menu";
-import { itemOrderUrl, itemPhotoAlt, formatPrice } from "@/lib/otter";
+import { itemOrderUrl, itemPhotoAlt, formatPrice, priceString } from "@/lib/otter";
 import { googleDirections } from "@/lib/directions";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { clampToWord } from "@/lib/text";
 
 type Params = { params: Promise<{ item: string }> };
 
@@ -34,31 +35,16 @@ export function generateStaticParams() {
  */
 const DESC_LIMIT = 155;
 
-function clampToWord(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max - 1);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:—-]+$/, "")}…`;
-}
-
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { item: slug } = await params;
   const item = itemById(slug);
   if (!item) return {};
 
   const title = `${item.name} — ${formatPrice(item.price)}`;
-  const full = `${title} · ${brand.name}`;
-  const tail = `${formatPrice(
-    item.price,
-  )}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
+  const tail = `${formatPrice(item.price)}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
   const description = `${clampToWord(item.desc, DESC_LIMIT - tail.length - 1)} ${tail}`;
 
-  return {
-    title,
-    description,
-    alternates: { canonical: `/menu/${item.id}/` },
-    openGraph: openGraphFor({ title: full, description, path: `/menu/${item.id}/` }),
-    twitter: twitterFor({ title: full, description }),
-  };
+  return pageMetadata({ title, description, path: `/menu/${item.id}/` });
 }
 
 export default async function MenuItemPage({ params }: Params) {
@@ -66,7 +52,7 @@ export default async function MenuItemPage({ params }: Params) {
   const item = itemById(slug);
   if (!item) notFound();
 
-  const hollywood = locations.find((l) => l.id === "hollywood");
+  const hollywood = flagship;
   const orderHref = itemOrderUrl(item, "menu-item");
 
   /**
@@ -84,7 +70,7 @@ export default async function MenuItemPage({ params }: Params) {
     ...(item.photo ? { image: `${brand.siteUrl}/menu/${item.photo}.webp` } : {}),
     offers: {
       "@type": "Offer",
-      price: item.price.toFixed(2),
+      price: priceString(item.price),
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: itemOrderUrl(item),
@@ -142,7 +128,6 @@ export default async function MenuItemPage({ params }: Params) {
               overflow: "hidden",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/menu/${item.photo}.webp`}
               srcSet={`/menu/${item.photo}-thumb.webp 200w, /menu/${item.photo}.webp 720w`}
@@ -179,9 +164,9 @@ export default async function MenuItemPage({ params }: Params) {
         <section className="cne-sec cne-rv">
           <div className="cne-eyebrow">Free either way</div>
           <h2>Pick a way.</h2>
-          <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
-            Every topping is free. Order it one of the two house ways, or build it yourself
-            from the same list — the price on this page does not change either way.
+          <p className="cne-lede">
+            Every topping is free. Order it one of the two house ways, or build it yourself from the
+            same list — the price on this page does not change either way.
           </p>
           <div className="cne-loc-hrs" style={{ marginTop: 12, maxWidth: "42ch" }}>
             {ways.map((w) => (

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { MenuBrowser } from "@/components/counter/MenuBrowser";
 import { JsonLdScript, menuNode, flagshipRestaurantLd } from "@/components/shared/JsonLd";
-import { breadcrumbLd, openGraphFor, twitterFor } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { SLIDER_PRICE, COMBO_FROM_PRICE, featuredItems } from "@/data/menu";
 import Link from "next/link";
-import { formatPrice as fmt } from "@/lib/otter";
 import { formatPrice } from "@/lib/otter";
 
 const title = "Menu & Prices — Sliders, Combos & Fries";
@@ -20,13 +19,7 @@ const description = `The full Chris N Eddy's menu and pickup prices: sliders fro
   COMBO_FROM_PRICE,
 )}, chris-cut fries, shakes and the Secret Menu. Every topping free.`;
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/menu/" },
-  openGraph: openGraphFor({ title: `${title} · Chris N Eddy's`, description, path: "/menu/" }),
-  twitter: twitterFor({ title: `${title} · Chris N Eddy's`, description }),
-};
+export const metadata: Metadata = pageMetadata({ title, description, path: "/menu/" });
 
 export default function MenuPage() {
   return (
@@ -50,7 +43,7 @@ export default function MenuPage() {
             <li key={i.id}>
               <Link href={`/menu/${i.id}/`}>
                 <span className="n">{i.name}</span>
-                <span className="p">{fmt(i.price)} &rsaquo;</span>
+                <span className="p">{formatPrice(i.price)} &rsaquo;</span>
               </Link>
             </li>
           ))}

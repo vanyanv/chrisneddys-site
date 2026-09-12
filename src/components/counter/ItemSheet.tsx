@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MenuItem } from "@/data/menu";
+import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
 import { WayPicker } from "./WayPicker";
-
-export type WayId = (typeof ways)[number]["id"];
 
 type Props = {
   item: MenuItem | null;
@@ -75,7 +73,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       const outside = !(active instanceof Node) || !sheet.contains(active);
       if (e.shiftKey ? active === first || outside : active === last || outside) {
         e.preventDefault();
-        (e.shiftKey ? last : first).focus();
+        // `stops.length === 0` returned above, so first/last are defined here.
+        (e.shiftKey ? last : first)?.focus();
       }
     };
     document.addEventListener("keydown", onKey);
@@ -192,11 +191,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
 
   return (
     <>
-      <div
-        className={`cne-scrim${open ? " is-open" : ""}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className={`cne-scrim${open ? " is-open" : ""}`} onClick={onClose} aria-hidden="true" />
       <div
         ref={sheetRef}
         className={`cne-sheet${open ? " is-open" : ""}${dragging ? " is-dragging" : ""}`}
@@ -286,9 +281,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
               >
                 ADD ON OTTER · {formatPrice(item.price)} →
               </a>
-              <p className="cne-fine">
-                Opens this exact item on our ordering page, ready to add.
-              </p>
+              <p className="cne-fine">Opens this exact item on our ordering page, ready to add.</p>
             </>
           )}
         </div>
@@ -341,8 +334,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
                     <span className="v">{formatPrice(item.price)}</span>
                   </div>
                   <p className="cne-ticket-note">
-                    Toppings can&rsquo;t be pre-set from a link, so they get ticked on the
-                    next screen. All free.
+                    Toppings can&rsquo;t be pre-set from a link, so they get ticked on the next
+                    screen. All free.
                   </p>
                   <div className="cne-ticket-extra">
                     <span className="l">Also on the next screen</span>

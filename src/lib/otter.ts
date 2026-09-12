@@ -104,7 +104,12 @@ export function itemPhotoAlt(item: Pick<MenuItem, "name" | "desc">): string {
   return item.desc ? `${item.name} — ${item.desc}` : `${item.name} from Chris N Eddy's`;
 }
 
+/** `12.00` — no currency symbol. What a JSON-LD `price` field wants. */
+export function priceString(price: number): string {
+  return price.toFixed(2);
+}
+
 /** Prices come from Otter as numbers; show them the way a menu should. */
 export function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`;
+  return `$${priceString(price)}`;
 }

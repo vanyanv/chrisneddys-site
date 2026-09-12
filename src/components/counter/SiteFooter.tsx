@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
 
 /**
  * The footer is the only place every page of the site is linked from. That is
@@ -26,7 +26,7 @@ const COUNTER_LINKS = [
   { href: "/locations/", label: "All locations" },
   ...locations.map((loc) => ({
     href: `/locations/${slugFor(loc)}/`,
-    label: neighbourhoodFor(loc),
+    label: loc.neighbourhood,
   })),
 ];
 
@@ -52,9 +52,7 @@ export function SiteFooter() {
           <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
             <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} />
           </Link>
-          <p>
-            Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.
-          </p>
+          <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>
           <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">
             {brand.ig}
           </a>
@@ -96,7 +94,7 @@ export function SiteFooter() {
                 the Locations column above, and two anchors on one URL in one
                 block is the kind of duplication that makes a footer read as
                 padded rather than as a map. */}
-            <p className="cne-foot-h">{neighbourhoodFor(loc)}</p>
+            <p className="cne-foot-h">{loc.neighbourhood}</p>
             {loc.isOpen ? (
               <>
                 <address>
@@ -126,10 +124,14 @@ export function SiteFooter() {
         ))}
       </div>
 
+      {/* The policy is linked from here rather than from the Eat column above:
+          it belongs beside the copyright line, and adding a ninth link to the
+          two named groups would pad the block those groups exist to keep tight. */}
       <div className="cne-foot-legal">
         <span>
           © {new Date().getFullYear()} {brand.name}
         </span>
+        <Link href="/privacy/">Privacy</Link>
       </div>
     </footer>
   );

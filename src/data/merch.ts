@@ -94,6 +94,17 @@ export const MERCH_UPDATED = "2026-09-10";
 export const TERMS_PENDING =
   "Shipping, delivery times and returns are still being worked out. They’ll be on this page before the shop opens.";
 
+/**
+ * A product's first view — the gallery's default and what card art uses.
+ * Every product in the catalogue below is defined with at least one view;
+ * this only throws if that contract is ever broken.
+ */
+export function firstView(product: MerchProduct): MerchView {
+  const view = product.views[0];
+  if (!view) throw new Error(`${product.slug} has no views`);
+  return view;
+}
+
 export const merch: MerchProduct[] = [
   {
     slug: "ball-cap",
@@ -120,9 +131,4 @@ export const merch: MerchProduct[] = [
 /** The catalogue is tiny, so a scan is cheaper than an index. */
 export function productBySlug(slug: string): MerchProduct | undefined {
   return merch.find((p) => p.slug === slug);
-}
-
-/** `$48.00`. Used everywhere a price is printed, so rounding happens once. */
-export function money(dollars: number): string {
-  return `$${dollars.toFixed(2)}`;
 }

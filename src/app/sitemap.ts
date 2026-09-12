@@ -3,6 +3,7 @@ import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
 import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
 import { merch, MERCH_UPDATED } from "@/data/merch";
+import { PRIVACY_UPDATED } from "@/data/privacy";
 
 export const dynamic = "force-static";
 
@@ -90,6 +91,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { path: "/about/", priority: 0.5, updated: SITE_UPDATED },
     { path: "/contact/", priority: 0.5, updated: SITE_UPDATED },
+    // Listed, but at the floor: it is a page that has to be findable and is
+    // never the answer to a search. Its own `lastmod` comes from the policy
+    // itself, so a crawler is told the terms moved only when they did.
+    { path: "/privacy/", priority: 0.1, updated: PRIVACY_UPDATED },
   ];
 
   return entries.map(({ path, priority, updated, images }) => ({

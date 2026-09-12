@@ -1279,6 +1279,20 @@ body {
   padding-top: 14px;
   color: #a99a78;
   font-size: 10px;
+  /* Wraps rather than crushing on a 320px handset, where the copyright line and
+     the policy link together outrun the column. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+}
+.cne-foot-legal a {
+  color: #a99a78;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cne-foot-legal a:hover {
+  color: var(--a-yel);
 }
 
 /* Six tabs on a narrow phone. SHOP is short, but it still takes a sixth of the
@@ -3725,4 +3739,134 @@ h3 { font-weight: 700; }
   .cne-dr-head h2 { font-size: 19px; }
   .cne-dr-body { padding: 16px 18px; }
   .cne-dr-foot { padding: 15px 18px 18px; }
+}
+
+/* ---- legal pages ---------------------------------------------------------
+   /privacy/ and anything else that is mostly prose. One measured column on the
+   paper ground rather than the red hero the marketing pages open with: a policy
+   is read, not scanned, and the display face at hero size above two thousand
+   words reads as a promotion of the thing it is disclosing.
+
+   The column is capped at 68ch. Body copy is 15px here rather than the site's
+   14px for the same reason — this is the one page on the site somebody reads
+   top to bottom. */
+.cne-lg {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: 34px 18px 64px;
+}
+.cne-lg-head {
+  border-bottom: 3px solid var(--a-ink);
+  padding-bottom: 18px;
+  margin-bottom: 26px;
+}
+.cne-lg-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-red);
+  margin: 0 0 8px;
+}
+.cne-lg-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 9vw, 46px);
+  line-height: 0.96;
+  margin: 0 0 10px;
+  color: var(--a-ink);
+  text-wrap: balance;
+}
+.cne-lg-date {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--a-sub);
+}
+
+/* The summary, boxed on cream so the one paragraph that answers the question
+   for most people is not the one they have to find. */
+.cne-lg-tldr {
+  background: var(--a-cream);
+  border: 3px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-shadow);
+  padding: 18px 20px;
+  margin-bottom: 34px;
+}
+.cne-lg-tldr h2 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin: 0 0 8px;
+  color: var(--a-ink);
+}
+.cne-lg-tldr p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.cne-lg-sec {
+  margin-bottom: 32px;
+}
+.cne-lg-sec h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  color: var(--a-ink);
+  /* Clears the sticky header when a heading is jumped to from the table of
+     contents a longer policy would grow, and from any anchor shared into it. */
+  scroll-margin-top: var(--cne-stuck);
+}
+.cne-lg-sec p,
+.cne-lg-sec li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--a-ink);
+}
+.cne-lg-sec p {
+  margin: 0 0 12px;
+}
+.cne-lg-sec ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+.cne-lg-sec li {
+  margin-bottom: 7px;
+}
+.cne-lg-sec strong {
+  font-weight: 700;
+}
+.cne-lg-sec a {
+  color: var(--a-red-cta);
+  text-underline-offset: 2px;
+}
+.cne-lg-sec code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--a-cream);
+  border: 1px solid var(--a-line);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* The one paragraph on the page making a claim about the code rather than about
+   policy, so it is marked as a statement of fact rather than of intent. */
+.cne-lg-note {
+  border-left: 4px solid var(--a-yel);
+  background: var(--a-card);
+  padding: 12px 14px;
+  margin: 0 0 12px;
+}
+
+.cne-lg-contact {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+@media (min-width: 768px) {
+  .cne-lg { padding: 52px 24px 80px; }
+  .cne-lg-tldr { padding: 22px 26px; }
+  .cne-lg-sec h2 { font-size: 24px; }
 }

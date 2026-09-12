@@ -21,6 +21,7 @@ Run `pnpm typecheck` and `pnpm lint` before reporting any change as done.
 ## Working in orchestrator mode
 
 For multi-step work, invoke the `orchestrate` skill: the main session plans and
-reviews, and delegates reading to the `investigator` subagent and code changes
-to the `implementer` subagent. Both run on Sonnet (see `.claude/agents/`), which
-is what keeps token cost down. Details in `.claude/skills/orchestrate/SKILL.md`.
+reviews, decides which workers to spawn, and delegates all reading and code
+changes to subagents that run on Sonnet (every Agent call passes
+`model: "sonnet"`, and `.claude/settings.json` defaults subagents to Sonnet).
+Details in `.claude/skills/orchestrate/SKILL.md`.

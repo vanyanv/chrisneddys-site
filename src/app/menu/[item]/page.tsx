@@ -8,6 +8,7 @@ import { itemOrderUrl, itemPhotoAlt, formatPrice } from "@/lib/otter";
 import { googleDirections } from "@/lib/directions";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { clampToWord } from "@/lib/text";
 
 type Params = { params: Promise<{ item: string }> };
 
@@ -33,12 +34,6 @@ export function generateStaticParams() {
  * page makes on purpose reads better than one the SERP makes for it.
  */
 const DESC_LIMIT = 155;
-
-function clampToWord(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max - 1);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:—-]+$/, "")}…`;
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { item: slug } = await params;

@@ -29,6 +29,8 @@
  * tracks outbound clicks, which is how "did someone actually go through to
  * Otter" gets measured.
  */
+import { shouldTrack } from "@/lib/analytics";
+
 // Sanitised before it ever reaches the template literal below: GA_ID is
 // interpolated straight into an inline `<script>` with no escaping, so an
 // override that somehow carried `</script>` or a stray quote would be a
@@ -36,34 +38,9 @@
 // digits and hyphens, so anything else is simply dropped.
 const GA_ID = (process.env.NEXT_PUBLIC_GA_ID || "G-9WECB13653").replace(/[^A-Za-z0-9-]/g, "");
 
-/**
- * Whether this page should report at all.
- *
- * A real function rather than a line of string-concatenated JavaScript, because
- * it is the one piece of analytics logic whose failure mode is silent in both
- * directions — a gate that is too loose pollutes the property, one that is too
- * tight loses the launch — so it is worth being able to test. It is serialised
- * into the inline snippet below by `toString()`, so there is exactly one copy
- * of the rule and no way for the tested version and the shipped one to drift.
- *
- * `search` is taken as an argument for the same reason: nothing here touches
- * `window`, so it runs in a test as happily as in a browser.
- *
- * MUST NOT reference anything outside its own parameters — no module-scope
- * constant, no import, nothing. It is serialised into the inline script below
- * with `.toString()`, so a closed-over reference would either crash the page
- * (the name does not exist in that scope) or silently read something else
- * entirely, and either way the tested function and the shipped one would no
- * longer be the same code.
- */
-export function shouldTrack(hostname: string, search: string): boolean {
-  // `search` is unused today — the debug flag deliberately cannot open the
-  // gate — but it stays in the signature because "is this host allowed to
-  // report" and "was this a deliberate debug visit" are asked in one breath.
-  void search;
-  return hostname === "chrisneddys.com" || hostname.endsWith(".chrisneddys.com");
-}
-
+// `shouldTrack` (see src/lib/analytics.ts) is serialised into the inline
+// snippet below by `toString()`, so there is exactly one copy of the gating
+// rule and no way for the tested version and the shipped one to drift.
 const GA_INIT = `(function(){
 var gate=${shouldTrack.toString()};
 if(!gate(location.hostname,location.search)){return}

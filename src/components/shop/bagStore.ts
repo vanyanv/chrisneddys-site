@@ -70,7 +70,7 @@ function persist() {
 }
 
 /** Drops anything that is no longer a product, or no longer a sane quantity. */
-function clean(lines: unknown): BagLine[] {
+export function clean(lines: unknown): BagLine[] {
   if (!Array.isArray(lines)) return [];
   const out: BagLine[] = [];
   for (const raw of lines) {

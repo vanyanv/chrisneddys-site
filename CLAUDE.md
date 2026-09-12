@@ -28,3 +28,17 @@ reviews, decides which workers to spawn, and delegates all reading and code
 changes to subagents that run on Sonnet (every Agent call passes
 `model: "sonnet"`, and `.claude/settings.json` defaults subagents to Sonnet).
 Details in `.claude/skills/orchestrate/SKILL.md`.
+
+## Tracking fixes
+
+Every user-visible fix gets a GitHub issue. Labels move `todo` -> `in-progress`
+-> `in-review`; close the issue with a comment linking the commit or PR that
+fixed it. Commit messages reference the issue number (e.g. `fixes #11`).
+
+In the same commit as the fix, add a line to `CHANGELOG.md` under
+`[Unreleased]` (`### Fixed`, `### Added`, or `### Changed`) with the issue
+link, following Keep a Changelog format.
+
+When a batch of fixes is deployed: bump `version` in `package.json`, move the
+`Unreleased` section into a new dated section, and tag the release
+`vX.Y.Z`.

@@ -481,8 +481,20 @@ body {
 .cne-row:hover .cne-row-thumb { transform: scale(1.05); }
 /* With a photo the square is filled edge to edge; the padding and centring
    below only exist for the text fallback when an item has no photo. */
-.cne-row-thumb:has(img) { padding: 0; display: block; }
-.cne-row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cne-row-thumb:has(img) { padding: 0; display: block; background-color: var(--a-bg); }
+.cne-row-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Every item is shot on a pure white sweep, which dropped a cold #fff square
+     into a system whose first neutral rule is that nothing is pure white.
+     Multiplying against the page ground turns the sweep into butcher paper and
+     leaves the food alone: #fff8e7 is (1.00, 0.97, 0.91), so the reds hold and
+     the shot warms by a few percent. See `.cne-sheet-shot` and `.cne-card-img`,
+     which do the same thing for the same photographs. */
+  mix-blend-mode: multiply;
+}
 .cne-row-name { flex: 1; min-width: 0; }
 .cne-row-name .n { font-size: 13.5px; font-weight: 800; line-height: 1.22; }
 .cne-row-name .d {
@@ -513,7 +525,10 @@ body {
   height: 26px;
   flex: none;
   border-radius: 50%;
-  background: var(--a-red);
+  /* Counter Red is a fill colour. The moment cream sits on it this is text on
+     a red surface, which is what Signal Red is for: 3.90:1 becomes 4.70:1 and
+     both edges are ink rules, so the step down is invisible. */
+  background: var(--a-red-cta);
   color: #fff2c9;
   border: 2px solid var(--a-ink);
   font-size: 13px;
@@ -524,7 +539,10 @@ body {
   transition: transform 0.16s;
 }
 .cne-row:hover .cne-chev { transform: translateX(3px); }
-.cne-row:focus-visible { outline: 3px solid var(--a-yel); outline-offset: 2px; }
+/* No focus rule here on purpose. The global ink ring in globals.css is the
+   system's rule — 3px ink at 2px offset, 16.99:1 on paper. The yellow ring
+   that used to live here cleared the page ground at 1.68:1, which is not a
+   focus indicator; yellow is only legible where the surface is ink. */
 
 /* ---- ways --------------------------------------------------------------- */
 .cne-ways { display: flex; gap: 7px; margin: 0 0 8px; }
@@ -540,11 +558,18 @@ body {
   transition: background 0.2s, color 0.2s;
   font: inherit;
 }
-.cne-way .t { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.05em; }
-.cne-way .s { font-size: 9px; color: var(--a-sub); margin-top: 3px; }
-.cne-way[aria-pressed="true"] { background: var(--a-ink); color: #fff2c9; }
-.cne-way[aria-pressed="true"] .s { color: rgba(255, 242, 201, 0.72); }
-.cne-way:focus-visible { outline: 3px solid var(--a-yel); outline-offset: 2px; }
+/* Blocks, but spans: a button's content model is phrasing content, so the
+   `<div>`s these used to be were never valid inside it. */
+.cne-way .t { display: block; font-family: var(--font-display); font-size: 11px; letter-spacing: 0.05em; }
+/* Was 9px. This is prose — "Lettuce, tomato, sauce, raw onion" — not a mono
+   label, so the 9.5px label floor never covered it. Same reasoning that took
+   the row description to 12.5px; the sheet is where people actually decide. */
+.cne-way .s { display: block; font-size: 12px; line-height: 1.35; color: var(--a-sub); margin-top: 4px; }
+.cne-way[aria-checked="true"] { background: var(--a-ink); color: #fff2c9; }
+.cne-way[aria-checked="true"] .s { color: rgba(255, 242, 201, 0.72); }
+/* Ink on paper, yellow only where the surface has gone ink. */
+.cne-way:focus-visible { outline: 3px solid var(--a-ink); outline-offset: 2px; }
+.cne-way[aria-checked="true"]:focus-visible { outline-color: var(--a-yel); }
 
 /* ---- locations cards ---------------------------------------------------- */
 .cne-loc {
@@ -750,108 +775,347 @@ body {
   background: var(--a-bg);
   color: var(--a-fg);
   border-top: 3px solid var(--a-ink);
-  border-radius: 18px 18px 0 0;
-  transform: translateY(102%);
-  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
+  /* Square. DESIGN.md settled this when the status capsule lost its corners:
+     "there is no 20px left in the system… a soft rectangle is the delivery
+     app's shape." The sheet was the last object on the site still wearing it,
+     on the one screen that links out to that app. The grab bar is a working
+     handle now, so the rounding is not what says "drag me" either. */
+  border-radius: 0;
+  transform: translateY(102%);  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
 }
-.cne-sheet.is-open { transform: none; }
+/* While a finger is on the grab bar the sheet follows it, so the transition
+   has to be off — otherwise every move is chasing a 0.42s tail. */
+.cne-sheet.is-dragging { transition: none; }
+.cne-sheet.is-open { transform: translateY(var(--cne-drag, 0px)); }
+
+/* The grab bar is a real handle now, not a picture of one: press it and the
+   sheet follows your finger, release past a third of its height and it goes.
+   It sat here promising that gesture for a while without implementing it. */
 .cne-sheet-grab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cne-sheet.is-dragging .cne-sheet-grab { cursor: grabbing; }
+.cne-sheet-grab::before {
+  content: "";
   width: 42px;
   height: 4.5px;
   border-radius: 4px;
   background: var(--a-line);
-  margin: 9px auto 2px;
-  flex: none;
+  transition: background 0.2s, width 0.2s;
 }
-.cne-sheet-body { overflow-y: auto; padding: 0 0 4px; }
+.cne-sheet-grab:hover::before,
+.cne-sheet.is-dragging .cne-sheet-grab::before { background: var(--a-ink); width: 54px; }
+/* Grows into spare height, never shrinks. The sheet's content does not fit a
+   phone — hero, price, Ways, button and an open ticket come to about 980px
+   against 88vh — so something has to give, and it must not be this. The burger
+   and the price are why the sheet was opened; the ticket is the part that was
+   one tap down to begin with. So the body keeps its full height and the ticket
+   below absorbs the overflow by scrolling inside itself. */
+.cne-sheet-body { flex: 1 0 auto; overflow-y: auto; padding: 0 0 4px; }
 .cne-sheet-foot {
   flex: none;
-  padding: 12px 15px calc(14px + env(safe-area-inset-bottom));
-  border-top: 2px solid var(--a-line);
+  padding: 13px 15px;
+  border-top: 3px solid var(--a-ink);
 }
+/* No safe-area padding here any more: the ticket below it is the sheet's last
+   element and carries the inset instead. Items that take no toppings have no
+   ticket, so the foot keeps it for them. */
+.cne-sheet:not(:has(.cne-ticket)) .cne-sheet-foot {
+  padding-bottom: calc(13px + env(safe-area-inset-bottom));
+}
+
+/* Was a bare ink glyph with no background, sitting on whatever pixels the food
+   photo happened to have in its top-right corner. Every current photo is shot
+   on white so it read fine, but that made contrast a property of the
+   photography rather than of the design. As a printed object it carries its
+   own ground, and it clears the 44px comfortable target it used to miss. */
 .cne-xbtn {
-  background: none;
-  border: none;
-  font-size: 20px;
+  background: var(--a-cream);
+  border: 2px solid var(--a-ink);
+  box-shadow: 2px 2px 0 var(--a-ink);
+  font-size: 17px;
   cursor: pointer;
   color: var(--a-fg);
   line-height: 1;
-  padding: 4px 6px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 11px;
+  top: 11px;
   z-index: 3;
+  transition: transform 0.12s, box-shadow 0.12s;
 }
+.cne-xbtn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--a-ink); }
+.cne-sheet-hero { position: relative; flex: none; }
+/* Was 150px. The photograph is the strongest thing this sheet has and it was
+   the fifth-largest element in it. A 42vh hero is the one change here with
+   category evidence behind it: DoorDash reports items carrying a photo take up
+   to 44% more monthly sales, and PRODUCT.md says the same thing in its own
+   words — "the product is the proof". Clamped rather than fixed, because 42vh
+   on a 667px phone and 42vh on a 932px one are different pictures. */
 .cne-sheet-shot {
-  height: 150px;
+  /* The photographs' own proportions. Every shot in /public/menu is 720x479,
+     and a hero taller than 3:2 cannot be filled by them: `cover` on a squarer
+     box scales by height, which leaves no vertical slack to crop with and
+     hands 44% of the hero to the white sweep above the food. Matching the
+     asset is what makes the picture bigger; fighting it just adds paper. */
+  aspect-ratio: 3 / 2;
+  /* A short viewport must not give the whole sheet to the photo. */
+  max-height: 42vh;
   background: var(--a-line) center / cover no-repeat;
   border-bottom: 3px solid var(--a-ink);
-  position: relative;
 }
-.cne-sheet-hd { padding: 13px 15px 0; display: flex; gap: 12px; align-items: flex-start; }
-.cne-sheet-hd h3 {
-  font-family: var(--font-display);
-  font-size: 20px;
+/* The white sweep becomes paper. See `.cne-row-thumb img`. Only when there is
+   actually a photograph — with no image the fallback is the rule-line grey,
+   and multiplying paper against paper would leave nothing to look at. */
+.cne-sheet-shot.is-photo {
+  background-color: var(--a-bg);
+  background-blend-mode: multiply;
+  /* Every shot carries a wide white sweep around the food, and at `cover` that
+     sweep takes about 44% of the hero. These two properties crop it out, per
+     photograph: `photoFocus.ts` measures each one's food bounding box and emits
+     the largest zoom that still fits it plus the offset that centres it. The
+     fallbacks are the all-photo compromise, for a photograph with no entry.
+
+     The numbers belong to the photography, not to taste. Re-shoot or re-crop
+     the sources tight to the food and this whole mechanism comes out. */
+  background-size: var(--cne-shot-zoom, 132%) auto;
+  background-position: center var(--cne-shot-focus, 62%);
+}
+/* The name is a printed object laid on the shot, not type floating on top of
+   whatever the photograph happens to have in that corner. It hangs off the
+   photo's bottom edge, so it grows upward into the picture on a long name
+   instead of pushing the price down. Same reasoning as `.cne-xbtn`: contrast
+   here is a property of the design, never of the photography. */
+.cne-sheet-name {
+  position: absolute;
+  left: 12px;
+  bottom: -22px;
+  max-width: calc(100% - 34px);
   margin: 0;
-  line-height: 1.03;
-  flex: 1;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.08;
+  color: #fff2c9;
+  background: var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-yel);
+  padding: 9px 12px 10px;
+}
+/* Clears the band's 22px overhang plus its 5px shadow. */
+.cne-sheet-hd {
+  padding: 40px 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.cne-sheet-hd .w {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--a-sub);
 }
 .cne-sheet-hd .p {
   font-family: var(--font-mono);
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 800;
+  line-height: 0.9;
   font-variant-numeric: tabular-nums;
 }
-.cne-sheet-desc { padding: 9px 15px 0; font-size: 12px; line-height: 1.5; color: var(--a-sub); }
+/* Was 12px in `--a-sub`. A well-written description is worth about 27% on its
+   own order rate, which makes it primary copy on this screen rather than a
+   caption under the name. Full ink, and a measure that stops it running the
+   width of a desktop drawer. */
+.cne-sheet-desc {
+  padding: 11px 15px 0;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--a-fg);
+  max-width: 44ch;
+}
+.cne-ways.cne-ways-sheet { padding: 15px 15px 17px; margin: 0; }
 
-.cne-tapcard {
-  margin: 14px 15px 0;
-  border: 2.5px dashed var(--a-red);
-  background: var(--a-card);
-  padding: 11px 12px;
-}
-.cne-tapcard .t {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--a-red);
-  margin-bottom: 8px;
-}
-.cne-taplist { display: flex; flex-wrap: wrap; gap: 6px; }
-.cne-taplist span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
+/* ---- the ticket ----------------------------------------------------------
+   What the dashed tap card, its two-sentence note and the add-on chip row
+   became: one object instead of three bordered boxes stacked with three
+   different border treatments and no hierarchy between them.
+
+   The point of it is the Way picker. Picking a Way used to rewrite a list of
+   checkboxes you would have to find again on another website — a control that
+   looked like configuration and delivered homework. Here the same press prints
+   those toppings into the bag as free line items, so the choice has a result
+   on screen. The row's own count moves too, which is what reports the change
+   while the ticket is shut.
+
+   Shut is the phone default and open is the desktop one; see `ticketOpen`. */
+.cne-ticket {
+  /* Shrinks, never grows: it yields its height to the body (see above) and
+     collapses to just its own button when there is nothing left to give. */
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-top: 3px solid var(--a-ink);
   background: var(--a-cream);
-  border: 1.5px solid var(--a-ink);
-  padding: 5px 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  animation: cne-tapin 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  padding-bottom: env(safe-area-inset-bottom);
 }
-.cne-taplist span:nth-child(2) { animation-delay: 0.05s; }
-.cne-taplist span:nth-child(3) { animation-delay: 0.1s; }
-.cne-taplist span:nth-child(4) { animation-delay: 0.15s; }
-@keyframes cne-tapin {
-  from { opacity: 0; transform: scale(0.86); }
+.cne-ticket-btn {
+  flex: none;
+  width: 100%;
+  /* 13px of padding either side of an 11px mono label lands at 43.6px, which
+     is under the 44px this site gives every other pressable thing. */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--a-fg);
+  font: inherit;
+}
+.cne-ticket-btn .t {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.cne-ticket-btn .c {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  /* Green is "free" everywhere else on the site. It means the same thing here
+     and nothing else is allowed to use it. */
+  color: var(--a-ok);
+  font-variant-numeric: tabular-nums;
+}
+/* Plus becomes minus. State is carried twice over — by this and by the count
+   beside it — so it survives greyscale, per the colour-independence rule. */
+.cne-ticket-btn .s { position: relative; width: 13px; height: 13px; flex: none; }
+.cne-ticket-btn .s::before,
+.cne-ticket-btn .s::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: var(--a-ink);
+  transform: translate(-50%, -50%);
+}
+.cne-ticket-btn .s::before { width: 13px; height: 2.5px; }
+.cne-ticket-btn .s::after {
+  width: 2.5px;
+  height: 13px;
+  transition: transform 0.26s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+.cne-ticket.is-open .cne-ticket-btn .s::after { transform: translate(-50%, -50%) scaleY(0); }
+
+/* `grid-template-rows` rather than height: height cannot animate to `auto`,
+   and animating a layout property is what this system does not do. */
+.cne-ticket-wrap {
+  /* `0 1 auto`, not `1 1 auto`: growing would pull the panel open again on a
+     tall screen while the row is shut. */
+  flex: 0 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+.cne-ticket.is-open .cne-ticket-wrap { grid-template-rows: 1fr; }
+.cne-ticket-panel { overflow: hidden; min-height: 0; }
+/* A Family Box is eleven lines plus a total. The ticket scrolls inside
+   whatever height it was left with rather than pushing anything off screen. */
+.cne-ticket-pad { height: 100%; padding: 0 15px 14px; overflow-y: auto; }
+
+.cne-tl {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--a-line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.cne-tl .q { min-width: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cne-tl .n { flex: 1; text-transform: uppercase; letter-spacing: 0.04em; }
+.cne-tl .v { font-weight: 700; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+/* Signal Red, not Counter Red: this is text on paper, and the display cut sits
+   at 4.28:1 here. The Fill-Is-Not-Text Rule. */
+.cne-tl.is-free .q { color: var(--a-red-cta); }
+.cne-tl.is-free .v { color: var(--a-ok); }
+.cne-tl.is-total {
+  margin-top: 8px;
+  padding-top: 9px;
+  border-bottom: none;
+  border-top: 3px solid var(--a-ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+/* The free lines land in order, the way a ticket comes off a printer. Ease-out
+   only: the stamp overshoot that used to be on the tap chips was involuntary
+   motion fired on open, and this is the same class of thing. */
+@keyframes cne-print {
+  from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: none; }
 }
-.cne-tapcard .note { font-size: 10.5px; line-height: 1.5; color: var(--a-sub); margin-top: 9px; }
-.cne-addon { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 15px 0; }
-.cne-addon span {
+.cne-ticket.is-open .cne-tl.is-free {
+  animation: cne-print 0.26s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.cne-ticket-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--a-sub);
+}
+.cne-ticket-extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.cne-ticket-extra .l {
+  width: 100%;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+.cne-ticket-extra .x {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   border: 1.5px solid var(--a-line);
   padding: 5px 8px;
   color: var(--a-sub);
 }
 
+/* Yellow, not red. DESIGN.md reserves Marquee Yellow for price and for the
+   primary action, and this is the only primary action in the sheet — in red it
+   read as more brand chrome rather than as the thing to press. */
 .cne-otter {
   display: flex;
   align-items: center;
@@ -859,20 +1123,20 @@ body {
   gap: 8px;
   text-align: center;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.05em;
-  background: var(--a-red-cta);
-  color: #fff2c9;
-  border: 2.5px solid var(--a-ink);
+  background: var(--a-yel);
+  color: var(--a-ink);
+  border: 3px solid var(--a-ink);
   box-shadow: 4px 4px 0 var(--a-ink);
-  padding: 15px;
+  padding: 16px 15px;
   text-decoration: none;
   transition: transform 0.12s, box-shadow 0.12s;
 }
-.cne-otter:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--a-ink); }
+.cne-otter:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--a-ink); }
 .cne-fine {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--a-sub);
   text-align: center;
   margin: 9px 0 0;
@@ -889,6 +1153,37 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .js .cne-rv { opacity: 1 !important; transform: none !important; }
+
+  /* The item sheet and everything it carries. A full-height panel sliding up,
+     plus four chips scaling in on a stagger, is the exact motion class this
+     query exists to suppress — and the chips are involuntary, they fire on
+     open rather than on hover. The scrim keeps its opacity fade: a cross-fade
+     is the accepted substitute, not the thing being opted out of. */
+  .cne-sheet { transition: none !important; }
+  .cne-sheet-grab::before { transition: none !important; }
+
+  /* The ticket. Its collapse is a `grid-template-rows` transition and the free
+     lines print in on a stagger — involuntary motion, fired by opening the row
+     or by changing the Way rather than by hovering, which is exactly what this
+     query is for. The open and shut states stay; only the travel between them
+     goes. The plus/minus still turns, it just turns instantly. */
+  .cne-ticket-wrap { transition: none !important; }
+  .cne-ticket-btn .s::after { transition: none !important; }
+  .cne-ticket.is-open .cne-tl.is-free {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Hover travel on the menu rows and the rail. */
+  .cne-row-thumb,
+  .cne-chev,
+  .cne-way,
+  .cne-menu-jump a { transition: none !important; }
+  .cne-row:hover .cne-row-thumb,
+  .cne-row:hover .cne-chev,
+  .cne-way:hover,
+  .cne-menu-jump a:hover { transform: none !important; }
 }
 
 /* ---- footer ------------------------------------------------------------- */
@@ -1265,24 +1560,45 @@ body {
   }
   .cne-sheet.is-open { transform: none; }
   .cne-sheet-grab { display: none; }
-  .cne-sheet-body { flex: 1; }
-  .cne-sheet-foot { padding: 20px 26px 26px; border-top-width: 4px; border-top-color: var(--a-ink); }
-  .cne-sheet-shot { height: 230px; border-bottom-width: 4px; }
-  .cne-sheet-hd { padding: 22px 26px 0; gap: 16px; }
-  .cne-sheet-hd h3 { font-size: 30px; line-height: 1.02; }
-  .cne-sheet-hd .p { font-size: 28px; }
-  .cne-sheet-desc { padding: 12px 26px 0; font-size: 15px; line-height: 1.55; }
-  .cne-tapcard { margin: 20px 26px 0; border-width: 3px; padding: 16px; }
-  .cne-tapcard .t { font-size: 11px; margin-bottom: 11px; }
-  .cne-taplist { gap: 8px; }
-  .cne-taplist span { font-size: 12.5px; border-width: 2px; padding: 7px 11px; }
-  .cne-addon { padding: 16px 26px 0; }
+  .cne-sheet-body { flex: 1 0 auto; }
+  .cne-sheet-foot { padding: 20px 26px; border-top-width: 4px; border-top-color: var(--a-ink); }
+  .cne-sheet:not(:has(.cne-ticket)) .cne-sheet-foot { padding-bottom: 26px; }
+  /* The drawer is full height, so the hero is not competing with anything for
+     it and the clamp's viewport term stops being the right measure. */
+  .cne-sheet-shot { max-height: 46vh; border-bottom-width: 4px; }
+  .cne-sheet-name {
+    left: 18px;
+    bottom: -24px;
+    max-width: calc(100% - 46px);
+    font-size: 27px;
+    padding: 11px 15px 12px;
+    box-shadow: 6px 6px 0 var(--a-yel);
+  }
+  .cne-sheet-hd { padding: 46px 26px 0; gap: 16px; }
+  .cne-sheet-hd .w { font-size: 12px; }
+  .cne-sheet-hd .p { font-size: 36px; }
+  .cne-sheet-desc { padding: 13px 26px 0; font-size: 15px; line-height: 1.55; }
+  .cne-ways.cne-ways-sheet { padding: 20px 26px 22px; }
+
+  .cne-ticket-btn { padding: 16px 26px; }
+  .cne-ticket-btn .t,
+  .cne-ticket-btn .c { font-size: 12px; }
+  /* Open from the start up here, and there is height for all of it, so the
+     phone's scroll cap comes off. */
+  .cne-ticket-pad { padding: 0 26px 22px; }
+  .cne-tl { font-size: 13px; padding: 7px 0; }
+  .cne-tl .q { min-width: 30px; }
+  .cne-tl.is-total { font-size: 15px; }
+  .cne-ticket-note { font-size: 13px; }
+  .cne-ticket-extra .x { font-size: 12px; }
+
   .cne-otter {
     font-size: 17px;
     border-width: 4px;
     box-shadow: 6px 6px 0 var(--a-ink);
     padding: 19px;
   }
+  .cne-otter:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--a-ink); }
   .cne-fine { font-size: 12px; }
 
   .cne-foot {
@@ -1342,7 +1658,9 @@ body {
   transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .cne-card:hover .cne-card-img { transform: scale(1.05); }
-.cne-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cne-card-img:has(img) { background-color: var(--a-bg); }
+/* The white sweep becomes paper. See `.cne-row-thumb img`. */
+.cne-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; mix-blend-mode: multiply; }
 .cne-card h3 {
   grid-column: 2;
   grid-row: 1;

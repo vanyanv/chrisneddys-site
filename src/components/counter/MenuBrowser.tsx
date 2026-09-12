@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 
-import { menu, categoryTitles, ways, type MenuCategoryKey } from "@/data/menu";
+import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { ItemSheet } from "./ItemSheet";
+import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
 
 const ORDER: MenuCategoryKey[] = ["combos", "sides", "secret", "drinks"];
@@ -25,22 +26,14 @@ export function MenuBrowser() {
     <>
       <div className="cne-menu">
         <aside className="cne-menu-side cne-sec">
-          <div className="cne-eyebrow">Pick a way — free</div>
-          <h1>Everything we make.</h1>
-          <div className="cne-ways">
-            {ways.map((w) => (
-              <button
-                key={w.id}
-                type="button"
-                className="cne-way"
-                aria-pressed={w.id === way}
-                onClick={() => setWay(w.id)}
-              >
-                <div className="t">{w.name.toUpperCase()}</div>
-                <div className="s">{w.summary}</div>
-              </button>
-            ))}
+          <div className="cne-eyebrow" id="cne-way-label">
+            Pick a way — free
           </div>
+          <h1>Everything we make.</h1>
+          {/* The eyebrow above is the group's visible name, so it names the
+              group programmatically too rather than being decoration a screen
+              reader has to guess the relevance of. */}
+          <WayPicker way={way} onChange={setWay} labelledBy="cne-way-label" />
 
           {/* Desktop only — on a phone the sections are a thumb-flick apart. */}
           <nav className="cne-menu-jump" aria-label="Menu sections">
@@ -69,8 +62,16 @@ export function MenuBrowser() {
               <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
               <div className="cne-cat-rule" aria-hidden="true" />
               <div className="cne-menu-grid">
-                {menu[key].map((it) => (
-                  <MenuRow key={it.id} item={it} onOpen={openItem} />
+                {menu[key].map((it, i) => (
+                  /* The first rows of the first section are on screen at load,
+                     and `loading="lazy"` on an above-the-fold image just delays
+                     it past the point the browser would have fetched it. */
+                  <MenuRow
+                    key={it.id}
+                    item={it}
+                    eager={key === ORDER[0] && i < 2}
+                    onOpen={openItem}
+                  />
                 ))}
               </div>
             </section>

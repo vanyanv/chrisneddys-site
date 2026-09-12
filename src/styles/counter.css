@@ -131,8 +131,12 @@ body {
   display: block;
   filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.3));
 }
-/* `display: contents` promotes the pill and the button to children of the row,
-   so `justify-content: space-between` sends one to each end around the logo. */
+/* `display: contents` promotes the pill, the bag button and the order button to
+   children of the row, so `justify-content: space-between` would otherwise send
+   the middle one — the bag button, once it exists — to the row's centre, right
+   under the logo. `.cne-bag-slot`'s auto left margin (below) claims the free
+   space before it instead, so the bag and order button sit together on the
+   right and the status pill keeps the left. */
 .cne-nav-right {
   display: contents;
 }
@@ -1745,6 +1749,12 @@ body {
     order: 3;
     margin-left: auto;
     gap: 14px;
+  }
+  /* The mobile fix above uses this same auto-margin trick on the slot itself,
+     since it's a bare flex item there. Here it's back inside a real flex group
+     that already right-aligns as a whole, so undo it to keep `gap` even. */
+  .cne-bag-slot {
+    margin-left: 0;
   }
 
   .cne-stat-a {
@@ -4903,11 +4913,20 @@ h3 {
 /* ---- the bag button, in the site header --------------------------------- */
 .cne-bag-slot {
   display: inline-flex;
+  /* Below 901px `.cne-nav-right` is `display: contents`, so this slot is a
+     direct flex item of `.cne-nav` alongside the status pill and the order
+     button. The auto margin claims all the free space before it, which keeps
+     the pill on the left and pulls the bag button (when it exists) and the
+     order button together on the right — off the centred logo. Reset at the
+     901px+ breakpoint, where `.cne-nav-right` becomes its own flex group and
+     already right-aligns itself with `margin-left: auto` there instead. */
+  margin-left: auto;
 }
 .cne-bagbtn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  position: relative;
   font-family: var(--font-mono);
   font-size: 9.5px;
   font-weight: 800;
@@ -4951,6 +4970,36 @@ h3 {
   display: block;
   height: 14px;
   line-height: 14px;
+}
+
+/* At the two narrowest phone widths (see DESIGN.md's "How the tag narrows":
+   the header only has half the viewport less half the wordmark to give each
+   side, 91px-127px), the order button alone already uses most of that on the
+   right, so the bag button has to shrink to icon-plus-count rather than the
+   fuller icon-count-with-room button it is above 480px. The count moves out
+   of flow onto the button's corner so it costs nothing but the icon's own
+   width, and the order button's own padding gives up a couple of px too. */
+@media (max-width: 480px) {
+  .cne-nav {
+    gap: 4px;
+  }
+  .cne-orderbtn {
+    padding: 8px 6px;
+  }
+  .cne-bagbtn {
+    gap: 0;
+    padding: 4px;
+  }
+  .cne-bagbtn-c {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    font-size: 8px;
+    border: 1.5px solid var(--a-yel);
+  }
 }
 
 /* ---- the drawer --------------------------------------------------------- */

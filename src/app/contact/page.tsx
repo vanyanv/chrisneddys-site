@@ -3,20 +3,14 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { neighbourhoodFor, slugFor } from "@/lib/locationSlug";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { GuestCheck } from "@/components/contact/GuestCheck";
 
 const title = "Contact Us — Catering, Press & Questions";
 const description =
   "Catering, press, partnerships or a problem with an order — one form at Chris N Eddy’s, answered by a real person. Or call (323) 544-3600.";
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/contact/" },
-  openGraph: openGraphFor({ title: `${title} · ${brand.name}`, description, path: "/contact/" }),
-  twitter: twitterFor({ title: `${title} · ${brand.name}`, description }),
-};
+export const metadata: Metadata = pageMetadata({ title, description, path: "/contact/" });
 
 /**
  * The three questions people send us that the page can answer itself. Kept in

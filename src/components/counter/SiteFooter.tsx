@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
 
 /**
  * The footer is the only place every page of the site is linked from. That is
@@ -26,7 +26,7 @@ const COUNTER_LINKS = [
   { href: "/locations/", label: "All locations" },
   ...locations.map((loc) => ({
     href: `/locations/${slugFor(loc)}/`,
-    label: neighbourhoodFor(loc),
+    label: loc.neighbourhood,
   })),
 ];
 
@@ -94,7 +94,7 @@ export function SiteFooter() {
                 the Locations column above, and two anchors on one URL in one
                 block is the kind of duplication that makes a footer read as
                 padded rather than as a map. */}
-            <p className="cne-foot-h">{neighbourhoodFor(loc)}</p>
+            <p className="cne-foot-h">{loc.neighbourhood}</p>
             {loc.isOpen ? (
               <>
                 <address>

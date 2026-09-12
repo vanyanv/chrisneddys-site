@@ -3,7 +3,7 @@ import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
 import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
 import { merch, MERCH_UPDATED } from "@/data/merch";
-import { PRIVACY_UPDATED } from "@/app/privacy/page";
+import { PRIVACY_UPDATED } from "@/data/privacy";
 
 export const dynamic = "force-static";
 

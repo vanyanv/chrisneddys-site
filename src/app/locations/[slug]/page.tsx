@@ -4,7 +4,7 @@ import Link from "next/link";
 import { brand } from "@/data/brand";
 import { breadcrumbLd, openGraphFor, twitterFor } from "@/lib/seo";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
-import { allLocationSlugs, locationBySlug, neighbourhoodFor } from "@/lib/locationSlug";
+import { allLocationSlugs, locationBySlug } from "@/lib/locationSlug";
 import { StoreDetail } from "@/components/counter/StoreDetail";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const loc = locationBySlug(slug);
   if (!loc) return {};
 
-  const hood = neighbourhoodFor(loc);
+  const hood = loc.neighbourhood;
   // Late night is the one thing this location has that the Hollywood smashburger
   // field mostly does not — For The Win shuts at 9PM — so the open location says
   // so in its title rather than burying it in the hours table.
@@ -43,7 +43,7 @@ export default async function LocationPage({ params }: Params) {
   const loc = locationBySlug(slug);
   if (!loc) notFound();
 
-  const hood = neighbourhoodFor(loc);
+  const hood = loc.neighbourhood;
 
   const jsonLd = breadcrumbLd([
     { name: "Locations", path: "/locations/" },

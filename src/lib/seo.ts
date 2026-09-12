@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { brand } from "@/data/brand";
 
 /**
@@ -23,12 +24,21 @@ export const ID = {
   menu: `${brand.siteUrl}/menu/#menu`,
 };
 
+/** The 1200x630 shape `openGraphFor` and `twitterFor` want for a custom image. */
+type OgImage = { url: string; width: number; height: number; alt: string };
+
 /**
  * Page metadata declared per-page replaces the parent's `openGraph` wholesale,
  * which is why the sub-pages were shipping with no social image at all. This
  * builds the block so the image can't be forgotten again.
  */
-export function openGraphFor(opts: { title: string; description: string; path: string }) {
+export function openGraphFor(opts: {
+  title: string;
+  description: string;
+  path: string;
+  /** Defaults to the shared burger card — pass one when the page has its own. */
+  image?: OgImage;
+}) {
   return {
     title: opts.title,
     description: opts.description,
@@ -36,16 +46,45 @@ export function openGraphFor(opts: { title: string; description: string; path: s
     siteName: brand.name,
     type: "website" as const,
     locale: "en_US",
-    images: [OG_IMAGE],
+    images: [opts.image ?? OG_IMAGE],
   };
 }
 
-export function twitterFor(opts: { title: string; description: string }) {
+export function twitterFor(opts: { title: string; description: string; image?: string }) {
   return {
     card: "summary_large_image" as const,
     title: opts.title,
     description: opts.description,
-    images: [OG_IMAGE.url],
+    images: [opts.image ?? OG_IMAGE.url],
+  };
+}
+
+/**
+ * The metadata block that most pages build: a title, a description, a
+ * canonical, and the shared `openGraphFor`/`twitterFor` pair — both fed the
+ * same `"<title> · <brand>"` line social previews want but a search snippet's
+ * own `<title>` does not (that one gets it from the layout's title template
+ * instead). Pass `image` for a page whose social card is its own subject
+ * rather than the sitewide burger shot.
+ */
+export function pageMetadata(opts: {
+  title: string;
+  description: string;
+  path: string;
+  image?: OgImage;
+}): Metadata {
+  const full = `${opts.title} · ${brand.name}`;
+  return {
+    title: opts.title,
+    description: opts.description,
+    alternates: { canonical: opts.path },
+    openGraph: openGraphFor({
+      title: full,
+      description: opts.description,
+      path: opts.path,
+      image: opts.image,
+    }),
+    twitter: twitterFor({ title: full, description: opts.description, image: opts.image?.url }),
   };
 }
 

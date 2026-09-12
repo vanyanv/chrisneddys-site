@@ -18,6 +18,10 @@ export const locationBySlug = (slug: string): Location | undefined =>
 
 export const allLocationSlugs = (): string[] => locations.map(slugFor);
 
-/** The neighbourhood people actually search, which isn't always `city`. */
-export const neighbourhoodFor = (loc: Location): string =>
-  loc.id === "hollywood" ? "Hollywood" : loc.id === "glendale" ? "Glendale" : "Van Nuys";
+/**
+ * @deprecated The business rule now lives on the data: read `loc.neighbourhood`
+ * directly. Kept only because `src/app/contact/page.tsx` — owned by another
+ * worker in this pass — still imports it; every caller in this file's scope
+ * has been switched to the field.
+ */
+export const neighbourhoodFor = (loc: Location): string => loc.neighbourhood;

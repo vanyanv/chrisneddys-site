@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, money, firstView } from "@/data/merch";
+import { TERMS_PENDING, merch, firstView } from "@/data/merch";
+import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { shopListLd } from "@/lib/merchLd";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
 const title = "Shop — Chris N Eddy's Merch";
 const description =
   "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Ball-Cap, $48, one size fits all, limited quantity.";
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/shop/" },
-  openGraph: openGraphFor({ title: `${title} · ${brand.name}`, description, path: "/shop/" }),
-  twitter: twitterFor({ title: `${title} · ${brand.name}`, description }),
-};
+export const metadata: Metadata = pageMetadata({ title, description, path: "/shop/" });
 
 /**
  * The shop index.
@@ -78,7 +73,7 @@ export default function ShopPage() {
                   <br />
                   {product.displayName[1]}
                 </h2>
-                <div className="cne-drop-price">{money(product.price)}</div>
+                <div className="cne-drop-price">{formatPrice(product.price)}</div>
                 <p>One size fits all. {product.limitedNote}</p>
                 <span className="cne-drop-go">
                   VIEW THE CAP <span aria-hidden="true">→</span>

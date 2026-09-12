@@ -1,26 +1,14 @@
 import type { Metadata } from "next";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { PRIVACY_UPDATED } from "@/data/privacy";
 
 const title = "Privacy Policy";
 const description =
   "What Chris N Eddy’s collects when you use this site, who it goes to, and how to get it deleted. No accounts, no payments, no data sold.";
 
-/**
- * Bumped by hand when the policy text changes, and only then. It is printed on
- * the page and is the `lastmod` this URL reports in the sitemap, so the two
- * cannot disagree about when the terms someone agreed to last moved.
- */
-export const PRIVACY_UPDATED = "2026-09-12";
-
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/privacy/" },
-  openGraph: openGraphFor({ title: `${title} · ${brand.name}`, description, path: "/privacy/" }),
-  twitter: twitterFor({ title: `${title} · ${brand.name}`, description }),
-};
+export const metadata: Metadata = pageMetadata({ title, description, path: "/privacy/" });
 
 const UPDATED_HUMAN = "12 September 2026";
 

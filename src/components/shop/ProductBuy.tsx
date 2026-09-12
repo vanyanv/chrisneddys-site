@@ -3,7 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { addToBag, openBag } from "./bagStore";
 import { flyToBag } from "./flyToBag";
-import { MAX_PER_ORDER, money, type MerchProduct } from "@/data/merch";
+import { MAX_PER_ORDER, type MerchProduct } from "@/data/merch";
+import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 
 /** GA4's ecommerce line item, from a product. */
@@ -130,7 +131,7 @@ export function BuyRow() {
         </button>
       </div>
       <button type="button" className="cne-btn-primary" onClick={add}>
-        {added ? "ADDED ✓" : `ADD TO BAG — ${money(product.price * qty)}`}
+        {added ? "ADDED ✓" : `ADD TO BAG — ${formatPrice(product.price * qty)}`}
       </button>
     </div>
   );
@@ -145,7 +146,7 @@ export function StickyBuy() {
 
   return (
     <div className="cne-pdp-sticky">
-      <span className="cne-price p">{money(product.price * qty)}</span>
+      <span className="cne-price p">{formatPrice(product.price * qty)}</span>
       <button type="button" className="cne-btn-primary" onClick={add}>
         {added ? "ADDED ✓" : "ADD TO BAG"}
       </button>

@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
-import { locations, DEFAULT_LOCATION, type Location } from "@/data/locations";
+import { locations, flagship, type Location } from "@/data/locations";
 import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
-import { itemOrderUrl, storeUrl } from "@/lib/otter";
-import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
+import { slugFor } from "@/lib/locationSlug";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { ID } from "@/lib/seo";
 
@@ -49,7 +49,7 @@ export function menuNode() {
         description: item.desc || undefined,
         offers: {
           "@type": "Offer",
-          price: item.price.toFixed(2),
+          price: priceString(item.price),
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
           url: itemOrderUrl(item),
@@ -170,7 +170,7 @@ export function restaurantLd(loc: Location) {
  * page, the menu and the order page all describe it by name.
  */
 export function flagshipRestaurantLd() {
-  return restaurantLd(locations.find((l) => l.id === "hollywood") ?? DEFAULT_LOCATION);
+  return restaurantLd(flagship);
 }
 
 /**
@@ -182,8 +182,6 @@ export function flagshipRestaurantLd() {
  * see `restaurantNode`, which the pages that are about a store emit themselves.
  */
 export function JsonLd(): ReactElement {
-  const flagship = locations.find((l) => l.id === "hollywood") ?? DEFAULT_LOCATION;
-
   const organization = {
     "@type": "Organization",
     "@id": ID.org,
@@ -225,7 +223,7 @@ export function JsonLd(): ReactElement {
     },
     areaServed: locations.map((loc) => ({
       "@type": "City",
-      name: neighbourhoodFor(loc),
+      name: loc.neighbourhood,
     })),
   };
 

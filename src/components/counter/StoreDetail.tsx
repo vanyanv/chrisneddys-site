@@ -1,12 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { locations, type Location } from "@/data/locations";
-import { orderUrl } from "@/lib/otter";
-import { googleDirections, appleDirections, prefersAppleMaps } from "@/lib/directions";
-import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
+import { LocationCard } from "@/components/locations/LocationCard";
 
 /**
  * One store's page. Beyond ranking for the neighbourhood, this is the page
@@ -18,8 +14,6 @@ import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
  * about how they relate.
  */
 export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
-  const [apple, setApple] = useState(false);
-  useEffect(() => setApple(prefersAppleMaps()), []);
   const others = locations.filter((l) => l.id !== loc.id);
 
   return (
@@ -34,71 +28,28 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
           data-surface="location-page"
           data-location={slugFor(loc)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: 8,
-            }}
-          >
-            {/* Not an `<h2>`: the page's own `<h1>` above already names this
-                store by neighbourhood, so a heading repeating it in caps is a
-                redundant node in the outline, not a second section. */}
-            <p className="cne-loc-h" style={{ font: "inherit", margin: 0, padding: 0 }}>
-              {loc.name.toUpperCase()}
-            </p>
-            {loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
-          </div>
-
-          <address className="cne-loc-addr" style={{ fontStyle: "normal" }}>
-            {loc.address}
-            <br />
-            {loc.city}, {loc.region} {loc.postal}
-          </address>
-
-          {loc.isOpen && (
-            <div className="cne-loc-hrs">
-              {loc.hours.map(([day, hrs]) => (
-                <div className="r" key={day}>
-                  <span>{day.toUpperCase()}</span>
-                  <b>{hrs}</b>
+          <LocationCard
+            loc={loc}
+            surface="location-page"
+            // Not an `<h2>`: the page's own `<h1>` above already names this
+            // store by neighbourhood, so a heading repeating it in caps is a
+            // redundant node in the outline, not a second section.
+            headingTag="p"
+            headingClassName="cne-loc-h"
+            headingStyle={{ font: "inherit", margin: 0, padding: 0 }}
+            status={loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
+            addressAs="address"
+            addressStyle={{ fontStyle: "normal" }}
+            showButtonsWhenClosed
+            footer={
+              loc.isOpen &&
+              !loc.otter && (
+                <div className="cne-loc-note">
+                  Online ordering for this store isn&rsquo;t live on Otter yet.
                 </div>
-              ))}
-            </div>
-          )}
-
-          <div className="cne-loc-btns">
-            {loc.id === "hollywood" && (
-              <a
-                className="cne-mini is-red"
-                href={orderUrl("location-page")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ORDER
-              </a>
-            )}
-            <a
-              className="cne-mini is-plain"
-              href={apple ? appleDirections(loc) : googleDirections(loc)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              DIRECTIONS
-            </a>
-            {loc.phoneTel && (
-              <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
-                CALL
-              </a>
-            )}
-          </div>
-
-          {loc.isOpen && loc.id !== "hollywood" && (
-            <div className="cne-loc-note">
-              Online ordering for this store isn&rsquo;t live on Otter yet.
-            </div>
-          )}
+              )
+            }
+          />
         </div>
       </section>
 
@@ -135,7 +86,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
             className={`cne-loc ${o.isOpen ? "is-live" : "is-soon"}`}
             style={{ display: "block", textDecoration: "none", color: "inherit" }}
           >
-            <h3>{neighbourhoodFor(o).toUpperCase()}</h3>
+            <h3>{o.neighbourhood.toUpperCase()}</h3>
             <div className="cne-loc-addr">
               {o.address}
               <br />

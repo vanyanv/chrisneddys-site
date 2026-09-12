@@ -352,6 +352,7 @@ export const ways = [
 ] as const;
 
 export type Way = (typeof ways)[number];
+export type WayId = Way["id"];
 
 /** Free topping modifiers, as Otter lists them. */
 export const toppings = [

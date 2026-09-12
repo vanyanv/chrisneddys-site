@@ -5,8 +5,8 @@ import { locations } from "@/data/locations";
 import { SLIDER_PRICE, COMBO_FROM_PRICE } from "@/data/menu";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { storeUrl, orderUrl } from "@/lib/otter";
-import { googleDirections } from "@/lib/directions";
-import { slugFor, neighbourhoodFor } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
+import { LocationCard } from "@/components/locations/LocationCard";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
 
@@ -139,56 +139,23 @@ export default function OrderPage() {
             data-surface="location-card"
             data-location={slugFor(loc)}
           >
-            <h3>{neighbourhoodFor(loc).toUpperCase()}</h3>
-            <address className="cne-loc-addr" style={{ fontStyle: "normal" }}>
-              {loc.address}
-              <br />
-              {loc.city}, {loc.region} {loc.postal}
-            </address>
-            {loc.isOpen ? (
-              <>
-                <div className="cne-loc-hrs">
-                  {loc.hours.map(([day, hrs]) => (
-                    <div className="r" key={day}>
-                      <span>{day.toUpperCase()}</span>
-                      <b>{hrs}</b>
-                    </div>
-                  ))}
-                </div>
-                <div className="cne-loc-btns">
-                  {loc.id === "hollywood" && (
-                    <a
-                      className="cne-mini is-red"
-                      href={orderUrl("location-card")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      ORDER
-                    </a>
-                  )}
-                  <a
-                    className="cne-mini is-plain"
-                    href={googleDirections(loc)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    DIRECTIONS
-                  </a>
-                  {loc.phoneTel && (
-                    <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
-                      CALL
-                    </a>
-                  )}
-                </div>
-              </>
-            ) : (
-              // No hours, no phone and no order link for a location that is not
-              // serving yet — every one of them would be a dead end.
-              <div className="cne-loc-note">Opening date to be announced.</div>
-            )}
-            <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
-              {neighbourhoodFor(loc)} hours &amp; directions &rarr;
-            </Link>
+            <LocationCard
+              loc={loc}
+              surface="location-card"
+              addressAs="address"
+              addressStyle={{ fontStyle: "normal" }}
+              footer={
+                // No hours, no phone and no order link for a location that is
+                // not serving yet — every one of them would be a dead end. The
+                // details link still runs either way.
+                <>
+                  {!loc.isOpen && <div className="cne-loc-note">Opening date to be announced.</div>}
+                  <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
+                    {loc.neighbourhood} hours &amp; directions &rarr;
+                  </Link>
+                </>
+              }
+            />
           </div>
         ))}
       </section>

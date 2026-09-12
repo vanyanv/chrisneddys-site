@@ -3,6 +3,8 @@ import { brand } from "./brand";
 export type Location = {
   id: "hollywood" | "glendale" | "vannuys";
   name: string;
+  /** The neighbourhood people actually search, which isn't always `city`. */
+  neighbourhood: string;
   sub: string;
   /**
    * The line this location answers itself. A store only gets a CALL button and a
@@ -18,6 +20,14 @@ export type Location = {
   postal: string;
   status: string;
   isOpen: boolean;
+  /**
+   * Present once this store takes online orders through Otter — today that is
+   * Hollywood only. `otter.ts` has one global storefront rather than one per
+   * location, so this is a flag, not a per-store config: whether the ORDER
+   * button (and an `OrderAction` in JSON-LD) makes sense for this address is
+   * `Boolean(loc.otter)`.
+   */
+  otter?: true;
   lat: number;
   lng: number;
   hours: Array<[string, string]>;
@@ -28,6 +38,7 @@ export const locations: Location[] = [
   {
     id: "hollywood",
     name: "Hollywood",
+    neighbourhood: "Hollywood",
     sub: "Open since 2021",
     address: "5539 W. Sunset Blvd",
     city: "Los Angeles",
@@ -35,6 +46,7 @@ export const locations: Location[] = [
     postal: "90028",
     status: "Open daily",
     isOpen: true,
+    otter: true,
     phone: brand.phone,
     phoneTel: brand.phoneTel,
     lat: 34.098,
@@ -56,6 +68,7 @@ export const locations: Location[] = [
   {
     id: "glendale",
     name: "Glendale",
+    neighbourhood: "Glendale",
     sub: "Opening soon",
     address: "1360 E Colorado St",
     city: "Glendale",
@@ -73,6 +86,7 @@ export const locations: Location[] = [
   {
     id: "vannuys",
     name: "Van Nuys",
+    neighbourhood: "Van Nuys",
     sub: "Opening soon",
     address: "14523 Sherman Way",
     city: "Van Nuys",
@@ -87,9 +101,10 @@ export const locations: Location[] = [
 ];
 
 /**
- * Fallback for a `find` by id that should always succeed but is typed as
- * possibly missing. Hollywood is first above and the array is never empty,
- * so this is safe — kept as a named constant instead of a bare `locations[0]`
- * at each call site.
+ * The store that answers `hollywood@`, orders and JSON-LD without a location
+ * of its own, and every `find(... "hollywood")` that used to need a fallback
+ * for a lookup typed as possibly missing. Hollywood is first above and the
+ * array is never empty, so this is safe — kept as a named constant instead of
+ * a bare `locations[0]` at each call site.
  */
-export const DEFAULT_LOCATION: Location = locations[0]!; // literal array above is non-empty
+export const flagship: Location = locations[0]!; // literal array above is non-empty

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ways } from "@/data/menu";
-import type { WayId } from "./ItemSheet";
+import { ways, type WayId } from "@/data/menu";
 
 /**
  * The two Ways, as a radio group.

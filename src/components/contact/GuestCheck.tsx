@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { track } from "@/lib/track";
+import { HttpError, emailLooksSendable, hasWeb3FormsKey, submitWeb3Form } from "@/lib/web3forms";
 
 /**
  * The contact form, drawn as a diner guest check.
@@ -19,8 +20,6 @@ import { track } from "@/lib/track";
  * key, a rejected key and a dead network all fall through to the same mailto.
  */
 
-const ENDPOINT = "https://api.web3forms.com/submit";
-const ACCESS_KEY = process.env.NEXT_PUBLIC_W3F_KEY ?? "";
 const MAX = 1200;
 
 const TOPICS = [
@@ -36,34 +35,8 @@ type Topic = (typeof TOPICS)[number];
 type Sent = { ticket: string; stamp: string; name: string; email: string; topic: Topic };
 type Status = "idle" | "sending" | "sent" | "error";
 
-/**
- * Carries the status code out of the `try` so the failure event can say
- * whether Web3Forms rejected the request or the network never reached it.
- * The provider's own message is deliberately not carried: it is free text
- * from a third party and has no business becoming a GA4 dimension.
- */
-class HttpError extends Error {
-  constructor(
-    readonly status: number,
-    /** True when Web3Forms answered 200 but its own body said `success: false`. */
-    readonly rejected: boolean,
-  ) {
-    super(`HTTP ${status}`);
-  }
-}
-
 /** Field-level messages, keyed by input name. */
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
-
-/**
- * Deliberately permissive: the only thing worth rejecting in the browser is an
- * address that cannot be delivered to at all. Anything stricter turns real
- * addresses (plus-tags, new TLDs, unicode locals) into a form that will not
- * submit, and the server checks it properly either way.
- */
-function emailLooksSendable(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
-}
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -150,7 +123,7 @@ export function GuestCheck(): ReactElement {
     setStatus("sending");
     setFailure("");
 
-    if (!ACCESS_KEY) {
+    if (!hasWeb3FormsKey()) {
       setStatus("error");
       setFailure("The form isn't wired up yet.");
       // A key that was never set looks exactly like a form nobody used. The
@@ -161,27 +134,18 @@ export function GuestCheck(): ReactElement {
     }
 
     try {
-      const res = await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: ACCESS_KEY,
-          // What lands in the inbox subject line, pre-sorted by topic.
-          subject: `[${topic}] ${name} — chrisneddys.com`,
-          from_name: `${brand.name} website`,
-          // Hitting reply in the inbox answers the sender, not the robot.
-          replyto: email,
-          botcheck: String(data.get("botcheck") ?? ""),
-          name,
-          email,
-          phone: phone || "—",
-          topic,
-          message: String(data.get("message") ?? "").trim(),
-        }),
+      await submitWeb3Form({
+        // What lands in the inbox subject line, pre-sorted by topic.
+        subject: `[${topic}] ${name} — chrisneddys.com`,
+        // Hitting reply in the inbox answers the sender, not the robot.
+        replyto: email,
+        botcheck: String(data.get("botcheck") ?? ""),
+        name,
+        email,
+        phone: phone || "—",
+        topic,
+        message: String(data.get("message") ?? "").trim(),
       });
-
-      const body: { success?: boolean; message?: string } = await res.json().catch(() => ({}));
-      if (!res.ok || !body.success) throw new HttpError(res.status, res.ok);
 
       setSent({ ticket, stamp, name, email, topic });
       setStatus("sent");

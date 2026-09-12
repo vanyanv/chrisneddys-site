@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { MenuItem } from "@/data/menu";
-import type { WayId } from "./ItemSheet";
+import type { MenuItem, WayId } from "@/data/menu";
 import { track } from "@/lib/track";
 
 /**

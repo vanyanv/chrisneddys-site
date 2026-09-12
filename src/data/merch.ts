@@ -132,8 +132,3 @@ export const merch: MerchProduct[] = [
 export function productBySlug(slug: string): MerchProduct | undefined {
   return merch.find((p) => p.slug === slug);
 }
-
-/** `$48.00`. Used everywhere a price is printed, so rounding happens once. */
-export function money(dollars: number): string {
-  return `$${dollars.toFixed(2)}`;
-}

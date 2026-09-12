@@ -206,6 +206,8 @@ body {
   --stat-inv-text: var(--a-yel-ink);
 }
 
+/* The clock is unknown until mount — the site is a static export. Both cells
+   hold their width so the header does not jump when the answer arrives. */
 .cne-stat-a {
   display: inline-flex;
   align-items: center;
@@ -219,6 +221,8 @@ body {
   transition:
     background 0.3s,
     color 0.3s;
+  min-width: 42px;
+  justify-content: center;
 }
 .cne-stat-b {
   display: inline-flex;
@@ -235,14 +239,6 @@ body {
     background 0.3s,
     color 0.3s,
     border-color 0.3s;
-}
-/* The clock is unknown until mount — the site is a static export. Both cells
-   hold their width so the header does not jump when the answer arrives. */
-.cne-stat-a {
-  min-width: 42px;
-  justify-content: center;
-}
-.cne-stat-b {
   min-width: 44px;
   justify-content: center;
 }
@@ -632,11 +628,6 @@ body {
 .cne-row-name {
   flex: 1;
   min-width: 0;
-}
-.cne-row-name .n {
-  font-size: 13.5px;
-  font-weight: 800;
-  line-height: 1.22;
 }
 .cne-row-name .d {
   /* Was 10.5px, which Lighthouse counted as illegible and which put the food
@@ -2394,7 +2385,7 @@ body {
   height: 26px;
   flex: none;
   border-radius: 50%;
-  background: var(--a-red);
+  background: var(--a-red-cta);
   color: #fff2c9;
   border: 2px solid var(--a-ink);
   font-size: 13px;
@@ -2404,9 +2395,6 @@ body {
   justify-content: center;
   transition: transform 0.16s;
   overflow: hidden;
-}
-.cne-card-cta {
-  background: var(--a-red-cta);
 }
 .cne-card:hover .cne-card-cta {
   transform: translateX(3px);
@@ -2674,6 +2662,15 @@ body {
 }
 
 /* ---- menu page ---------------------------------------------------------- */
+/* The lede paragraph under a section heading — item pages, mostly. Named for
+   what it is rather than which page it is on, since nothing else about it is
+   page-specific. */
+.cne-lede {
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
 /* A phone reads the menu as one column, so the wrapper is inert here and the
    sections keep the `.cne-sec` rhythm they had. The desktop grid is below. */
 .cne-menu {
@@ -2983,6 +2980,9 @@ h3 {
 /* The prototype's item name is a block, so the description wraps to the name
    column rather than running under the price. */
 .cne-row-name .n {
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.22;
   display: block;
 }
 

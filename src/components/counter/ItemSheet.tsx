@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MenuItem } from "@/data/menu";
+import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
 import { WayPicker } from "./WayPicker";
-
-export type WayId = (typeof ways)[number]["id"];
 
 type Props = {
   item: MenuItem | null;

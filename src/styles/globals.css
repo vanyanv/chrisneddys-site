@@ -278,7 +278,11 @@ body {
 
 /* ---- Locations map -------------------------------------------------------
    Real OpenStreetMap geometry, drawn in brand colours. See src/data/laGeo.ts.
-   Everything here is presentational; the geometry itself is in the SVG. */
+   Everything here is presentational; the geometry itself is in the SVG.
+
+   Source of truth for scripts/build-map-base.mjs — the generated
+   public/map-base.svg copies these; keep them even though no DOM element
+   matches. */
 .cne-map-water { fill: var(--a-water); stroke: none; }
 .cne-map-river { stroke: var(--a-water); stroke-width: 1.3; fill: none; stroke-linecap: round; }
 .cne-map-blvd {

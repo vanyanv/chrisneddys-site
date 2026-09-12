@@ -5,6 +5,14 @@
  * geometry ships once, in the HTML, and never again in a client bundle. The
  * projection helpers live in `./laGeo`.
  *
+ * `scripts/build-map-base.mjs` reads `motorwayPath`, `waterPath`, `riverPath`
+ * and the `d` fields of `namedStreets` as raw text — via regex against this
+ * file's source, not by importing the module — to bake `public/map-base.svg`.
+ * Keep those in the `export const NAME = "...";` / `d: "..."` shape the
+ * script's regexes expect, or the generator breaks with a "could not read"
+ * error. (`shields` is not read by the generator; it is drawn only at runtime
+ * by `LocationsMapCanvas`.)
+ *
  * © OpenStreetMap contributors, ODbL.
  */
 

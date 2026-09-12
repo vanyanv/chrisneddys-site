@@ -40,7 +40,7 @@ export default function LocationsPage() {
     <>
       <JsonLdScript data={breadcrumbLd([{ name: "Locations", path: "/locations/" }])} />
       <JsonLdScript data={storeList} />
-      <LocationsView mapCanvas={<LocationsMapCanvas />} />
+      <LocationsView mapCanvas={<LocationsMapCanvas eager />} />
     </>
   );
 }

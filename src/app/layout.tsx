@@ -126,7 +126,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           defer
           data-domain="chrisneddys.com"
           src="https://plausible.io/js/script.outbound-links.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </body>
     </html>

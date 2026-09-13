@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Performance: Plausible analytics now loads after the window load event instead of right after hydration, keeping it off the critical path on every page ([#19](https://github.com/vanyanv/chrisneddys-site/issues/19))
+
 ### Fixed
 
 - Product page: the mobile sticky ADD TO BAG bar now stays pinned for the whole page instead of scrolling away after the buy column ([#17](https://github.com/vanyanv/chrisneddys-site/issues/17))

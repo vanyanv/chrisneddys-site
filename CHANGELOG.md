@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Mobile header: bag button no longer overlaps the wordmark when the bag has items ([#11](https://github.com/vanyanv/chrisneddys-site/issues/11))
+
 ## [0.1.0] - 2026-09-12
 
 Initial tracked version.

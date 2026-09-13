@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-order-links.mjs",
+    "images:shop": "node scripts/build-shop-images.mjs --in assets/shop/foam-trucker-blue --out public/shop/foam-trucker-blue",
     "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -31,6 +32,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",
     "prettier": "^3.4.1",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vitest": "^5.0.0"

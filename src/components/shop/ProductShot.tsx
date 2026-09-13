@@ -4,14 +4,17 @@ import type { MerchProduct, MerchView } from "@/data/merch";
 /**
  * One product image.
  *
- * The photograph is Otter's — the same file the menu row for the cap uses, so
- * there is one asset on disk and one upload to redo when the shot changes.
- * `CapArt` stays as the fallback for any product added before its photo is,
- * which is why this component exists rather than an `<img>` at each call site.
+ * Three sources, tried in order: a per-view photo (`view.photo`, under the
+ * product's own `photoDir`) for a product shot the way the Foam Trucker is;
+ * the legacy `product.photo` — the same Otter asset the menu row for a cap
+ * used, for a product that still shares that one file; and `CapArt`, the
+ * drawing, for any view that has neither yet. That last case is not an edge
+ * case today — it is every view on the Foam Trucker, until the photography
+ * lands.
  *
- * The frame is fixed by `.cne-capshot` at every size it appears, so the drawing
- * and the photograph occupy exactly the same box and nothing on the page moves
- * when a product crosses over from one to the other.
+ * The frame is fixed by `.cne-capshot` at every size it appears, so whichever
+ * source renders occupies exactly the same box and nothing on the page moves
+ * when a product crosses over from the drawing to a photograph.
  */
 export function ProductShot({
   product,
@@ -19,6 +22,7 @@ export function ProductShot({
   sizes,
   priority = false,
   className = "",
+  thumb = false,
 }: {
   product: MerchProduct;
   view: MerchView;
@@ -27,26 +31,56 @@ export function ProductShot({
   /** The product page's main shot is the largest paint on that route. */
   priority?: boolean;
   className?: string;
+  /**
+   * True inside the thumbnail strip, where every tile is square regardless of
+   * the source photo's own aspect ratio — so the per-view aspect ratio below
+   * is skipped and `.cne-pdp-t .cne-capshot`'s `1 / 1` rule wins instead.
+   */
+  thumb?: boolean;
 }) {
-  if (!product.photo) {
-    return <CapArt view={view.id as CapView} className={className} />;
+  if (view.photo) {
+    const { src, width, height } = view.photo;
+    const base = `${product.photoDir ?? ""}/${src}`;
+
+    return (
+      <div
+        className={`cne-capshot is-photo ${className}`.trim()}
+        style={thumb ? undefined : { aspectRatio: `${width} / ${height}` }}
+      >
+        <img
+          src={`${base}.webp`}
+          srcSet={`${base}-thumb.webp 200w, ${base}.webp 720w`}
+          sizes={sizes}
+          alt={view.caption}
+          width={width}
+          height={height}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          decoding={priority ? "sync" : "async"}
+        />
+      </div>
+    );
   }
 
-  const src = `/menu/${product.photo}.webp`;
+  if (product.photo) {
+    const src = `/menu/${product.photo}.webp`;
 
-  return (
-    <div className={`cne-capshot is-photo ${className}`.trim()}>
-      <img
-        src={src}
-        srcSet={`/menu/${product.photo}-thumb.webp 200w, ${src} 720w`}
-        sizes={sizes}
-        alt={view.caption}
-        width={720}
-        height={411}
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : undefined}
-        decoding={priority ? "sync" : "async"}
-      />
-    </div>
-  );
+    return (
+      <div className={`cne-capshot is-photo ${className}`.trim()}>
+        <img
+          src={src}
+          srcSet={`/menu/${product.photo}-thumb.webp 200w, ${src} 720w`}
+          sizes={sizes}
+          alt={view.caption}
+          width={720}
+          height={411}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          decoding={priority ? "sync" : "async"}
+        />
+      </div>
+    );
+  }
+
+  return <CapArt view={view.id as CapView} color={product.capColor} className={className} />;
 }

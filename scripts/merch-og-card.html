@@ -2,14 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Chris N Eddy's Ball-Cap — social card source</title>
+    <title>Chris N Eddy's Foam Trucker — Blue — social card source</title>
     <!--
-  Source for /public/shop/ball-cap.png, the product's social card and its
-  `Product.image` in structured data.
+  Source for /public/shop/foam-trucker-blue.png, the product's social card and
+  its `Product.image` in structured data.
 
-  It states only what is known about the cap: the name, the price, that the run
-  is limited and that it is one size. The crown carries no embroidery, because
-  nobody has seen the artwork.
+  It states only what is known about the cap: the name, the price, that
+  Capsule 01 is limited to 50 and individually numbered, and that it is one
+  size fits most. The photo is the real hero shot — the same `front.webp`
+  the product page's gallery uses — inlined as a data URI by
+  `inlineLocalImages()` below so headless Chrome can actually load it from a
+  `file://` page.
 
   It is a real PNG in /public rather than a generated `opengraph-image` route
   because a static export writes that route to an extensionless file, which
@@ -18,7 +21,6 @@
   reason; this follows it.
 
   Regenerate with: node scripts/render-merch-og.mjs
-  Delete both the moment there is a photograph of the actual hat.
 -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -107,10 +109,10 @@
         letter-spacing: 0.12em;
         white-space: nowrap;
       }
-      /* The product photograph — the same Otter file /shop and the menu row use,
-     read straight off disk, so the card cannot drift from the page. It is a
-     cutout on white, so it sits on the red as a printed plate: ink rule, hard
-     offset shadow, and the tilt the drawing used to have. */
+      /* The hero gallery shot — `front.webp`, read straight off disk by
+     `inlineLocalImages()` — square, so a square frame. Cutout-on-white, ink
+     border and hard offset shadow, same printed-plate treatment the old
+     ball-cap card gave its own photo. */
       .right {
         position: relative;
         z-index: 2;
@@ -120,7 +122,8 @@
         justify-content: center;
       }
       .shot {
-        width: 400px;
+        width: 380px;
+        aspect-ratio: 1 / 1;
         border: 5px solid #1a1612;
         background: #fffdf6;
         transform: rotate(-2.5deg);
@@ -130,7 +133,8 @@
       }
       .shot img {
         width: 100%;
-        height: auto;
+        height: 100%;
+        object-fit: cover;
         display: block;
       }
     </style>
@@ -138,19 +142,19 @@
   <body>
     <span class="dots"></span>
     <div class="left">
-      <span class="flag">LIMITED RUN</span>
+      <span class="flag">ONLY 50 MADE</span>
       <div>
-        <h1>CHRIS N EDDY&rsquo;S<em>BALL-CAP</em></h1>
+        <h1>THE FOAM TRUCKER<em>&mdash; BLUE</em></h1>
         <div class="row">
           <span class="price">$48.00</span>
-          <span class="size">ONE SIZE FITS ALL</span>
+          <span class="size">ONE SIZE FITS MOST</span>
         </div>
       </div>
-      <div class="foot">CHRISNEDDYS.COM/SHOP &middot; 5539 W. SUNSET BLVD</div>
+      <div class="foot">CHRISNEDDYS.COM/SHOP &middot; CAPSULE 01 &middot; NUMBERED /50</div>
     </div>
     <div class="right">
       <div class="shot">
-        <img src="../public/menu/6cff1a91-e6d5-4bad-adc6-e62bc26f19cf.webp" alt="" />
+        <img src="../public/shop/foam-trucker-blue/front.webp" alt="" />
       </div>
     </div>
   </body>

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Performance: the About page's two Way buttons are now visible in the initial HTML instead of fading in after script runs, cutting that page's Largest Contentful Paint by about 0.7 s on throttled mobile ([#19](https://github.com/vanyanv/chrisneddys-site/issues/19))
 - Performance: Plausible analytics now loads after the window load event instead of right after hydration, keeping it off the critical path on every page ([#19](https://github.com/vanyanv/chrisneddys-site/issues/19))
 
 ### Fixed

@@ -4972,14 +4972,31 @@ h3 {
   line-height: 14px;
 }
 
-/* At the two narrowest phone widths (see DESIGN.md's "How the tag narrows":
-   the header only has half the viewport less half the wordmark to give each
-   side, 91px-127px), the order button alone already uses most of that on the
-   right, so the bag button has to shrink to icon-plus-count rather than the
-   fuller icon-count-with-room button it is above 480px. The count moves out
-   of flow onto the button's corner so it costs nothing but the icon's own
-   width, and the order button's own padding gives up a couple of px too. */
-@media (max-width: 480px) {
+/* The budget to the right of the centred wordmark is half the viewport, less
+   half the ~104px logo, less the row's 13px of padding: 95px at 320, 115px at
+   360, 122.5px at 375, 130px at 390, 141px at 412, 142px at 414, 150px at 430.
+
+   The three sizes measure out to:
+     full size  — bag 57px  + 8px gap + order 74.8px = 139.8px
+     medium     — bag 49px  + 6px gap + order 64.8px = 119.8px
+     icon-only  — bag 24px  + 4px gap + order 64.8px =  92.8px
+
+   139.8 only clears the budget at 420px and up, so full size holds there.
+   119.8 clears 375's 122.5px budget but not 360's 115px, so medium runs
+   375-419. 92.8 clears 320's 95px budget, so icon-only covers 320-374. */
+@media (max-width: 419px) {
+  .cne-nav {
+    gap: 6px;
+  }
+  .cne-orderbtn {
+    padding: 8px 6px;
+  }
+  .cne-bagbtn {
+    gap: 5px;
+    padding: 5px 6px;
+  }
+}
+@media (max-width: 374px) {
   .cne-nav {
     gap: 4px;
   }

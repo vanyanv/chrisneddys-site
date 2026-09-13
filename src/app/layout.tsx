@@ -18,21 +18,21 @@ import { TrackEvents } from "@/components/shared/TrackEvents";
 const bowlby = Bowlby_One({
   subsets: ["latin"],
   weight: "400",
-  display: "swap",
+  display: "optional",
   variable: "--font-bowlby",
 });
 
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
+  display: "optional",
   variable: "--font-inter",
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  display: "swap",
+  display: "optional",
   variable: "--font-mono-jb",
 });
 
@@ -126,7 +126,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           defer
           data-domain="chrisneddys.com"
           src="https://plausible.io/js/script.outbound-links.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </body>
     </html>

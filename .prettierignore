@@ -12,3 +12,4 @@ tsconfig.tsbuildinfo
 # file's source with regex expecting single-line `export const NAME = "...";`
 # and `d: "..."` entries, so it must not be reflowed.
 src/data/laGeoPaths.ts
+.claude/worktrees/

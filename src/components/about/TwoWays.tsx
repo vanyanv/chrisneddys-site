@@ -59,7 +59,14 @@ export function TwoWays() {
 
           Their type is set by `.cne-side .cne-side-h` in counter.css, next to
           the rest of `.cne-side`. */}
-      <section className="cne-split cne-rv" aria-label="The two Ways" style={style}>
+      {/* `is-in` is server-rendered: this section is always first in <main>
+          on /about, so it is above the fold on every load and holds the
+          page's LCP text. Leaving the class to the REVEAL_ABOVE_FOLD sweep in
+          layout.tsx (which runs after the whole document parses and blocks on
+          the CSSOM) plus the 0.6s opacity transition pushed LCP to ~2.7s on
+          throttled mobile; shipping it in the HTML lets
+          `.js .cne-split.is-in .cne-side` win from the first paint. */}
+      <section className="cne-split cne-rv is-in" aria-label="The two Ways" style={style}>
         {SIDES.map((side) => {
           const taps = ways.find((w) => w.id === side.id)?.taps ?? [];
           return (

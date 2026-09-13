@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-13
+
 ### Changed
 
 - Shop: the Foam Trucker — Blue (Capsule 01, limited to 50) replaces the placeholder Ball-Cap, with an eight-view gallery and certificate of authenticity ([#14](https://github.com/vanyanv/chrisneddys-site/issues/14))

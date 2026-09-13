@@ -136,107 +136,107 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           </div>
         </div>
 
-        <StickyBuy />
-      </BuyProvider>
+        {product.details && product.details.length > 0 && (
+          <section className="cne-sec cne-rv cne-pdp-details">
+            <div className="cne-eyebrow">The details</div>
+            <h2>What&rsquo;s actually on it.</h2>
+            <ul className="cne-detail-list">
+              {product.details.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
 
-      {product.details && product.details.length > 0 && (
-        <section className="cne-sec cne-rv cne-pdp-details">
-          <div className="cne-eyebrow">The details</div>
-          <h2>What&rsquo;s actually on it.</h2>
-          <ul className="cne-detail-list">
-            {product.details.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-
-          {product.fit && (
-            <div className="cne-detail-block">
-              <div className="cne-pdp-lab">Fit</div>
-              <p>{product.fit}</p>
-            </div>
-          )}
-
-          {product.limitedCopy && (
-            <div className="cne-detail-block">
-              <div className="cne-pdp-lab">Limited to 50</div>
-              <p>{product.limitedCopy}</p>
-            </div>
-          )}
-
-          {product.why && (
-            <div className="cne-detail-block">
-              <div className="cne-pdp-lab">Why this one</div>
-              <p>{product.why}</p>
-            </div>
-          )}
-        </section>
-      )}
-
-      {product.authenticityCopy && (
-        <section className="cne-sec cne-rv cne-pdp-auth">
-          <div className="cne-eyebrow">Authenticity</div>
-          <h2>Paired with the cap.</h2>
-          <div className="cne-auth">
-            <div className="cne-auth-copy">
-              <p>{product.authenticityCopy}</p>
-              {product.authenticityFacts && product.authenticityFacts.length > 0 && (
-                <dl className="cne-auth-facts">
-                  {product.authenticityFacts.map((fact) => (
-                    <div key={fact.label}>
-                      <dt>{fact.label}</dt>
-                      <dd>{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-            </div>
-
-            {product.authenticity && (
-              <div className="cne-auth-imgs">
-                <img
-                  className="cne-auth-img is-cert"
-                  src={`${product.photoDir}/${product.authenticity.certificate.src}.webp`}
-                  srcSet={`${product.photoDir}/${product.authenticity.certificate.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.certificate.src}.webp 720w`}
-                  sizes="(min-width: 901px) 280px, 45vw"
-                  width={product.authenticity.certificate.width}
-                  height={product.authenticity.certificate.height}
-                  style={{
-                    aspectRatio: `${product.authenticity.certificate.width} / ${product.authenticity.certificate.height}`,
-                  }}
-                  alt={product.authenticity.certificate.alt}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <img
-                  className="cne-auth-img is-sticker"
-                  src={`${product.photoDir}/${product.authenticity.sticker.src}.webp`}
-                  srcSet={`${product.photoDir}/${product.authenticity.sticker.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.sticker.src}.webp 720w`}
-                  sizes="(min-width: 901px) 280px, 45vw"
-                  width={product.authenticity.sticker.width}
-                  height={product.authenticity.sticker.height}
-                  style={{
-                    aspectRatio: `${product.authenticity.sticker.width} / ${product.authenticity.sticker.height}`,
-                  }}
-                  alt={product.authenticity.sticker.alt}
-                  loading="lazy"
-                  decoding="async"
-                />
+            {product.fit && (
+              <div className="cne-detail-block">
+                <div className="cne-pdp-lab">Fit</div>
+                <p>{product.fit}</p>
               </div>
             )}
-          </div>
-        </section>
-      )}
 
-      <section className="cne-sec cne-rv cne-pdp-more">
-        <div className="cne-eyebrow">While you’re here</div>
-        <h2>Come eat.</h2>
-        <p>
-          The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices of
-          cheese, every topping free. <Link href="/menu/">See the menu</Link> or{" "}
-          <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
-          <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
-        </p>
-      </section>
+            {product.limitedCopy && (
+              <div className="cne-detail-block">
+                <div className="cne-pdp-lab">Limited to 50</div>
+                <p>{product.limitedCopy}</p>
+              </div>
+            )}
+
+            {product.why && (
+              <div className="cne-detail-block">
+                <div className="cne-pdp-lab">Why this one</div>
+                <p>{product.why}</p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {product.authenticityCopy && (
+          <section className="cne-sec cne-rv cne-pdp-auth">
+            <div className="cne-eyebrow">Authenticity</div>
+            <h2>Paired with the cap.</h2>
+            <div className="cne-auth">
+              <div className="cne-auth-copy">
+                <p>{product.authenticityCopy}</p>
+                {product.authenticityFacts && product.authenticityFacts.length > 0 && (
+                  <dl className="cne-auth-facts">
+                    {product.authenticityFacts.map((fact) => (
+                      <div key={fact.label}>
+                        <dt>{fact.label}</dt>
+                        <dd>{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+              </div>
+
+              {product.authenticity && (
+                <div className="cne-auth-imgs">
+                  <img
+                    className="cne-auth-img is-cert"
+                    src={`${product.photoDir}/${product.authenticity.certificate.src}.webp`}
+                    srcSet={`${product.photoDir}/${product.authenticity.certificate.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.certificate.src}.webp 720w`}
+                    sizes="(min-width: 901px) 280px, 45vw"
+                    width={product.authenticity.certificate.width}
+                    height={product.authenticity.certificate.height}
+                    style={{
+                      aspectRatio: `${product.authenticity.certificate.width} / ${product.authenticity.certificate.height}`,
+                    }}
+                    alt={product.authenticity.certificate.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <img
+                    className="cne-auth-img is-sticker"
+                    src={`${product.photoDir}/${product.authenticity.sticker.src}.webp`}
+                    srcSet={`${product.photoDir}/${product.authenticity.sticker.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.sticker.src}.webp 720w`}
+                    sizes="(min-width: 901px) 280px, 45vw"
+                    width={product.authenticity.sticker.width}
+                    height={product.authenticity.sticker.height}
+                    style={{
+                      aspectRatio: `${product.authenticity.sticker.width} / ${product.authenticity.sticker.height}`,
+                    }}
+                    alt={product.authenticity.sticker.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        <section className="cne-sec cne-rv cne-pdp-more">
+          <div className="cne-eyebrow">While you’re here</div>
+          <h2>Come eat.</h2>
+          <p>
+            The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
+            of cheese, every topping free. <Link href="/menu/">See the menu</Link> or{" "}
+            <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
+            <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
+          </p>
+        </section>
+
+        <StickyBuy />
+      </BuyProvider>
     </>
   );
 }

@@ -18,21 +18,21 @@ import { TrackEvents } from "@/components/shared/TrackEvents";
 const bowlby = Bowlby_One({
   subsets: ["latin"],
   weight: "400",
-  display: "swap",
+  display: "optional",
   variable: "--font-bowlby",
 });
 
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
+  display: "optional",
   variable: "--font-inter",
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  display: "swap",
+  display: "optional",
   variable: "--font-mono-jb",
 });
 

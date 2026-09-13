@@ -50,7 +50,14 @@ export function SiteFooter() {
       <div className="cne-foot-top">
         <div className="cne-foot-brand">
           <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
-            <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} />
+            <Image
+              src="/cne-logo.webp"
+              alt={brand.name}
+              width={309}
+              height={89}
+              loading="eager"
+              style={{ aspectRatio: "309 / 89" }}
+            />
           </Link>
           <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>
           <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">

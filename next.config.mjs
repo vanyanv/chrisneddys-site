@@ -10,6 +10,9 @@ const nextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
   outputFileTracingRoot: __dirname,
+  experimental: {
+    inlineCss: true,
+  },
 };
 
 export default nextConfig;

@@ -11,3 +11,6 @@ out/
 # Local scratch: Playwright MCP captures and TS incremental cache
 .playwright-mcp/
 tsconfig.tsbuildinfo
+
+# Claude Code agent worktrees
+.claude/worktrees/

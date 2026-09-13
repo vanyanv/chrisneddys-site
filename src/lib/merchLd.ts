@@ -1,7 +1,7 @@
 import { brand } from "@/data/brand";
 import { ID } from "@/lib/seo";
 import { priceString } from "@/lib/otter";
-import { SHOP_OPEN, type MerchProduct } from "@/data/merch";
+import { SHOP_OPEN, type MerchProduct, type MerchView } from "@/data/merch";
 
 /**
  * Product structured data.
@@ -37,12 +37,27 @@ export function socialCard(slug: string): string {
  *
  * The photograph first, because a merchant listing wants the object and not a
  * poster of it; the generated social card second, since it is the 1200x630 that
- * link previews want and a second image costs nothing here. Products without a
- * photo fall back to the card alone.
+ * link previews want and a second image costs nothing here. Preference order
+ * for the photograph is the first gallery view's own shot, then the legacy
+ * `product.photo` (Otter's asset, for a product built the old way), then
+ * nothing — a product with neither falls back to the card alone.
  */
-export function productImage(product: { slug: string; photo?: string }): string[] {
+export function productImage(product: {
+  slug: string;
+  photo?: string;
+  photoDir?: string;
+  views?: MerchView[];
+}): string[] {
   const card = socialCard(product.slug);
-  return product.photo ? [`${brand.siteUrl}/menu/${product.photo}.webp`, card] : [card];
+  const view = product.views?.[0];
+
+  if (view?.photo) {
+    return [`${brand.siteUrl}${product.photoDir ?? ""}/${view.photo.src}.webp`, card];
+  }
+  if (product.photo) {
+    return [`${brand.siteUrl}/menu/${product.photo}.webp`, card];
+  }
+  return [card];
 }
 
 export function productLd(product: MerchProduct) {

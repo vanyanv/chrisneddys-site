@@ -10,7 +10,7 @@ import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
 const title = "Shop — Chris N Eddy's Merch";
 const description =
-  "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Ball-Cap, $48, one size fits all, limited quantity.";
+  "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Foam Trucker — Blue, $48, Capsule 01, only 50 made.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/shop/" });
 
@@ -58,7 +58,7 @@ export default function ShopPage() {
         <div className="cne-drops">
           {merch.map((product) => (
             <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
-              <span className="cne-drop-flag">LIMITED RUN</span>
+              <span className="cne-drop-flag">ONLY 50 MADE</span>
               <div className="cne-drop-art">
                 <ProductShot
                   product={product}
@@ -74,9 +74,9 @@ export default function ShopPage() {
                   {product.displayName[1]}
                 </h2>
                 <div className="cne-drop-price">{formatPrice(product.price)}</div>
-                <p>One size fits all. {product.limitedNote}</p>
+                <p>One size fits most. {product.limitedNote}</p>
                 <span className="cne-drop-go">
-                  VIEW THE CAP <span aria-hidden="true">→</span>
+                  SECURE YOUR NUMBER <span aria-hidden="true">→</span>
                 </span>
               </div>
             </Link>

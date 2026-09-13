@@ -7,11 +7,12 @@ import { firstView, type MerchProduct } from "@/data/merch";
 /**
  * The product gallery.
  *
- * One photograph today, so there is no thumbnail strip — a row of four
- * labelled "views" of the same shot would be describing angles nobody has
- * taken, with captions ("back strap and brass slide", "embroidery detail")
- * that were invented to fill it. The strip returns on its own the moment
- * `views` has more than one entry, which is the moment more shots exist.
+ * The strip only appears once `views` has more than one entry — a single
+ * photograph doesn't need eight labelled angles of itself. The Foam Trucker
+ * has eight real views lined up (front, 3/4, button, stitch, snap, back), each
+ * with its own caption, even though none of them has a photograph behind it
+ * yet: every tab renders `CapArt` until `scripts/build-shop-images.mjs` has
+ * something to point at instead.
  *
  * `#cne-pdp-shot` is the id `flyToBag` looks for. Keeping the handle on the DOM
  * rather than passing a ref means the buy controls and the gallery do not have
@@ -50,7 +51,7 @@ export function ProductGallery({ product }: { product: MerchProduct }) {
               aria-label={`${v.label} — ${v.caption}`}
               onClick={() => setActive(i)}
             >
-              <ProductShot product={product} view={v} sizes="120px" />
+              <ProductShot product={product} view={v} sizes="120px" thumb />
             </button>
           ))}
         </div>

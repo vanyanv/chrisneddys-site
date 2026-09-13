@@ -6,12 +6,12 @@ describe("breadcrumbLd", () => {
   it("puts Home first and preserves the given trail's order", () => {
     const ld = breadcrumbLd([
       { name: "Shop", path: "/shop/" },
-      { name: "Ball-Cap", path: "/shop/ball-cap/" },
+      { name: "Foam Trucker — Blue", path: "/shop/foam-trucker-blue/" },
     ]);
 
     expect(ld["@type"]).toBe("BreadcrumbList");
     expect(ld.itemListElement).toHaveLength(3);
-    expect(ld.itemListElement.map((s) => s.name)).toEqual(["Home", "Shop", "Ball-Cap"]);
+    expect(ld.itemListElement.map((s) => s.name)).toEqual(["Home", "Shop", "Foam Trucker — Blue"]);
     expect(ld.itemListElement.map((s) => s.position)).toEqual([1, 2, 3]);
   });
 

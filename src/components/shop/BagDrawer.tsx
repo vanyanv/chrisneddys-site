@@ -2,8 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CapArt } from "./CapArt";
-import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
+import { ProductShot } from "./ProductShot";
+import {
+  bagLineImage,
+  bagSubtotal,
+  closeBag,
+  removeFromBag,
+  setBagQty,
+  useBag,
+  type BagLine,
+} from "./bagStore";
 import { MAX_PER_ORDER, TERMS_PENDING, productBySlug } from "@/data/merch";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
@@ -191,8 +199,9 @@ function BagRow({
   removing: boolean;
   onRemove: () => void;
 }) {
-  const product = productBySlug(line.slug);
-  if (!product) return null;
+  const image = bagLineImage(line);
+  if (!image) return null;
+  const { product, view } = image;
 
   return (
     <li
@@ -200,7 +209,7 @@ function BagRow({
       style={{ "--cne-li-i": index } as React.CSSProperties}
     >
       <div className="cne-li-art">
-        <CapArt />
+        <ProductShot product={product} view={view} sizes="72px" thumb />
       </div>
       <div className="cne-li-b">
         <span className="n">{product.displayName[1]}</span>

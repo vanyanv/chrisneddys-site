@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Product page: the mobile sticky ADD TO BAG bar now stays pinned for the whole page instead of scrolling away after the buy column ([#17](https://github.com/vanyanv/chrisneddys-site/issues/17))
+- Cart lines now show the image of the product that was added instead of a generic cap placeholder ([#18](https://github.com/vanyanv/chrisneddys-site/issues/18))
 
 ## [0.2.0] - 2026-09-13
 

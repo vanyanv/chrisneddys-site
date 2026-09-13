@@ -1,7 +1,13 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { MAX_PER_ORDER, productBySlug } from "@/data/merch";
+import {
+  MAX_PER_ORDER,
+  firstView,
+  productBySlug,
+  type MerchProduct,
+  type MerchView,
+} from "@/data/merch";
 
 /**
  * The bag.
@@ -157,4 +163,17 @@ export function bagCount(lines: BagLine[]): number {
 /** In dollars. Unknown slugs were already filtered out by `clean`. */
 export function bagSubtotal(lines: BagLine[]): number {
   return lines.reduce((sum, l) => sum + (productBySlug(l.slug)?.price ?? 0) * l.qty, 0);
+}
+
+/**
+ * The product and gallery view a bag line's own thumbnail should render —
+ * the same pair `ProductShot` takes on the product page, so a cap in the bag
+ * shows its own photo (or its own `capColor` illustration), not another
+ * product's. Pulled out as a pure lookup, separate from the JSX that renders
+ * it, so it can be unit-tested without a DOM.
+ */
+export function bagLineImage(line: BagLine): { product: MerchProduct; view: MerchView } | null {
+  const product = productBySlug(line.slug);
+  if (!product) return null;
+  return { product, view: firstView(product) };
 }

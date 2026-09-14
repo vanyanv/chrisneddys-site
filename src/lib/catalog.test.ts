@@ -5,6 +5,7 @@ import type { PgliteDatabase } from "drizzle-orm/pglite";
 import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { editions, productImages, variants } from "@/db/schema";
 import {
   catalogueUpdatedAt,
@@ -109,5 +110,28 @@ describe("catalogueUpdatedAt", () => {
   it("returns an ISO date driven by the product's own updated_at", async () => {
     const updated = await catalogueUpdatedAt();
     expect(updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+// Runs last: it sells editions out from under the run the earlier tests in
+// this file assert is untouched (50 of 50 available, every row "available").
+describe("getInventory after editions sell", () => {
+  it("counts only the editions still marked available", async () => {
+    const db = await getDb();
+    const [variant] = await db.select().from(variants);
+    if (!variant) throw new Error("expected the seeded variant to exist");
+
+    for (let number = 1; number <= 37; number++) {
+      await db
+        .update(editions)
+        .set({ status: "sold" })
+        .where(and(eq(editions.variantId, variant.id), eq(editions.number, number)));
+    }
+
+    expect(await getInventory("foam-trucker-blue")).toEqual({
+      tracked: true,
+      available: 13,
+      editionSize: 50,
+    });
   });
 });

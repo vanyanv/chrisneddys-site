@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
-import { listPublishedProducts } from "@/lib/catalog";
+import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -34,6 +34,7 @@ export const revalidate = 60;
  */
 export default async function ShopPage() {
   const merch = await listPublishedProducts();
+  const inventories = await Promise.all(merch.map((product) => getInventory(product.slug)));
 
   return (
     <>
@@ -63,31 +64,51 @@ export default async function ShopPage() {
         </p>
 
         <div className="cne-drops">
-          {merch.map((product) => (
-            <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
-              <span className="cne-drop-flag">ONLY 50 MADE</span>
-              <div className="cne-drop-art">
-                <ProductShot
-                  product={product}
-                  view={firstView(product)}
-                  sizes="(min-width: 901px) 700px, 100vw"
-                  priority
-                />
-              </div>
-              <div className="cne-drop-b">
-                <h2>
-                  {product.displayName[0]}
-                  <br />
-                  {product.displayName[1]}
-                </h2>
-                <div className="cne-drop-price">{formatPrice(product.price)}</div>
-                <p>One size fits most. {product.limitedNote}</p>
-                <span className="cne-drop-go">
-                  SECURE YOUR NUMBER <span aria-hidden="true">→</span>
-                </span>
-              </div>
-            </Link>
-          ))}
+          {merch.map((product, i) => {
+            const line = inventoryLine(inventories[i], product.eyebrow);
+
+            return (
+              <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
+                <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : "ONLY 50 MADE"}</span>
+                <div className="cne-drop-art">
+                  <ProductShot
+                    product={product}
+                    view={firstView(product)}
+                    sizes="(min-width: 901px) 700px, 100vw"
+                    priority
+                  />
+                </div>
+                <div className="cne-drop-b">
+                  <h2>
+                    {product.displayName[0]}
+                    <br />
+                    {product.displayName[1]}
+                  </h2>
+                  <div className="cne-drop-price">{formatPrice(product.price)}</div>
+                  {line && (
+                    <div className={`cne-inv is-sm${line.soldOut ? " is-soldout" : ""}`}>
+                      <span className="cne-inv-text">{line.text}</span>
+                      {line.barRatio !== null && (
+                        <div className="cne-inv-bar" aria-hidden="true">
+                          <span style={{ width: `${line.barRatio * 100}%` }} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <p>One size fits most. {product.limitedNote}</p>
+                  <span className="cne-drop-go">
+                    {line?.soldOut ? (
+                      "SOLD OUT"
+                    ) : (
+                      <>
+                        SECURE YOUR NUMBER <span aria-hidden="true">→</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         <p className="cne-drop-note">

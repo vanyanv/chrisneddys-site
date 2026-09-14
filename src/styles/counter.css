@@ -5761,3 +5761,64 @@ h3 {
     font-size: 24px;
   }
 }
+
+/* ---- live inventory ------------------------------------------------------
+   Only rendered when `catalog.ts`'s `getInventory` reports a real, tracked
+   count — the fallback catalogue never reaches this markup at all. Mono to
+   match every other numeric readout on the shop (the price, the qty
+   stepper), and the bar fills in the one brand yellow that is a fill colour
+   rather than text (see `--a-yel`'s note above). */
+.cne-inv {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cne-inv-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--a-fg);
+}
+.cne-inv-bar {
+  width: 100%;
+  max-width: 220px;
+  height: 6px;
+  border: 2px solid var(--a-ink);
+  background: var(--a-cream);
+  overflow: hidden;
+}
+.cne-inv-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--a-yel);
+}
+.cne-inv.is-soldout .cne-inv-text {
+  color: var(--a-red-cta);
+}
+
+/* Smaller cut for the shop index card, under the price rather than the buy
+   row — same information, less room. */
+.cne-inv.is-sm .cne-inv-text {
+  font-size: 9.5px;
+}
+.cne-inv.is-sm .cne-inv-bar {
+  max-width: 160px;
+  height: 5px;
+}
+
+/* The buy button once tracked stock hits zero — dashed like the "payment not
+   connected" state it sits next to in the stylesheet, but ink-bordered and
+   solid-cream rather than transparent: nothing here is a placeholder, the
+   run is actually gone. */
+.cne-btn-primary.is-soldout {
+  background: var(--a-cream);
+  color: var(--a-fg);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.cne-btn-primary.is-soldout:active {
+  transform: none;
+}

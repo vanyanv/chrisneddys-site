@@ -148,6 +148,10 @@ const cachedCatalogueUpdatedAt = unstable_cache(queryCatalogueUpdatedAt, ["catal
   tags: CACHE_TAGS,
   revalidate: REVALIDATE_SECONDS,
 });
+const cachedInventory = unstable_cache(queryInventory, ["catalogue-inventory"], {
+  tags: CACHE_TAGS,
+  revalidate: REVALIDATE_SECONDS,
+});
 
 export async function listPublishedProducts(): Promise<MerchProduct[]> {
   if (shouldUseFallback()) return merch;
@@ -194,7 +198,56 @@ export async function getInventory(slug: string): Promise<InventoryStatus | unde
     if (!merch.some((p) => p.slug === slug)) return undefined;
     return { tracked: false, available: 0, editionSize: null };
   }
-  return queryInventory(slug);
+  if (isTestEnv()) return queryInventory(slug);
+  return cachedInventory(slug);
+}
+
+/**
+ * The "N of 50 left" / sold-out line the shop index card and the product page
+ * both need, derived the same way in both places so the two can never say
+ * different things about the same product. Returns `null` whenever nothing
+ * new should render — untracked inventory (the honesty rule above), or a
+ * tracked count high enough that flagging it would be noise.
+ */
+export type InventoryLine = {
+  text: string;
+  soldOut: boolean;
+  /** `available / editionSize`, for the bar's width — `null` when there's no bar. */
+  barRatio: number | null;
+};
+
+export function inventoryLine(
+  inventory: InventoryStatus | undefined,
+  eyebrow: string,
+): InventoryLine | null {
+  if (!inventory?.tracked) return null;
+
+  if (inventory.available === 0) {
+    return { text: soldOutLine(eyebrow), soldOut: true, barRatio: null };
+  }
+  if (inventory.editionSize) {
+    return {
+      text: `${inventory.available} OF ${inventory.editionSize} LEFT`,
+      soldOut: false,
+      barRatio: inventory.available / inventory.editionSize,
+    };
+  }
+  if (inventory.available <= 20) {
+    return { text: `${inventory.available} LEFT`, soldOut: false, barRatio: null };
+  }
+  return null;
+}
+
+/**
+ * "SOLD OUT", plus the eyebrow's own capsule label when the eyebrow states
+ * one after a period (e.g. "CNE Merch. Capsule 01" -> "SOLD OUT · CAPSULE 01
+ * CLOSED"). Falls back to plain "SOLD OUT" when the eyebrow doesn't carry one.
+ */
+function soldOutLine(eyebrow: string): string {
+  const dot = eyebrow.indexOf(".");
+  if (dot === -1) return "SOLD OUT";
+  const label = eyebrow.slice(dot + 1).trim();
+  return label ? `SOLD OUT · ${label.toUpperCase()} CLOSED` : "SOLD OUT";
 }
 
 /** ISO date (`YYYY-MM-DD`) of the latest product update, for the sitemap's `lastmod`. */

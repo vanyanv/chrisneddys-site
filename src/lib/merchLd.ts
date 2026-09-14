@@ -2,6 +2,7 @@ import { brand } from "@/data/brand";
 import { ID } from "@/lib/seo";
 import { priceString } from "@/lib/otter";
 import { SHOP_OPEN, type MerchProduct, type MerchView } from "@/data/merch";
+import type { InventoryStatus } from "@/lib/catalog";
 
 /**
  * Product structured data.
@@ -60,7 +61,22 @@ export function productImage(product: {
   return [card];
 }
 
-export function productLd(product: MerchProduct) {
+/**
+ * A real store selling out is a fact worth stating even while `SHOP_OPEN` is
+ * false elsewhere — a sold-out capsule with no way to buy it is not a
+ * misrepresentation, it's the truth. Everything else here still follows
+ * `SHOP_OPEN`: an in-stock claim on a shop that cannot take money would be.
+ */
+function offerAvailability(inventory?: InventoryStatus): string | undefined {
+  if (inventory?.tracked) {
+    if (inventory.available === 0) return "https://schema.org/SoldOut";
+    if (SHOP_OPEN) return "https://schema.org/InStock";
+    return undefined;
+  }
+  return SHOP_OPEN ? "https://schema.org/InStock" : undefined;
+}
+
+export function productLd(product: MerchProduct, inventory?: InventoryStatus) {
   const url = `${brand.siteUrl}/shop/${product.slug}/`;
 
   return {
@@ -83,9 +99,10 @@ export function productLd(product: MerchProduct) {
       price: priceString(product.price),
       itemCondition: "https://schema.org/NewCondition",
       seller: { "@id": ID.org },
-      // Stated only once the shop can take money. Until then the price is a
-      // fact and the ability to buy is not, so only the fact is published.
-      availability: SHOP_OPEN ? "https://schema.org/InStock" : undefined,
+      // Stated only once the shop can take money, unless the item has sold
+      // out — see `offerAvailability`. Until then the price is a fact and the
+      // ability to buy is not, so only the fact is published.
+      availability: offerAvailability(inventory),
     },
   };
 }

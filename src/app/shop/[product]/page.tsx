@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING } from "@/data/merch";
-import { getProductBySlug, listPublishedProducts } from "@/lib/catalog";
+import { MAX_PER_ORDER, TERMS_PENDING } from "@/data/merch";
+import {
+  getInventory,
+  getProductBySlug,
+  inventoryLine,
+  listPublishedProducts,
+} from "@/lib/catalog";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -72,9 +77,14 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  const inventory = await getInventory(slug);
+  const line = inventoryLine(inventory, product.eyebrow);
+  const soldOut = line?.soldOut ?? false;
+  const maxQty = inventory?.tracked ? Math.min(MAX_PER_ORDER, inventory.available) : MAX_PER_ORDER;
+
   return (
     <>
-      <JsonLdScript data={productLd(product)} />
+      <JsonLdScript data={productLd(product, inventory)} />
       <JsonLdScript
         data={breadcrumbLd([
           { name: "Shop", path: "/shop/" },
@@ -102,7 +112,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         </div>
       </div>
 
-      <BuyProvider product={product}>
+      <BuyProvider product={product} soldOut={soldOut} maxQty={maxQty}>
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
           <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
@@ -123,6 +133,17 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             <div className="cne-pdp-price">
               <span className="cne-price p">{formatPrice(product.price)}</span>
             </div>
+
+            {line && (
+              <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
+                <span className="cne-inv-text">{line.text}</span>
+                {line.barRatio !== null && (
+                  <div className="cne-inv-bar" aria-hidden="true">
+                    <span style={{ width: `${line.barRatio * 100}%` }} />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* One size fits most, so there is no variant grid at all. The
                 scarcity line takes the space the size chips would have used. */}

@@ -33,6 +33,21 @@ describe("productLd", () => {
     // SHOP_OPEN is false in this catalogue, so no availability is claimed.
     expect(ld.offers.availability).toBeUndefined();
   });
+
+  it("states no availability for untracked inventory, even when passed", () => {
+    const untracked = productLd(trucker, { tracked: false, available: 0, editionSize: null });
+    expect(untracked.offers.availability).toBeUndefined();
+  });
+
+  it("still says nothing while tracked stock remains and the shop is closed", () => {
+    const inStock = productLd(trucker, { tracked: true, available: 13, editionSize: 50 });
+    expect(inStock.offers.availability).toBeUndefined();
+  });
+
+  it("states SoldOut once tracked inventory hits zero, regardless of SHOP_OPEN", () => {
+    const soldOut = productLd(trucker, { tracked: true, available: 0, editionSize: 50 });
+    expect(soldOut.offers.availability).toBe("https://schema.org/SoldOut");
+  });
 });
 
 describe("shopListLd", () => {

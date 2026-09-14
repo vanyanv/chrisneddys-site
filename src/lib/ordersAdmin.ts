@@ -13,6 +13,7 @@ import { and, eq, gte, inArray } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { orderItems, orders, type ShipTo } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
+import * as email from "@/lib/email";
 import {
   getOrder,
   listOrders,
@@ -262,18 +263,15 @@ export async function getOrdersDashboardCounts(): Promise<OrdersDashboardCounts>
 // ---------------------------------------------------------------------------
 
 /**
- * Best-effort shipping/pickup-ready email. `src/lib/email.ts` is being built
- * by another worker in parallel, so it's imported lazily: any failure —
- * the module not existing yet, a missing export, a thrown error mid-send —
- * is swallowed here and never blocks (or rolls back) the status change that
- * already committed.
+ * Best-effort shipping/pickup-ready email. Any failure — a missing Resend
+ * config, a thrown error mid-send — is swallowed here and never blocks (or
+ * rolls back) the status change that already committed.
  */
 async function notifyBestEffort(kind: "shipped" | "pickup_ready", orderId: string): Promise<void> {
   try {
     const order = await getOrder(orderId);
     if (!order) return;
 
-    const email = await import("@/lib/email");
     if (kind === "shipped") {
       await email.sendShippingNotice(order);
     } else {

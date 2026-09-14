@@ -10,7 +10,14 @@ const initial: RefundActionState = {};
 export function RefundCard({ order }: { order: AdminOrderDetail }) {
   const [state, formAction, pending] = useActionState(markRefundedAction, initial);
   const [armed, setArmed] = useState(false);
-  const canRefund = order.status === "paid" || order.status === "fulfilled";
+  // Matches `markRefunded`'s own allowed-from set in src/lib/orders.ts: any
+  // post-payment status a full refund could reasonably arrive during,
+  // shipped or picked-up alike.
+  const canRefund =
+    order.status === "paid" ||
+    order.status === "fulfilled" ||
+    order.status === "ready_for_pickup" ||
+    order.status === "picked_up";
 
   return (
     <div className="adm-card">

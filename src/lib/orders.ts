@@ -117,7 +117,7 @@ export type StoreSettingsPatch = Partial<{
 
 export type UpdateStoreSettingsResult =
   | { ok: true; settings: StoreSettings }
-  | { ok: false; error: string };
+  | { ok: false; error: string; field?: keyof StoreSettingsPatch };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/;
@@ -156,7 +156,23 @@ export async function updateStoreSettings(
     }
   }
 
-  await getStoreSettings(database); // ensure the row exists before updating it
+  // Also ensures the row exists before the update below.
+  const current = await getStoreSettings(database);
+
+  // A pickup counter with no address is not a real pickup option — checked
+  // against the *effective* patch (what the row would read after this
+  // write), so blanking the address while pickup is already on is caught
+  // exactly the same as flipping pickup on over an address that's already
+  // blank.
+  const effectivePickupEnabled = patch.pickupEnabled ?? current.pickupEnabled;
+  const effectivePickupAddress = (patch.pickupAddress ?? current.pickupAddress).trim();
+  if (effectivePickupEnabled && !effectivePickupAddress) {
+    return {
+      ok: false,
+      error: "Add the pickup address, or turn pickup off.",
+      field: "pickupAddress",
+    };
+  }
 
   const [row] = await database
     .update(storeSettings)

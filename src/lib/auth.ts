@@ -46,8 +46,10 @@ function firstForwardedIp(value: string | null): string | null {
  * directly instead of going through `headers()` (there is no request to
  * read headers from in a unit test). Falls back to `"unknown"` — a single
  * shared bucket — if neither header is present, which only ever happens
- * off Vercel. */
-async function resolveClientIp(ipOverride?: string): Promise<string> {
+ * off Vercel. Exported so other throttled server actions (e.g. the order
+ * lookup form, `src/app/(site)/shop/order/actions.ts`) read the client IP
+ * the same way `signIn` does. */
+export async function resolveClientIp(ipOverride?: string): Promise<string> {
   if (ipOverride) return ipOverride;
   const headerList = await headers();
   return (

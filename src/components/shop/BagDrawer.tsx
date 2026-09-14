@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CapArt } from "./CapArt";
 import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
-import { TERMS_PENDING } from "@/data/merch";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 
@@ -40,17 +39,23 @@ function lineItem(line: BagLine): TrackItem {
  * page. It renders nothing at all until it is open, so the cost to every other
  * page on the site is the component's own bytes and no DOM.
  *
- * `shopOpen` and `pickupEnabled` are read server-side (`isShopOpen()` and the
- * store settings row — see the `(site)` root layout) and passed down as
- * props: this is a client component, so it cannot read the env or the
- * database itself.
+ * `shopOpen`, `pickupEnabled` and `shippingNote` are read server-side
+ * (`isShopOpenFor(settings)`, the store settings row, and
+ * `shippingReturnsNote(settings)` — see the `(site)` root layout) and passed
+ * down as plain props: this is a client component, so it cannot read the env
+ * or the database itself. `shippingNote` is the real "Shipping & returns"
+ * line once the shop is open, or the `TERMS_PENDING` placeholder otherwise —
+ * the layout decides which, so this component only ever renders whichever
+ * string it's given.
  */
 export function BagDrawer({
   shopOpen,
   pickupEnabled,
+  shippingNote,
 }: {
   shopOpen: boolean;
   pickupEnabled: boolean;
+  shippingNote: string | null;
 }) {
   const { lines, open } = useBag();
   const panel = useRef<HTMLDivElement>(null);
@@ -220,7 +225,7 @@ export function BagDrawer({
               <span>{formatPrice(subtotal)}</span>
             </div>
           </div>
-          <p className="cne-dr-note is-terms">{TERMS_PENDING}</p>
+          {shippingNote && <p className="cne-dr-note is-terms">{shippingNote}</p>}
 
           {shopOpen ? (
             <>

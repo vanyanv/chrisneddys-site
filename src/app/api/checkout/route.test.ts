@@ -8,7 +8,7 @@ import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { brand } from "@/data/brand";
 import { getInventory } from "@/lib/catalog";
-import { getOrder } from "@/lib/orders";
+import { getOrder, updateStoreSettings } from "@/lib/orders";
 
 // `server-only` throws when a module carrying it is resolved outside a real
 // Next.js server build (it relies on the bundler's `react-server` export
@@ -35,9 +35,14 @@ beforeAll(async () => {
   await seedCatalogue(db);
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   process.env.STRIPE_SECRET_KEY = "sk_test_fake";
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_fake";
+  // `isShopOpenFor` also requires a published returns policy — the seeded
+  // settings row has none (`returnsPolicy` is null by default), so every
+  // "shop open" test needs one set to actually be open under the new
+  // predicate. `supportEmail` is already non-empty from the seed.
+  await updateStoreSettings({ returnsPolicy: "Returns accepted within 30 days, unworn." });
   createMock.mockReset();
   createMock.mockImplementation(async () => {
     stripeState.lastId = `cs_test_${Math.random().toString(36).slice(2)}`;
@@ -59,6 +64,20 @@ describe("POST /api/checkout — shop closed", () => {
   it("503s with no reservation when Stripe env vars aren't set", async () => {
     delete process.env.STRIPE_SECRET_KEY;
     delete process.env.STRIPE_WEBHOOK_SECRET;
+
+    const before = await getInventory(SLUG);
+    const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "pickup" });
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toMatch(/shop isn't open/i);
+    expect(createMock).not.toHaveBeenCalled();
+
+    const after = await getInventory(SLUG);
+    expect(after?.available).toBe(before?.available);
+  });
+
+  it("503s with no reservation when Stripe keys are set but no returns policy is published", async () => {
+    const set = await updateStoreSettings({ returnsPolicy: null });
+    expect(set.ok).toBe(true);
 
     const before = await getInventory(SLUG);
     const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "pickup" });
@@ -103,8 +122,9 @@ describe("POST /api/checkout — shop open", () => {
     );
     expect(params.cancel_url).toBe(`${brand.siteUrl}/shop/?cancelled=1`);
 
-    // ~30 minutes out, allowing a few seconds of test-run slop.
-    const expected = Math.floor(Date.now() / 1000) + 30 * 60;
+    // ~35 minutes out (the 30-minute hold plus Stripe's required margin),
+    // allowing a few seconds of test-run slop.
+    const expected = Math.floor(Date.now() / 1000) + 35 * 60;
     expect(params.expires_at).toBeGreaterThanOrEqual(expected - 5);
     expect(params.expires_at).toBeLessThanOrEqual(expected + 30);
 

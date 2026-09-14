@@ -112,9 +112,10 @@ export default async function PrivacyPage() {
             When you buy something from the <Link href="/shop/">shop</Link>, Stripe Checkout
             collects your <strong>name</strong>, <strong>email address</strong>, your{" "}
             <strong>shipping address</strong> if you have it shipped, and a{" "}
-            <strong>phone number</strong> if you choose to give one there. It hands that back to us
-            along with <strong>what you bought</strong> and, for a numbered item like the Foam
-            Trucker, <strong>which edition number</strong> your order was assigned.
+            <strong>phone number</strong> — Stripe requires it to check out, and we only use it for
+            questions about your order. It hands that back to us along with{" "}
+            <strong>what you bought</strong> and, for a numbered item like the Foam Trucker,{" "}
+            <strong>which edition number</strong> your order was assigned.
           </p>
           <p>
             Your <strong>card details never reach us</strong>. You type them into Stripe&rsquo;s own

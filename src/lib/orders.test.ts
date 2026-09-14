@@ -300,6 +300,62 @@ describe("store settings", () => {
     expect(settings.shipCountries).toEqual(["US", "CA"]);
     expect(settings.pickupEnabled).toBe(false);
   });
+
+  it("rejects turning pickup on with a blank pickup address, and writes nothing", async () => {
+    const before = await getStoreSettings();
+    const result = await updateStoreSettings({ pickupEnabled: true, pickupAddress: "" });
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected the update to be rejected");
+    expect(result.error).toBe("Add the pickup address, or turn pickup off.");
+    expect(result.field).toBe("pickupAddress");
+
+    const after = await getStoreSettings();
+    expect(after.pickupEnabled).toBe(before.pickupEnabled);
+    expect(after.pickupAddress).toBe(before.pickupAddress);
+  });
+
+  it("rejects a whitespace-only pickup address the same way", async () => {
+    const result = await updateStoreSettings({ pickupEnabled: true, pickupAddress: "   \n  " });
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected the update to be rejected");
+    expect(result.field).toBe("pickupAddress");
+  });
+
+  it("rejects blanking the pickup address while pickup is already on, without re-stating pickupEnabled", async () => {
+    const enable = await updateStoreSettings({
+      pickupEnabled: true,
+      pickupAddress: "123 Real St, LA, CA",
+    });
+    expect(enable.ok).toBe(true);
+
+    const result = await updateStoreSettings({ pickupAddress: "" });
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected the update to be rejected");
+    expect(result.field).toBe("pickupAddress");
+
+    const after = await getStoreSettings();
+    expect(after.pickupAddress).toBe("123 Real St, LA, CA");
+  });
+
+  it("allows turning pickup off with a blank address", async () => {
+    const result = await updateStoreSettings({ pickupEnabled: false, pickupAddress: "" });
+    expect(result.ok).toBe(true);
+
+    const settings = await getStoreSettings();
+    expect(settings.pickupEnabled).toBe(false);
+  });
+
+  it("allows a real pickup address alongside pickupEnabled: true", async () => {
+    const result = await updateStoreSettings({
+      pickupEnabled: true,
+      pickupAddress: "5539 W. Sunset Blvd, Los Angeles, CA 90028",
+    });
+    expect(result.ok).toBe(true);
+
+    const settings = await getStoreSettings();
+    expect(settings.pickupEnabled).toBe(true);
+    expect(settings.pickupAddress).toBe("5539 W. Sunset Blvd, Los Angeles, CA 90028");
+  });
 });
 
 describe("plain-quantity product", () => {

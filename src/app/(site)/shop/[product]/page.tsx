@@ -11,6 +11,7 @@ import {
 } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
+import { isShopOpenFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -87,10 +88,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const settings = await getStoreSettings();
   const note = shippingReturnsNote(settings);
   const flag = editionFlag(inventory?.editionSize ?? null);
+  const shopOpen = isShopOpenFor(settings);
 
   return (
     <>
-      <JsonLdScript data={productLd(product, inventory)} />
+      <JsonLdScript data={productLd(product, inventory, shopOpen)} />
       <JsonLdScript
         data={breadcrumbLd([
           { name: "Shop", path: "/shop/" },

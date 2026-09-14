@@ -8,9 +8,12 @@
  * order paid once the customer pays; this route never touches order status
  * beyond "pending" (or "cancelled", if Stripe itself can't be reached).
  *
- * Gated on `isShopOpen()` (`STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`
- * both set) — a 503 with no reservation made, no Stripe key required to
- * fail closed.
+ * Gated on `isShopOpenFor(settings)` (`hasPaymentKeys()` — `STRIPE_SECRET_KEY`
+ * + `STRIPE_WEBHOOK_SECRET` both set — plus a published returns policy and a
+ * support email on the store settings row) — a 503 with no reservation made.
+ * `hasPaymentKeys()` alone is checked first, before the body is even parsed,
+ * so a shop with no Stripe key at all fails closed without touching the
+ * database.
  */
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
@@ -29,7 +32,7 @@ import {
   type Fulfilment,
   type QuoteLineError,
 } from "@/lib/orders";
-import { isShopOpen } from "@/lib/shopStatus";
+import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
 import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -39,20 +42,32 @@ export const runtime = "nodejs";
 const MAX_LINE_ITEMS = 10;
 
 const HOLD_MINUTES = 30;
-const SESSION_EXPIRES_SECONDS = HOLD_MINUTES * 60;
+
+/**
+ * How much longer the Stripe Checkout Session's own `expires_at` outlives
+ * `HOLD_MINUTES`. Stripe requires `expires_at` to be at least 30 minutes out
+ * *measured on Stripe's own clock* — a session created with `expires_at`
+ * exactly `HOLD_MINUTES` (30) from now, by the time Stripe's clock sees the
+ * request, can land a few seconds under that floor and get rejected. Five
+ * minutes of margin absorbs that clock skew and network latency without
+ * changing what the order's own hold means to a customer (still ~30
+ * minutes) — only Stripe's session lives a little longer than the hold.
+ */
+const SESSION_EXPIRES_MARGIN_MINUTES = 5;
+const SESSION_EXPIRES_SECONDS = (HOLD_MINUTES + SESSION_EXPIRES_MARGIN_MINUTES) * 60;
 
 /**
  * How much longer the order's hold outlives the Stripe Checkout Session's
- * own `expires_at`. Both start out ~`HOLD_MINUTES` from now, created a few
- * database round-trips apart — with no gap, a customer who pays in the
- * final seconds before Stripe's own expiry could still have their order
- * released by `releaseExpiredReservations` first (it only looks at the
- * order's `expiresAt`), after which `markPaid` would find a `cancelled`
- * order instead of the `pending` one it expects. Setting the order's
- * `expiresAt` to Stripe's `expires_at` plus this grace period (via
- * `setOrderExpiry`, right after the session is created) makes that
- * ordering impossible: the order can never expire before Stripe's own
- * session does.
+ * own `expires_at`. The order's hold starts at `HOLD_MINUTES` from now, and
+ * the session is created a few database round-trips later with `expires_at`
+ * `SESSION_EXPIRES_MARGIN_MINUTES` past that — with no further gap, a
+ * customer who pays in the final seconds before Stripe's own expiry could
+ * still have their order released by `releaseExpiredReservations` first (it
+ * only looks at the order's `expiresAt`), after which `markPaid` would find
+ * a `cancelled` order instead of the `pending` one it expects. Setting the
+ * order's `expiresAt` to Stripe's `expires_at` plus this grace period (via
+ * `setOrderExpiry`, right after the session is created) makes that ordering
+ * impossible: the order can never expire before Stripe's own session does.
  */
 const EXPIRY_GRACE_MINUTES = 10;
 
@@ -147,7 +162,7 @@ async function quoteErrorResponse(error: QuoteLineError): Promise<NextResponse> 
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  if (!isShopOpen()) {
+  if (!hasPaymentKeys()) {
     return NextResponse.json({ error: "The shop isn't open yet." }, { status: 503 });
   }
 
@@ -157,6 +172,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { items, fulfilment } = parsed;
 
   const settings = await getStoreSettings();
+  if (!isShopOpenFor(settings)) {
+    return NextResponse.json({ error: "The shop isn't open yet." }, { status: 503 });
+  }
   if (fulfilment === "pickup" && !settings.pickupEnabled) {
     return badRequest("Pickup isn't available right now.");
   }

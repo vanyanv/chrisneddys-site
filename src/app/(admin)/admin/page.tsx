@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getDb } from "@/db/client";
 import { products } from "@/db/schema";
-import { isAuthConfigured } from "@/lib/auth";
 import { getOrdersDashboardCounts } from "@/lib/ordersAdmin";
+import { getSetupChecklist } from "@/lib/setupChecklist";
 
 export const dynamic = "force-dynamic";
 
@@ -16,18 +16,8 @@ async function loadStatusCounts(): Promise<StatusCounts> {
   return counts;
 }
 
-const SETUP_ITEMS: { label: string; ok: boolean }[] = [
-  { label: "Database connected (DATABASE_URL)", ok: Boolean(process.env.DATABASE_URL) },
-  { label: "Owner sign-in", ok: isAuthConfigured() },
-  {
-    label: "Photo storage (BLOB_READ_WRITE_TOKEN)",
-    ok: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-  },
-  { label: "Payments (STRIPE_SECRET_KEY)", ok: Boolean(process.env.STRIPE_SECRET_KEY) },
-  { label: "Email (RESEND_API_KEY)", ok: Boolean(process.env.RESEND_API_KEY) },
-];
-
 export default async function AdminDashboardPage() {
+  const setupItems = getSetupChecklist();
   const [counts, orderCounts] = await Promise.all([loadStatusCounts(), getOrdersDashboardCounts()]);
   const total = counts.draft + counts.published + counts.archived;
 
@@ -62,12 +52,13 @@ export default async function AdminDashboardPage() {
         <div className="adm-card">
           <span className="adm-label">Setup checklist</span>
           <ul className="adm-checklist" style={{ marginTop: 12 }}>
-            {SETUP_ITEMS.map((item) => (
-              <li key={item.label}>
+            {setupItems.map((item) => (
+              <li key={item.key}>
                 <span className="adm-check-icon" data-ok={item.ok}>
                   {item.ok ? "✓" : "–"}
                 </span>
                 {item.label}
+                {!item.ok && item.detail && <span className="adm-help"> — {item.detail}</span>}
               </li>
             ))}
           </ul>

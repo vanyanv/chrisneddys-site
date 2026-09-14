@@ -81,8 +81,8 @@ export default async function ReturnsPage() {
       ) : (
         <section className="cne-lg-sec">
           <p>
-            The returns policy hasn&rsquo;t been published yet. Until it is, the shop stays closed.
-            Questions: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+            The returns policy hasn&rsquo;t been published yet. Until it is published, checkout
+            stays closed. Questions: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
           </p>
         </section>
       )}

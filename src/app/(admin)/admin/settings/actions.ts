@@ -6,6 +6,8 @@ import type { StoreSettingsPatch } from "@/lib/orders";
 export type SaveSettingsState = {
   ok?: boolean;
   error?: string;
+  /** ISO timestamp — formatted client-side (`SettingsForm`) so it renders in
+   * the viewer's local time instead of the server's (UTC on Vercel). */
   savedAt?: string;
   /** Per-field messages, keyed by the form field name, for `adm-field-error`. */
   fieldErrors?: Record<string, string>;
@@ -86,6 +88,5 @@ export async function saveSettingsAction(
   const result = await saveStoreSettings(patch);
   if (!result.ok) return { error: result.error };
 
-  const savedAt = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  return { ok: true, savedAt };
+  return { ok: true, savedAt: new Date().toISOString() };
 }

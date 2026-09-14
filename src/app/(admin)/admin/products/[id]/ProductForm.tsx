@@ -311,7 +311,13 @@ export function ProductForm({ product }: { product: AdminProduct }) {
         </button>
 
         {saveState?.ok && saveState.savedAt && (
-          <span className="adm-saved-note">Saved · {saveState.savedAt}</span>
+          <span className="adm-saved-note">
+            Saved ·{" "}
+            {new Date(saveState.savedAt).toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </span>
         )}
 
         {product.status === "published" && (

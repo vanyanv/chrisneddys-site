@@ -80,8 +80,8 @@ export default async function TermsPage() {
       ) : (
         <section className="cne-lg-sec">
           <p>
-            The terms of sale haven&rsquo;t been published yet. Until they are, the shop stays
-            closed. Questions: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+            The terms of sale haven&rsquo;t been published yet. Until they are published, checkout
+            stays closed. Questions: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
           </p>
         </section>
       )}

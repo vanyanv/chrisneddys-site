@@ -168,10 +168,13 @@ export const owners = pgTable("owners", {
 });
 
 /**
- * Every owner sign-in attempt (success or failure), for the throttle in
- * `src/lib/auth.ts` — before verifying a password it counts recent failures
- * for both the email and the IP and refuses (without spending a scrypt call)
- * once either hits the limit. Rows older than 24h are pruned opportunistically
+ * Every throttled attempt (success or failure), for the throttle in
+ * `src/lib/signInThrottle.ts` — before verifying a password (or looking up
+ * an order) it counts recent failures for both the email and the IP and
+ * refuses once either hits the limit. `kind` separates independent throttles
+ * that share this table (`"sign_in"` for `src/lib/auth.ts`, `"order_lookup"`
+ * for `src/app/(site)/shop/order/actions.ts`) so failures on one never lock
+ * out the other. Rows older than 24h are pruned opportunistically
  * (`pruneSignInAttempts`) rather than on a schedule.
  */
 export const signInAttempts = pgTable(
@@ -181,6 +184,7 @@ export const signInAttempts = pgTable(
     email: text("email").notNull(),
     ip: text("ip").notNull(),
     succeeded: boolean("succeeded").notNull(),
+    kind: text("kind").notNull().default("sign_in"),
     attemptedAt: timestamp("attempted_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

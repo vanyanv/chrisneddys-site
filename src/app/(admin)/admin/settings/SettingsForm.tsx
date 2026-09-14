@@ -194,7 +194,10 @@ export function SettingsForm({ settings }: { settings: StoreSettings }) {
         </button>
 
         {state?.ok && state.savedAt && (
-          <span className="adm-saved-note">Saved · {state.savedAt}</span>
+          <span className="adm-saved-note">
+            Saved ·{" "}
+            {new Date(state.savedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+          </span>
         )}
 
         <a href="/returns/" target="_blank" rel="noreferrer" className="adm-btn">

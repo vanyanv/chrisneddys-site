@@ -42,7 +42,13 @@ export async function createProductAction(
   redirect(`/admin/products/${id}`);
 }
 
-export type SaveProductState = { ok?: boolean; error?: string; savedAt?: string };
+export type SaveProductState = {
+  ok?: boolean;
+  error?: string;
+  /** ISO timestamp — formatted client-side (`ProductForm`) so it renders in
+   * the viewer's local time instead of the server's (UTC on Vercel). */
+  savedAt?: string;
+};
 
 function linesToList(value: FormDataEntryValue | null): string[] {
   return String(value ?? "")
@@ -107,8 +113,7 @@ export async function saveProductAction(
 
   revalidateStorefront(result.oldSlug, result.newSlug);
 
-  const savedAt = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  return { ok: true, savedAt };
+  return { ok: true, savedAt: new Date().toISOString() };
 }
 
 export type StatusActionState = { error?: string };

@@ -3,7 +3,6 @@ import { ID } from "@/lib/seo";
 import { priceString } from "@/lib/otter";
 import { type MerchProduct, type MerchView } from "@/data/merch";
 import type { InventoryStatus } from "@/lib/catalog";
-import { isShopOpen } from "@/lib/shopStatus";
 
 /**
  * Product structured data.
@@ -66,22 +65,24 @@ export function productImage(product: {
  * A real store selling out is a fact worth stating even while the shop is
  * closed — a sold-out capsule with no way to buy it is not a
  * misrepresentation, it's the truth. Everything else here still follows
- * `isShopOpen()`: an in-stock claim on a shop that cannot take money would
- * be. Read straight from the env here (never passed in) — every caller of
- * `productLd` is a server component, so there is no client boundary to carry
- * it across, unlike `BagDrawer`'s `shopOpen` prop.
+ * `shopOpen`: an in-stock claim on a shop that cannot take money would be.
+ * `shopOpen` (`isShopOpenFor(settings)` — `src/lib/shopStatus.ts`) is passed
+ * in rather than computed here: it needs the `store_settings` row, and
+ * `productLd`'s callers (product pages) already fetch that row for their own
+ * "Shipping & returns" line, so this stays a DB-free, unit-testable
+ * composer, the same way `BagDrawer`'s `shopOpen` prop is read once
+ * server-side and threaded down rather than re-derived per component.
  */
-function offerAvailability(inventory?: InventoryStatus): string | undefined {
-  const open = isShopOpen();
+function offerAvailability(shopOpen: boolean, inventory?: InventoryStatus): string | undefined {
   if (inventory?.tracked) {
     if (inventory.available === 0) return "https://schema.org/SoldOut";
-    if (open) return "https://schema.org/InStock";
+    if (shopOpen) return "https://schema.org/InStock";
     return undefined;
   }
-  return open ? "https://schema.org/InStock" : undefined;
+  return shopOpen ? "https://schema.org/InStock" : undefined;
 }
 
-export function productLd(product: MerchProduct, inventory?: InventoryStatus) {
+export function productLd(product: MerchProduct, inventory?: InventoryStatus, shopOpen = false) {
   const url = `${brand.siteUrl}/shop/${product.slug}/`;
 
   return {
@@ -107,7 +108,7 @@ export function productLd(product: MerchProduct, inventory?: InventoryStatus) {
       // Stated only once the shop can take money, unless the item has sold
       // out — see `offerAvailability`. Until then the price is a fact and the
       // ability to buy is not, so only the fact is published.
-      availability: offerAvailability(inventory),
+      availability: offerAvailability(shopOpen, inventory),
     },
   };
 }

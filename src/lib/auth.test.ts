@@ -8,6 +8,7 @@ import { hashPassword, verifyPassword } from "@/lib/password";
 import { signSessionToken, verifySessionToken } from "@/lib/sessionToken";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
 import {
+  checkIpThrottle,
   checkThrottle,
   MAX_FAILED_ATTEMPTS,
   pruneSignInAttempts,
@@ -216,5 +217,85 @@ describe("sign-in throttle", () => {
     });
     expect(remaining).toHaveLength(1);
     expect(remaining[0]?.attemptedAt.getTime()).toBe(recent.getTime());
+  });
+});
+
+describe("attempt throttle kinds", () => {
+  const now = new Date("2026-01-01T00:00:00Z");
+  const MAX_LOOKUP_ATTEMPTS = 10;
+
+  it("sign-in failures don't lock out order lookups for the same IP", async () => {
+    const db = await getDb();
+    const ip = "203.0.113.50";
+    const email = "shopper@example.com";
+
+    // 5 failed sign-ins is enough to lock the "sign_in" kind for this IP...
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS; i++) {
+      await recordSignInAttempt(db, email, ip, false, now, "sign_in");
+    }
+    expect((await checkThrottle(db, email, ip, now, "sign_in")).locked).toBe(true);
+
+    // ...but the "order_lookup" kind for the very same IP has no failures.
+    const lookup = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
+    expect(lookup.locked).toBe(false);
+    expect(lookup.failures).toBe(0);
+  });
+
+  it("order-lookup failures don't lock out sign-in for the same IP", async () => {
+    const db = await getDb();
+    const ip = "203.0.113.51";
+    const email = "shopper2@example.com";
+
+    for (let i = 0; i < MAX_LOOKUP_ATTEMPTS; i++) {
+      await recordSignInAttempt(db, email, ip, false, now, "order_lookup");
+    }
+    const lookup = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
+    expect(lookup.locked).toBe(true);
+
+    const signIn = await checkThrottle(db, email, ip, now, "sign_in");
+    expect(signIn.locked).toBe(false);
+    expect(signIn.ipFailures).toBe(0);
+  });
+
+  it("locks order lookups for an IP after 10 failed lookups, not before", async () => {
+    const db = await getDb();
+    const ip = "203.0.113.52";
+    const email = "shopper3@example.com";
+
+    for (let i = 0; i < MAX_LOOKUP_ATTEMPTS - 1; i++) {
+      const status = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
+      expect(status.locked).toBe(false);
+      await recordSignInAttempt(db, email, ip, false, now, "order_lookup");
+    }
+
+    // 9 failures recorded — still not locked.
+    expect((await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup")).locked).toBe(
+      false,
+    );
+
+    await recordSignInAttempt(db, email, ip, false, now, "order_lookup");
+
+    // 10th failure — now locked, with a positive retry hint inside the
+    // 15-minute window.
+    const locked = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
+    expect(locked.locked).toBe(true);
+    expect(locked.failures).toBe(MAX_LOOKUP_ATTEMPTS);
+    expect(locked.retryAfterSeconds).toBeGreaterThan(0);
+    expect(locked.retryAfterSeconds).toBeLessThanOrEqual(15 * 60);
+  });
+
+  it("a successful order lookup is never counted as a failure", async () => {
+    const db = await getDb();
+    const ip = "203.0.113.53";
+    const email = "shopper4@example.com";
+
+    for (let i = 0; i < MAX_LOOKUP_ATTEMPTS - 1; i++) {
+      await recordSignInAttempt(db, email, ip, false, now, "order_lookup");
+    }
+    await recordSignInAttempt(db, email, ip, true, now, "order_lookup"); // the 10th lookup hits
+
+    const status = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
+    expect(status.locked).toBe(false);
+    expect(status.failures).toBe(MAX_LOOKUP_ATTEMPTS - 1);
   });
 });

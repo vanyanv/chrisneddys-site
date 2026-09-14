@@ -14,6 +14,10 @@ import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { TrackEvents } from "@/components/shared/TrackEvents";
+import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
+import { getStoreSettings } from "@/lib/orders";
+import { shippingReturnsNote } from "@/lib/shopCopy";
+import { TERMS_PENDING } from "@/data/merch";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -93,7 +97,52 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+/**
+ * Re-checked at most once a minute, the same window the shop pages use for
+ * the catalogue — `shopOpen` and `pickupEnabled` below can go stale for up
+ * to 60s after an admin flips a setting, never longer, and never requires a
+ * redeploy to pick up.
+ */
+export const revalidate = 60;
+
+/**
+ * The storefront's root layout — everything under the `(site)` route group
+ * (every page except `/admin`). `/admin` has its own root layout
+ * (`src/app/(admin)/layout.tsx`): two root layouts, split by route group,
+ * rather than one layout branching on the request path. Branching on
+ * `headers()` here previously opted the entire app into dynamic rendering,
+ * turning every static/ISR storefront page (`/`, `/shop`, `/menu`, …) into
+ * an on-demand server render — a real regression this route-group split
+ * undoes.
+ *
+ * `shopOpen` (`isShopOpenFor(settings)` — Stripe keys, a published returns
+ * policy, and a support email all set) and `pickupEnabled` (the store
+ * settings row) are read here, server-side, and passed down as props to
+ * `BagDrawer` — a client component, so it cannot read either itself.
+ * `shippingNote` is the "Shipping & returns" line (or the closed-shop
+ * placeholder) for the same reason.
+ *
+ * `getStoreSettings()` is only called once the Stripe keys are present. Not
+ * just an optimisation: `isShopOpenFor` itself needs the settings row (it
+ * reads `returnsPolicy` and `supportEmail` off it), so there is no way to
+ * know whether the shop is open without fetching it once the keys exist —
+ * but with no keys at all, `isShopOpenFor` is false regardless of what the
+ * row says, so there is nothing to read. And — unlike `src/lib/catalog.ts`
+ * — `src/lib/orders.ts` has no "no `DATABASE_URL`, fall back to the in-repo
+ * data" path of its own, so calling it unconditionally here would make
+ * *every* page in this layout touch a database (migrating and seeding a
+ * fresh local one, on a production build with no `DATABASE_URL` — CI, or a
+ * preview deploy that hasn't been given one) purely to render props no one
+ * reads. Skipping the call keeps that build honest and fast, the same way
+ * the shop pages already do for the catalogue itself.
+ */
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = hasPaymentKeys() ? await getStoreSettings() : null;
+  const shopOpen = settings ? isShopOpenFor(settings) : false;
+  const pickupEnabled = settings?.pickupEnabled ?? false;
+  const shippingNote =
+    (shopOpen && settings ? shippingReturnsNote(settings)?.line : null) ?? TERMS_PENDING;
+
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
@@ -120,7 +169,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Sitewide, because the bag is: someone who put a cap in it and then
             wandered off to the menu should still be able to open it. Renders
             no DOM at all until it is opened. */}
-        <BagDrawer />
+        <BagDrawer shopOpen={shopOpen} pickupEnabled={pickupEnabled} shippingNote={shippingNote} />
         <OrderDock />
         <Script
           defer

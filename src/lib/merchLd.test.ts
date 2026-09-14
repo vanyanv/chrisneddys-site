@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { productLd, shopListLd, socialCard, productImage } from "@/lib/merchLd";
 import { merch } from "@/data/merch";
 import { brand } from "@/data/brand";
@@ -9,7 +10,7 @@ const trucker = merch.find((p) => p.slug === "foam-trucker-blue");
 if (!trucker) throw new Error("expected foam-trucker-blue in the merch catalogue");
 
 describe("productLd", () => {
-  const ld = productLd(trucker);
+  const ld = productLd(trucker, undefined, false);
 
   it("declares a Product with an absolute, product-scoped @id and url", () => {
     expect(ld["@type"]).toBe("Product");
@@ -30,8 +31,49 @@ describe("productLd", () => {
     expect(ld.offers["@id"]).toBe(`${ld.url}#offer`);
     expect(ld.offers.price).toBe(trucker.price.toFixed(2));
     expect(ld.offers.priceCurrency).toBe("USD");
-    // SHOP_OPEN is false in this catalogue, so no availability is claimed.
+    // shopOpen: false was passed in, so no availability is claimed.
     expect(ld.offers.availability).toBeUndefined();
+  });
+
+  it("states no availability for untracked inventory while the shop is closed", () => {
+    const untracked = productLd(
+      trucker,
+      { tracked: false, available: 0, editionSize: null },
+      false,
+    );
+    expect(untracked.offers.availability).toBeUndefined();
+  });
+
+  it("still says nothing while tracked stock remains and the shop is closed", () => {
+    const inStock = productLd(trucker, { tracked: true, available: 13, editionSize: 50 }, false);
+    expect(inStock.offers.availability).toBeUndefined();
+  });
+
+  it("states SoldOut once tracked inventory hits zero, regardless of shop-open state", () => {
+    const soldOutClosed = productLd(
+      trucker,
+      { tracked: true, available: 0, editionSize: 50 },
+      false,
+    );
+    expect(soldOutClosed.offers.availability).toBe("https://schema.org/SoldOut");
+
+    const soldOutOpen = productLd(trucker, { tracked: true, available: 0, editionSize: 50 }, true);
+    expect(soldOutOpen.offers.availability).toBe("https://schema.org/SoldOut");
+  });
+
+  it("defaults shopOpen to false when the third argument is omitted", () => {
+    const defaulted = productLd(trucker);
+    expect(defaulted.offers.availability).toBeUndefined();
+  });
+
+  it("states InStock for untracked inventory once the shop is open", () => {
+    const untracked = productLd(trucker, { tracked: false, available: 0, editionSize: null }, true);
+    expect(untracked.offers.availability).toBe("https://schema.org/InStock");
+  });
+
+  it("states InStock for tracked inventory with stock left once the shop is open", () => {
+    const inStock = productLd(trucker, { tracked: true, available: 13, editionSize: 50 }, true);
+    expect(inStock.offers.availability).toBe("https://schema.org/InStock");
   });
 });
 

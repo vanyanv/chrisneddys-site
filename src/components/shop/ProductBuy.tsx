@@ -37,6 +37,11 @@ type BuyContext = {
   add: () => void;
   /** True for the ~700ms the button spends confirming, so both copies agree. */
   added: boolean;
+  /** Tracked inventory at zero. Disables both buy buttons; hides the stepper. */
+  soldOut: boolean;
+  /** The stepper's ceiling — the product's own `perOrderLimit` (falling back
+   * to `MAX_PER_ORDER`), or less when tracked stock is lower. */
+  maxQty: number;
 };
 
 const Ctx = createContext<BuyContext | null>(null);
@@ -49,11 +54,20 @@ function useBuy(): BuyContext {
 
 export function BuyProvider({
   product,
+  soldOut = false,
+  maxQty,
   children,
 }: {
   product: MerchProduct;
+  /** From the catalogue's live inventory — never computed client-side. */
+  soldOut?: boolean;
+  /** Omit to fall back to the product's own `perOrderLimit` (or
+   * `MAX_PER_ORDER` when that's unset) — callers that also know the live
+   * inventory cap (the product page) pass the smaller of the two instead. */
+  maxQty?: number;
   children: React.ReactNode;
 }) {
+  const cappedQty = maxQty ?? product.perOrderLimit ?? MAX_PER_ORDER;
   const [qty, setQtyRaw] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -69,9 +83,12 @@ export function BuyProvider({
     });
   }, [product]);
 
-  const setQty = useCallback((n: number) => {
-    setQtyRaw(Math.max(1, Math.min(MAX_PER_ORDER, n)));
-  }, []);
+  const setQty = useCallback(
+    (n: number) => {
+      setQtyRaw(Math.max(1, Math.min(cappedQty, n)));
+    },
+    [cappedQty],
+  );
 
   const add = useCallback(() => {
     // Reported on the tap rather than inside `flyToBag`'s callback: the buyer
@@ -88,15 +105,15 @@ export function BuyProvider({
     setAdded(true);
     window.setTimeout(() => setAdded(false), 900);
     flyToBag(source, () => {
-      addToBag(product.slug, qty);
+      addToBag(product, qty);
       setQtyRaw(1);
       openBag();
     });
   }, [product, qty]);
 
   const value = useMemo(
-    () => ({ product, qty, setQty, add, added }),
-    [product, qty, setQty, add, added],
+    () => ({ product, qty, setQty, add, added, soldOut, maxQty: cappedQty }),
+    [product, qty, setQty, add, added, soldOut, cappedQty],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -104,7 +121,17 @@ export function BuyProvider({
 
 /** The desktop stepper + primary button. */
 export function BuyRow() {
-  const { product, qty, setQty, add, added } = useBuy();
+  const { product, qty, setQty, add, added, soldOut, maxQty } = useBuy();
+
+  if (soldOut) {
+    return (
+      <div className="cne-pdp-row">
+        <button type="button" className="cne-btn-primary is-soldout" disabled>
+          SOLD OUT
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="cne-pdp-row">
@@ -124,7 +151,7 @@ export function BuyRow() {
         <button
           type="button"
           onClick={() => setQty(qty + 1)}
-          disabled={qty >= MAX_PER_ORDER}
+          disabled={qty >= maxQty}
           aria-label="Increase quantity"
         >
           +
@@ -142,14 +169,20 @@ export function BuyRow() {
  * a media query in JS, so it is correct in the first frame and on resize.
  */
 export function StickyBuy() {
-  const { product, add, added, qty } = useBuy();
+  const { product, add, added, qty, soldOut } = useBuy();
 
   return (
     <div className="cne-pdp-sticky">
       <span className="cne-price p">{formatPrice(product.price * qty)}</span>
-      <button type="button" className="cne-btn-primary" onClick={add}>
-        {added ? "ADDED ✓" : "ADD TO BAG"}
-      </button>
+      {soldOut ? (
+        <button type="button" className="cne-btn-primary is-soldout" disabled>
+          SOLD OUT
+        </button>
+      ) : (
+        <button type="button" className="cne-btn-primary" onClick={add}>
+          {added ? "ADDED ✓" : "ADD TO BAG"}
+        </button>
+      )}
     </div>
   );
 }

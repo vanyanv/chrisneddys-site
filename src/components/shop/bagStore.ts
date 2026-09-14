@@ -1,13 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import {
-  MAX_PER_ORDER,
-  firstView,
-  productBySlug,
-  type MerchProduct,
-  type MerchView,
-} from "@/data/merch";
+import { MAX_PER_ORDER, firstView, productBySlug, type MerchProduct } from "@/data/merch";
 
 /**
  * The bag.
@@ -27,9 +21,37 @@ import {
  * the correct amount of consequence.
  */
 
+/** A bag line's own thumbnail — the same `photo.thumbUrl` (or its computed
+ * fallback) `ProductShot` renders, so a line keeps its own picture rather
+ * than falling back to a shared default. `null` when the product has no
+ * photo yet, so the bag row draws `CapArt` instead of a broken `<img>`. */
+export type BagLineImage = { url: string; alt: string };
+
 export type BagLine = {
   slug: string;
   qty: number;
+  /**
+   * A snapshot of the product as it was when this line was added — not a
+   * live read. A product that is later edited, unpublished or deleted in
+   * /admin must not turn an existing bag line into an empty $0 row, so the
+   * bag carries everything a row needs to render with it.
+   */
+  name: string;
+  displayName: [string, string];
+  /**
+   * Display-only, in cents, from the price at add time. Server-side pricing
+   * is authoritative at checkout — `quoteCart` in `src/lib/orders.ts`
+   * re-prices every line against the live database — so this number is only
+   * ever shown to the buyer while they shop and can drift from what they
+   * are actually charged.
+   */
+  priceCents: number;
+  image: BagLineImage | null;
+  /** The line's own per-order cap, captured at add time. */
+  perOrderLimit: number;
+  /** `Date.now()` when the line was first added. Not currently read for
+   * anything but useful to have for a future "recently added" sort. */
+  addedAt: number;
 };
 
 export type BagState = {
@@ -40,7 +62,11 @@ export type BagState = {
   ready: boolean;
 };
 
-const STORAGE_KEY = "cne.bag.v1";
+/** v2 stores a full display snapshot per line instead of just a slug — see
+ * `BagLine`. `hydrateBag` migrates a v1 bag (slug + qty only) into v2 by
+ * looking the slug up in the static catalogue, once, the first time it runs. */
+const STORAGE_KEY = "cne.bag.v2";
+const LEGACY_STORAGE_KEY = "cne.bag.v1";
 
 /**
  * The first snapshot must match what the server rendered, or React will paper
@@ -75,17 +101,138 @@ function persist() {
   }
 }
 
-/** Drops anything that is no longer a product, or no longer a sane quantity. */
+/**
+ * The line image the same way `ProductShot` resolves one: the uploaded
+ * Blob thumbnail when the first view has one, else the `photoDir`-relative
+ * thumbnail path; `null` when the product has no photo at all yet (an
+ * unphotographed product can no longer reach here at all once it's
+ * published — see `setStatus` in `src/lib/catalogAdmin.ts` — but a draft
+ * previewed some other way, or the in-repo fallback copy, still might).
+ */
+function buildLineImage(product: MerchProduct): BagLineImage | null {
+  const view = firstView(product);
+  const photo = view?.photo;
+  if (!view || !photo) return null;
+  const base = `${product.photoDir ?? ""}/${photo.src}`;
+  const url = photo.thumbUrl ?? `${base}-thumb.webp`;
+  return { url, alt: view.caption };
+}
+
+function isBagLineImage(raw: unknown): raw is BagLineImage {
+  if (typeof raw !== "object" || raw === null) return false;
+  const { url, alt } = raw as Partial<BagLineImage>;
+  return typeof url === "string" && url.length > 0 && typeof alt === "string";
+}
+
+/**
+ * Validates and clamps whatever came out of `localStorage` (or a v1 → v2
+ * migration). Unlike the old, catalogue-backed version, this no longer
+ * drops a line because its slug isn't in the catalogue — the line carries
+ * its own snapshot now, so a product edited or removed since the line was
+ * added still renders exactly as it looked when it was added. It only
+ * clamps the quantity to the line's own `perOrderLimit`.
+ */
 export function clean(lines: unknown): BagLine[] {
   if (!Array.isArray(lines)) return [];
   const out: BagLine[] = [];
   for (const raw of lines) {
     if (typeof raw !== "object" || raw === null) continue;
-    const { slug, qty } = raw as Partial<BagLine>;
-    if (typeof slug !== "string" || !productBySlug(slug)) continue;
-    const n = Math.floor(Number(qty));
-    if (!Number.isFinite(n) || n < 1) continue;
-    out.push({ slug, qty: Math.min(n, MAX_PER_ORDER) });
+    const line = raw as Partial<BagLine>;
+
+    if (typeof line.slug !== "string" || !line.slug) continue;
+    if (typeof line.name !== "string" || !line.name) continue;
+    if (
+      !Array.isArray(line.displayName) ||
+      line.displayName.length !== 2 ||
+      typeof line.displayName[0] !== "string" ||
+      typeof line.displayName[1] !== "string"
+    ) {
+      continue;
+    }
+
+    const qty = Math.floor(Number(line.qty));
+    if (!Number.isFinite(qty) || qty < 1) continue;
+
+    const perOrderLimit =
+      typeof line.perOrderLimit === "number" &&
+      Number.isFinite(line.perOrderLimit) &&
+      line.perOrderLimit > 0
+        ? Math.floor(line.perOrderLimit)
+        : MAX_PER_ORDER;
+
+    const priceCents =
+      typeof line.priceCents === "number" && Number.isFinite(line.priceCents)
+        ? Math.max(0, Math.floor(line.priceCents))
+        : 0;
+
+    const addedAt =
+      typeof line.addedAt === "number" && Number.isFinite(line.addedAt) ? line.addedAt : Date.now();
+
+    out.push({
+      slug: line.slug,
+      qty: Math.min(qty, perOrderLimit),
+      name: line.name,
+      displayName: [line.displayName[0], line.displayName[1]],
+      priceCents,
+      image: isBagLineImage(line.image) ? line.image : null,
+      perOrderLimit,
+      addedAt,
+    });
+  }
+  return out;
+}
+
+/**
+ * Reads the legacy v1 bag (`{ slug, qty }[]`) and rebuilds each line as a v2
+ * snapshot by looking the slug up in the static catalogue — the only
+ * catalogue a v1 line could ever have pointed at, since v1 predates the
+ * database-backed storefront. A slug no longer in that catalogue is dropped:
+ * there is nothing to snapshot, and carrying it forward as an empty line is
+ * the exact bug this migration exists to fix. Runs at most once: the v1 key
+ * is removed as soon as it's read, migrated or not.
+ */
+function migrateLegacyBag(): BagLine[] {
+  let raw: string | null;
+  try {
+    raw = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+  } catch {
+    return [];
+  }
+  if (!raw) return [];
+
+  const out: BagLine[] = [];
+  try {
+    const legacyLines: unknown = JSON.parse(raw)?.lines;
+    if (Array.isArray(legacyLines)) {
+      for (const entry of legacyLines) {
+        if (typeof entry !== "object" || entry === null) continue;
+        const { slug, qty } = entry as { slug?: unknown; qty?: unknown };
+        if (typeof slug !== "string") continue;
+        const product = productBySlug(slug);
+        if (!product) continue;
+        const n = Math.floor(Number(qty));
+        if (!Number.isFinite(n) || n < 1) continue;
+        const limit = product.perOrderLimit ?? MAX_PER_ORDER;
+        out.push({
+          slug: product.slug,
+          qty: Math.min(n, limit),
+          name: product.name,
+          displayName: product.displayName,
+          priceCents: Math.round(product.price * 100),
+          image: buildLineImage(product),
+          perOrderLimit: limit,
+          addedAt: Date.now(),
+        });
+      }
+    }
+  } catch {
+    // Malformed v1 JSON — nothing to migrate.
+  }
+
+  try {
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+  } catch {
+    // Best effort — losing the old key later is not worth failing over.
   }
   return out;
 }
@@ -99,7 +246,7 @@ export function hydrateBag() {
   let lines: BagLine[] = [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) lines = clean(JSON.parse(raw).lines);
+    lines = raw ? clean(JSON.parse(raw).lines) : migrateLegacyBag();
   } catch {
     lines = [];
   }
@@ -107,29 +254,68 @@ export function hydrateBag() {
   emit();
 }
 
-export function addToBag(slug: string, qty = 1) {
-  const existing = state.lines.find((l) => l.slug === slug);
+/**
+ * Builds a fresh line's display snapshot from a live product — the pure
+ * core of `addToBag`'s "this slug isn't in the bag yet" branch, pulled out
+ * so it's directly testable without touching the module's private state or
+ * `localStorage`.
+ */
+export function buildBagLine(product: MerchProduct, qty: number): BagLine {
+  const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
+  return {
+    slug: product.slug,
+    qty: Math.min(perOrderLimit, qty),
+    name: product.name,
+    displayName: product.displayName,
+    priceCents: Math.round(product.price * 100),
+    image: buildLineImage(product),
+    perOrderLimit,
+    addedAt: Date.now(),
+  };
+}
+
+/**
+ * Re-derives an existing line's quantity (and cap) against the *live*
+ * product — the pure core of `addToBag`'s "already in the bag" branch. A
+ * `perOrderLimit` changed in /admin since the line was first added is
+ * picked up on the next add, rather than staying stale until the line is
+ * removed and re-added.
+ */
+export function bumpBagLine(line: BagLine, product: MerchProduct, qty: number): BagLine {
+  const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
+  return { ...line, qty: Math.min(perOrderLimit, line.qty + qty), perOrderLimit };
+}
+
+/** Adds `qty` of `product` to the bag, snapshotting its current display
+ * details onto the line — see `buildBagLine` and `bumpBagLine`. */
+export function addToBag(product: MerchProduct, qty = 1) {
+  const existing = state.lines.find((l) => l.slug === product.slug);
   const lines = existing
-    ? state.lines.map((l) =>
-        l.slug === slug ? { ...l, qty: Math.min(MAX_PER_ORDER, l.qty + qty) } : l,
-      )
-    : [...state.lines, { slug, qty: Math.min(MAX_PER_ORDER, qty) }];
+    ? state.lines.map((l) => (l.slug === product.slug ? bumpBagLine(l, product, qty) : l))
+    : [...state.lines, buildBagLine(product, qty)];
   set({ lines });
 }
 
 /** Setting a line to zero removes it — the stepper's minus is also the delete. */
 export function setBagQty(slug: string, qty: number) {
-  const n = Math.max(0, Math.min(MAX_PER_ORDER, Math.floor(qty)));
   set({
-    lines:
-      n === 0
-        ? state.lines.filter((l) => l.slug !== slug)
-        : state.lines.map((l) => (l.slug === slug ? { ...l, qty: n } : l)),
+    lines: state.lines.flatMap((l) => {
+      if (l.slug !== slug) return [l];
+      const n = Math.max(0, Math.min(l.perOrderLimit, Math.floor(qty)));
+      return n === 0 ? [] : [{ ...l, qty: n }];
+    }),
   });
 }
 
 export function removeFromBag(slug: string) {
   set({ lines: state.lines.filter((l) => l.slug !== slug) });
+}
+
+/** Empties the bag outright — called once by the thanks page after a
+ * successful checkout, since the cart that was just paid for shouldn't
+ * still be sitting in it. */
+export function clearBag() {
+  set({ lines: [] });
 }
 
 export function openBag() {
@@ -160,20 +346,9 @@ export function bagCount(lines: BagLine[]): number {
   return lines.reduce((n, l) => n + l.qty, 0);
 }
 
-/** In dollars. Unknown slugs were already filtered out by `clean`. */
+/** In dollars, from each line's own display-only snapshot price — see the
+ * note on `BagLine.priceCents`. Server-side pricing (`quoteCart`) is what
+ * actually gets charged. */
 export function bagSubtotal(lines: BagLine[]): number {
-  return lines.reduce((sum, l) => sum + (productBySlug(l.slug)?.price ?? 0) * l.qty, 0);
-}
-
-/**
- * The product and gallery view a bag line's own thumbnail should render —
- * the same pair `ProductShot` takes on the product page, so a cap in the bag
- * shows its own photo (or its own `capColor` illustration), not another
- * product's. Pulled out as a pure lookup, separate from the JSX that renders
- * it, so it can be unit-tested without a DOM.
- */
-export function bagLineImage(line: BagLine): { product: MerchProduct; view: MerchView } | null {
-  const product = productBySlug(line.slug);
-  if (!product) return null;
-  return { product, view: firstView(product) };
+  return lines.reduce((sum, l) => sum + (l.priceCents / 100) * l.qty, 0);
 }

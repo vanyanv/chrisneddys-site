@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
 import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
-import { merch, MERCH_UPDATED } from "@/data/merch";
 import { PRIVACY_UPDATED } from "@/data/privacy";
+import { catalogueUpdatedAt, listPublishedProducts } from "@/lib/catalog";
 
 export const dynamic = "force-static";
 
@@ -23,6 +23,10 @@ const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 const LOCATIONS_UPDATED = "2026-09-09";
 /** When the site's copy and structure last changed. */
 const SITE_UPDATED = "2026-09-09";
+/** When /returns and /terms were added. Both also carry the store settings
+ * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
+ * itself only tracks changes to the route, not to the policy text. */
+const RETURNS_TERMS_ADDED = "2026-09-14";
 
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(menu) as MenuCategoryKey[])
@@ -38,7 +42,9 @@ const uniqueMenuImages = Array.from(new Set(menuImages));
  * the menu is what people search for and order from, so it sits alongside the
  * home page; the per-store pages are the local-search entry points.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [merch, merchUpdated] = await Promise.all([listPublishedProducts(), catalogueUpdatedAt()]);
+
   const entries: Array<{
     path: string;
     priority: number;
@@ -76,11 +82,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // The shop is its own funnel: /shop/ is the entry point and each product
     // page is what a search for the product itself should land on, so the
     // product ranks above the index it sits in.
-    { path: "/shop/", priority: 0.7, updated: MERCH_UPDATED },
+    { path: "/shop/", priority: 0.7, updated: merchUpdated },
     ...merch.map((p) => ({
       path: `/shop/${p.slug}/`,
       priority: 0.8,
-      updated: MERCH_UPDATED,
+      updated: merchUpdated,
       images: [`${brand.siteUrl}/shop/${p.slug}.png`],
     })),
     { path: "/locations/", priority: 0.8, updated: LOCATIONS_UPDATED },
@@ -95,6 +101,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // never the answer to a search. Its own `lastmod` comes from the policy
     // itself, so a crawler is told the terms moved only when they did.
     { path: "/privacy/", priority: 0.1, updated: PRIVACY_UPDATED },
+    { path: "/returns/", priority: 0.1, updated: RETURNS_TERMS_ADDED },
+    { path: "/terms/", priority: 0.1, updated: RETURNS_TERMS_ADDED },
   ];
 
   return entries.map(({ path, priority, updated, images }) => ({

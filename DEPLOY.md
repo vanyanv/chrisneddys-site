@@ -118,55 +118,87 @@ the other.
 
 ---
 
-## Vercel
+## Database
 
-Static export is auto-detected; the redirect and headers go in `vercel.json`:
+The shop's catalogue lives in Postgres (Neon), read through `src/lib/catalog.ts`.
+Set `DATABASE_URL` (the Neon connection string) as an environment variable on the
+Vercel project — Production, and any Preview that should read and write the real
+catalogue.
 
-```json
-{
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "chrisneddys.com" }],
-      "destination": "https://www.chrisneddys.com/$1",
-      "permanent": true
-    }
-  ],
-  "headers": [
-    {
-      "source": "/_next/static/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains; preload"
-        },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=()"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://api.web3forms.com https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; upgrade-insecure-requests"
-        }
-      ]
-    }
-  ]
-}
+`pnpm build`'s `prebuild` step (`scripts/db-prepare.mjs`) runs on every build: with
+`DATABASE_URL` set it applies any pending migrations in `drizzle/` and upserts the
+seed catalogue (`src/db/seed.ts`), both idempotent, so this is safe on every
+deploy. A Preview deploy with no `DATABASE_URL` configured — or a `pnpm build` run
+anywhere else without one, CI included — prints a message and skips both, and the
+site falls back to the in-repo catalogue in `src/data/merch.ts` instead of failing
+the build.
+
+---
+
+## Payments
+
+The shop is "open" — the bag's CHECKOUT button live, `POST /api/checkout`
+answering instead of 503ing — only once both `STRIPE_SECRET_KEY` and
+`STRIPE_WEBHOOK_SECRET` are set (`src/lib/shopStatus.ts`). Order confirmation
+/ shipping / pickup-ready email additionally needs `RESEND_API_KEY` and
+`EMAIL_FROM`; without them an order email is logged instead of sent, and
+never fails the checkout or webhook it's attached to. All four are
+documented in `.env.example`.
+
+**Test mode first.** Use Stripe's test-mode keys (`sk_test_...`) end to end —
+a real Checkout Session, a real webhook delivery, a real (test) card — before
+ever setting live keys in Production.
+
+**Stripe Tax must be turned on.** Every Checkout Session this app creates
+sets `automatic_tax: { enabled: true }`; if the Stripe account hasn't enabled
+Tax (Dashboard → Tax → get started) and added a tax registration for
+California, Stripe returns an error at session-creation time instead of
+collecting tax, and checkout breaks outright rather than quietly under- or
+over-charging. Add the CA registration (and any other state this store ships
+to) before flipping `STRIPE_SECRET_KEY` on in Production.
+
+**Webhook endpoint.** In the Stripe dashboard → Developers → Webhooks, add
+an endpoint at:
+
+```
+https://www.chrisneddys.com/api/stripe/webhook
 ```
 
-The `/(.*)` block is second on purpose: Vercel applies every matching block, so
-the static-asset rule above still adds its own `Cache-Control` on top.
+subscribed to exactly these four event types:
 
-Add both domains in the project's Domains panel and set `www` as primary —
-Vercel then issues the apex redirect itself, and the `redirects` block above
-becomes belt-and-braces.
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.expired`
+- `checkout.session.async_payment_failed`
+- `charge.refunded`
+
+(Stripe's UI lists these as a flat set to check, not five separate
+endpoints — one endpoint, five event types.) Copy the endpoint's "Signing
+secret" into `STRIPE_WEBHOOK_SECRET`. The route verifies every delivery
+against this secret and 400s a bad signature; it never trusts an
+unauthenticated POST to mark an order paid.
+
+**Idempotency.** Every webhook delivery's Stripe event id is recorded before
+it's processed and checked again before anything happens, so a duplicate
+delivery — Stripe retries a slow or failed response — never double-marks an
+order paid or double-assigns an edition number. If the handler itself throws
+partway through, the id's claim is rolled back before the 500 goes out, so
+Stripe's automatic retry gets a real attempt rather than being silently
+skipped as "already seen."
+
+---
+
+## Vercel
+
+The app now has a server (`next build` / `next start`), so this is a standard
+Next.js deployment. The security headers and cache policy above ship from
+`headers()` in `next.config.mjs` — one source for every host, Vercel included,
+so there is no `vercel.json` to add. `img-src` in that CSP also allows Vercel
+Blob (`https://*.public.blob.vercel-storage.com`), where product photos live.
+
+The only thing that still belongs in Vercel's own config is the apex → www
+redirect: add both domains in the project's Domains panel and set `www` as
+primary — Vercel issues the redirect itself, no `redirects` block needed.
 
 ## Netlify / Cloudflare Pages
 

@@ -1,6 +1,17 @@
 /**
  * The merch catalogue.
  *
+ * Phase 1 of the Postgres-backed shop moved the source of truth to the
+ * database (`src/db/schema.ts`), read through `src/lib/catalog.ts` — that is
+ * the only module the app should read products through now. This file keeps
+ * two jobs: `src/db/seed.ts` upserts the `merch` array below into the
+ * database (so a product's copy still starts life here), and
+ * `src/lib/catalog.ts` returns this same array unchanged whenever there is no
+ * database to read from — a production build with no `DATABASE_URL` (CI, or
+ * a preview deploy that has not been given one). The bag drawer
+ * (`src/components/shop/BagDrawer.tsx`) also still reads this file directly,
+ * client-side, and is out of scope for phase 1.
+ *
  * Otter still lists a cap of its own — `chris-n-eddy-s-ball-cap-limited-run`
  * in `menu.ts` — but it is a different, older item and is left alone
  * deliberately: Otter's row keeps its own name, price and photo, and nothing
@@ -41,8 +52,13 @@ export type MerchView = {
    * Left unset until the photography lands: an unset `photo` is what tells
    * `ProductShot` to draw `CapArt` instead, so the gallery is fully wired —
    * eight tabs, eight captions — before a single picture exists.
+   *
+   * `url`/`thumbUrl` are set instead of (never alongside a meaningful) `src`
+   * for an image uploaded through /admin — a full Vercel Blob URL for each
+   * cut. `ProductShot` prefers these over the `photoDir`-relative path when
+   * present.
    */
-  photo?: { src: string; width: number; height: number };
+  photo?: { src: string; width: number; height: number; url?: string; thumbUrl?: string };
 };
 
 /** A single authenticity-section image: the certificate, or the brim sticker. */
@@ -52,9 +68,20 @@ type AuthPhoto = {
   width: number;
   height: number;
   alt: string;
+  /** Same convention as `MerchView.photo.url`/`thumbUrl` — set for an uploaded image. */
+  url?: string;
+  thumbUrl?: string;
 };
 
 export type MerchProduct = {
+  /**
+   * The database row's id, when this product was read through
+   * `src/lib/catalog.ts` from Postgres rather than from the array below.
+   * Unset for the in-repo fallback/seed copy.
+   */
+  id?: string;
+  /** The row's publication state in the database. Unset for the fallback copy. */
+  status?: "draft" | "published" | "archived";
   /** URL slug: /shop/<slug>/ */
   slug: string;
   /** Exactly as it should appear on a receipt and in structured data. */
@@ -106,6 +133,13 @@ export type MerchProduct = {
   /** Gallery angles. See `MerchView`. */
   views: MerchView[];
   /**
+   * The most of this one product a single order will take — the database
+   * row's own `per_order_limit`, settable per product in /admin. Unset for
+   * the in-repo fallback/seed copy, where every caller falls back to the
+   * blanket `MAX_PER_ORDER` below.
+   */
+  perOrderLimit?: number;
+  /**
    * The construction list under "The details" — copied straight off the spec
    * sheet, one fact per line. Nothing paraphrased or inferred beyond it.
    */
@@ -129,16 +163,6 @@ export type MerchProduct = {
   authenticity?: { certificate: AuthPhoto; sticker: AuthPhoto };
 };
 
-/**
- * Whether the shop can take money.
- *
- * False until a payment processor is connected. It disables the checkout
- * button, and it is why the Product schema states a price without claiming the
- * item is available to buy — a merchant listing for something no one can
- * actually purchase is the search-result equivalent of a locked door.
- */
-export const SHOP_OPEN = false;
-
 /** The most of one item a single order will take. Keeps a run from being swept. */
 export const MAX_PER_ORDER = 6;
 
@@ -157,13 +181,15 @@ export const TERMS_PENDING =
 
 /**
  * A product's first view — the gallery's default and what card art uses.
- * Every product in the catalogue below is defined with at least one view;
- * this only throws if that contract is ever broken.
+ * Every product in the catalogue below is seeded with at least one view, but
+ * a product published through /admin is not guaranteed one at the type
+ * level (`setStatus` in `src/lib/catalogAdmin.ts` refuses to publish one with
+ * no photo, but a draft can still reach this function) — so this returns
+ * `undefined` rather than throwing, and every caller renders `CapArt` in
+ * that case instead of crashing the page.
  */
-export function firstView(product: MerchProduct): MerchView {
-  const view = product.views[0];
-  if (!view) throw new Error(`${product.slug} has no views`);
-  return view;
+export function firstView(product: MerchProduct): MerchView | undefined {
+  return product.views[0];
 }
 
 export const merch: MerchProduct[] = [

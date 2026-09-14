@@ -28,7 +28,7 @@ export function ProductGallery({ product }: { product: MerchProduct }) {
       <div className="cne-pdp-main" id="cne-pdp-shot">
         {/* Keyed on the view so the crossfade replays when the angle changes. */}
         <ProductShot
-          key={view.id}
+          key={view?.id ?? "none"}
           product={product}
           view={view}
           sizes="(min-width: 901px) 620px, 100vw"

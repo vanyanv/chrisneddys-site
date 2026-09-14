@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, productBySlug } from "@/data/merch";
+import { MAX_PER_ORDER, TERMS_PENDING } from "@/data/merch";
+import {
+  getInventory,
+  getProductBySlug,
+  inventoryLine,
+  listPublishedProducts,
+} from "@/lib/catalog";
+import { getStoreSettings } from "@/lib/orders";
+import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
+import { isShopOpenFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -12,14 +21,19 @@ import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
 type Params = { product: string };
 
+/** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
+ * admin) invalidates it immediately regardless of this window. */
+export const revalidate = 60;
+
 /** One product today, and the route already handles the second one. */
-export function generateStaticParams(): Params[] {
-  return merch.map((p) => ({ product: p.slug }));
+export async function generateStaticParams(): Promise<Params[]> {
+  const products = await listPublishedProducts();
+  return products.map((p) => ({ product: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { product: slug } = await params;
-  const product = productBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return {};
 
   // Title case, from the product's real name rather than the all-caps display
@@ -63,12 +77,22 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  */
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { product: slug } = await params;
-  const product = productBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
+
+  const inventory = await getInventory(slug);
+  const line = inventoryLine(inventory, product.eyebrow);
+  const soldOut = line?.soldOut ?? false;
+  const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
+  const maxQty = inventory?.tracked ? Math.min(perOrderLimit, inventory.available) : perOrderLimit;
+  const settings = await getStoreSettings();
+  const note = shippingReturnsNote(settings);
+  const flag = editionFlag(inventory?.editionSize ?? null);
+  const shopOpen = isShopOpenFor(settings);
 
   return (
     <>
-      <JsonLdScript data={productLd(product)} />
+      <JsonLdScript data={productLd(product, inventory, shopOpen)} />
       <JsonLdScript
         data={breadcrumbLd([
           { name: "Shop", path: "/shop/" },
@@ -83,7 +107,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             [
               "capsule 01",
               "★",
-              "only 50 made",
+              flag.toLowerCase(),
               "★",
               "numbered /50",
               "★",
@@ -96,7 +120,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         </div>
       </div>
 
-      <BuyProvider product={product}>
+      <BuyProvider product={product} soldOut={soldOut} maxQty={maxQty}>
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
           <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
@@ -118,10 +142,21 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               <span className="cne-price p">{formatPrice(product.price)}</span>
             </div>
 
+            {line && (
+              <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
+                <span className="cne-inv-text">{line.text}</span>
+                {line.barRatio !== null && (
+                  <div className="cne-inv-bar" aria-hidden="true">
+                    <span style={{ width: `${line.barRatio * 100}%` }} />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* One size fits most, so there is no variant grid at all. The
                 scarcity line takes the space the size chips would have used. */}
             <div className="cne-limited">
-              <span className="tag">ONLY 50 MADE</span>
+              <span className="tag">{flag}</span>
               <span className="txt">{product.limitedNote}</span>
             </div>
 
@@ -132,7 +167,20 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             <BuyRow />
 
-            <p className="cne-pending">{TERMS_PENDING}</p>
+            {note ? (
+              <p className="cne-pending">
+                {note.line} See <Link href="/returns/">returns</Link>
+                {note.hasTerms && (
+                  <>
+                    {" "}
+                    and <Link href="/terms/">terms</Link>
+                  </>
+                )}
+                .
+              </p>
+            ) : (
+              <p className="cne-pending">{TERMS_PENDING}</p>
+            )}
           </div>
         </div>
 
@@ -190,34 +238,45 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
               {product.authenticity && (
                 <div className="cne-auth-imgs">
-                  <img
-                    className="cne-auth-img is-cert"
-                    src={`${product.photoDir}/${product.authenticity.certificate.src}.webp`}
-                    srcSet={`${product.photoDir}/${product.authenticity.certificate.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.certificate.src}.webp 720w`}
-                    sizes="(min-width: 901px) 280px, 45vw"
-                    width={product.authenticity.certificate.width}
-                    height={product.authenticity.certificate.height}
-                    style={{
-                      aspectRatio: `${product.authenticity.certificate.width} / ${product.authenticity.certificate.height}`,
-                    }}
-                    alt={product.authenticity.certificate.alt}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <img
-                    className="cne-auth-img is-sticker"
-                    src={`${product.photoDir}/${product.authenticity.sticker.src}.webp`}
-                    srcSet={`${product.photoDir}/${product.authenticity.sticker.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.sticker.src}.webp 720w`}
-                    sizes="(min-width: 901px) 280px, 45vw"
-                    width={product.authenticity.sticker.width}
-                    height={product.authenticity.sticker.height}
-                    style={{
-                      aspectRatio: `${product.authenticity.sticker.width} / ${product.authenticity.sticker.height}`,
-                    }}
-                    alt={product.authenticity.sticker.alt}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {(() => {
+                    const cert = product.authenticity.certificate;
+                    const certFull = cert.url ?? `${product.photoDir}/${cert.src}.webp`;
+                    const certThumb = cert.thumbUrl ?? `${product.photoDir}/${cert.src}-thumb.webp`;
+                    return (
+                      <img
+                        className="cne-auth-img is-cert"
+                        src={certFull}
+                        srcSet={`${certThumb} 200w, ${certFull} 720w`}
+                        sizes="(min-width: 901px) 280px, 45vw"
+                        width={cert.width}
+                        height={cert.height}
+                        style={{ aspectRatio: `${cert.width} / ${cert.height}` }}
+                        alt={cert.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    );
+                  })()}
+                  {(() => {
+                    const sticker = product.authenticity.sticker;
+                    const stickerFull = sticker.url ?? `${product.photoDir}/${sticker.src}.webp`;
+                    const stickerThumb =
+                      sticker.thumbUrl ?? `${product.photoDir}/${sticker.src}-thumb.webp`;
+                    return (
+                      <img
+                        className="cne-auth-img is-sticker"
+                        src={stickerFull}
+                        srcSet={`${stickerThumb} 200w, ${stickerFull} 720w`}
+                        sizes="(min-width: 901px) 280px, 45vw"
+                        width={sticker.width}
+                        height={sticker.height}
+                        style={{ aspectRatio: `${sticker.width} / ${sticker.height}` }}
+                        alt={sticker.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    );
+                  })()}
                 </div>
               )}
             </div>

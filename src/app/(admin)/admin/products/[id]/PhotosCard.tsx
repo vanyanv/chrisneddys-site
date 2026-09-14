@@ -3,6 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AdminProduct, AdminProductImage } from "@/lib/catalogAdmin";
+import { imageThumbSrc } from "@/lib/productImage";
 import {
   moveImageAction,
   removeImageAction,
@@ -14,27 +15,25 @@ const imageStateInitial: ImageActionState = {};
 
 function ImageRow({
   productId,
+  photoDir,
   image,
   canMoveUp,
   canMoveDown,
 }: {
   productId: string;
+  photoDir: string | null;
   image: AdminProductImage;
   canMoveUp: boolean;
   canMoveDown: boolean;
 }) {
   const [state, formAction, pending] = useActionState(updateImageAction, imageStateInitial);
 
+  const thumb = imageThumbSrc(photoDir, image);
+
   return (
     <div className="adm-photo-row">
-      {image.urlThumb || image.urlFull ? (
-        <img
-          className="adm-photo-thumb"
-          src={image.urlThumb ?? image.urlFull ?? ""}
-          alt=""
-          width={72}
-          height={72}
-        />
+      {thumb ? (
+        <img className="adm-photo-thumb" src={thumb} alt="" width={72} height={72} />
       ) : (
         <span className="adm-photo-thumb adm-thumb-empty" aria-hidden="true" />
       )}
@@ -163,6 +162,7 @@ export function PhotosCard({
           <ImageRow
             key={image.id}
             productId={product.id}
+            photoDir={product.photoDir}
             image={image}
             canMoveUp={i > 0}
             canMoveDown={i < views.length - 1}
@@ -191,6 +191,7 @@ export function PhotosCard({
         {product.certificate && (
           <ImageRow
             productId={product.id}
+            photoDir={product.photoDir}
             image={product.certificate}
             canMoveUp={false}
             canMoveDown={false}
@@ -199,6 +200,7 @@ export function PhotosCard({
         {product.sticker && (
           <ImageRow
             productId={product.id}
+            photoDir={product.photoDir}
             image={product.sticker}
             canMoveUp={false}
             canMoveDown={false}

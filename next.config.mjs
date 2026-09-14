@@ -7,18 +7,34 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // policy". This is now the one place these ship from for every host — Vercel
 // runs a server, so `public/_headers` (Netlify/Cloudflare only, inert
 // elsewhere) is no longer enough on its own.
+// Two directives in the shipped policy are hostile to `next dev`, which serves
+// over plain http on localhost. Both are gated on NODE_ENV so the deployed
+// policy is unchanged byte for byte:
+//
+//  - 'unsafe-eval' — react-refresh evaluates its module registry with `eval`,
+//    and without it the browser refuses the entire client bundle. Nothing
+//    hydrates, so add-to-bag, the bag drawer and the gallery silently do
+//    nothing. Production never loads react-refresh.
+//  - upgrade-insecure-requests — rewrites every http request the page makes to
+//    https, including same-origin `fetch`. On http://localhost that turns the
+//    admin's own POST /api/admin/upload into an ERR_SSL_PROTOCOL_ERROR against
+//    a port speaking no TLS, so photo upload fails with nothing in the server
+//    log. In production every URL is already https and the directive is a
+//    no-op for correctly-written pages — it stays there.
+const isDev = process.env.NODE_ENV === "development";
+
 const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://plausible.io`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.public.blob.vercel-storage.com",
   "font-src 'self'",
   "connect-src 'self' https://api.web3forms.com https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
-  "upgrade-insecure-requests",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 /** @type {import('next').NextConfig} */

@@ -1,12 +1,15 @@
 /**
  * The admin shell's own stylesheet — imported only by
- * `src/app/admin/layout.tsx`, never by the storefront. Reuses the `--a-*`
- * tokens `src/styles/counter.css` already put on `:root` (that file itself
- * is untouched); this file just draws a plainer, denser system on top of
+ * `src/app/admin/layout.tsx`, never by the storefront. The `--a-*` tokens it
+ * draws with come from `./tokens.css`, imported below — the storefront's
+ * `counter.css` is never loaded here, so they have to arrive on their own.
+ * This file just draws a plainer, denser system on top of
  * them: square corners, ink rules, hard offset shadows, Bowlby One for
  * headings, JetBrains Mono for labels — on-brand, but built for a table and
  * a form rather than a menu board.
  */
+
+@import "./tokens.css";
 
 .adm-shell {
   min-height: 100vh;
@@ -137,6 +140,10 @@
     border-bottom: none;
     border-right: 2px solid var(--a-line);
     padding: 24px 16px;
+    /* The base rule scrolls this strip sideways because on a phone it is a
+       horizontal row of tabs. Once it is a column the row can't overflow, and
+       leaving it on paints a scrollbar under the last item. */
+    overflow-x: visible;
   }
 
   .adm-sidebar a {

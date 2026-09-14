@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Admin: the entire `/admin` interface rendered unstyled — correct typography on a blank white page. `admin.css` draws with 11 `--a-*` tokens that were defined only in `counter.css`, which the admin route group never loads, so every `background`, `border`, `box-shadow` and `color` in it was dropped as invalid at computed-value time. The tokens now live in `src/styles/tokens.css`, imported by both stylesheets
+- Admin: photos seeded from the repo showed as black squares in the product editor and the products table. Those rows store a stem (`front`, `angle`) resolved against the product's `photoDir`, which the admin had no field for and no code path to use — it understood only uploaded Blob URLs. Both now resolve through one helper, the way the storefront always has
+- Admin: the product slug field accepted any value. Its `pattern` was `^[a-z0-9-]+$`, which fails to compile under the `v` flag browsers apply to that attribute, so the invalid regex was discarded along with the validation
+- Admin: the sidebar painted a stray horizontal scrollbar under the last nav item once it became a column at 900px and up
+- Bag: a line named only the second half of the product's display name — "— BLUE" rather than "THE FOAM TRUCKER — BLUE"
+- Development: `next dev` no longer serves a Content-Security-Policy that breaks itself. `upgrade-insecure-requests` rewrote the admin's own upload request to https against a port speaking no TLS, and the absence of `'unsafe-eval'` blocked react-refresh, so no client component on the site hydrated — add-to-bag, the bag drawer and the product gallery all silently did nothing. Both are now gated on `NODE_ENV`; the deployed policy is unchanged
+- `pnpm install` failed before it could start: the lockfile carried two concatenated YAML documents, and `packageManager` pinned a pnpm version that does not exist
+
 ## [0.3.0] - 2026-09-14
 
 ### Changed

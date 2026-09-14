@@ -15,7 +15,7 @@
  * in the same viewBox.
  *
  * Run after any change to `src/data/laGeoPaths.ts`, `src/data/laGeo.ts`, the
- * map colour tokens in `src/styles/counter.css`, or the `.cne-map-*`
+ * map colour tokens in `src/styles/tokens.css`, or the `.cne-map-*`
  * stroke-widths in `src/styles/globals.css`:
  *
  *     node scripts/build-map-base.mjs
@@ -32,7 +32,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const paths = readFileSync(join(root, "src/data/laGeoPaths.ts"), "utf8");
 const geo = readFileSync(join(root, "src/data/laGeo.ts"), "utf8");
-const tokens = readFileSync(join(root, "src/styles/counter.css"), "utf8");
+const tokens = readFileSync(join(root, "src/styles/tokens.css"), "utf8");
 const globalsCss = readFileSync(join(root, "src/styles/globals.css"), "utf8");
 
 /** Pull `export const <name> = "<path data>";` out of laGeoPaths.ts. */
@@ -42,10 +42,10 @@ function pathConst(name) {
   return m[1];
 }
 
-/** Pull a `--a-*` colour out of the :root block in counter.css. */
+/** Pull a `--a-*` colour out of the :root block in tokens.css. */
 function token(name) {
   const m = tokens.match(new RegExp(`--${name}:\\s*([^;]+);`));
-  if (!m) throw new Error(`counter.css: could not read --${name}`);
+  if (!m) throw new Error(`tokens.css: could not read --${name}`);
   return m[1].trim();
 }
 

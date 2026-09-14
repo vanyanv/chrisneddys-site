@@ -121,12 +121,16 @@ export function ProductForm({ product }: { product: AdminProduct }) {
           <label htmlFor="slug" className="adm-label">
             Slug
           </label>
+          {/* The hyphen in `pattern` is escaped because browsers compile that
+              attribute with the `v` flag, where a bare `-` at the end of a
+              character class is a syntax error. The invalid regex threw and the
+              attribute was dropped, so the field accepted any slug at all. */}
           <input
             id="slug"
             name="slug"
             type="text"
             className="adm-input"
-            pattern="^[a-z0-9-]+$"
+            pattern="^[a-z0-9\-]+$"
             defaultValue={product.slug}
             required
           />

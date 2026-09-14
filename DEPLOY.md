@@ -142,8 +142,8 @@ answering instead of 503ing — only once both `STRIPE_SECRET_KEY` and
 `STRIPE_WEBHOOK_SECRET` are set (`src/lib/shopStatus.ts`). Order confirmation
 / shipping / pickup-ready email additionally needs `RESEND_API_KEY` and
 `EMAIL_FROM`; without them an order email is logged instead of sent, and
-never fails the checkout or webhook it's attached to. All four are
-documented in `.env.example`.
+never fails the checkout or webhook it's attached to. All four are listed
+under **Environment variables** below.
 
 **Test mode first.** Use Stripe's test-mode keys (`sk_test_...`) end to end —
 a real Checkout Session, a real webhook delivery, a real (test) card — before
@@ -185,6 +185,38 @@ order paid or double-assigns an edition number. If the handler itself throws
 partway through, the id's claim is rolled back before the 500 goes out, so
 Stripe's automatic retry gets a real attempt rather than being silently
 skipped as "already seen."
+
+---
+
+## Environment variables
+
+Set these on the Vercel project (Production, and any Preview that should read
+and write real data). Locally they go in `.env.local`, which is gitignored.
+
+| Variable                | Needed for                                                                                                                                                | Unset means                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`          | The catalogue, orders and editions — the Neon connection string. Check the **database name** at the end of it: one Neon endpoint can host several.        | `pnpm dev` uses a file-persisted PGlite database at `.pglite/dev`; a production build falls back to the in-repo catalogue in `src/data/merch.ts` |
+| `AUTH_SECRET`           | Signing the `/admin` owner-session JWT. Generate with `openssl rand -base64 32`                                                                           | Owner sign-in is off                                                                                                                             |
+| `OWNER_EMAILS`          | Comma-separated allowlist of owner addresses. Ignored once the `owners` table has rows                                                                    | Owner sign-in is off                                                                                                                             |
+| `OWNER_PASSWORD_HASH`   | The shared owner password as `scrypt$<salt>$<hash>`. Generate with `pnpm owner:password <password>`                                                       | Owner sign-in is off                                                                                                                             |
+| `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com` | The admin's photo-upload card is disabled; it never writes into `public/`                                                                        |
+| `STRIPE_SECRET_KEY`     | Creating Checkout Sessions                                                                                                                                | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
+| `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                | Checkout stays closed — half a Stripe setup is not enough                                                                                        |
+| `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails                                                                                                             | Emails are logged, never sent; a missing key never fails a checkout                                                                              |
+| `EMAIL_FROM`            | The verified "from" address, e.g. `Chris N Eddy's <orders@chrisneddys.com>`                                                                               | As above                                                                                                                                         |
+| `NEXT_PUBLIC_GA_ID`     | Overrides the GA4 measurement ID — see **Analytics before launch**                                                                                        | The repo default in `Analytics.tsx` is used                                                                                                      |
+| `NEXT_PUBLIC_W3F_KEY`   | Web3Forms key for the `/contact/` form                                                                                                                    | The form still validates but falls back to mailto/phone                                                                                          |
+
+Two traps worth knowing, both of which have already cost an afternoon:
+
+- **Escape `$` as `\$` in a `.env` file.** Next expands `$NAME` in env values, so
+  an unescaped `OWNER_PASSWORD_HASH=scrypt$abc$def` silently becomes `scrypt`
+  and sign-in fails with the deliberately unhelpful "That email or password
+  isn't right." Quoting does not help; only the backslash does.
+- **Check the database name in `DATABASE_URL`.** Neon's connection snippet
+  defaults to `neondb`, which may not be the database you created for this
+  project. Pointing at the wrong one lets `prebuild` create this app's ten
+  tables inside somebody else's database.
 
 ---
 

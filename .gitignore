@@ -18,3 +18,7 @@ tsconfig.tsbuildinfo
 # Claude Code agent worktrees
 .claude/worktrees/
 .vercel
+
+# Carries live owner credentials in this checkout, so it is not tracked.
+# The variables it documents are listed in DEPLOY.md.
+.env.example

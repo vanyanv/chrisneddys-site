@@ -4,7 +4,9 @@ out/
 .env
 .env.local
 
-# Local dev database (PGlite), file-persisted so `pnpm dev` survives restarts.
+# Local PGlite database(s), file-persisted so they survive restarts:
+# `.pglite/dev` for `pnpm dev`, `.pglite/e2e` for `pnpm test:e2e`
+# (PGLITE_DATA_DIR, src/db/client.ts) — never the same directory.
 .pglite/
 .DS_Store
 *.log
@@ -14,6 +16,12 @@ out/
 # Local scratch: Playwright MCP captures and TS incremental cache
 .playwright-mcp/
 tsconfig.tsbuildinfo
+
+# Playwright e2e (playwright.config.ts): HTML report and trace/screenshot
+# output from `pnpm test:e2e`. Its database is `.pglite/e2e` above, wiped and
+# reseeded by the config's webServer command.
+playwright-report/
+test-results/
 
 # Claude Code agent worktrees
 .claude/worktrees/

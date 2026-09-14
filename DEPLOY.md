@@ -133,6 +133,12 @@ anywhere else without one, CI included — prints a message and skips both, and 
 site falls back to the in-repo catalogue in `src/data/merch.ts` instead of failing
 the build.
 
+With `DATABASE_URL` unset outside of Vitest (`pnpm dev`, or the e2e suite),
+`src/db/client.ts` instead opens a file-persisted PGlite database at
+`.pglite/dev`, overridable via `PGLITE_DATA_DIR` (relative to the repo root) —
+the e2e suite points it at `.pglite/e2e` so it never touches your own dev
+database.
+
 ---
 
 ## Payments

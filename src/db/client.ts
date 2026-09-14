@@ -40,9 +40,12 @@
  *   instance. Tests own their own migrate/seed calls (see
  *   `src/lib/catalog.test.ts`), so nothing is bootstrapped here either.
  * - `DATABASE_URL` unset, everything else (i.e. `pnpm dev`) → a PGlite
- *   instance file-persisted at `.pglite/` (gitignored), migrated and seeded
- *   once per process so a fresh clone works with zero setup. Both steps are
- *   idempotent, so restarting `next dev` never duplicates anything.
+ *   instance file-persisted at `.pglite/dev` (gitignored), migrated and
+ *   seeded once per process so a fresh clone works with zero setup. Both
+ *   steps are idempotent, so restarting `next dev` never duplicates anything.
+ *   `PGLITE_DATA_DIR` overrides that path (relative to the repo root) — the
+ *   e2e suite (`playwright.config.ts`) points it at `.pglite/e2e` so it never
+ *   touches the developer's own `.pglite/dev` database.
  *
  * `src/lib/catalog.ts` decides on its own, separately, when to skip the
  * database entirely and read `src/data/merch.ts` instead (a production build
@@ -81,7 +84,8 @@ export type Db = PgDatabase<PgQueryResultHKT, Schema>;
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const migrationsFolder = join(root, "drizzle");
-const devDataDir = join(root, ".pglite", "dev");
+// Relative to the repo root; see the module comment above.
+const devDataDir = join(root, process.env.PGLITE_DATA_DIR ?? join(".pglite", "dev"));
 
 function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";
@@ -129,7 +133,8 @@ async function createDb(): Promise<Db> {
 
   // pnpm dev, no DATABASE_URL: a durable local database, bootstrapped once.
   // PGlite's node filesystem backend does `mkdir` (not `mkdir -p`) on its
-  // data directory, so `.pglite/` itself has to exist first.
+  // data directory, so `.pglite/` (or PGLITE_DATA_DIR's parent) has to exist
+  // first.
   mkdirSync(devDataDir, { recursive: true });
   const client = new PGlite(devDataDir);
   const db = drizzlePglite(client, { schema });

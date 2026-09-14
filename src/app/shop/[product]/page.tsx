@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, productBySlug } from "@/data/merch";
+import { TERMS_PENDING } from "@/data/merch";
+import { getProductBySlug, listPublishedProducts } from "@/lib/catalog";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -12,14 +13,19 @@ import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
 type Params = { product: string };
 
+/** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
+ * admin) invalidates it immediately regardless of this window. */
+export const revalidate = 60;
+
 /** One product today, and the route already handles the second one. */
-export function generateStaticParams(): Params[] {
-  return merch.map((p) => ({ product: p.slug }));
+export async function generateStaticParams(): Promise<Params[]> {
+  const products = await listPublishedProducts();
+  return products.map((p) => ({ product: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { product: slug } = await params;
-  const product = productBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return {};
 
   // Title case, from the product's real name rather than the all-caps display
@@ -63,7 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  */
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { product: slug } = await params;
-  const product = productBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   return (

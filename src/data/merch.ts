@@ -1,6 +1,17 @@
 /**
  * The merch catalogue.
  *
+ * Phase 1 of the Postgres-backed shop moved the source of truth to the
+ * database (`src/db/schema.ts`), read through `src/lib/catalog.ts` — that is
+ * the only module the app should read products through now. This file keeps
+ * two jobs: `src/db/seed.ts` upserts the `merch` array below into the
+ * database (so a product's copy still starts life here), and
+ * `src/lib/catalog.ts` returns this same array unchanged whenever there is no
+ * database to read from — a production build with no `DATABASE_URL` (CI, or
+ * a preview deploy that has not been given one). The bag drawer
+ * (`src/components/shop/BagDrawer.tsx`) also still reads this file directly,
+ * client-side, and is out of scope for phase 1.
+ *
  * Otter still lists a cap of its own — `chris-n-eddy-s-ball-cap-limited-run`
  * in `menu.ts` — but it is a different, older item and is left alone
  * deliberately: Otter's row keeps its own name, price and photo, and nothing
@@ -55,6 +66,14 @@ type AuthPhoto = {
 };
 
 export type MerchProduct = {
+  /**
+   * The database row's id, when this product was read through
+   * `src/lib/catalog.ts` from Postgres rather than from the array below.
+   * Unset for the in-repo fallback/seed copy.
+   */
+  id?: string;
+  /** The row's publication state in the database. Unset for the fallback copy. */
+  status?: "draft" | "published" | "archived";
   /** URL slug: /shop/<slug>/ */
   slug: string;
   /** Exactly as it should appear on a receipt and in structured data. */

@@ -22,4 +22,8 @@ overrides:
 # uses; it falls back to its JavaScript path when unbuilt, so it is declined
 # rather than handed a compile step no production artifact depends on.
 allowBuilds:
+  # esbuild's postinstall fetches the prebuilt binary matching this platform;
+  # drizzle-kit (dev-only, used to generate/run migrations) shells out to it,
+  # so it needs to actually run rather than fall back.
+  esbuild: true
   unrs-resolver: false

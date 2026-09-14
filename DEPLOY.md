@@ -118,9 +118,27 @@ the other.
 
 ---
 
+## Database
+
+The shop's catalogue lives in Postgres (Neon), read through `src/lib/catalog.ts`.
+Set `DATABASE_URL` (the Neon connection string) as an environment variable on the
+Vercel project — Production, and any Preview that should read and write the real
+catalogue.
+
+`pnpm build`'s `prebuild` step (`scripts/db-prepare.mjs`) runs on every build: with
+`DATABASE_URL` set it applies any pending migrations in `drizzle/` and upserts the
+seed catalogue (`src/db/seed.ts`), both idempotent, so this is safe on every
+deploy. A Preview deploy with no `DATABASE_URL` configured — or a `pnpm build` run
+anywhere else without one, CI included — prints a message and skips both, and the
+site falls back to the in-repo catalogue in `src/data/merch.ts` instead of failing
+the build.
+
+---
+
 ## Vercel
 
-Static export is auto-detected; the redirect and headers go in `vercel.json`:
+The app now has a server (`next build` / `next start`), so this is a standard
+Next.js deployment; the redirect and headers still go in `vercel.json`:
 
 ```json
 {

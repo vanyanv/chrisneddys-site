@@ -3,6 +3,9 @@ node_modules/
 out/
 .env
 .env.local
+
+# Local dev database (PGlite), file-persisted so `pnpm dev` survives restarts.
+.pglite/
 .DS_Store
 *.log
 .vscode/

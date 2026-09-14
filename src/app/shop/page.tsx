@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { TERMS_PENDING, merch, firstView } from "@/data/merch";
+import { TERMS_PENDING, firstView } from "@/data/merch";
+import { listPublishedProducts } from "@/lib/catalog";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -13,6 +14,10 @@ const description =
   "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Foam Trucker — Blue, $48, Capsule 01, only 50 made.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/shop/" });
+
+/** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
+ * admin) invalidates it immediately regardless of this window. */
+export const revalidate = 60;
 
 /**
  * The shop index.
@@ -27,7 +32,9 @@ export const metadata: Metadata = pageMetadata({ title, description, path: "/sho
  * shipping rate, a free-shipping threshold, a delivery window and a returns
  * window, and not one of the four had been decided.
  */
-export default function ShopPage() {
+export default async function ShopPage() {
+  const merch = await listPublishedProducts();
+
   return (
     <>
       <JsonLdScript data={breadcrumbLd([{ name: "Shop", path: "/shop/" }])} />

@@ -14,6 +14,11 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // src/db/*.ts is imported with explicit ".ts" extensions on its own
+    // relative specifiers so `scripts/db-prepare.mjs` can load it straight
+    // through Node's built-in TypeScript stripping (no bundler involved) —
+    // this is what lets `import ... from "./schema.ts"` type-check.
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],

@@ -1,15 +1,8 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
-import "@/styles/admin.css";
 import { getOwnerSession, requireOwner } from "@/lib/auth";
-import { signOutAction } from "@/app/admin/actions";
-
-export const metadata: Metadata = {
-  title: "Store admin — Chris N Eddy's",
-  robots: { index: false, follow: false },
-};
+import { signOutAction } from "@/app/(admin)/admin/actions";
 
 const NAV = [
   { href: "/admin/products", label: "Products" },

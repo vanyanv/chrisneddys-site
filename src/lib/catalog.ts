@@ -51,6 +51,8 @@ type ImageRow = {
   width: number;
   height: number;
   kind: "view" | "certificate" | "sticker";
+  urlFull?: string | null;
+  urlThumb?: string | null;
 };
 
 /** Maps a database product row (with its images) onto the app's existing `MerchProduct` shape. */
@@ -62,7 +64,13 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
       id: img.viewId,
       label: img.label,
       caption: img.alt,
-      photo: { src: img.src, width: img.width, height: img.height },
+      photo: {
+        src: img.src,
+        width: img.width,
+        height: img.height,
+        url: img.urlFull ?? undefined,
+        thumbUrl: img.urlThumb ?? undefined,
+      },
     }));
   const certificate = images.find((img) => img.kind === "certificate");
   const sticker = images.find((img) => img.kind === "sticker");
@@ -96,12 +104,16 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
               width: certificate.width,
               height: certificate.height,
               alt: certificate.alt,
+              url: certificate.urlFull ?? undefined,
+              thumbUrl: certificate.urlThumb ?? undefined,
             },
             sticker: {
               src: sticker.src,
               width: sticker.width,
               height: sticker.height,
               alt: sticker.alt,
+              url: sticker.urlFull ?? undefined,
+              thumbUrl: sticker.urlThumb ?? undefined,
             },
           }
         : undefined,

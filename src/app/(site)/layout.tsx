@@ -93,6 +93,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * The storefront's root layout — everything under the `(site)` route group
+ * (every page except `/admin`). `/admin` has its own root layout
+ * (`src/app/(admin)/layout.tsx`): two root layouts, split by route group,
+ * rather than one layout branching on the request path. Branching on
+ * `headers()` here previously opted the entire app into dynamic rendering,
+ * turning every static/ISR storefront page (`/`, `/shop`, `/menu`, …) into
+ * an on-demand server render — a real regression this route-group split
+ * undoes.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>

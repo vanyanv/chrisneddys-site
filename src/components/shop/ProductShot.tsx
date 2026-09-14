@@ -39,8 +39,10 @@ export function ProductShot({
   thumb?: boolean;
 }) {
   if (view.photo) {
-    const { src, width, height } = view.photo;
+    const { src, width, height, url, thumbUrl } = view.photo;
     const base = `${product.photoDir ?? ""}/${src}`;
+    const fullSrc = url ?? `${base}.webp`;
+    const thumbSrc = thumbUrl ?? `${base}-thumb.webp`;
 
     return (
       <div
@@ -48,8 +50,8 @@ export function ProductShot({
         style={thumb ? undefined : { aspectRatio: `${width} / ${height}` }}
       >
         <img
-          src={`${base}.webp`}
-          srcSet={`${base}-thumb.webp 200w, ${base}.webp 720w`}
+          src={fullSrc}
+          srcSet={`${thumbSrc} 200w, ${fullSrc} 720w`}
           sizes={sizes}
           alt={view.caption}
           width={width}

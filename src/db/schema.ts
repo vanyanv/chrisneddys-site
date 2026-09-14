@@ -81,6 +81,14 @@ export const productImages = pgTable(
     width: integer("width").notNull(),
     height: integer("height").notNull(),
     kind: productImageKindEnum("kind").notNull().default("view"),
+    /**
+     * Set once this image was uploaded through /admin (`POST
+     * /api/admin/upload`) rather than seeded from `photo_dir` + `src`. Both
+     * null for a seeded image; both set for an uploaded one — `src/lib/
+     * catalog.ts` prefers these when present.
+     */
+    urlFull: text("url_full"),
+    urlThumb: text("url_thumb"),
     ...timestamps,
   },
   (t) => [unique("product_images_product_view_unique").on(t.productId, t.viewId)],

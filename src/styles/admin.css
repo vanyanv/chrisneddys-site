@@ -390,3 +390,406 @@
   color: var(--a-fg);
   line-height: 1.5;
 }
+
+/* ---- forms (products list + editor) --------------------------------------- */
+
+.adm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.adm-input,
+.adm-textarea {
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 10px;
+  border: 2px solid var(--a-ink);
+  background: var(--a-bg);
+  color: var(--a-fg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.adm-textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.adm-input:focus-visible,
+.adm-textarea:focus-visible {
+  outline: 2px solid var(--a-red-cta);
+  outline-offset: 1px;
+}
+
+.adm-help {
+  font-size: 12px;
+  color: var(--a-sub);
+  margin: 4px 0 0;
+}
+
+.adm-field-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.adm-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 520px) {
+  .adm-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---- products list head + tabs -------------------------------------------- */
+
+.adm-products-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.adm-new-product {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.adm-new-product .adm-input {
+  width: auto;
+  min-width: 220px;
+}
+
+.adm-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 16px;
+  flex-wrap: wrap;
+}
+
+.adm-tab {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--a-fg);
+  background: var(--a-card);
+  border: 2px solid var(--a-ink);
+  padding: 6px 11px;
+}
+
+.adm-tab[aria-current="page"] {
+  background: var(--a-yel);
+}
+
+.adm-row-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.adm-product-name {
+  font-weight: 600;
+}
+
+.adm-product-slug {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-sub);
+}
+
+.adm-thumb {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1.5px solid var(--a-ink);
+}
+
+.adm-thumb-empty {
+  background: var(--a-ink);
+}
+
+.adm-inv-untracked {
+  color: var(--a-sub);
+}
+
+.adm-inv-edition {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 90px;
+}
+
+.adm-inv-bar {
+  height: 5px;
+  background: var(--a-line);
+  width: 100%;
+}
+
+.adm-inv-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--a-ok);
+}
+
+/* ---- editor layout ---------------------------------------------------------- */
+
+.adm-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .adm-editor-grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+}
+
+.adm-editor-left,
+.adm-editor-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.adm-product-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-fact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 520px) {
+  .adm-fact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.adm-fact-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1.5px solid var(--a-line);
+  padding: 8px;
+}
+
+.adm-editor-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-ink);
+  padding: 12px 14px;
+  margin-top: 4px;
+}
+
+.adm-inline-form {
+  display: inline-flex;
+}
+
+.adm-saved-note {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-ok);
+}
+
+/* ---- photos card ------------------------------------------------------------ */
+
+.adm-photo-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.adm-photo-row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  border: 1.5px solid var(--a-line);
+  padding: 10px;
+}
+
+.adm-photo-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 1.5px solid var(--a-ink);
+  display: block;
+}
+
+.adm-photo-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-photo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---- inventory card ---------------------------------------------------------- */
+
+.adm-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.adm-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.adm-inv-summary {
+  font-size: 13px;
+  margin: 14px 0 8px;
+}
+
+.adm-edition-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.adm-edition-key {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.adm-edition-key::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--a-ink);
+}
+
+.adm-edition-key.is-available::before {
+  background: var(--a-card);
+}
+
+.adm-edition-key.is-reserved::before {
+  background: var(--a-yel);
+}
+
+.adm-edition-key.is-sold::before {
+  background: var(--a-ink);
+}
+
+.adm-edition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+  gap: 4px;
+}
+
+.adm-edition-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  border: 1.5px solid var(--a-ink);
+  background: var(--a-card);
+}
+
+.adm-edition-cell.is-reserved {
+  background: var(--a-yel);
+}
+
+.adm-edition-cell.is-sold {
+  background: var(--a-ink);
+  color: var(--a-cream);
+}
+
+/* ---- status card -------------------------------------------------------------- */
+
+.adm-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.adm-status-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adm-status-list dt {
+  color: var(--a-sub);
+}
+
+.adm-status-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+.adm-mono-value {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.adm-chip.is-published {
+  background: var(--a-ok);
+  color: var(--a-cream);
+  border-color: var(--a-ok);
+}
+
+.adm-chip.is-draft {
+  background: var(--a-cream);
+}
+
+.adm-chip.is-archived {
+  background: var(--a-line);
+  color: var(--a-sub);
+}

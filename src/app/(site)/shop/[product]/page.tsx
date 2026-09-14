@@ -217,34 +217,45 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
               {product.authenticity && (
                 <div className="cne-auth-imgs">
-                  <img
-                    className="cne-auth-img is-cert"
-                    src={`${product.photoDir}/${product.authenticity.certificate.src}.webp`}
-                    srcSet={`${product.photoDir}/${product.authenticity.certificate.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.certificate.src}.webp 720w`}
-                    sizes="(min-width: 901px) 280px, 45vw"
-                    width={product.authenticity.certificate.width}
-                    height={product.authenticity.certificate.height}
-                    style={{
-                      aspectRatio: `${product.authenticity.certificate.width} / ${product.authenticity.certificate.height}`,
-                    }}
-                    alt={product.authenticity.certificate.alt}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <img
-                    className="cne-auth-img is-sticker"
-                    src={`${product.photoDir}/${product.authenticity.sticker.src}.webp`}
-                    srcSet={`${product.photoDir}/${product.authenticity.sticker.src}-thumb.webp 200w, ${product.photoDir}/${product.authenticity.sticker.src}.webp 720w`}
-                    sizes="(min-width: 901px) 280px, 45vw"
-                    width={product.authenticity.sticker.width}
-                    height={product.authenticity.sticker.height}
-                    style={{
-                      aspectRatio: `${product.authenticity.sticker.width} / ${product.authenticity.sticker.height}`,
-                    }}
-                    alt={product.authenticity.sticker.alt}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {(() => {
+                    const cert = product.authenticity.certificate;
+                    const certFull = cert.url ?? `${product.photoDir}/${cert.src}.webp`;
+                    const certThumb = cert.thumbUrl ?? `${product.photoDir}/${cert.src}-thumb.webp`;
+                    return (
+                      <img
+                        className="cne-auth-img is-cert"
+                        src={certFull}
+                        srcSet={`${certThumb} 200w, ${certFull} 720w`}
+                        sizes="(min-width: 901px) 280px, 45vw"
+                        width={cert.width}
+                        height={cert.height}
+                        style={{ aspectRatio: `${cert.width} / ${cert.height}` }}
+                        alt={cert.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    );
+                  })()}
+                  {(() => {
+                    const sticker = product.authenticity.sticker;
+                    const stickerFull = sticker.url ?? `${product.photoDir}/${sticker.src}.webp`;
+                    const stickerThumb =
+                      sticker.thumbUrl ?? `${product.photoDir}/${sticker.src}-thumb.webp`;
+                    return (
+                      <img
+                        className="cne-auth-img is-sticker"
+                        src={stickerFull}
+                        srcSet={`${stickerThumb} 200w, ${stickerFull} 720w`}
+                        sizes="(min-width: 901px) 280px, 45vw"
+                        width={sticker.width}
+                        height={sticker.height}
+                        style={{ aspectRatio: `${sticker.width} / ${sticker.height}` }}
+                        alt={sticker.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    );
+                  })()}
                 </div>
               )}
             </div>

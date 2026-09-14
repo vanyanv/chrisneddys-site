@@ -52,8 +52,13 @@ export type MerchView = {
    * Left unset until the photography lands: an unset `photo` is what tells
    * `ProductShot` to draw `CapArt` instead, so the gallery is fully wired —
    * eight tabs, eight captions — before a single picture exists.
+   *
+   * `url`/`thumbUrl` are set instead of (never alongside a meaningful) `src`
+   * for an image uploaded through /admin — a full Vercel Blob URL for each
+   * cut. `ProductShot` prefers these over the `photoDir`-relative path when
+   * present.
    */
-  photo?: { src: string; width: number; height: number };
+  photo?: { src: string; width: number; height: number; url?: string; thumbUrl?: string };
 };
 
 /** A single authenticity-section image: the certificate, or the brim sticker. */
@@ -63,6 +68,9 @@ type AuthPhoto = {
   width: number;
   height: number;
   alt: string;
+  /** Same convention as `MerchView.photo.url`/`thumbUrl` — set for an uploaded image. */
+  url?: string;
+  thumbUrl?: string;
 };
 
 export type MerchProduct = {

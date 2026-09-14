@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Shop: live "N of 50 left" count and sold-out state, shown only when the database tracks inventory ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))
 - Owner sign-in and the `/admin` shell — email allowlist + shared password, session cookie, middleware protection, and a bare dashboard ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))
+- Admin: products can be created, edited, photographed (Vercel Blob), stocked as a quantity or a numbered edition, and published from /admin/products ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))
 
 ## [0.2.0] - 2026-09-13
 

@@ -8,56 +8,7 @@
  * Values are ported verbatim — this file is the reference for pixel parity.
  */
 
-/* ---- tokens ------------------------------------------------------------- */
-:root {
-  --a-bg: #fff8e7;
-  --a-fg: #1a1612;
-  --a-red: #e63027;
-  --a-yel: #f5b82e;
-  --a-cream: #fff2c9;
-  --a-line: #e3d8bc;
-  --a-card: #fffdf6;
-  --a-ink: #1a1612;
-  --a-sub: rgba(26, 22, 18, 0.62);
-  --a-nav: #e63027;
-  /* The tab strip runs a shade deeper than the display red, because 10px cream
-     type cannot clear 4.5:1 on #E63027 — that red tops out at 4.35:1 against
-     pure white, so no text colour passes on it. Both edges of the strip are
-     3px ink rules, which is what makes the step invisible. */
-  --a-navsurf: #d0281c;
-  /* The brand yellow is a fill colour. As *text* on the hero red it reads at
-     2.45:1, and the price is the one number in the hero worth reading, so text
-     on red uses a brighter cut of the same yellow. */
-  --a-yel-ink: #ffd633;
-  --a-shadow: #1a1612;
-  /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
-  --a-red-cta: #d0281c;
-  /* How much of the top of the viewport the sticky header owns, plus air: the
-     header is 85px with the tab strip on a phone and 76px once the desktop
-     one collapses to a single row. The surplus is not padding for its own
-     sake — the section headings are Bowlby One at line-height 1, and that face
-     puts ink above its own line box, so a heading whose *box* clears the
-     header by 8px still reads as clipped. Anything that sticks below the
-     header, and every anchor the page scrolls to, measures from this, so the
-     two cannot drift apart. */
-  --cne-stuck: 104px;
-  /* The one positive colour on the site — free shipping, and the bag meter. */
-  --a-ok: #2f6b43;
-  /* map */
-  --a-mapbg: #f4ecd8;
-  --a-water: #bcd3dd;
-  --a-fwy: #f5b82e;
-  --a-fwycase: #1a1612;
-  --a-blvd: rgba(26, 22, 18, 0.42);
-  /* /about's two Ways: the brand's two flat colours, straight from the hero
-     panel and the order button. */
-  --sp-a-bg: #e63027;
-  --sp-a-fg: #fff2c9;
-  --sp-a-accent: #f5b82e;
-  --sp-b-bg: #f5b82e;
-  --sp-b-fg: #1a1612;
-  --sp-b-accent: #e63027;
-}
+@import "./tokens.css";
 
 /* Above 901px the tab strip folds into the nav row and the header loses 9px. */
 @media (min-width: 901px) {

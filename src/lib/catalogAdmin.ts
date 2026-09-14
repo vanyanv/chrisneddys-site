@@ -12,6 +12,7 @@
  */
 import { and, asc, eq, ne } from "drizzle-orm";
 import { getDb } from "@/db/client";
+import { imageThumbSrc } from "@/lib/productImage";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
@@ -487,7 +488,7 @@ export async function listProductsForAdmin(): Promise<AdminProductListRow[]> {
     status: row.status,
     priceCents: row.priceCents,
     updatedAt: row.updatedAt,
-    thumbUrl: row.images[0]?.urlThumb ?? row.images[0]?.urlFull ?? null,
+    thumbUrl: row.images[0] ? imageThumbSrc(row.photoDir, row.images[0]) : null,
     inventory: summarizeInventory(row.variants[0]),
   }));
 }
@@ -497,6 +498,9 @@ export type AdminProductImage = {
   viewId: string;
   label: string;
   alt: string;
+  /** Stem under the product's `photoDir` for a seeded, repo-shipped image.
+   * Empty for an upload, which carries absolute Blob URLs instead. */
+  src: string;
   urlFull: string | null;
   urlThumb: string | null;
   position: number;
@@ -508,6 +512,8 @@ export type AdminProduct = {
   id: string;
   slug: string;
   name: string;
+  /** Directory the seeded photos live under, e.g. `/shop/foam-trucker-blue`. */
+  photoDir: string | null;
   displayName1: string;
   displayName2: string;
   eyebrow: string;
@@ -552,6 +558,7 @@ export async function getProductForAdmin(id: string): Promise<AdminProduct | und
     viewId: img.viewId,
     label: img.label,
     alt: img.alt,
+    src: img.src,
     urlFull: img.urlFull,
     urlThumb: img.urlThumb,
     position: img.position,
@@ -563,6 +570,7 @@ export async function getProductForAdmin(id: string): Promise<AdminProduct | und
     id: row.id,
     slug: row.slug,
     name: row.name,
+    photoDir: row.photoDir,
     displayName1: row.displayName1,
     displayName2: row.displayName2,
     eyebrow: row.eyebrow,

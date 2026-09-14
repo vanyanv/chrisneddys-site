@@ -7,13 +7,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // policy". This is now the one place these ship from for every host — Vercel
 // runs a server, so `public/_headers` (Netlify/Cloudflare only, inert
 // elsewhere) is no longer enough on its own.
+// `next dev`'s react-refresh runtime evaluates its module registry with
+// `eval`, so a policy without 'unsafe-eval' kills the client bundle outright:
+// nothing hydrates, and every interactive control on the site (add to bag, the
+// bag drawer, the product gallery) silently does nothing. Production never
+// loads react-refresh, so the shipped policy stays exactly as it was — this
+// concession exists only while `pnpm dev` is running.
+const isDev = process.env.NODE_ENV === "development";
+
 const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://plausible.io`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.public.blob.vercel-storage.com",
   "font-src 'self'",

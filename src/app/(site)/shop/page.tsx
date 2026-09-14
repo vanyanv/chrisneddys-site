@@ -3,6 +3,8 @@ import Link from "next/link";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
 import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
+import { getStoreSettings } from "@/lib/orders";
+import { shippingReturnsNote } from "@/lib/shopCopy";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -35,6 +37,8 @@ export const revalidate = 60;
 export default async function ShopPage() {
   const merch = await listPublishedProducts();
   const inventories = await Promise.all(merch.map((product) => getInventory(product.slug)));
+  const settings = await getStoreSettings();
+  const note = shippingReturnsNote(settings);
 
   return (
     <>
@@ -118,11 +122,29 @@ export default async function ShopPage() {
 
       <section className="cne-sec cne-rv">
         <div className="cne-eyebrow">Before you buy</div>
-        <h2>Still being sorted.</h2>
-        <p className="cne-shop-lede">
-          {TERMS_PENDING} Want to know when it opens? <Link href="/contact/">Get in touch</Link> or
-          call {brand.phone}.
-        </p>
+        {note ? (
+          <>
+            <h2>Shipping &amp; returns.</h2>
+            <p className="cne-shop-lede">
+              {note.line} See <Link href="/returns/">returns</Link>
+              {note.hasTerms && (
+                <>
+                  {" "}
+                  and <Link href="/terms/">terms</Link>
+                </>
+              )}
+              .
+            </p>
+          </>
+        ) : (
+          <>
+            <h2>Still being sorted.</h2>
+            <p className="cne-shop-lede">
+              {TERMS_PENDING} Want to know when it opens? <Link href="/contact/">Get in touch</Link>{" "}
+              or call {brand.phone}.
+            </p>
+          </>
+        )}
       </section>
     </>
   );

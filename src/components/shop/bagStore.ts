@@ -132,6 +132,13 @@ export function removeFromBag(slug: string) {
   set({ lines: state.lines.filter((l) => l.slug !== slug) });
 }
 
+/** Empties the bag outright — called once by the thanks page after a
+ * successful checkout, since the cart that was just paid for shouldn't
+ * still be sitting in it. */
+export function clearBag() {
+  set({ lines: [] });
+}
+
 export function openBag() {
   if (state.lines.length === 0) return;
   set({ open: true });

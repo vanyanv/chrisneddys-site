@@ -1,8 +1,9 @@
 import { brand } from "@/data/brand";
 import { ID } from "@/lib/seo";
 import { priceString } from "@/lib/otter";
-import { SHOP_OPEN, type MerchProduct, type MerchView } from "@/data/merch";
+import { type MerchProduct, type MerchView } from "@/data/merch";
 import type { InventoryStatus } from "@/lib/catalog";
+import { isShopOpen } from "@/lib/shopStatus";
 
 /**
  * Product structured data.
@@ -62,18 +63,22 @@ export function productImage(product: {
 }
 
 /**
- * A real store selling out is a fact worth stating even while `SHOP_OPEN` is
- * false elsewhere — a sold-out capsule with no way to buy it is not a
+ * A real store selling out is a fact worth stating even while the shop is
+ * closed — a sold-out capsule with no way to buy it is not a
  * misrepresentation, it's the truth. Everything else here still follows
- * `SHOP_OPEN`: an in-stock claim on a shop that cannot take money would be.
+ * `isShopOpen()`: an in-stock claim on a shop that cannot take money would
+ * be. Read straight from the env here (never passed in) — every caller of
+ * `productLd` is a server component, so there is no client boundary to carry
+ * it across, unlike `BagDrawer`'s `shopOpen` prop.
  */
 function offerAvailability(inventory?: InventoryStatus): string | undefined {
+  const open = isShopOpen();
   if (inventory?.tracked) {
     if (inventory.available === 0) return "https://schema.org/SoldOut";
-    if (SHOP_OPEN) return "https://schema.org/InStock";
+    if (open) return "https://schema.org/InStock";
     return undefined;
   }
-  return SHOP_OPEN ? "https://schema.org/InStock" : undefined;
+  return open ? "https://schema.org/InStock" : undefined;
 }
 
 export function productLd(product: MerchProduct, inventory?: InventoryStatus) {

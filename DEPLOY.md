@@ -135,6 +135,59 @@ the build.
 
 ---
 
+## Payments
+
+The shop is "open" — the bag's CHECKOUT button live, `POST /api/checkout`
+answering instead of 503ing — only once both `STRIPE_SECRET_KEY` and
+`STRIPE_WEBHOOK_SECRET` are set (`src/lib/shopStatus.ts`). Order confirmation
+/ shipping / pickup-ready email additionally needs `RESEND_API_KEY` and
+`EMAIL_FROM`; without them an order email is logged instead of sent, and
+never fails the checkout or webhook it's attached to. All four are
+documented in `.env.example`.
+
+**Test mode first.** Use Stripe's test-mode keys (`sk_test_...`) end to end —
+a real Checkout Session, a real webhook delivery, a real (test) card — before
+ever setting live keys in Production.
+
+**Stripe Tax must be turned on.** Every Checkout Session this app creates
+sets `automatic_tax: { enabled: true }`; if the Stripe account hasn't enabled
+Tax (Dashboard → Tax → get started) and added a tax registration for
+California, Stripe returns an error at session-creation time instead of
+collecting tax, and checkout breaks outright rather than quietly under- or
+over-charging. Add the CA registration (and any other state this store ships
+to) before flipping `STRIPE_SECRET_KEY` on in Production.
+
+**Webhook endpoint.** In the Stripe dashboard → Developers → Webhooks, add
+an endpoint at:
+
+```
+https://www.chrisneddys.com/api/stripe/webhook
+```
+
+subscribed to exactly these four event types:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.expired`
+- `checkout.session.async_payment_failed`
+- `charge.refunded`
+
+(Stripe's UI lists these as a flat set to check, not five separate
+endpoints — one endpoint, five event types.) Copy the endpoint's "Signing
+secret" into `STRIPE_WEBHOOK_SECRET`. The route verifies every delivery
+against this secret and 400s a bad signature; it never trusts an
+unauthenticated POST to mark an order paid.
+
+**Idempotency.** Every webhook delivery's Stripe event id is recorded before
+it's processed and checked again before anything happens, so a duplicate
+delivery — Stripe retries a slow or failed response — never double-marks an
+order paid or double-assigns an edition number. If the handler itself throws
+partway through, the id's claim is rolled back before the 500 goes out, so
+Stripe's automatic retry gets a real attempt rather than being silently
+skipped as "already seen."
+
+---
+
 ## Vercel
 
 The app now has a server (`next build` / `next start`), so this is a standard

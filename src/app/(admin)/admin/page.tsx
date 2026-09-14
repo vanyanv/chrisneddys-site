@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { getDb } from "@/db/client";
 import { products } from "@/db/schema";
 import { isAuthConfigured } from "@/lib/auth";
+import { getOrdersDashboardCounts } from "@/lib/ordersAdmin";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,7 @@ const SETUP_ITEMS: { label: string; ok: boolean }[] = [
 ];
 
 export default async function AdminDashboardPage() {
-  const counts = await loadStatusCounts();
+  const [counts, orderCounts] = await Promise.all([loadStatusCounts(), getOrdersDashboardCounts()]);
   const total = counts.draft + counts.published + counts.archived;
 
   return (
@@ -42,10 +44,19 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="adm-card">
-          <span className="adm-label">Orders</span>
-          <div className="adm-card-num" style={{ fontSize: 20 }}>
-            Not open yet
-          </div>
+          <span className="adm-label">Orders — to fulfil</span>
+          <div className="adm-card-num">{orderCounts.toFulfil}</div>
+          <p style={{ margin: 0, fontSize: 13, color: "var(--a-sub)" }}>
+            {orderCounts.readyForPickup} ready for pickup · {orderCounts.fulfilledThisWeek}{" "}
+            fulfilled this week
+          </p>
+          <Link
+            href="/admin/orders"
+            className="adm-btn"
+            style={{ marginTop: 10, display: "inline-block" }}
+          >
+            View orders →
+          </Link>
         </div>
 
         <div className="adm-card">

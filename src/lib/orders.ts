@@ -902,3 +902,69 @@ export async function markStripeEventProcessed(id: string, db?: Db): Promise<voi
     .set({ processedAt: new Date() })
     .where(eq(stripeEvents.id, id));
 }
+
+/**
+ * Undoes `recordStripeEvent` — called when the webhook's handler throws
+ * after already claiming the idempotency slot, so Stripe's retry of the
+ * same event id gets a fresh attempt instead of being silently skipped.
+ */
+export async function deleteStripeEvent(id: string, db?: Db): Promise<void> {
+  const database = await resolveDb(db);
+  await database.delete(stripeEvents).where(eq(stripeEvents.id, id));
+}
+
+// ---------------------------------------------------------------------------
+// Checkout-route helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Read-only, no locks: a product's per-order cap and how many units are
+ * still claimable right now — what the checkout route turns a
+ * `QuoteLineError` into a human message with ("Only 2 per order.", "Only 1
+ * left."). Small helper added for that one call site rather than exposing
+ * `perOrderLimit` on the public `MerchProduct` shape.
+ */
+export async function getProductLimits(
+  slug: string,
+  db?: Db,
+): Promise<{ perOrderLimit: number; available: number } | undefined> {
+  const database = await resolveDb(db);
+  const product = await loadProductWithVariants(database, slug);
+  if (!product) return undefined;
+  const variant = product.variants[0];
+  const available = variant ? await availableForRead(database, variant, new Date()) : 0;
+  return { perOrderLimit: product.perOrderLimit, available };
+}
+
+/**
+ * Edition size per variant id, for a "#37 of 50" line — not stored on
+ * `order_items` itself (an edition's size lives on the variant), so the
+ * email templates and the thanks/order-lookup pages share this one lookup
+ * rather than each re-deriving it.
+ */
+export async function getEditionSizes(
+  variantIds: string[],
+  db?: Db,
+): Promise<Map<string, number | null>> {
+  const database = await resolveDb(db);
+  const ids = [...new Set(variantIds)];
+  if (ids.length === 0) return new Map();
+  const rows = await database
+    .select({ id: variants.id, editionSize: variants.editionSize })
+    .from(variants)
+    .where(inArray(variants.id, ids));
+  return new Map(rows.map((r) => [r.id, r.editionSize]));
+}
+
+/** By Stripe PaymentIntent id — `charge.refunded` carries the intent, not
+ * the Checkout Session id `markPaid`/`releaseOrder` otherwise key off. */
+export async function getOrderByPaymentIntentId(
+  paymentIntentId: string,
+  db?: Db,
+): Promise<OrderWithItems | undefined> {
+  const database = await resolveDb(db);
+  return database.query.orders.findFirst({
+    where: eq(orders.stripePaymentIntentId, paymentIntentId),
+    with: { items: true },
+  });
+}

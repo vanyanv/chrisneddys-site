@@ -131,14 +131,17 @@ export function SiteFooter() {
         ))}
       </div>
 
-      {/* The policy is linked from here rather than from the Eat column above:
-          it belongs beside the copyright line, and adding a ninth link to the
-          two named groups would pad the block those groups exist to keep tight. */}
+      {/* The policies are linked from here rather than from the Eat column
+          above: they belong beside the copyright line, and adding three more
+          links to the two named groups would pad the block those groups
+          exist to keep tight. */}
       <div className="cne-foot-legal">
         <span>
           © {new Date().getFullYear()} {brand.name}
         </span>
         <Link href="/privacy/">Privacy</Link>
+        <Link href="/returns/">Returns</Link>
+        <Link href="/terms/">Terms</Link>
       </div>
     </footer>
   );

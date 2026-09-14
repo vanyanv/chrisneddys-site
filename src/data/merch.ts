@@ -156,16 +156,6 @@ export type MerchProduct = {
   authenticity?: { certificate: AuthPhoto; sticker: AuthPhoto };
 };
 
-/**
- * Whether the shop can take money.
- *
- * False until a payment processor is connected. It disables the checkout
- * button, and it is why the Product schema states a price without claiming the
- * item is available to buy — a merchant listing for something no one can
- * actually purchase is the search-result equivalent of a locked door.
- */
-export const SHOP_OPEN = false;
-
 /** The most of one item a single order will take. Keeps a run from being swept. */
 export const MAX_PER_ORDER = 6;
 

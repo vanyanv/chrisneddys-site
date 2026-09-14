@@ -1,4 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// `merchLd.ts` now reads `isShopOpen()` from `shopStatus.ts`, which carries
+// `import "server-only"` — that throws outside a real Next.js server build
+// (it relies on the bundler's `react-server` export condition, which plain
+// Node/Vitest resolution doesn't set), so it's stubbed the same way this
+// repo's other server-only-adjacent tests do (see the note in
+// src/app/api/checkout/route.test.ts).
+vi.mock("server-only", () => ({}));
+
 import { productLd, shopListLd, socialCard, productImage } from "@/lib/merchLd";
 import { merch } from "@/data/merch";
 import { brand } from "@/data/brand";
@@ -30,7 +39,7 @@ describe("productLd", () => {
     expect(ld.offers["@id"]).toBe(`${ld.url}#offer`);
     expect(ld.offers.price).toBe(trucker.price.toFixed(2));
     expect(ld.offers.priceCurrency).toBe("USD");
-    // SHOP_OPEN is false in this catalogue, so no availability is claimed.
+    // isShopOpen() is false in tests (no Stripe keys set), so no availability is claimed.
     expect(ld.offers.availability).toBeUndefined();
   });
 
@@ -44,7 +53,7 @@ describe("productLd", () => {
     expect(inStock.offers.availability).toBeUndefined();
   });
 
-  it("states SoldOut once tracked inventory hits zero, regardless of SHOP_OPEN", () => {
+  it("states SoldOut once tracked inventory hits zero, regardless of shop-open state", () => {
     const soldOut = productLd(trucker, { tracked: true, available: 0, editionSize: 50 });
     expect(soldOut.offers.availability).toBe("https://schema.org/SoldOut");
   });

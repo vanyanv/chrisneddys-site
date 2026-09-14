@@ -8,10 +8,13 @@
  * cannot make, because both go to the same URL.
  *
  * Every event here is an *intent* signal except `contact_submit` and
- * `notify_signup`. None of them is a purchase: the sale happens on Otter, on a
- * domain this tag cannot reach, and the shop cannot take payment yet. Naming
- * them `*_click` rather than `conversion` is deliberate — the number people
- * report should not be able to be mistaken for revenue.
+ * `notify_signup`. For the menu, the sale happens on Otter, on a domain this
+ * tag cannot reach — naming those events `*_click` rather than `conversion`
+ * is deliberate, so the number people report can't be mistaken for revenue.
+ * `begin_checkout` is the shop's own exception: once `STRIPE_SECRET_KEY` and
+ * `STRIPE_WEBHOOK_SECRET` are set, tapping CHECKOUT really does request a
+ * Stripe Checkout Session — this event still fires the moment that request
+ * goes out, not on confirmed payment, so it stays an intent signal too.
  */
 
 type Primitive = string | number | boolean | undefined;
@@ -54,7 +57,9 @@ export type TrackEvent =
   /** Put something in the bag. */
   | "add_to_cart"
   /** Opened the bag. */
-  | "view_cart";
+  | "view_cart"
+  /** Tapped CHECKOUT in the bag and a Stripe Checkout Session was requested. */
+  | "begin_checkout";
 
 declare global {
   interface Window {

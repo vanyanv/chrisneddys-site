@@ -434,6 +434,14 @@
   margin: 4px 0 0;
 }
 
+/* A single field's own validation message — smaller and tighter than
+   `.adm-error`, which sits once at the bottom of a whole form. */
+.adm-field-error {
+  font-size: 12px;
+  color: var(--a-red-cta);
+  margin: 4px 0 0;
+}
+
 .adm-field-row {
   flex-direction: row;
   align-items: center;
@@ -792,4 +800,191 @@
 .adm-chip.is-archived {
   background: var(--a-line);
   color: var(--a-sub);
+}
+
+/* ---- orders desk --------------------------------------------------------- */
+
+.adm-money {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-table td.adm-items-cell {
+  white-space: normal;
+  max-width: 320px;
+}
+
+.adm-chip[data-order-status="paid"] {
+  background: var(--a-card);
+}
+
+.adm-chip[data-order-status="fulfilled"],
+.adm-chip[data-order-status="picked_up"] {
+  background: var(--a-ok);
+  color: var(--a-cream);
+  border-color: var(--a-ok);
+}
+
+.adm-chip[data-order-status="ready_for_pickup"] {
+  background: var(--a-yel);
+}
+
+.adm-chip[data-order-status="refunded"] {
+  background: var(--a-red-cta);
+  color: var(--a-cream);
+  border-color: var(--a-red-cta);
+}
+
+.adm-chip[data-order-status="cancelled"],
+.adm-chip[data-order-status="pending"] {
+  background: var(--a-line);
+  color: var(--a-sub);
+}
+
+.adm-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.adm-order-head-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--a-sub);
+  margin-top: 6px;
+}
+
+.adm-order-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adm-address {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.adm-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adm-timeline li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  border-left: 2px solid var(--a-line);
+  padding-left: 10px;
+  position: relative;
+}
+
+.adm-timeline-dot {
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--a-ink);
+  background: var(--a-yel);
+  flex-shrink: 0;
+  margin-left: -15px;
+}
+
+.adm-timeline-label {
+  flex: 1;
+}
+
+.adm-timeline-time {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-sub);
+  white-space: nowrap;
+}
+
+/* ---- packing slip --------------------------------------------------------- */
+
+.adm-slip-noprint {
+  margin-bottom: 16px;
+}
+
+.adm-slip-sheet {
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  padding: 24px;
+  max-width: 480px;
+}
+
+.adm-slip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid var(--a-ink);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.adm-slip-store {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 20px;
+}
+
+.adm-slip-number {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.adm-slip-to p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 6px 0 16px;
+}
+
+.adm-slip-items {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.adm-slip-items th,
+.adm-slip-items td {
+  text-align: left;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--a-line);
+}
+
+.adm-slip-thanks {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 16px;
+  text-align: center;
+  margin: 20px 0 0;
+}
+
+@media print {
+  .adm-topbar,
+  .adm-sidebar,
+  .adm-slip-noprint {
+    display: none !important;
+  }
+
+  .adm-main {
+    padding: 0;
+  }
+
+  .adm-slip-sheet {
+    border: none;
+    box-shadow: none;
+    max-width: none;
+  }
 }

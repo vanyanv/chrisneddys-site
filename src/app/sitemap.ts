@@ -23,6 +23,10 @@ const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 const LOCATIONS_UPDATED = "2026-09-09";
 /** When the site's copy and structure last changed. */
 const SITE_UPDATED = "2026-09-09";
+/** When /returns and /terms were added. Both also carry the store settings
+ * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
+ * itself only tracks changes to the route, not to the policy text. */
+const RETURNS_TERMS_ADDED = "2026-09-14";
 
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(menu) as MenuCategoryKey[])
@@ -97,6 +101,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // never the answer to a search. Its own `lastmod` comes from the policy
     // itself, so a crawler is told the terms moved only when they did.
     { path: "/privacy/", priority: 0.1, updated: PRIVACY_UPDATED },
+    { path: "/returns/", priority: 0.1, updated: RETURNS_TERMS_ADDED },
+    { path: "/terms/", priority: 0.1, updated: RETURNS_TERMS_ADDED },
   ];
 
   return entries.map(({ path, priority, updated, images }) => ({

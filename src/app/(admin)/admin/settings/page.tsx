@@ -1,10 +1,23 @@
+import { getSettingsForAdmin } from "@/lib/settingsAdmin";
+import { SettingsForm } from "./SettingsForm";
+import { ConnectionsCard } from "./ConnectionsCard";
+
 export const dynamic = "force-dynamic";
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
+  const settings = await getSettingsForAdmin();
+
   return (
     <>
       <h1 className="adm-h1">Settings</h1>
-      <p className="adm-notice">Coming in the next step.</p>
+      <div className="adm-editor-grid">
+        <div className="adm-editor-left">
+          <SettingsForm settings={settings} />
+        </div>
+        <div className="adm-editor-right">
+          <ConnectionsCard />
+        </div>
+      </div>
     </>
   );
 }

@@ -9,6 +9,8 @@ import {
   inventoryLine,
   listPublishedProducts,
 } from "@/lib/catalog";
+import { getStoreSettings } from "@/lib/orders";
+import { shippingReturnsNote } from "@/lib/shopCopy";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -81,6 +83,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const line = inventoryLine(inventory, product.eyebrow);
   const soldOut = line?.soldOut ?? false;
   const maxQty = inventory?.tracked ? Math.min(MAX_PER_ORDER, inventory.available) : MAX_PER_ORDER;
+  const settings = await getStoreSettings();
+  const note = shippingReturnsNote(settings);
 
   return (
     <>
@@ -159,7 +163,20 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             <BuyRow />
 
-            <p className="cne-pending">{TERMS_PENDING}</p>
+            {note ? (
+              <p className="cne-pending">
+                {note.line} See <Link href="/returns/">returns</Link>
+                {note.hasTerms && (
+                  <>
+                    {" "}
+                    and <Link href="/terms/">terms</Link>
+                  </>
+                )}
+                .
+              </p>
+            ) : (
+              <p className="cne-pending">{TERMS_PENDING}</p>
+            )}
           </div>
         </div>
 

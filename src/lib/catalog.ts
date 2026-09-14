@@ -196,7 +196,15 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
   if (!variant) return { tracked: false, available: 0, editionSize: null };
 
   const tracked = variant.inventoryQuantity !== null;
-  const available = variant.editions.filter((e) => e.status === "available").length;
+  // Edition products: "available" is the count of edition rows still in that
+  // status — `reserved` and `sold` rows are deliberately excluded, not
+  // lumped in. Plain-quantity products have no edition rows at all, so their
+  // count comes straight from `inventory_quantity` instead (kept in sync by
+  // `src/lib/orders.ts` on every reservation/payment/release).
+  const available =
+    variant.editionSize !== null
+      ? variant.editions.filter((e) => e.status === "available").length
+      : (variant.inventoryQuantity ?? 0);
   return { tracked, available, editionSize: variant.editionSize };
 }
 

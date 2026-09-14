@@ -15,7 +15,7 @@
  */
 import { eq } from "drizzle-orm";
 import { merch, type MerchProduct, type MerchView } from "../data/merch.ts";
-import { editions, productImages, products, variants } from "./schema.ts";
+import { editions, productImages, products, storeSettings, variants } from "./schema.ts";
 import type { Db } from "./client.ts";
 
 const FOAM_TRUCKER_SLUG = "foam-trucker-blue";
@@ -79,8 +79,26 @@ function imageRows(product: MerchProduct): ImageRow[] {
   return rows;
 }
 
+/**
+ * Inserts the single `store_settings` row the first time this runs.
+ * Deliberately `onConflictDoNothing` rather than an upsert — an owner's
+ * edits through /admin should survive every later redeploy's reseed.
+ */
+async function seedStoreSettings(db: Db): Promise<void> {
+  await db
+    .insert(storeSettings)
+    .values({
+      id: "default",
+      storeName: "Chris N Eddy's",
+      supportEmail: "chris@chrisneddys.com",
+    })
+    .onConflictDoNothing({ target: storeSettings.id });
+}
+
 /** Upserts the in-repo catalogue into the database. Safe to call any number of times. */
 export async function seedCatalogue(db: Db): Promise<void> {
+  await seedStoreSettings(db);
+
   const product = findFoamTrucker();
 
   const [row] = await db

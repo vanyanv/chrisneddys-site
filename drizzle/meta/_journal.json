@@ -15,6 +15,13 @@
       "when": 1789349550543,
       "tag": "0001_green_sentinels",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789351282711,
+      "tag": "0002_left_swarm",
+      "breakpoints": true
     }
   ]
 }

@@ -7,8 +7,9 @@
  * to a product's copy still starts in `merch.ts` — `src/db/seed.ts` is what
  * carries it into these tables.
  *
- * Phase 1 is catalogue-only: no orders table yet, so `editions.order_id` is a
- * bare `uuid` with no foreign key. Phase 3 adds `orders` and the constraint.
+ * Phase 3 adds the order/reservation layer (`orders`, `order_items`,
+ * `stripe_events`, `store_settings`) and the `editions.order_id` foreign
+ * key — see `src/lib/orders.ts` for the module that reads and writes it.
  */
 import { relations } from "drizzle-orm";
 import {
@@ -17,6 +18,7 @@ import {
   integer,
   jsonb,
   pgEnum,
+  pgSequence,
   pgTable,
   text,
   timestamp,
@@ -36,9 +38,40 @@ export const productImageKindEnum = pgEnum("product_image_kind", [
   "sticker",
 ]);
 export const editionStatusEnum = pgEnum("edition_status", ["available", "reserved", "sold"]);
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "paid",
+  "fulfilled",
+  "ready_for_pickup",
+  "picked_up",
+  "refunded",
+  "cancelled",
+]);
+export const fulfilmentEnum = pgEnum("fulfilment", ["ship", "pickup"]);
 
 /** One label/value pair, e.g. `{ label: "Capsule", value: "CNE-01" }`. */
 export type AuthenticityFact = { label: string; value: string };
+
+/** A shipping address snapshot, stored as-is on the order at payment time. */
+export type ShipTo = {
+  name: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+};
+
+/**
+ * Backs `orders.number` (e.g. `CNE-1001`) — a plain Postgres sequence so
+ * concurrent checkouts never race for the same number. `nextOrderNumber`
+ * in `src/lib/orders.ts` reads it with `nextval`.
+ */
+export const orderNumberSeq = pgSequence("order_number_seq", {
+  startWith: 1001,
+  increment: 1,
+});
 
 export const products = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -118,8 +151,7 @@ export const editions = pgTable(
     number: integer("number").notNull(),
     status: editionStatusEnum("status").notNull().default("available"),
     reservedUntil: timestamp("reserved_until", { withTimezone: true }),
-    // No FK yet: orders arrive in phase 3.
-    orderId: uuid("order_id"),
+    orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }),
     ...timestamps,
   },
   (t) => [
@@ -134,6 +166,96 @@ export const owners = pgTable("owners", {
   name: text("name"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Single-row (`id = 'default'`) shop-wide configuration. */
+export const storeSettings = pgTable("store_settings", {
+  id: text("id").primaryKey().default("default"),
+  storeName: text("store_name").notNull(),
+  supportEmail: text("support_email").notNull(),
+  pickupEnabled: boolean("pickup_enabled").notNull().default(true),
+  pickupAddress: text("pickup_address")
+    .notNull()
+    .default("5539 W. Sunset Blvd, Los Angeles, CA 90028"),
+  shippingFlatCents: integer("shipping_flat_cents").notNull().default(600),
+  shippingFreeOverCents: integer("shipping_free_over_cents"),
+  shipCountries: jsonb("ship_countries").$type<string[]>().notNull().default(["US"]),
+  returnsPolicy: text("returns_policy"),
+  termsText: text("terms_text"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const orders = pgTable("orders", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** `CNE-1001`, `CNE-1002`, … — see `orderNumberSeq` / `nextOrderNumber`. */
+  number: text("number").notNull().unique(),
+  status: orderStatusEnum("status").notNull().default("pending"),
+  fulfilment: fulfilmentEnum("fulfilment").notNull(),
+  /**
+   * Null until known. `createPendingOrder` may not have an email yet (the
+   * cart hasn't reached Stripe Checkout); `markPaid` always fills both this
+   * and `name` in from Stripe.
+   */
+  email: text("email"),
+  name: text("name"),
+  phone: text("phone"),
+  shipTo: jsonb("ship_to").$type<ShipTo>(),
+  subtotalCents: integer("subtotal_cents").notNull(),
+  shippingCents: integer("shipping_cents").notNull(),
+  taxCents: integer("tax_cents").notNull(),
+  totalCents: integer("total_cents").notNull(),
+  currency: text("currency").notNull().default("usd"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  carrier: text("carrier"),
+  trackingNumber: text("tracking_number"),
+  /** Set on creation for a pending order, cleared on payment. Reservations
+   * with an `expires_at` in the past are fair game for `releaseExpiredReservations`. */
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
+  refundedAt: timestamp("refunded_at", { withTimezone: true }),
+  notes: text("notes"),
+  ...timestamps,
+});
+
+export const orderItems = pgTable("order_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  productId: uuid("product_id")
+    .notNull()
+    .references(() => products.id),
+  variantId: uuid("variant_id")
+    .notNull()
+    .references(() => variants.id),
+  /** Snapshots, so a later edit to the product doesn't rewrite history. */
+  productName: text("product_name").notNull(),
+  sku: text("sku").notNull(),
+  unitPriceCents: integer("unit_price_cents").notNull(),
+  quantity: integer("quantity").notNull(),
+  /** Edition products only; null until `markPaid` assigns it. */
+  editionNumber: integer("edition_number"),
+  ...timestamps,
+});
+
+/** Stripe webhook idempotency: one row per event id ever seen. */
+export const stripeEvents = pgTable("stripe_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true }),
+});
+
+export const ordersRelations = relations(orders, ({ many }) => ({
+  items: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+  product: one(products, { fields: [orderItems.productId], references: [products.id] }),
+  variant: one(variants, { fields: [orderItems.variantId], references: [variants.id] }),
+}));
 
 export const productsRelations = relations(products, ({ many }) => ({
   images: many(productImages),

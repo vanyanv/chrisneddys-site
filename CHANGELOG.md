@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Checkout Sessions now enable invoice creation, so Stripe generates an invoice for every order instead of only for subscriptions
+
 ### Fixed
 
 - Checkout Sessions now declare an explicit product tax code, shipping tax code and tax behavior instead of relying on the Stripe account's preset defaults; the deploy doc's claim that a missing tax registration breaks checkout is corrected to what actually happens, which is silent zero collection

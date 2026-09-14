@@ -246,6 +246,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     line_items: lineItems,
     phone_number_collection: { enabled: true },
     automatic_tax: { enabled: true },
+    // Stripe only auto-generates an invoice for a subscription; a one-time
+    // payment like every order here gets no invoice unless asked for one.
+    // This just produces the invoice document — whether the customer is
+    // emailed it depends on the "Successful payments" setting under Dashboard
+    // customer emails, not on anything in this code.
+    invoice_creation: { enabled: true },
     integration_identifier: INTEGRATION_IDENTIFIER,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_EXPIRES_SECONDS,
     metadata: { orderId: pending.orderId, orderNumber: pending.number, fulfilment },

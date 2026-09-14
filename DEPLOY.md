@@ -183,6 +183,15 @@ transactions too, so test-mode volume gives no signal — the clock starts at
 the first live sale. Whether this store is obliged to register anywhere is
 a question for a tax advisor, not something this document decides.
 
+**Invoices are on, but customer emails are opt-in.** Every Checkout Session
+this app creates sets `invoice_creation: { enabled: true }`, so Stripe
+generates an invoice for each order rather than only for subscriptions.
+Whether the customer actually receives that invoice by email depends on a
+Dashboard setting, not this code: "Successful payments" must be ticked under
+"Email customers about" in the Stripe Dashboard's customer emails settings.
+That setting lives per environment, so ticking it in the sandbox does
+nothing for live mode — it has to be turned on again there.
+
 **Webhook endpoint.** In the Stripe dashboard → Developers → Webhooks, add
 an endpoint at:
 

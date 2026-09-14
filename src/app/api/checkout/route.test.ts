@@ -118,6 +118,7 @@ describe("POST /api/checkout — shop open", () => {
 
     expect(params.phone_number_collection).toEqual({ enabled: true });
     expect(params.automatic_tax).toEqual({ enabled: true });
+    expect(params.invoice_creation).toEqual({ enabled: true });
     expect(params.integration_identifier).toBe("chrisneddys-shop-nwwxvyur");
     expect(params.client_reference_id).toBeTruthy();
     expect(params.success_url).toBe(

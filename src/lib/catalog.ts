@@ -15,7 +15,7 @@
  * rendering mode). Phase 2's admin can call `revalidateTag("catalogue")`
  * after a write and every cached read here picks it up immediately.
  */
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/db/client";
 import { products, type AuthenticityFact } from "@/db/schema";
@@ -126,6 +126,7 @@ async function queryPublishedProducts(): Promise<MerchProduct[]> {
   const rows = await db.query.products.findMany({
     where: eq(products.status, "published"),
     with: { images: true },
+    orderBy: [asc(products.position), asc(products.createdAt)],
   });
   return rows.map(mapProductRow);
 }

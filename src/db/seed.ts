@@ -109,6 +109,8 @@ export async function seedCatalogue(db: Db): Promise<void> {
   // Insert-only: create the product row the first time this runs, then
   // never touch it again — /admin owns price/status/copy/etc. from then on,
   // and a redeploy must not revert an owner's edits.
+  const position = merch.findIndex((p) => p.slug === product.slug);
+
   const [insertedProduct] = await db
     .insert(products)
     .values({
@@ -123,6 +125,7 @@ export async function seedCatalogue(db: Db): Promise<void> {
       priceCents: Math.round(product.price * 100),
       oneSize: product.oneSize,
       status: "published",
+      position: position === -1 ? 0 : position,
       capColor: product.capColor ?? null,
       details: product.details ?? null,
       fit: product.fit ?? null,

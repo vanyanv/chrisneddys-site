@@ -6,13 +6,14 @@ import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { editions, productImages, variants } from "@/db/schema";
+import { editions, productImages, products, variants } from "@/db/schema";
 import {
   catalogueUpdatedAt,
   getInventory,
   getProductBySlug,
   listPublishedProducts,
 } from "@/lib/catalog";
+import { addImage, createDraft, setStatus } from "@/lib/catalogAdmin";
 import { merch } from "@/data/merch";
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
@@ -114,6 +115,41 @@ describe("catalogueUpdatedAt", () => {
   it("returns an ISO date driven by the product's own updated_at", async () => {
     const updated = await catalogueUpdatedAt();
     expect(updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+// Placed after "seed idempotency" (which asserts exact row counts) since
+// this adds its own products/images.
+describe("listPublishedProducts ordering", () => {
+  it("orders by position asc, then createdAt — following a reorder", async () => {
+    const db = await getDb();
+
+    const a = await createDraft("Ordering Product A");
+    const b = await createDraft("Ordering Product B");
+    for (const draft of [a, b]) {
+      await addImage({
+        productId: draft.id,
+        kind: "view",
+        viewId: crypto.randomUUID(),
+        label: "FRONT",
+        alt: "front view alt text",
+        urlFull: "https://example.com/order.webp",
+        urlThumb: "https://example.com/order-thumb.webp",
+        width: 720,
+        height: 720,
+      });
+      await setStatus(draft.id, "published");
+    }
+
+    // b was created after a, so plain creation order already puts a first —
+    // explicitly force the opposite order via position to prove the query
+    // sorts by position rather than insertion/createdAt order.
+    await db.update(products).set({ position: 0 }).where(eq(products.id, b.id));
+    await db.update(products).set({ position: 1 }).where(eq(products.id, a.id));
+
+    const published = await listPublishedProducts();
+    const slugs = published.map((p) => p.slug);
+    expect(slugs.indexOf(b.slug)).toBeLessThan(slugs.indexOf(a.slug));
   });
 });
 

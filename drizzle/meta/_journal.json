@@ -36,6 +36,13 @@
       "when": 1789355924102,
       "tag": "0004_closed_captain_britain",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789421524956,
+      "tag": "0005_dashing_sasquatch",
+      "breakpoints": true
     }
   ]
 }

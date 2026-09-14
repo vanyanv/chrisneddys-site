@@ -127,6 +127,18 @@ describe("setStatus", () => {
     const before = await getProductForAdmin(draft.id);
     expect(before?.publishedAt).toBeNull();
 
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/1.webp",
+      urlThumb: "https://example.com/1-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+
     const first = await setStatus(draft.id, "published");
     expect(first.ok).toBe(true);
     const afterFirstPublish = await getProductForAdmin(draft.id);
@@ -139,6 +151,47 @@ describe("setStatus", () => {
     // Re-publishing keeps the original timestamp rather than treating every
     // publish as a new "first" one.
     expect(afterRepublish?.publishedAt?.getTime()).toBe(firstPublishedAt?.getTime());
+  });
+
+  it("refuses to publish a product with no photo, and takes no action", async () => {
+    const draft = await createDraft("Photoless Product");
+
+    const result = await setStatus(draft.id, "published");
+    expect(result).toEqual({
+      ok: false,
+      error: "Add at least one photo before publishing.",
+    });
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.status).toBe("draft");
+    expect(admin?.publishedAt).toBeNull();
+  });
+
+  it("allows publishing once a view photo exists", async () => {
+    const draft = await createDraft("Photographed Product");
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/1.webp",
+      urlThumb: "https://example.com/1-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+
+    const result = await setStatus(draft.id, "published");
+    expect(result.ok).toBe(true);
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.status).toBe("published");
+  });
+
+  it("does not require a photo to move a product to draft or archived", async () => {
+    const draft = await createDraft("Never Photographed Product");
+    expect((await setStatus(draft.id, "draft")).ok).toBe(true);
+    expect((await setStatus(draft.id, "archived")).ok).toBe(true);
   });
 });
 

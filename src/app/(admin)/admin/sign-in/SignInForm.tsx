@@ -35,7 +35,7 @@ export function SignInForm({ next }: { next: string }) {
 
       {state.error ? (
         <p className="adm-error" role="alert">
-          {state.error}
+          {state.retryAfterSeconds ? "Too many attempts. Try again in a few minutes." : state.error}
         </p>
       ) : null}
 

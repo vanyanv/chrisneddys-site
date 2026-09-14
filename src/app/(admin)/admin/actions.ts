@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { signIn, signOut } from "@/lib/auth";
 
-export type SignInState = { error?: string };
+export type SignInState = { error?: string; retryAfterSeconds?: number };
 
 /** Only ever redirects inside the admin area — never off-site. */
 function safeNextPath(next: FormDataEntryValue | null): string {
@@ -21,7 +21,7 @@ export async function signInAction(
   const next = safeNextPath(formData.get("next"));
 
   const result = await signIn(email, password);
-  if (!result.ok) return { error: result.error };
+  if (!result.ok) return { error: result.error, retryAfterSeconds: result.retryAfterSeconds };
 
   redirect(next);
 }

@@ -8,7 +8,7 @@ import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { editions, products, variants } from "@/db/schema";
 import { getInventory } from "@/lib/catalog";
-import { createDraft, setInventory, setStatus } from "@/lib/catalogAdmin";
+import { addImage, createDraft, setInventory, setStatus } from "@/lib/catalogAdmin";
 import {
   createPendingOrder,
   getOrder,
@@ -306,6 +306,17 @@ describe("plain-quantity product", () => {
   it("only decrements inventory_quantity once the order is paid", async () => {
     const draft = await createDraft("Quantity Order Test Product");
     await setInventory(draft.id, "quantity", 5);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/qty-1.webp",
+      urlThumb: "https://example.com/qty-1-thumb.webp",
+      width: 720,
+      height: 720,
+    });
     await setStatus(draft.id, "published");
 
     const reservation = await createPendingOrder({
@@ -339,6 +350,17 @@ describe("plain-quantity product", () => {
   it("blocks a second reservation that would oversell the remaining stock", async () => {
     const draft = await createDraft("Tight Quantity Product");
     await setInventory(draft.id, "quantity", 2);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/qty-2.webp",
+      urlThumb: "https://example.com/qty-2-thumb.webp",
+      width: 720,
+      height: 720,
+    });
     await setStatus(draft.id, "published");
 
     const first = await createPendingOrder({

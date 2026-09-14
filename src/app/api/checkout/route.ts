@@ -25,6 +25,7 @@ import {
   quoteCart,
   releaseExpiredReservations,
   releaseOrder,
+  setOrderExpiry,
   type Fulfilment,
   type QuoteLineError,
 } from "@/lib/orders";
@@ -40,6 +41,21 @@ const MAX_LINE_ITEMS = 10;
 const HOLD_MINUTES = 30;
 const SESSION_EXPIRES_SECONDS = HOLD_MINUTES * 60;
 
+/**
+ * How much longer the order's hold outlives the Stripe Checkout Session's
+ * own `expires_at`. Both start out ~`HOLD_MINUTES` from now, created a few
+ * database round-trips apart — with no gap, a customer who pays in the
+ * final seconds before Stripe's own expiry could still have their order
+ * released by `releaseExpiredReservations` first (it only looks at the
+ * order's `expiresAt`), after which `markPaid` would find a `cancelled`
+ * order instead of the `pending` one it expects. Setting the order's
+ * `expiresAt` to Stripe's `expires_at` plus this grace period (via
+ * `setOrderExpiry`, right after the session is created) makes that
+ * ordering impossible: the order can never expire before Stripe's own
+ * session does.
+ */
+const EXPIRY_GRACE_MINUTES = 10;
+
 type CheckoutBody = {
   items: { slug: string; quantity: number }[];
   fulfilment: Fulfilment;
@@ -47,6 +63,27 @@ type CheckoutBody = {
 
 function badRequest(error: string, code?: string): NextResponse {
   return NextResponse.json(code ? { error, code } : { error }, { status: 400 });
+}
+
+/**
+ * Sums quantities for repeated slugs into one line per product, in
+ * first-seen order. Without this, a cart could repeat the same slug across
+ * several line items to slip past `quoteCart`/`createPendingOrder`'s
+ * per-line `perOrderLimit` check (each line individually within the limit,
+ * the sum across lines over it) — every quantity check downstream
+ * (`quoteCart`, `createPendingOrder`) is per-slug, so it must see one merged
+ * line per product to enforce the limit correctly.
+ */
+function mergeDuplicateSlugs(
+  items: { slug: string; quantity: number }[],
+): { slug: string; quantity: number }[] {
+  const order: string[] = [];
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    if (!totals.has(item.slug)) order.push(item.slug);
+    totals.set(item.slug, (totals.get(item.slug) ?? 0) + item.quantity);
+  }
+  return order.map((slug) => ({ slug, quantity: totals.get(slug)! }));
 }
 
 /** Parses and shape-checks the request body without touching the database.
@@ -75,7 +112,7 @@ function parseBody(raw: unknown): CheckoutBody | NextResponse {
     parsed.push({ slug, quantity: qty });
   }
 
-  return { items: parsed, fulfilment };
+  return { items: mergeDuplicateSlugs(parsed), fulfilment };
 }
 
 /** Turns a `QuoteLineError` (from `quoteCart` or a race in
@@ -203,6 +240,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   await attachStripeSession(pending.orderId, session.id);
+
+  // Stripe's own `expires_at` is authoritative for when the *session* dies;
+  // push the order's hold past it (see `EXPIRY_GRACE_MINUTES`) so the two
+  // can't race.
+  if (session.expires_at) {
+    const graceExpiresAt = new Date((session.expires_at + EXPIRY_GRACE_MINUTES * 60) * 1000);
+    await setOrderExpiry(pending.orderId, graceExpiresAt);
+  }
 
   return NextResponse.json({ url: session.url });
 }

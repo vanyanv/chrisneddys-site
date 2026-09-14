@@ -87,6 +87,7 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
     metaDescription: row.metaDescription,
     limitedNote: row.limitedNote,
     oneSize: row.oneSize,
+    perOrderLimit: row.perOrderLimit,
     photoDir: row.photoDir ?? undefined,
     capColor: row.capColor ?? undefined,
     views,

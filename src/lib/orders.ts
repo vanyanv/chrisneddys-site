@@ -261,6 +261,27 @@ async function loadProductWithVariants(
 }
 
 /**
+ * Sums quantities for repeated slugs into one line per product, in
+ * first-seen order — defends `quoteCart`'s per-line `perOrderLimit` check
+ * (and, by extension, `createPendingOrder`'s, which repeats the same
+ * per-item validation under a lock) the same way the checkout route's own
+ * body parsing does. Both merge independently: a caller of `quoteCart` that
+ * isn't the checkout route (there is none today, but the type is public)
+ * gets the same limit enforcement for free.
+ */
+function mergeDuplicateSlugs(
+  items: { slug: string; quantity: number }[],
+): { slug: string; quantity: number }[] {
+  const order: string[] = [];
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    if (!totals.has(item.slug)) order.push(item.slug);
+    totals.set(item.slug, (totals.get(item.slug) ?? 0) + item.quantity);
+  }
+  return order.map((slug) => ({ slug, quantity: totals.get(slug)! }));
+}
+
+/**
  * Prices a cart with no side effects and no locks — safe to call as often as
  * the checkout UI wants. `createPendingOrder` re-validates everything under
  * row locks before actually reserving anything, so a quote going stale
@@ -275,8 +296,9 @@ export async function quoteCart(
   const now = new Date();
   const lines: QuoteLine[] = [];
   let subtotalCents = 0;
+  const mergedItems = mergeDuplicateSlugs(items);
 
-  for (const item of items) {
+  for (const item of mergedItems) {
     const product = await loadProductWithVariants(database, item.slug);
     if (!product) return { code: "unknown_product", slug: item.slug };
     if (product.status !== "published") return { code: "not_published", slug: item.slug };
@@ -522,6 +544,21 @@ export async function attachStripeSession(
     .where(eq(orders.id, orderId));
 }
 
+/**
+ * Overwrites a pending order's hold expiry — used once the checkout route
+ * knows the Stripe Checkout Session's own `expires_at`, so the two never
+ * race: the order's hold is set to run a little *after* Stripe's session
+ * expires, not roughly alongside it. A no-op on an order that isn't
+ * `pending` (already paid or released — nothing to extend).
+ */
+export async function setOrderExpiry(orderId: string, at: Date, db?: Db): Promise<void> {
+  const database = await resolveDb(db);
+  await database
+    .update(orders)
+    .set({ expiresAt: at, updatedAt: new Date() })
+    .where(and(eq(orders.id, orderId), eq(orders.status, "pending")));
+}
+
 // ---------------------------------------------------------------------------
 // Payment
 // ---------------------------------------------------------------------------
@@ -567,13 +604,31 @@ function toMarkPaidResult(
   };
 }
 
+const PAID_AFTER_RELEASE_NOTE = "PAID AFTER RELEASE — NO STOCK LEFT — REFUND IN STRIPE";
+
 /**
- * Flips a pending order to paid: reserved editions become `sold` (and their
+ * Flips an order to paid: reserved editions become `sold` (and their
  * numbers land on the matching `order_items.edition_number`), plain-quantity
  * variants decrement `inventory_quantity` by the paid quantity — the only
  * point that column drops for those products, per the "decrement only on
  * payment" rule. Idempotent: a second call for an already-paid order just
  * re-reads and returns the same result, no double decrement.
+ *
+ * Tolerates an order that has already been `cancelled` (its hold released —
+ * by `releaseExpiredReservations`, or the webhook's own
+ * `checkout.session.expired`/`async_payment_failed` handling) by the time
+ * Stripe confirms the payment: a customer paying in the last seconds before
+ * the hold's `expiresAt` can still land here after the release ran. Rather
+ * than throwing forever (the order would never get marked paid, so the desk
+ * would never see money that Stripe actually collected), it re-reserves on
+ * the spot — preferring the exact edition numbers this order held before
+ * (still findable by `editions.order_id`, as long as nothing else has
+ * claimed them since released editions go back into the ordinary
+ * `available` pool) and falling back to the next lowest-numbered available
+ * ones. If stock genuinely ran out in between, the order is still marked
+ * paid (Stripe already has the customer's money — that can't be undone
+ * here), but `notes` gets `PAID_AFTER_RELEASE_NOTE` so the desk flags it for
+ * a manual Stripe refund, and the shortfall is logged.
  */
 export async function markPaid(input: MarkPaidInput, db?: Db): Promise<MarkPaidResult> {
   const database = await resolveDb(db);
@@ -592,7 +647,9 @@ export async function markPaid(input: MarkPaidInput, db?: Db): Promise<MarkPaidR
       const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, order.id));
       return toMarkPaidResult(order, items);
     }
-    if (order.status !== "pending") {
+
+    const wasReleased = order.status === "cancelled";
+    if (order.status !== "pending" && !wasReleased) {
       throw new Error(`markPaid: order ${order.number} is not pending (status: ${order.status})`);
     }
 
@@ -602,49 +659,116 @@ export async function markPaid(input: MarkPaidInput, db?: Db): Promise<MarkPaidR
       byVariant.set(item.variantId, [...(byVariant.get(item.variantId) ?? []), item]);
     }
 
+    let outOfStock = false;
+
     for (const [variantId, variantItems] of byVariant.entries()) {
       const variant = await tx.query.variants.findFirst({ where: eq(variants.id, variantId) });
       if (!variant) continue;
 
       if (variant.editionSize !== null) {
-        const reservedEditions = await tx
-          .select()
-          .from(editions)
-          .where(
-            and(
-              eq(editions.orderId, order.id),
-              eq(editions.variantId, variantId),
-              eq(editions.status, "reserved"),
-            ),
-          )
-          .orderBy(asc(editions.number));
-
         const unassignedItems = variantItems.filter((i) => i.editionNumber === null);
-        const pairCount = Math.min(reservedEditions.length, unassignedItems.length);
+        const needed = unassignedItems.length;
+
+        let claimed: { id: string; number: number }[];
+        if (!wasReleased) {
+          claimed = await tx
+            .select({ id: editions.id, number: editions.number })
+            .from(editions)
+            .where(
+              and(
+                eq(editions.orderId, order.id),
+                eq(editions.variantId, variantId),
+                eq(editions.status, "reserved"),
+              ),
+            )
+            .orderBy(asc(editions.number));
+        } else {
+          // Prefer this order's own previously-reserved numbers, still
+          // sitting `available` (nobody else claimed them in between).
+          const sameNumbers = await tx
+            .select({ id: editions.id, number: editions.number })
+            .from(editions)
+            .where(
+              and(
+                eq(editions.variantId, variantId),
+                eq(editions.orderId, order.id),
+                eq(editions.status, "available"),
+              ),
+            )
+            .orderBy(asc(editions.number))
+            .limit(needed)
+            .for("update", { skipLocked: true });
+
+          claimed = [...sameNumbers];
+          const stillNeeded = needed - claimed.length;
+          if (stillNeeded > 0) {
+            const claimedIds = new Set(claimed.map((e) => e.id));
+            const candidates = await tx
+              .select({ id: editions.id, number: editions.number })
+              .from(editions)
+              .where(and(eq(editions.variantId, variantId), eq(editions.status, "available")))
+              .orderBy(asc(editions.number))
+              .limit(stillNeeded + claimedIds.size)
+              .for("update", { skipLocked: true });
+            for (const candidate of candidates) {
+              if (claimed.length >= needed) break;
+              if (claimedIds.has(candidate.id)) continue;
+              claimed.push(candidate);
+            }
+          }
+        }
+
+        const pairCount = Math.min(claimed.length, unassignedItems.length);
         for (let i = 0; i < pairCount; i++) {
-          const edition = reservedEditions[i]!;
+          const edition = claimed[i]!;
           const item = unassignedItems[i]!;
           await tx
             .update(editions)
-            .set({ status: "sold", reservedUntil: null })
+            .set({ status: "sold", reservedUntil: null, orderId: order.id })
             .where(eq(editions.id, edition.id));
           await tx
             .update(orderItems)
             .set({ editionNumber: edition.number, updatedAt: new Date() })
             .where(eq(orderItems.id, item.id));
         }
+        if (pairCount < needed) outOfStock = true;
 
         await syncVariantAvailableMirror(tx, variantId);
       } else if (variant.inventoryQuantity !== null) {
         const totalQuantity = variantItems.reduce((sum, i) => sum + i.quantity, 0);
-        await tx
-          .update(variants)
-          .set({
-            inventoryQuantity: sql`${variants.inventoryQuantity} - ${totalQuantity}`,
-            updatedAt: new Date(),
-          })
-          .where(eq(variants.id, variantId));
+        if (!wasReleased) {
+          await tx
+            .update(variants)
+            .set({
+              inventoryQuantity: sql`${variants.inventoryQuantity} - ${totalQuantity}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(variants.id, variantId));
+        } else {
+          const [lockedVariant] = await tx
+            .select()
+            .from(variants)
+            .where(eq(variants.id, variantId))
+            .for("update");
+          const available = lockedVariant?.inventoryQuantity ?? 0;
+          const decrement = Math.min(available, totalQuantity);
+          if (decrement < totalQuantity) outOfStock = true;
+          await tx
+            .update(variants)
+            .set({
+              inventoryQuantity: sql`${variants.inventoryQuantity} - ${decrement}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(variants.id, variantId));
+        }
       }
+    }
+
+    if (outOfStock) {
+      console.error(
+        `markPaid: order ${order.number} was paid after its hold was released and ran out of ` +
+          "stock reclaiming it — flagged on the order for a manual refund.",
+      );
     }
 
     const paidAt = input.paidAt ?? new Date();
@@ -663,6 +787,7 @@ export async function markPaid(input: MarkPaidInput, db?: Db): Promise<MarkPaidR
         stripePaymentIntentId: input.paymentIntentId,
         paidAt,
         expiresAt: null,
+        notes: outOfStock ? PAID_AFTER_RELEASE_NOTE : order.notes,
         updatedAt: new Date(),
       })
       .where(eq(orders.id, order.id));
@@ -706,9 +831,17 @@ export async function releaseOrder(
     const touchedVariants = new Set(reserved.map((e) => e.variantId));
 
     if (reserved.length > 0) {
+      // `order_id` is deliberately *not* cleared here (only `status` and
+      // `reserved_until` are): a fresh reservation only ever looks at
+      // `status = 'available'`, never at who last held a number, so this
+      // is harmless for the ordinary claim path — but it lets `markPaid`
+      // recognize and prefer these exact numbers if this same order's
+      // payment lands after the release (see `markPaid`'s `wasReleased`
+      // branch). The next order to actually reserve this edition
+      // overwrites `order_id` to its own id, same as always.
       await tx
         .update(editions)
-        .set({ status: "available", reservedUntil: null, orderId: null })
+        .set({ status: "available", reservedUntil: null })
         .where(eq(editions.orderId, order.id));
     }
     for (const variantId of touchedVariants) {
@@ -866,17 +999,37 @@ export async function markPickedUp(orderId: string, db?: Db): Promise<OrderMutat
 }
 
 /** Refunded orders keep their editions `sold` — v1 doesn't resell a
- * refunded number. */
+ * refunded number. Allowed from any post-payment status a full refund could
+ * reasonably arrive during — `paid`/`fulfilled` (shipped orders) and
+ * `ready_for_pickup`/`picked_up` (pickup orders; Stripe doesn't care which
+ * side of the counter the item is on). */
 export async function markRefunded(
   orderId: string,
   patch: { refundedAt?: Date },
   db?: Db,
 ): Promise<OrderMutationResult> {
   const database = await resolveDb(db);
-  return transitionOrder(database, orderId, ["paid", "fulfilled"], {
-    status: "refunded",
-    refundedAt: patch.refundedAt ?? new Date(),
-  });
+  return transitionOrder(
+    database,
+    orderId,
+    ["paid", "fulfilled", "ready_for_pickup", "picked_up"],
+    {
+      status: "refunded",
+      refundedAt: patch.refundedAt ?? new Date(),
+    },
+  );
+}
+
+/** Appends a line to `orders.notes`, keeping whatever was already there —
+ * used for events worth flagging on the order without changing its status,
+ * like a partial Stripe refund (see the webhook's `charge.refunded`
+ * handling: only a *full* refund calls `markRefunded`). */
+export async function appendOrderNote(orderId: string, text: string, db?: Db): Promise<void> {
+  const database = await resolveDb(db);
+  const order = await database.query.orders.findFirst({ where: eq(orders.id, orderId) });
+  if (!order) return;
+  const notes = order.notes ? `${order.notes}\n${text}` : text;
+  await database.update(orders).set({ notes, updatedAt: new Date() }).where(eq(orders.id, orderId));
 }
 
 // ---------------------------------------------------------------------------

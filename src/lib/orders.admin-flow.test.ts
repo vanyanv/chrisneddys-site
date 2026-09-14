@@ -177,4 +177,22 @@ describe("refund", () => {
     const second = await markRefunded(orderId, {});
     expect(second.ok).toBe(false);
   });
+
+  it("refunds a pickup order that's ready for pickup but not yet collected", async () => {
+    const orderId = await createPaidOrder("pickup");
+    await markReadyForPickup(orderId);
+
+    const result = await markRefunded(orderId, {});
+    expect(result.ok).toBe(true);
+    expect((await getOrder(orderId))?.status).toBe("refunded");
+  });
+
+  it("refunds a pickup order that's already been picked up", async () => {
+    const orderId = await createPaidOrder("pickup");
+    await markPickedUp(orderId);
+
+    const result = await markRefunded(orderId, {});
+    expect(result.ok).toBe(true);
+    expect((await getOrder(orderId))?.status).toBe("refunded");
+  });
 });

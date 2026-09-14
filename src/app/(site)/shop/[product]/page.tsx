@@ -10,7 +10,7 @@ import {
   listPublishedProducts,
 } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/orders";
-import { shippingReturnsNote } from "@/lib/shopCopy";
+import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { formatPrice } from "@/lib/otter";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
@@ -82,9 +82,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const inventory = await getInventory(slug);
   const line = inventoryLine(inventory, product.eyebrow);
   const soldOut = line?.soldOut ?? false;
-  const maxQty = inventory?.tracked ? Math.min(MAX_PER_ORDER, inventory.available) : MAX_PER_ORDER;
+  const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
+  const maxQty = inventory?.tracked ? Math.min(perOrderLimit, inventory.available) : perOrderLimit;
   const settings = await getStoreSettings();
   const note = shippingReturnsNote(settings);
+  const flag = editionFlag(inventory?.editionSize ?? null);
 
   return (
     <>
@@ -103,7 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             [
               "capsule 01",
               "★",
-              "only 50 made",
+              flag.toLowerCase(),
               "★",
               "numbered /50",
               "★",
@@ -152,7 +154,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             {/* One size fits most, so there is no variant grid at all. The
                 scarcity line takes the space the size chips would have used. */}
             <div className="cne-limited">
-              <span className="tag">ONLY 50 MADE</span>
+              <span className="tag">{flag}</span>
               <span className="txt">{product.limitedNote}</span>
             </div>
 

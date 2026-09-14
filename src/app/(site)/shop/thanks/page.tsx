@@ -3,10 +3,20 @@ import Link from "next/link";
 import { brand } from "@/data/brand";
 import { getEditionSizes, getOrderBySessionId, getStoreSettings } from "@/lib/orders";
 import { formatPrice } from "@/lib/otter";
+import { canShowFullOrderDetails } from "@/lib/orderVisibility";
 import { ClearBagOnce } from "@/components/shop/ClearBagOnce";
 
-/** Reads a live order by a query-string session id and shows whatever the
- * database currently says — never static, never cached across visitors. */
+/**
+ * Reads a live order by a query-string session id and shows whatever the
+ * database currently says — never static, never cached across visitors.
+ * `?session_id=` alone is enough to load an order (there's no session/email
+ * check), so this must never be cached or served from anywhere but this
+ * request: `src/middleware.ts` also stamps `Cache-Control: private,
+ * no-store` on every response for this route — Server Components can't set
+ * response headers themselves, only Route Handlers and Middleware can — and
+ * `canShowFullOrderDetails` below limits how long a stale link keeps
+ * showing anything beyond the order number.
+ */
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -107,7 +117,22 @@ export default async function ThanksPage({
   }
 
   // paid, fulfilled, ready_for_pickup, picked_up, or refunded — every one of
-  // these means the payment itself went through.
+  // these means the payment itself went through. Anyone with this URL can
+  // load this order by session id alone, so full details (items, edition
+  // number, totals) only show for a couple of hours after payment; past
+  // that, a stale/shared link only gets the order number.
+  if (!canShowFullOrderDetails(order)) {
+    return (
+      <Shell>
+        <h1>Thanks — order {order.number}</h1>
+        <p className="cne-shop-lede">
+          Check your confirmation email for the details, or{" "}
+          <Link href="/shop/order/">look up your order</Link> with your order number and email.
+        </p>
+      </Shell>
+    );
+  }
+
   const [sizes, settings] = await Promise.all([
     getEditionSizes(order.items.map((i) => i.variantId)),
     getStoreSettings(),

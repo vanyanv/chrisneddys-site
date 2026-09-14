@@ -29,6 +29,17 @@ function singleLine(text: string): string {
     .join(", ");
 }
 
+/**
+ * The shop's scarcity flag — the shop index card's flag, the product page's
+ * marquee word and its limited chip all read from this, so none of the
+ * three can say a run size the live inventory doesn't back. `editionSize`
+ * is `InventoryStatus.editionSize` (`src/lib/catalog.ts`): a real number for
+ * a tracked edition product, `null` for anything untracked or without one.
+ */
+export function editionFlag(editionSize: number | null): string {
+  return editionSize !== null ? `ONLY ${editionSize} MADE` : "LIMITED RUN";
+}
+
 export type ShippingReturnsNote = {
   /** e.g. "Ships flat $6 in the US · free over $75 · or pick up at 5539 W. Sunset Blvd." */
   line: string;

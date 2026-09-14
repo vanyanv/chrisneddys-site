@@ -18,6 +18,7 @@ import { getDb } from "@/db/client";
 import { owners } from "@/db/schema";
 import { verifyPassword } from "@/lib/password";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
+import { checkThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
 import {
   SESSION_COOKIE_NAME,
   SESSION_MAX_AGE_SECONDS,
@@ -32,6 +33,28 @@ const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
 
 function ownerEmailsFromEnv(): string[] {
   return parseOwnerEmails(process.env.OWNER_EMAILS);
+}
+
+/** First IP in `x-forwarded-for` (the client, per convention — proxies
+ * append their own), falling back to `x-real-ip`. Vercel sets both. */
+function firstForwardedIp(value: string | null): string | null {
+  const first = value?.split(",")[0]?.trim();
+  return first ? first : null;
+}
+
+/** The caller's IP for the throttle: `ipOverride` lets tests pass one
+ * directly instead of going through `headers()` (there is no request to
+ * read headers from in a unit test). Falls back to `"unknown"` — a single
+ * shared bucket — if neither header is present, which only ever happens
+ * off Vercel. */
+async function resolveClientIp(ipOverride?: string): Promise<string> {
+  if (ipOverride) return ipOverride;
+  const headerList = await headers();
+  return (
+    firstForwardedIp(headerList.get("x-forwarded-for")) ??
+    headerList.get("x-real-ip")?.trim() ??
+    "unknown"
+  );
 }
 
 /** True once AUTH_SECRET, OWNER_EMAILS and OWNER_PASSWORD_HASH are all set. */
@@ -71,11 +94,19 @@ export async function requireOwner(): Promise<OwnerSession> {
  * Every failure path — unknown email, wrong password, auth not configured —
  * runs the same scrypt derivation and returns the same generic error, so
  * neither timing nor message tells an attacker which part was wrong.
+ *
+ * Throttled first: 5 failed attempts for either the email or the IP in the
+ * last 15 minutes refuses the request with the same generic error — and,
+ * unlike the paths below, *without* spending a scrypt call, since the answer
+ * doesn't depend on the password at all once a channel is locked — plus a
+ * `retryAfterSeconds` hint. `ipOverride` exists only so tests can supply an
+ * IP directly; real callers always let it come from `headers()`.
  */
 export async function signIn(
   email: string,
   password: string,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+  ipOverride?: string,
+): Promise<{ ok: true } | { ok: false; error: string; retryAfterSeconds?: number }> {
   const secret = process.env.AUTH_SECRET;
   const passwordHash = process.env.OWNER_PASSWORD_HASH;
   const normalizedEmail = email.trim().toLowerCase();
@@ -88,6 +119,27 @@ export async function signIn(
   }
 
   const db = await getDb();
+  const ip = await resolveClientIp(ipOverride);
+  const now = new Date();
+
+  await pruneSignInAttempts(db, now);
+
+  const throttle = await checkThrottle(db, normalizedEmail, ip, now);
+  if (throttle.locked) {
+    await recordSignInAttempt(db, normalizedEmail, ip, false, now);
+    console.warn("[auth] sign-in throttled", {
+      email: normalizedEmail,
+      ip,
+      emailFailures: throttle.emailFailures,
+      ipFailures: throttle.ipFailures,
+    });
+    return {
+      ok: false,
+      error: GENERIC_SIGN_IN_ERROR,
+      retryAfterSeconds: throttle.retryAfterSeconds,
+    };
+  }
+
   const existingOwners = await db.select({ email: owners.email, name: owners.name }).from(owners);
   const allowlist =
     existingOwners.length > 0
@@ -98,6 +150,12 @@ export async function signIn(
   const passwordOk = await verifyPassword(password, passwordHash);
 
   if (!allowed || !passwordOk) {
+    await recordSignInAttempt(db, normalizedEmail, ip, false, now);
+    console.warn("[auth] failed sign-in attempt", {
+      email: normalizedEmail,
+      ip,
+      count: throttle.emailFailures + 1,
+    });
     return { ok: false, error: GENERIC_SIGN_IN_ERROR };
   }
 
@@ -116,6 +174,8 @@ export async function signIn(
     { email: normalizedEmail, name: matched?.name ?? null },
     secret,
   );
+
+  await recordSignInAttempt(db, normalizedEmail, ip, true, now);
 
   const store = await cookies();
   store.set(SESSION_COOKIE_NAME, token, {

@@ -2,17 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ProductShot } from "./ProductShot";
-import {
-  bagLineImage,
-  bagSubtotal,
-  closeBag,
-  removeFromBag,
-  setBagQty,
-  useBag,
-  type BagLine,
-} from "./bagStore";
-import { MAX_PER_ORDER, TERMS_PENDING, productBySlug } from "@/data/merch";
+import { CapArt } from "./CapArt";
+import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
+import { TERMS_PENDING } from "@/data/merch";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 
@@ -24,6 +16,18 @@ type Fulfilment = "ship" | "pickup";
 /** `/api/checkout`'s error shape — a human message, and (when it came from a
  * `QuoteLineError`) the machine code the message was built from. */
 type CheckoutErrorBody = { error?: string; code?: string };
+
+/** GA4's ecommerce line item, from a bag line's own snapshot — display-only,
+ * same as the rest of the line, so this can drift from what checkout
+ * actually charges. */
+function lineItem(line: BagLine): TrackItem {
+  return {
+    item_id: line.slug,
+    item_name: line.name,
+    price: line.priceCents / 100,
+    quantity: line.qty,
+  };
+}
 
 /**
  * The bag, as a drawer over whatever you were looking at.
@@ -96,19 +100,7 @@ export function BagDrawer({
   // alone: changing a quantity while the drawer is up is not a second view.
   useEffect(() => {
     if (!open) return;
-    const items: TrackItem[] = lines.flatMap((line) => {
-      const product = productBySlug(line.slug);
-      return product
-        ? [
-            {
-              item_id: product.slug,
-              item_name: product.name,
-              price: product.price,
-              quantity: line.qty,
-            },
-          ]
-        : [];
-    });
+    const items: TrackItem[] = lines.map(lineItem);
     track("view_cart", { currency: "USD", value: bagSubtotal(lines), items });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -141,19 +133,7 @@ export function BagDrawer({
     setCheckoutError(null);
     setCheckoutPending(true);
 
-    const items: TrackItem[] = lines.flatMap((line) => {
-      const product = productBySlug(line.slug);
-      return product
-        ? [
-            {
-              item_id: product.slug,
-              item_name: product.name,
-              price: product.price,
-              quantity: line.qty,
-            },
-          ]
-        : [];
-    });
+    const items: TrackItem[] = lines.map(lineItem);
     track("begin_checkout", { currency: "USD", value: bagSubtotal(lines), items });
 
     try {
@@ -334,27 +314,29 @@ function BagRow({
   removing: boolean;
   onRemove: () => void;
 }) {
-  const image = bagLineImage(line);
-  if (!image) return null;
-  const { product, view } = image;
-
   return (
     <li
       className={`cne-li${removing ? " is-out" : ""}`}
       style={{ "--cne-li-i": index } as React.CSSProperties}
     >
       <div className="cne-li-art">
-        <ProductShot product={product} view={view} sizes="72px" thumb />
+        {line.image ? (
+          <div className="cne-capshot is-photo">
+            <img src={line.image.url} alt={line.image.alt} loading="lazy" decoding="async" />
+          </div>
+        ) : (
+          <CapArt />
+        )}
       </div>
       <div className="cne-li-b">
-        <span className="n">{product.displayName[1]}</span>
-        <span className="v">LIMITED RUN{product.oneSize ? " · ONE SIZE" : ""}</span>
+        <span className="n">{line.displayName[1]}</span>
+        <span className="v">LIMITED RUN</span>
         <div className="cne-li-ft">
           <div className="cne-qty-sm">
             <button
               type="button"
               onClick={() => setBagQty(line.slug, line.qty - 1)}
-              aria-label={`Decrease ${product.name} quantity`}
+              aria-label={`Decrease ${line.name} quantity`}
             >
               &minus;
             </button>
@@ -362,13 +344,13 @@ function BagRow({
             <button
               type="button"
               onClick={() => setBagQty(line.slug, line.qty + 1)}
-              disabled={line.qty >= MAX_PER_ORDER}
-              aria-label={`Increase ${product.name} quantity`}
+              disabled={line.qty >= line.perOrderLimit}
+              aria-label={`Increase ${line.name} quantity`}
             >
               +
             </button>
           </div>
-          <span className="cne-price">{formatPrice(product.price * line.qty)}</span>
+          <span className="cne-price">{formatPrice((line.priceCents / 100) * line.qty)}</span>
         </div>
         <button type="button" className="cne-li-rm" onClick={onRemove}>
           Remove

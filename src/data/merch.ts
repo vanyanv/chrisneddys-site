@@ -133,6 +133,13 @@ export type MerchProduct = {
   /** Gallery angles. See `MerchView`. */
   views: MerchView[];
   /**
+   * The most of this one product a single order will take — the database
+   * row's own `per_order_limit`, settable per product in /admin. Unset for
+   * the in-repo fallback/seed copy, where every caller falls back to the
+   * blanket `MAX_PER_ORDER` below.
+   */
+  perOrderLimit?: number;
+  /**
    * The construction list under "The details" — copied straight off the spec
    * sheet, one fact per line. Nothing paraphrased or inferred beyond it.
    */
@@ -174,13 +181,15 @@ export const TERMS_PENDING =
 
 /**
  * A product's first view — the gallery's default and what card art uses.
- * Every product in the catalogue below is defined with at least one view;
- * this only throws if that contract is ever broken.
+ * Every product in the catalogue below is seeded with at least one view, but
+ * a product published through /admin is not guaranteed one at the type
+ * level (`setStatus` in `src/lib/catalogAdmin.ts` refuses to publish one with
+ * no photo, but a draft can still reach this function) — so this returns
+ * `undefined` rather than throwing, and every caller renders `CapArt` in
+ * that case instead of crashing the page.
  */
-export function firstView(product: MerchProduct): MerchView {
-  const view = product.views[0];
-  if (!view) throw new Error(`${product.slug} has no views`);
-  return view;
+export function firstView(product: MerchProduct): MerchView | undefined {
+  return product.views[0];
 }
 
 export const merch: MerchProduct[] = [

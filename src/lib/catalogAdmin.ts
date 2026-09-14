@@ -149,14 +149,26 @@ export type SetStatusResult = { ok: true; slug: string } | { ok: false; error: s
  * Sets a product's status. Stamps `publishedAt` the first time a product is
  * ever published; an unpublish/republish cycle keeps that original
  * timestamp rather than treating every publish as a new "first" one.
+ *
+ * Refuses to publish a product with no gallery photo: `firstView` (in
+ * `src/data/merch.ts`) has to return something for the shop index and the
+ * product page to render, and a product with zero `view` images is exactly
+ * the case that used to render an empty $0 line instead.
  */
 export async function setStatus(
   id: string,
   status: "draft" | "published" | "archived",
 ): Promise<SetStatusResult> {
   const db = await getDb();
-  const existing = await db.query.products.findFirst({ where: eq(products.id, id) });
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
+    with: { images: { where: eq(productImages.kind, "view") } },
+  });
   if (!existing) return { ok: false, error: "Product not found." };
+
+  if (status === "published" && existing.images.length === 0) {
+    return { ok: false, error: "Add at least one photo before publishing." };
+  }
 
   const publishedAt =
     status === "published" && existing.publishedAt === null ? new Date() : existing.publishedAt;

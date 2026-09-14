@@ -12,7 +12,12 @@
  *   `catalogueChanged()` so the storefront's "N left" count updates.
  * - `checkout.session.expired` / `checkout.session.async_payment_failed` —
  *   `releaseOrder()` returns the hold to the pool.
- * - `charge.refunded` — looked up by payment intent, `markRefunded()`.
+ * - `charge.refunded` — fires for a partial refund too (Stripe's charge
+ *   object doesn't distinguish "a" refund from "the" refund in the event
+ *   type). Looked up by payment intent: `markRefunded()` only when
+ *   `charge.refunded === true` (the charge is now *fully* refunded); a
+ *   partial refund instead appends a note via `appendOrderNote()` and
+ *   leaves the order's status alone.
  *
  * Idempotency: `recordStripeEvent(event.id, event.type)` claims the event id
  * before any of the above runs; a second delivery of the same event id
@@ -25,6 +30,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
 import {
+  appendOrderNote,
   catalogueChanged,
   deleteStripeEvent,
   getOrder,
@@ -112,7 +118,15 @@ async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
   const order = await getOrderByPaymentIntentId(intentId);
   if (!order) return;
 
-  await markRefunded(order.id, {});
+  if (charge.refunded) {
+    await markRefunded(order.id, {});
+    return;
+  }
+
+  // A partial refund: leave the order's status where it is, but flag the
+  // amount on it for the desk to see.
+  const dollars = (charge.amount_refunded / 100).toFixed(2);
+  await appendOrderNote(order.id, `Partial refund of $${dollars} in Stripe`);
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

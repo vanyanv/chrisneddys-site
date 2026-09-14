@@ -22,6 +22,13 @@
       "when": 1789351282711,
       "tag": "0002_left_swarm",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789354354867,
+      "tag": "0003_legal_dark_phoenix",
+      "breakpoints": true
     }
   ]
 }

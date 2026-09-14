@@ -146,6 +146,27 @@ describe("POST /api/checkout — shop open", () => {
     expect(after?.available).toBe(before?.available);
   });
 
+  it("merges duplicate slug lines before validation, so the per-order limit can't be bypassed", async () => {
+    // The Foam Trucker's `perOrderLimit` is 6 — each line here is within
+    // the limit on its own, but the two together (12) are not, and must be
+    // rejected as such rather than passing as two separate valid lines.
+    const before = await getInventory(SLUG);
+    const res = await post({
+      items: [
+        { slug: SLUG, quantity: 6 },
+        { slug: SLUG, quantity: 6 },
+      ],
+      fulfilment: "pickup",
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.code).toBe("over_limit");
+    expect(createMock).not.toHaveBeenCalled();
+
+    const after = await getInventory(SLUG);
+    expect(after?.available).toBe(before?.available);
+  });
+
   it("rejects more than 10 line items before touching the database", async () => {
     const items = Array.from({ length: 11 }, () => ({ slug: SLUG, quantity: 1 }));
     const res = await post({ items, fulfilment: "pickup" });

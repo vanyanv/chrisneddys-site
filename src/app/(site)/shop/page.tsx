@@ -4,7 +4,7 @@ import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
 import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/orders";
-import { shippingReturnsNote } from "@/lib/shopCopy";
+import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -70,10 +70,11 @@ export default async function ShopPage() {
         <div className="cne-drops">
           {merch.map((product, i) => {
             const line = inventoryLine(inventories[i], product.eyebrow);
+            const flag = editionFlag(inventories[i]?.editionSize ?? null);
 
             return (
               <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
-                <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : "ONLY 50 MADE"}</span>
+                <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
                 <div className="cne-drop-art">
                   <ProductShot
                     product={product}

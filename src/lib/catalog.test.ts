@@ -63,6 +63,10 @@ describe("listPublishedProducts", () => {
     expect(product.metaDescription).toBe(trucker.metaDescription);
     expect(product.limitedNote).toBe(trucker.limitedNote);
     expect(product.oneSize).toBe(trucker.oneSize);
+    // The seeded row's own `per_order_limit` — the fallback copy in
+    // `merch.ts` leaves it unset, so this only exists on the database-backed
+    // product.
+    expect(product.perOrderLimit).toBe(6);
     expect(product.photoDir).toBe(trucker.photoDir);
     expect(product.capColor).toBe(trucker.capColor);
     expect(product.details).toEqual(trucker.details);

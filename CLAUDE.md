@@ -1,25 +1,41 @@
 # chrisneddys.com
 
-Next.js 15 App Router site, static export (`output: "export"`), Tailwind v4,
-TypeScript, pnpm. Content lives in `src/data/*.ts`; helpers in `src/lib`;
-routes in `src/app`; UI in `src/components`. Deployment and host headers are
-documented in `DEPLOY.md`; brand and layout rules in `DESIGN.md`.
+Next.js 15 App Router site on Vercel, Tailwind v4, TypeScript, pnpm. Storefront
+pages are static with revalidation; `/admin` and `/api` are server routes
+(middleware-protected sign-in, Stripe checkout/webhook). The catalogue and
+orders live in Postgres — Neon in deployed environments, PGlite locally and
+in tests — with `src/data/merch.ts` as seed source and static fallback when
+there's no database to talk to. Content lives in `src/data/*.ts`; helpers in
+`src/lib`; routes in `src/app`; UI in `src/components`. Deployment and host
+headers are documented in `DEPLOY.md`; brand and layout rules in `DESIGN.md`.
 
 ## Commands
 
 ```
 pnpm install
-pnpm dev          # local server
-pnpm typecheck    # tsc --noEmit
-pnpm lint         # eslint .
-pnpm test         # vitest run
-pnpm format:check # prettier --check (pre-commit hook formats staged files)
-pnpm build        # runs scripts/build-map-base.mjs first, then next build -> out/
-pnpm check:links  # verifies order links
+pnpm dev             # local server
+pnpm typecheck       # tsc --noEmit
+pnpm lint            # eslint .
+pnpm test            # vitest run
+pnpm format:check    # prettier --check (pre-commit hook formats staged files)
+pnpm build           # runs scripts/build-map-base.mjs + db-prepare.mjs, then next build -> .next/
+pnpm check:links     # verifies order links
+pnpm db:generate     # drizzle-kit generate -> drizzle/*.sql (commit the output)
+pnpm db:migrate      # apply pending migrations (also runs on build via db-prepare.mjs)
+pnpm db:seed         # upsert the seed catalogue
+pnpm db:studio       # drizzle-kit studio
+pnpm owner:password  # print an OWNER_PASSWORD_HASH for a given password
 ```
 
 Run `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, and `pnpm test` before
 reporting any change as done.
+
+## Store
+
+The catalogue is `src/lib/catalog.ts`; orders, reservations and payment are
+`src/lib/orders.ts`. Environment variables and the database/payments setup
+they depend on are documented in `DEPLOY.md`'s "Database" and "Payments"
+sections.
 
 ## Working in orchestrator mode
 

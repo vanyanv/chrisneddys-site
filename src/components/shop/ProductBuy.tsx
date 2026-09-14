@@ -39,7 +39,8 @@ type BuyContext = {
   added: boolean;
   /** Tracked inventory at zero. Disables both buy buttons; hides the stepper. */
   soldOut: boolean;
-  /** The stepper's ceiling — `MAX_PER_ORDER`, or less when tracked stock is lower. */
+  /** The stepper's ceiling — the product's own `perOrderLimit` (falling back
+   * to `MAX_PER_ORDER`), or less when tracked stock is lower. */
   maxQty: number;
 };
 
@@ -54,15 +55,19 @@ function useBuy(): BuyContext {
 export function BuyProvider({
   product,
   soldOut = false,
-  maxQty = MAX_PER_ORDER,
+  maxQty,
   children,
 }: {
   product: MerchProduct;
   /** From the catalogue's live inventory — never computed client-side. */
   soldOut?: boolean;
+  /** Omit to fall back to the product's own `perOrderLimit` (or
+   * `MAX_PER_ORDER` when that's unset) — callers that also know the live
+   * inventory cap (the product page) pass the smaller of the two instead. */
   maxQty?: number;
   children: React.ReactNode;
 }) {
+  const cappedQty = maxQty ?? product.perOrderLimit ?? MAX_PER_ORDER;
   const [qty, setQtyRaw] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -80,9 +85,9 @@ export function BuyProvider({
 
   const setQty = useCallback(
     (n: number) => {
-      setQtyRaw(Math.max(1, Math.min(maxQty, n)));
+      setQtyRaw(Math.max(1, Math.min(cappedQty, n)));
     },
-    [maxQty],
+    [cappedQty],
   );
 
   const add = useCallback(() => {
@@ -100,15 +105,15 @@ export function BuyProvider({
     setAdded(true);
     window.setTimeout(() => setAdded(false), 900);
     flyToBag(source, () => {
-      addToBag(product.slug, qty);
+      addToBag(product, qty);
       setQtyRaw(1);
       openBag();
     });
   }, [product, qty]);
 
   const value = useMemo(
-    () => ({ product, qty, setQty, add, added, soldOut, maxQty }),
-    [product, qty, setQty, add, added, soldOut, maxQty],
+    () => ({ product, qty, setQty, add, added, soldOut, maxQty: cappedQty }),
+    [product, qty, setQty, add, added, soldOut, cappedQty],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

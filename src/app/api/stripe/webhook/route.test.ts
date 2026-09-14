@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
-import { attachStripeSession, createPendingOrder, getOrder } from "@/lib/orders";
+import { attachStripeSession, createPendingOrder, getOrder, markPaid } from "@/lib/orders";
 
 // See the note in src/app/api/checkout/route.test.ts — `server-only` throws
 // outside a real Next.js server build, so it's stubbed for every module this
@@ -59,6 +59,43 @@ async function pendingOrderWithSession(sessionId: string, quantity = 1) {
   if ("code" in result) throw new Error(`expected a pending order, got ${result.code}`);
   await attachStripeSession(result.orderId, sessionId);
   return result;
+}
+
+/** A paid order with a known Stripe PaymentIntent id — what
+ * `getOrderByPaymentIntentId` looks orders up by for `charge.refunded`. */
+async function paidOrderWithIntent(paymentIntentId: string) {
+  const reservation = await createPendingOrder({
+    items: [{ slug: SLUG, quantity: 1 }],
+    fulfilment: "pickup",
+  });
+  if ("code" in reservation) throw new Error(`expected a reservation, got ${reservation.code}`);
+  await markPaid({
+    orderId: reservation.orderId,
+    paymentIntentId,
+    email: "buyer@example.com",
+    name: "Test Buyer",
+    amounts: { subtotal: 4800, shipping: 0, tax: 0, total: 4800 },
+  });
+  return reservation.orderId;
+}
+
+function chargeRefundedEvent(
+  id: string,
+  paymentIntentId: string,
+  overrides: Record<string, unknown> = {},
+) {
+  return {
+    id,
+    type: "charge.refunded",
+    data: {
+      object: {
+        payment_intent: paymentIntentId,
+        refunded: true,
+        amount_refunded: 4800,
+        ...overrides,
+      },
+    },
+  };
 }
 
 function sessionCompletedEvent(
@@ -171,5 +208,42 @@ describe("POST /api/stripe/webhook", () => {
     );
     const res2 = await post("raw-body");
     expect(res2.status).toBe(500);
+  });
+
+  it("marks the order refunded on a full (charge.refunded === true) refund", async () => {
+    const paymentIntentId = "pi_full_refund_1";
+    const orderId = await paidOrderWithIntent(paymentIntentId);
+
+    constructEventMock.mockReturnValueOnce(
+      chargeRefundedEvent("evt_full_refund_1", paymentIntentId, {
+        refunded: true,
+        amount_refunded: 4800,
+      }),
+    );
+    const res = await post("raw-body");
+    expect(res.status).toBe(200);
+
+    const order = await getOrder(orderId);
+    expect(order?.status).toBe("refunded");
+    expect(order?.refundedAt).not.toBeNull();
+  });
+
+  it("leaves the order's status alone and appends a note on a partial refund", async () => {
+    const paymentIntentId = "pi_partial_refund_1";
+    const orderId = await paidOrderWithIntent(paymentIntentId);
+
+    constructEventMock.mockReturnValueOnce(
+      chargeRefundedEvent("evt_partial_refund_1", paymentIntentId, {
+        refunded: false,
+        amount_refunded: 1200,
+      }),
+    );
+    const res = await post("raw-body");
+    expect(res.status).toBe(200);
+
+    const order = await getOrder(orderId);
+    expect(order?.status).toBe("paid");
+    expect(order?.refundedAt).toBeNull();
+    expect(order?.notes).toBe("Partial refund of $12.00 in Stripe");
   });
 });

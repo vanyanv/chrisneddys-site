@@ -167,6 +167,28 @@ export const owners = pgTable("owners", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * Every owner sign-in attempt (success or failure), for the throttle in
+ * `src/lib/auth.ts` — before verifying a password it counts recent failures
+ * for both the email and the IP and refuses (without spending a scrypt call)
+ * once either hits the limit. Rows older than 24h are pruned opportunistically
+ * (`pruneSignInAttempts`) rather than on a schedule.
+ */
+export const signInAttempts = pgTable(
+  "sign_in_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull(),
+    ip: text("ip").notNull(),
+    succeeded: boolean("succeeded").notNull(),
+    attemptedAt: timestamp("attempted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("sign_in_attempts_email_attempted_at_idx").on(t.email, t.attemptedAt),
+    index("sign_in_attempts_ip_attempted_at_idx").on(t.ip, t.attemptedAt),
+  ],
+);
+
 /** Single-row (`id = 'default'`) shop-wide configuration. */
 export const storeSettings = pgTable("store_settings", {
   id: text("id").primaryKey().default("default"),

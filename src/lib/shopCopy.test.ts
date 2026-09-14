@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { shippingReturnsNote } from "@/lib/shopCopy";
+import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import type { StoreSettings } from "@/lib/orders";
+
+describe("editionFlag", () => {
+  it("reads 'ONLY N MADE' for a tracked edition size", () => {
+    expect(editionFlag(50)).toBe("ONLY 50 MADE");
+    expect(editionFlag(1)).toBe("ONLY 1 MADE");
+  });
+
+  it("reads 'LIMITED RUN' when there's no edition size to back a number", () => {
+    expect(editionFlag(null)).toBe("LIMITED RUN");
+  });
+});
 
 const base: StoreSettings = {
   id: "default",

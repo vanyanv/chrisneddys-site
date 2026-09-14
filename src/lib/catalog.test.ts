@@ -1,8 +1,8 @@
 import { fileURLToPath } from "node:url";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
-import { getDb } from "@/db/client";
+import { getDb, hasDatabase } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -173,5 +173,62 @@ describe("getInventory after editions sell", () => {
       available: 13,
       editionSize: 50,
     });
+  });
+});
+
+// `hasDatabase()` (in `src/db/client.ts`) is the shared rule
+// `shouldUseFallback()` here delegates to for whether the storefront reads
+// this file's PGlite/Postgres, or the static `src/data/merch.ts` fallback.
+// Vitest itself runs with `NODE_ENV=test` and `VITEST=true`, so these tests
+// save and restore all four env vars the rule reads, to exercise it as if
+// running outside Vitest without disturbing any other test in this file.
+describe("hasDatabase", () => {
+  // `NODE_ENV` is typed `readonly` (Next.js's global env augmentation), so
+  // every read/write here goes through this mutable view instead of
+  // `process.env` directly.
+  const env = process.env as Record<string, string | undefined>;
+
+  const ENV_KEYS = ["DATABASE_URL", "PGLITE_DATA_DIR", "NODE_ENV", "VITEST"] as const;
+  const original: Record<(typeof ENV_KEYS)[number], string | undefined> = {
+    DATABASE_URL: undefined,
+    PGLITE_DATA_DIR: undefined,
+    NODE_ENV: undefined,
+    VITEST: undefined,
+  };
+
+  beforeEach(() => {
+    for (const key of ENV_KEYS) {
+      original[key] = env[key];
+      delete env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const key of ENV_KEYS) {
+      if (original[key] === undefined) delete env[key];
+      else env[key] = original[key];
+    }
+  });
+
+  it("is true whenever DATABASE_URL is set, regardless of NODE_ENV", () => {
+    env.DATABASE_URL = "postgres://example";
+    env.NODE_ENV = "production";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is true when PGLITE_DATA_DIR is set even under NODE_ENV=production with no DATABASE_URL", () => {
+    env.NODE_ENV = "production";
+    env.PGLITE_DATA_DIR = ".pglite/e2e";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is true outside production with neither DATABASE_URL nor PGLITE_DATA_DIR set", () => {
+    env.NODE_ENV = "development";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is false under NODE_ENV=production with neither DATABASE_URL nor PGLITE_DATA_DIR set", () => {
+    env.NODE_ENV = "production";
+    expect(hasDatabase()).toBe(false);
   });
 });

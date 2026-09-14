@@ -47,9 +47,11 @@
  *   e2e suite (`playwright.config.ts`) points it at `.pglite/e2e` so it never
  *   touches the developer's own `.pglite/dev` database.
  *
- * `src/lib/catalog.ts` decides on its own, separately, when to skip the
- * database entirely and read `src/data/merch.ts` instead (a production build
- * with no `DATABASE_URL` — CI, or a preview without the variable set).
+ * `hasDatabase()` (below) is the shared rule for whether there is a database
+ * to talk to at all — `src/lib/catalog.ts` calls it to decide when to skip
+ * the database entirely and read `src/data/merch.ts` instead (a production
+ * build/run with no `DATABASE_URL` and no `PGLITE_DATA_DIR` — CI, or a
+ * preview without either variable set).
  *
  * `scripts/db-prepare.mjs`, the one-shot deploy-time migrate/seed script,
  * deliberately keeps using `drizzle-orm/neon-http` rather than this module:
@@ -89,6 +91,35 @@ const devDataDir = join(root, process.env.PGLITE_DATA_DIR ?? join(".pglite", "de
 
 function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";
+}
+
+/**
+ * Whether this process has an actual database to read/write — Postgres or a
+ * local PGlite instance — as opposed to needing the static
+ * `src/data/merch.ts` fallback that `src/lib/catalog.ts` falls back to.
+ *
+ * This is the one shared rule every "is there a database?" check in the app
+ * should use, so none of them can disagree with what `createDb()` above
+ * actually does:
+ *
+ * - `DATABASE_URL` set -> Postgres (Neon). True.
+ * - Otherwise, `PGLITE_DATA_DIR` set -> `createDb()`'s file-persisted PGlite
+ *   branch opens a database there regardless of `NODE_ENV`. True. This is
+ *   what lets the e2e harness (`playwright.config.ts`) run `next start` with
+ *   `NODE_ENV=production` and no `DATABASE_URL` while still pointing the
+ *   public storefront at the same local database the admin writes to,
+ *   instead of the static fallback.
+ * - Otherwise, outside of `NODE_ENV=production` (`pnpm dev`, Vitest) ->
+ *   `createDb()`'s default file-persisted (or in Vitest, in-memory) PGlite
+ *   instance. True.
+ * - Otherwise — a production build/run with neither `DATABASE_URL` nor
+ *   `PGLITE_DATA_DIR` set, e.g. a Vercel Preview without the variable
+ *   configured, or CI — there is no database to talk to. False.
+ */
+export function hasDatabase(): boolean {
+  if (process.env.DATABASE_URL) return true;
+  if (process.env.PGLITE_DATA_DIR) return true;
+  return process.env.NODE_ENV !== "production";
 }
 
 /**

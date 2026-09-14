@@ -107,23 +107,21 @@ test.describe.serial("admin products sheet", () => {
     await expect(row.getByTestId("stock-cell")).toContainText("50 / 50");
   });
 
-  // Flows 3 and 4 stop short of asserting the *value*/*presence* a saved
-  // price or a Hidden status produces on `/shop/`. `src/lib/catalog.ts`
-  // (`shouldUseFallback`) reads the static `src/data/merch.ts` catalogue,
-  // not the database, for any production build (`next start`, exactly what
-  // `webServer.command` runs) with no `DATABASE_URL` — and
-  // `playwright.config.ts` pins `DATABASE_URL` to `""` on purpose, to keep
-  // this suite off the real Neon database (see its module comment). So in
-  // this harness `/shop/` always renders the static Foam Trucker at its
-  // static $48, regardless of what the admin just saved to PGlite — proven
-  // by running this suite once with a plain `res.text()).toContain("$52")`
-  // assertion here, which failed with the fallback's literal "$48.00" in
-  // the response. That's a property of the e2e environment (a real deploy
-  // sets a real `DATABASE_URL`, so `shouldUseFallback()` is false there and
-  // the same `revalidateTag("catalogue")` these actions already call makes
-  // the shop pick up the change), not a bug in the sheet — so these tests
-  // assert what this harness can actually prove: the admin write persists,
-  // and `/shop/` keeps rendering.
+  // Flows 3 and 4 assert the real thing: `playwright.config.ts` pins
+  // `DATABASE_URL` to `""` and `PGLITE_DATA_DIR` to `.pglite/e2e`, and
+  // `hasDatabase()` (`src/db/client.ts`) treats a set `PGLITE_DATA_DIR` the
+  // same as `DATABASE_URL` regardless of `NODE_ENV` — so `/shop/` reads the
+  // same PGlite database the sheet just wrote to, not the static
+  // `src/data/merch.ts` fallback. The actions already call
+  // `revalidateTag("catalogue")` / `revalidatePath("/shop/")`
+  // (`src/app/(admin)/admin/products/actions.ts`), which should make the
+  // change visible on the very next request — `expect.poll` just absorbs any
+  // scheduling wobble between the Save action's response and the next
+  // `GET /shop/` picking up the revalidated render.
+  async function shopHtml(): Promise<string> {
+    return (await page.request.get("/shop/")).text();
+  }
+
   test("3. saving a price change shows a toast and survives reload", async () => {
     const row = rowBySlug(page, FOAM_TRUCKER_SLUG);
 
@@ -138,9 +136,16 @@ test.describe.serial("admin products sheet", () => {
       "$52.00",
     );
 
-    const res = await page.request.get("/shop/");
-    expect(res.status()).toBe(200);
+    await expect.poll(shopHtml, { timeout: 10_000 }).toContain("$52");
   });
+
+  // The product card's own heading ("THE FOAM TRUCKER", from
+  // `product.displayName[0]`) — not a case-insensitive "Foam Trucker" match,
+  // which would also hit `/shop/`'s static, hardcoded SEO
+  // `<meta name="description">` ("...The Foam Trucker — Blue...", set in
+  // this file above and rendered regardless of the product's live status).
+  // The all-caps display name only ever comes from the actual product row.
+  const FOAM_TRUCKER_HEADING = "THE FOAM TRUCKER";
 
   test("4. toggling Live flips the pill immediately, with a toast and an Undo", async () => {
     const row = rowBySlug(page, FOAM_TRUCKER_SLUG);
@@ -149,11 +154,12 @@ test.describe.serial("admin products sheet", () => {
     await expect(row.getByRole("button", { name: "Hidden", exact: true })).toBeVisible();
     await expect(page.getByRole("status")).toContainText("Now hidden from the shop");
 
+    await expect.poll(shopHtml, { timeout: 10_000 }).not.toContain(FOAM_TRUCKER_HEADING);
+
     await page.getByRole("button", { name: "Undo", exact: true }).click();
     await expect(row.getByRole("button", { name: "Live", exact: true })).toBeVisible();
 
-    const res = await page.request.get("/shop/");
-    expect(res.status()).toBe(200);
+    await expect.poll(shopHtml, { timeout: 10_000 }).toContain(FOAM_TRUCKER_HEADING);
   });
 
   test("5. expanding a row, editing a display line, and reloading with ?open= keeps it open", async () => {
@@ -211,12 +217,11 @@ test.describe.serial("admin products sheet", () => {
     await expect(newRow).toBeVisible();
     await expect(newRow.getByRole("button", { name: "Hidden", exact: true })).toBeVisible();
 
-    // True in this harness either way — see the note above test 3 — but for
-    // a hidden draft specifically it also holds for the reason that matters
-    // in production: it was never published, so it was never in the
-    // catalogue `/shop/` reads to begin with.
-    const html = await (await page.request.get("/shop/")).text();
-    expect(html).not.toContain("E2E Tee");
+    // It was never published, so it was never in the catalogue `/shop/`
+    // reads to begin with — no polling needed, unlike tests 3 and 4 above,
+    // since there's no revalidation to wait on for something that was never
+    // there.
+    expect(await shopHtml()).not.toContain("E2E Tee");
 
     await newRow.getByRole("button", { name: "Hidden", exact: true }).click();
     await expect(page.getByRole("status")).toContainText(/photo/i);

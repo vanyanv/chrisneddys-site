@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-14
+
 ### Changed
 
 - Security headers and cache policy now ship from `next.config.mjs` so they apply on Vercel's server build; Vercel Blob is allowed for product images ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))

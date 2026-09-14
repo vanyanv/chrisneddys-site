@@ -76,6 +76,7 @@ function PriceCell({
       type="button"
       className={`adm-cell-edit${changed ? " is-changed" : ""}${error ? " is-error" : ""}`}
       data-field="price"
+      data-testid="price-cell"
       onClick={() => setEditing(true)}
     >
       <span className="adm-sr-only">Price for {row.name}</span>
@@ -174,6 +175,7 @@ function StockCell({
           type="button"
           className={`adm-cell-edit${changed ? " is-changed" : ""}${error ? " is-error" : ""}`}
           data-field="stock"
+          data-testid="stock-cell"
           onClick={() => setEditing(true)}
         >
           <span className="adm-sr-only">Stock for {row.name}</span>
@@ -193,6 +195,7 @@ function StockCell({
         type="button"
         className={`adm-cell-edit${changed ? " is-changed" : ""}${error ? " is-error" : ""}`}
         data-field="stock"
+        data-testid="stock-cell"
         onClick={() => setEditing(true)}
       >
         <span className="adm-sr-only">Edition size for {row.name}</span>
@@ -277,6 +280,21 @@ export function ProductSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Keeps `?open=` in sync with `openId` from an effect (after commit),
+   * never from inside the click handlers that change `openId` — calling
+   * `router.replace` in the same tick as a state update that other
+   * components read from context is what produces React's "Cannot update
+   * Router while rendering ProductSheet" warning. The ref-guarded compare
+   * against `initialOpenId` skips the redundant replace on first mount. */
+  const syncedOpenIdRef = useRef(initialOpenId);
+  useEffect(() => {
+    if (syncedOpenIdRef.current === openId) return;
+    syncedOpenIdRef.current = openId;
+    router.replace(openId ? `/admin/products?open=${openId}` : "/admin/products", {
+      scroll: false,
+    });
+  }, [openId, router]);
+
   const rowDrag = usePointerListReorder(
     rows.map((r) => r.id),
     (orderedIds) => {
@@ -315,7 +333,6 @@ export function ProductSheet({
     if (collapseTimer.current) clearTimeout(collapseTimer.current);
     setOpenId(id);
     setMountedId(id);
-    router.replace(`/admin/products?open=${id}`, { scroll: false });
     if (!productCache[id]) {
       void loadProductForPanelAction(id).then((product) => {
         if (product) setProductCache((prev) => ({ ...prev, [id]: product }));
@@ -329,7 +346,6 @@ export function ProductSheet({
 
   function collapseRow() {
     setOpenId(null);
-    router.replace("/admin/products", { scroll: false });
     if (collapseTimer.current) clearTimeout(collapseTimer.current);
     collapseTimer.current = setTimeout(() => setMountedId(null), 260);
   }
@@ -575,7 +591,12 @@ export function ProductSheet({
               ) : (
                 <span className="adm-thumb adm-thumb-empty" aria-hidden="true" />
               )}
-              <button type="button" className="adm-name-cell" onClick={() => expandRow(row.id)}>
+              <button
+                type="button"
+                className="adm-name-cell"
+                data-testid="name-cell"
+                onClick={() => expandRow(row.id)}
+              >
                 <span className="adm-name-cell-name">{row.name}</span>
                 <span className="adm-name-cell-slug">/{row.slug}</span>
               </button>
@@ -706,11 +727,15 @@ export function ProductSheet({
 
       {mountedId && isMobile && (
         <div className={`adm-mobile-sheet${openId === mountedId ? " is-open" : ""}`}>
-          <div className="adm-sheet-handle" aria-hidden="true" />
-          <button type="button" className="adm-btn" onClick={collapseRow}>
-            Close
-          </button>
-          <div className="adm-row-expand-grid">{editorNode}</div>
+          <div className="adm-mobile-sheet-header">
+            <div className="adm-sheet-handle" aria-hidden="true" />
+            <button type="button" className="adm-btn" onClick={collapseRow}>
+              Close
+            </button>
+          </div>
+          <div className="adm-mobile-sheet-body">
+            <div className="adm-row-expand-grid">{editorNode}</div>
+          </div>
         </div>
       )}
 

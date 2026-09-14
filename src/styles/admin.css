@@ -471,6 +471,7 @@
   background: var(--a-bg);
   color: var(--a-fg);
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 .adm-textarea {
@@ -641,18 +642,25 @@
   border: 1px solid var(--a-line);
   padding: 8px;
 }
+/* spans the full width of the expanded row's grid (under all three
+   columns), not just the column it happens to be a sibling of, with one
+   hairline above — no boxed card, the row-expand-grid is already the one
+   lifted surface. */
 .adm-editor-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  padding: 12px 14px;
-  margin-top: 4px;
+  border-top: 1px solid var(--a-line);
+  padding-top: 14px;
+  margin-top: 6px;
+}
+.adm-editor-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 .adm-inline-form {
   display: inline-flex;
@@ -664,12 +672,10 @@
 }
 
 /* ---- photos card ---------------------------------------------------------------- */
-.adm-photo-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
+/* `.adm-photo-row` is also used, unchanged, by the sheet's Archived-list
+   disclosure (`ProductSheet.tsx`) for a plain name/slug/Restore row — keep
+   its 3-column layout working for that even though the photos editor below
+   no longer uses it. */
 .adm-photo-row {
   display: grid;
   grid-template-columns: 72px 1fr auto;
@@ -678,20 +684,149 @@
   border: 1px solid var(--a-line);
   padding: 10px;
 }
-.adm-photo-thumb {
-  width: 72px;
-  height: 72px;
-  object-fit: cover;
+/* Compact 3-up thumb grid: 72-96px square cells (capped by max-width, not
+   by a fixed px size, so the same 3 columns hold at both the ~350px desktop
+   column and a 390px phone). */
+.adm-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 300px;
+  margin-bottom: 12px;
+}
+.adm-photo-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
   border: 1px solid var(--a-line);
+  background: var(--a-card);
+  overflow: hidden;
+}
+.adm-photo-cell.is-selected {
+  border-color: var(--a-ink);
+  box-shadow: inset 0 0 0 1px var(--a-ink);
+}
+.adm-photo-cell.is-dragging {
+  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+  z-index: 2;
+}
+.adm-photo-cell-empty {
+  border-style: dashed;
+  background: none;
+}
+.adm-photo-select {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.adm-photo-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
   background: var(--a-cream);
 }
-.adm-photo-fields {
+.adm-photo-add-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--a-sub);
+  cursor: pointer;
+}
+.adm-photo-cell-empty.is-disabled .adm-photo-add-tile {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+/* drag handle and remove control: hidden until the cell is hovered or has
+   focus within (covers touch, where a tap focuses `.adm-photo-select`
+   before any drag/remove happens) — ghost/ink by default, red only on
+   hover/focus, per the "no large red buttons" rule. */
+.adm-photo-drag,
+.adm-photo-remove {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--a-fg);
+  background: var(--a-card);
+  border: 1px solid var(--a-line);
+  opacity: 0;
+  cursor: pointer;
+  transition:
+    opacity 0.18s ease-out,
+    color 0.18s ease-out,
+    border-color 0.18s ease-out;
+}
+.adm-photo-drag {
+  top: 2px;
+  left: 2px;
+  cursor: grab;
+}
+.adm-photo-remove {
+  top: 2px;
+  right: 2px;
+}
+.adm-photo-cell:hover .adm-photo-drag,
+.adm-photo-cell:focus-within .adm-photo-drag,
+.adm-photo-cell.is-dragging .adm-photo-drag {
+  opacity: 1;
+}
+.adm-photo-cell:hover .adm-photo-remove,
+.adm-photo-cell:focus-within .adm-photo-remove,
+.adm-photo-remove:focus-visible,
+.adm-photo-remove.is-confirm {
+  opacity: 1;
+}
+.adm-photo-remove:hover,
+.adm-photo-remove:focus-visible,
+.adm-photo-remove.is-confirm {
+  color: var(--a-red-cta);
+  border-color: var(--a-red-cta);
+}
+.adm-photo-cover-badge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--a-ink);
+  color: var(--a-cream);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 2px 0;
+  pointer-events: none;
+}
+/* the single label/alt editor for whichever thumb is selected */
+.adm-photo-detail {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+  max-width: 300px;
+  margin: 0 0 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--a-line);
 }
-.adm-photo-actions {
+.adm-photo-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 96px));
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.adm-photo-mini-slot {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -746,8 +881,9 @@
 }
 .adm-edition-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 3px;
+  max-width: 360px;
 }
 .adm-edition-cell {
   display: flex;
@@ -1223,6 +1359,9 @@
 .adm-row-expand-grid {
   overflow: hidden;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 1.1fr 1.3fr 1fr;
   gap: 24px;
@@ -1231,9 +1370,18 @@
   border-bottom: 1px solid var(--a-line);
   padding: 22px;
 }
+.adm-row-expand-grid > section {
+  min-width: 0;
+  width: 100%;
+}
 @media (max-width: 900px) {
   .adm-row-expand-grid {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .adm-row-expand-grid {
+    padding: 16px;
   }
 }
 .adm-group-label {
@@ -1261,10 +1409,22 @@
   z-index: 55;
   box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
   transform: translateY(100%);
-  transition: transform 0.22s ease-out;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.22s ease-out,
+    opacity 0.22s ease-out,
+    visibility 0s linear 0.22s;
 }
 .adm-savebar.is-visible {
   transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    transform 0.22s ease-out,
+    opacity 0.22s ease-out;
 }
 .adm-savebar-count {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
@@ -1325,10 +1485,31 @@
     z-index: 56;
     transform: translateY(100%);
     transition: transform 0.22s ease-out;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .adm-mobile-sheet.is-open {
     transform: translateY(0);
+  }
+  /* fixed header (grab handle + Close) stays put; only the body scrolls */
+  .adm-mobile-sheet-header {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 14px 10px;
+    border-bottom: 1px solid var(--a-line);
+    background: var(--a-card);
+  }
+  .adm-mobile-sheet-header .adm-btn {
+    align-self: flex-start;
+  }
+  .adm-mobile-sheet-body {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

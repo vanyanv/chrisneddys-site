@@ -53,7 +53,14 @@ export function RowMenu({ label, actions }: { label: string; actions: RowMenuAct
 
   return (
     <details className="adm-menu-wrap" ref={ref} onKeyDown={onKeyDown}>
-      <summary className="adm-menu-btn" aria-label={label}>
+      {/* `<details>`'s own accessible role is "group", named from the
+       * `<summary>`'s *text* content ("···") — Chromium's accessibility
+       * tree doesn't expose the summary as its own queryable "button" node
+       * the way HTML-AAM's role table implies, so `aria-label` here labels
+       * the toggle for assistive tech that does honour it, but a test (or
+       * any tooling that walks the ax tree) needs `data-testid` to find the
+       * trigger reliably. */}
+      <summary className="adm-menu-btn" aria-label={label} data-testid="row-menu-trigger">
         &middot;&middot;&middot;
       </summary>
       <div className="adm-menu" role="menu">

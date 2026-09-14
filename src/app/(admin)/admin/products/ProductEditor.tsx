@@ -443,12 +443,14 @@ export function ProductEditor({
           <span className="adm-saving-icon" aria-hidden="true" />
           {savingText}
         </span>
-        {product.status === "published" && (
-          <a className="adm-btn" href={`/shop/${product.slug}/`} target="_blank" rel="noreferrer">
-            View on site ↗
-          </a>
-        )}
-        <RowMenu label={`Actions for ${product.name}`} actions={menuActions} />
+        <div className="adm-editor-footer-actions">
+          {product.status === "published" && (
+            <a className="adm-btn" href={`/shop/${product.slug}/`} target="_blank" rel="noreferrer">
+              View on site ↗
+            </a>
+          )}
+          <RowMenu label={`Actions for ${product.name}`} actions={menuActions} />
+        </div>
       </div>
     </>
   );

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Checkout Sessions now declare an explicit product tax code, shipping tax code and tax behavior instead of relying on the Stripe account's preset defaults; the deploy doc's claim that a missing tax registration breaks checkout is corrected to what actually happens, which is silent zero collection
 - Admin: the entire `/admin` interface rendered unstyled — correct typography on a blank white page. `admin.css` draws with 11 `--a-*` tokens that were defined only in `counter.css`, which the admin route group never loads, so every `background`, `border`, `box-shadow` and `color` in it was dropped as invalid at computed-value time. The tokens now live in `src/styles/tokens.css`, imported by both stylesheets
 - Admin: photos seeded from the repo showed as black squares in the product editor and the products table. Those rows store a stem (`front`, `angle`) resolved against the product's `photoDir`, which the admin had no field for and no code path to use — it understood only uploaded Blob URLs. Both now resolve through one helper, the way the storefront always has
 - Admin: the product slug field accepted any value. Its `pattern` was `^[a-z0-9-]+$`, which fails to compile under the `v` flag browsers apply to that attribute, so the invalid regex was discarded along with the validation

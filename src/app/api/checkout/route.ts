@@ -44,6 +44,33 @@ const MAX_LINE_ITEMS = 10;
 const HOLD_MINUTES = 30;
 
 /**
+ * Stripe's product tax code for "Clothing & Footwear" — with `automatic_tax`
+ * on, a line item that doesn't declare one falls back to the account's
+ * default code, and clothing is taxed differently (sometimes exempt) from
+ * that default in several US states. Every product in this catalogue is
+ * apparel, so it's set here rather than left implicit; the moment the
+ * catalogue stops being all apparel, this belongs on the product row
+ * instead, not hardcoded for every line item.
+ */
+const CLOTHING_TAX_CODE = "txcd_30011000";
+
+/**
+ * Stripe's product tax code for "Shipping". Shipping taxability varies by
+ * state (taxable in some, exempt in others, tied to whether the shipped
+ * goods are taxable in a few) — Stripe resolves that from this code rather
+ * than the account's default.
+ */
+const SHIPPING_TAX_CODE = "txcd_92010001";
+
+/**
+ * A stable label for grouping this app's Checkout Sessions in the Stripe
+ * Dashboard, per Stripe's `integration_identifier` guidance — the random
+ * suffix is what that guidance asks for, to keep the identifier unique to
+ * this integration.
+ */
+const INTEGRATION_IDENTIFIER = "chrisneddys-shop-nwwxvyur";
+
+/**
  * How much longer the Stripe Checkout Session's own `expires_at` outlives
  * `HOLD_MINUTES`. Stripe requires `expires_at` to be at least 30 minutes out
  * *measured on Stripe's own clock* — a session created with `expires_at`
@@ -204,7 +231,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           product_data: {
             name: line.product.name,
             images: image ? [image] : undefined,
+            tax_code: CLOTHING_TAX_CODE,
           },
+          // US retail: tax is added on top of the listed price, not baked
+          // into it.
+          tax_behavior: "exclusive",
         },
       };
     }),
@@ -215,6 +246,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     line_items: lineItems,
     phone_number_collection: { enabled: true },
     automatic_tax: { enabled: true },
+    integration_identifier: INTEGRATION_IDENTIFIER,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_EXPIRES_SECONDS,
     metadata: { orderId: pending.orderId, orderNumber: pending.number, fulfilment },
     client_reference_id: pending.orderId,
@@ -230,6 +262,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           type: "fixed_amount",
           fixed_amount: { amount: quote.shippingCents, currency: quote.currency },
           display_name: quote.shippingCents === 0 ? "Free shipping" : "Shipping",
+          tax_code: SHIPPING_TAX_CODE,
+          tax_behavior: "exclusive",
         },
       },
     ];

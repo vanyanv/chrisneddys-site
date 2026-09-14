@@ -110,12 +110,15 @@ describe("POST /api/checkout — shop open", () => {
         product_data: {
           name: "Chris N Eddy's Foam Trucker — Blue (Capsule 01)",
           images: [`${brand.siteUrl}/shop/foam-trucker-blue/front.webp`],
+          tax_code: "txcd_30011000",
         },
+        tax_behavior: "exclusive",
       },
     });
 
     expect(params.phone_number_collection).toEqual({ enabled: true });
     expect(params.automatic_tax).toEqual({ enabled: true });
+    expect(params.integration_identifier).toBe("chrisneddys-shop-nwwxvyur");
     expect(params.client_reference_id).toBeTruthy();
     expect(params.success_url).toBe(
       `${brand.siteUrl}/shop/thanks/?session_id={CHECKOUT_SESSION_ID}`,
@@ -134,6 +137,8 @@ describe("POST /api/checkout — shop open", () => {
     expect(params.shipping_options).toHaveLength(1);
     expect(params.shipping_options[0].shipping_rate_data.fixed_amount.amount).toBe(600);
     expect(params.shipping_options[0].shipping_rate_data.display_name).toBe("Shipping");
+    expect(params.shipping_options[0].shipping_rate_data.tax_code).toBe("txcd_92010001");
+    expect(params.shipping_options[0].shipping_rate_data.tax_behavior).toBe("exclusive");
 
     // The order is pending, reserved, and findable by the session id this
     // route attached to it.

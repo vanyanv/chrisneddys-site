@@ -91,32 +91,47 @@ function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";
 }
 
-let dbPromise: Promise<Db> | null = null;
+/**
+ * A plain module-scope `let` is NOT a true process-wide singleton under
+ * `next dev`: the App Router compiles a module into a separate instance per
+ * webpack "layer" (RSC, the SSR/page render, and the Server Actions
+ * endpoint each get their own copy of this file), so a server action's
+ * `getDb()` and a page's `getDb()` can end up creating two independent
+ * `PGlite` instances pointed at the same `devDataDir`. PGlite can't have two
+ * live instances on one data directory — this surfaced as writes made by a
+ * Server Action (e.g. the Sheet's Save) silently not showing up when the
+ * page re-rendered, and, once a third route triggered a third instance,
+ * outright `RuntimeError: Aborted()` failures. `globalThis` is the one
+ * object every layer's module instance shares within the same Node.js
+ * process, so parking the promise there (Prisma's documented fix for the
+ * same class of bug) makes `getDb()` an actual singleton in dev. Production
+ * (`DATABASE_URL` set, one bundled function, no layer-split dev compiler)
+ * and Vitest (in-memory PGlite, single process) were never affected, so
+ * this only changes behaviour for `pnpm dev`.
+ */
+const globalForDb = globalThis as unknown as {
+  __dbPromise?: Promise<Db> | null;
+  __neonPool?: Pool | null;
+};
 
 /** Creates (once per process) and returns the Drizzle client for this environment. */
 export function getDb(): Promise<Db> {
-  if (!dbPromise) dbPromise = createDb();
-  return dbPromise;
+  if (!globalForDb.__dbPromise) globalForDb.__dbPromise = createDb();
+  return globalForDb.__dbPromise;
 }
 
-// Module-level singleton: one `Pool` per process, reused across every
-// `createDb()` call and every serverless invocation this process handles —
-// never opened per-request, per the driver's own guidance for a long-lived
-// Node.js server/function (as opposed to Edge, where a Pool must live and
-// die within one request).
-let neonPool: Pool | null = null;
-
 function getNeonPool(url: string): Pool {
-  if (!neonPool) {
-    neonPool = new Pool({ connectionString: url });
+  if (!globalForDb.__neonPool) {
+    const pool = new Pool({ connectionString: url });
     // Surface idle-connection errors (e.g. Neon closing a stale socket)
     // instead of letting them become an unhandled 'error' event that
     // crashes the process.
-    neonPool.on("error", (err: Error) => {
+    pool.on("error", (err: Error) => {
       console.error("neon Pool error", err);
     });
+    globalForDb.__neonPool = pool;
   }
-  return neonPool;
+  return globalForDb.__neonPool;
 }
 
 async function createDb(): Promise<Db> {

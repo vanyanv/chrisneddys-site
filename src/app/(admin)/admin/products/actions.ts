@@ -51,6 +51,24 @@ export async function createProductAction(
   redirect(`/admin/products/${id}`);
 }
 
+export type CreateProductPlainResult =
+  | { ok: true; id: string; slug: string }
+  | { ok: false; error: string };
+
+/** The Sheet's inline "+ Add a product" row: a plain (non-FormData, non-
+ * redirecting) equivalent of `createProductAction` so the row can create the
+ * draft, apply its starting price, and expand in place instead of
+ * navigating away to the full editor. */
+export async function createProductPlainAction(name: string): Promise<CreateProductPlainResult> {
+  await requireOwner();
+  const trimmed = name.trim();
+  if (!trimmed) return { ok: false, error: "Give the product a name." };
+
+  const { id, slug } = await createDraft(trimmed);
+  revalidateStorefront(slug);
+  return { ok: true, id, slug };
+}
+
 export type SaveProductState = {
   ok?: boolean;
   error?: string;

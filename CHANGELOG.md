@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Security headers and cache policy now ship from `next.config.mjs` so they apply on Vercel's server build; Vercel Blob is allowed for product images ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))
 - Shop: the catalogue now lives in Postgres (Neon) with the in-repo product as seed and fallback; the site no longer builds as a static export ([#22](https://github.com/vanyanv/chrisneddys-site/issues/22))
 - Performance: the site's CSS is inlined into each exported page instead of loaded as two render-blocking stylesheets, roughly halving first paint on throttled mobile across all routes ([#19](https://github.com/vanyanv/chrisneddys-site/issues/19))
 - Performance: web fonts use `font-display: optional` so text no longer reflows when Bowlby One, Inter, or JetBrains Mono finish loading; on a slow first visit the metric-matched fallback is kept for that page view ([#19](https://github.com/vanyanv/chrisneddys-site/issues/19))

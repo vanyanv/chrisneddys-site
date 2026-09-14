@@ -138,53 +138,14 @@ the build.
 ## Vercel
 
 The app now has a server (`next build` / `next start`), so this is a standard
-Next.js deployment; the redirect and headers still go in `vercel.json`:
+Next.js deployment. The security headers and cache policy above ship from
+`headers()` in `next.config.mjs` — one source for every host, Vercel included,
+so there is no `vercel.json` to add. `img-src` in that CSP also allows Vercel
+Blob (`https://*.public.blob.vercel-storage.com`), where product photos live.
 
-```json
-{
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "chrisneddys.com" }],
-      "destination": "https://www.chrisneddys.com/$1",
-      "permanent": true
-    }
-  ],
-  "headers": [
-    {
-      "source": "/_next/static/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains; preload"
-        },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=()"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://api.web3forms.com https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; upgrade-insecure-requests"
-        }
-      ]
-    }
-  ]
-}
-```
-
-The `/(.*)` block is second on purpose: Vercel applies every matching block, so
-the static-asset rule above still adds its own `Cache-Control` on top.
-
-Add both domains in the project's Domains panel and set `www` as primary —
-Vercel then issues the apex redirect itself, and the `redirects` block above
-becomes belt-and-braces.
+The only thing that still belongs in Vercel's own config is the apex → www
+redirect: add both domains in the project's Domains panel and set `www` as
+primary — Vercel issues the redirect itself, no `redirects` block needed.
 
 ## Netlify / Cloudflare Pages
 

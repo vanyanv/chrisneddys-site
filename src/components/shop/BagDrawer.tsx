@@ -334,7 +334,11 @@ function BagRow({
         )}
       </div>
       <div className="cne-li-b">
-        <span className="n">{line.displayName[1]}</span>
+        {/* Both halves, joined: `displayName` is split for the two-line
+            treatment on the shop grid and the product page, and taking only
+            [1] here left the bag reading "— BLUE". Same one-line form the
+            breadcrumb and the JSON-LD use. */}
+        <span className="n">{line.displayName.join(" ")}</span>
         <span className="v">LIMITED RUN</span>
         <div className="cne-li-ft">
           <div className="cne-qty-sm">

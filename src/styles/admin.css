@@ -1,178 +1,234 @@
 /**
- * The admin shell's own stylesheet — imported only by
- * `src/app/admin/layout.tsx`, never by the storefront. The `--a-*` tokens it
- * draws with come from `./tokens.css`, imported below — the storefront's
- * `counter.css` is never loaded here, so they have to arrive on their own.
- * This file just draws a plainer, denser system on top of
- * them: square corners, ink rules, hard offset shadows, Bowlby One for
- * headings, JetBrains Mono for labels — on-brand, but built for a table and
- * a form rather than a menu board.
+ * The Sheet — the admin shell's stylesheet (`src/app/(admin)/layout.tsx`,
+ * `admin/layout.tsx`, and the packing-slip page import it). Tokens come
+ * from `./tokens.css`, imported below.
+ *
+ * System: 1px `--a-line` hairlines, square corners except pills/circles, no
+ * offset box-shadows. One lifted surface per screen — the slide-in panel /
+ * bottom sheet — carries `0 12px 32px rgba(26,22,18,.14)`; nothing else
+ * does. Bowlby One only on `.adm-h1`, `.adm-btn-primary`, the top-bar
+ * wordmark, and `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
+ * labels/pills/prices/slugs/timestamps. Full primitive reference: CSS.md.
  */
-
 @import "./tokens.css";
-
+* {
+  box-sizing: border-box;
+}
 .adm-shell {
   min-height: 100vh;
   background: var(--a-bg);
   color: var(--a-fg);
   font-family: var(--font-inter), system-ui, sans-serif;
 }
-
 .adm-shell-guest {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--adm-gutter, 20px);
 }
+.adm-shell :focus-visible {
+  outline: 2px solid var(--a-yel-deep);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .adm-shell *,
+  .adm-shell *::before,
+  .adm-shell *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 
-/* ---- top bar ------------------------------------------------------------ */
-
+/* ---- top bar --------------------------------------------------------- */
 .adm-topbar {
   background: var(--a-ink);
   color: var(--a-cream);
-  border-bottom: 3px solid var(--a-ink);
 }
-
 .adm-topbar-inner {
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 12px 16px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 8px 16px;
 }
-
 .adm-brand {
+  order: 1;
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: inherit;
 }
-
-.adm-brand img {
-  height: 28px;
-  width: auto;
-  display: block;
+.adm-wordmark {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
-
 .adm-store-label {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.18em;
   color: var(--a-yel-ink);
-  border-left: 2px solid rgba(255, 242, 201, 0.35);
+  border-left: 1px solid rgba(255, 242, 201, 0.35);
   padding-left: 10px;
 }
-
 .adm-topbar-right {
+  order: 2;
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
 }
-
-.adm-email-chip {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.03em;
-  background: rgba(255, 242, 201, 0.1);
-  border: 1.5px solid rgba(255, 242, 201, 0.3);
-  padding: 5px 9px;
-  color: var(--a-cream);
-  max-width: 42vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ---- body: sidebar + main ------------------------------------------------ */
-
-.adm-body {
-  max-width: 1120px;
-  margin: 0 auto;
+.adm-nav-tabs {
+  order: 3;
+  flex-basis: 100%;
   display: flex;
-  flex-direction: column;
-}
-
-.adm-sidebar {
-  display: flex;
-  gap: 6px;
-  padding: 10px 16px;
-  border-bottom: 2px solid var(--a-line);
+  gap: 22px;
+  justify-content: center;
   overflow-x: auto;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 242, 201, 0.16);
 }
-
-.adm-sidebar a {
+.adm-nav-tab {
+  position: relative;
+  flex: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--a-cream);
+  opacity: 0.72;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 4px 2px 8px;
+  transition: opacity 0.18s ease-out;
+}
+.adm-nav-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--a-yel);
+  transform: scaleX(0);
+  transition: transform 0.2s ease-out;
+}
+.adm-nav-tab:hover {
+  opacity: 1;
+}
+.adm-nav-tab:hover::after {
+  transform: scaleX(1);
+}
+.adm-nav-tab[aria-current="page"] {
+  opacity: 1;
+}
+.adm-nav-tab[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+@media (min-width: 760px) {
+  .adm-topbar-inner {
+    flex-wrap: nowrap;
+    padding: 14px 24px;
+  }
+  .adm-nav-tabs {
+    order: 2;
+    flex: 1;
+    flex-basis: auto;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    overflow: visible;
+  }
+  .adm-topbar-right {
+    order: 3;
+    margin-left: 0;
+  }
+}
+/* light-surface `.adm-pill` (below) overridden here for the ink top bar */
+.adm-topbar-right .adm-pill {
+  background: transparent;
+  border-color: rgba(255, 242, 201, 0.35);
+  color: var(--a-cream);
+}
+.adm-topbar-right .adm-pill::before {
+  background: var(--a-sub);
+}
+/* `.adm-pill`'s is-open/is-live/is-hidden/is-closed modifiers (below) set a
+   text colour at the same specificity as the cream override above — on the
+   ink bar, is-closed's dark `--a-sub` text is ink-on-ink. Pin text to cream
+   for both states here and let only the dot carry the green/muted signal. */
+.adm-topbar-right .adm-pill.is-open,
+.adm-topbar-right .adm-pill.is-closed {
+  color: var(--a-cream);
+}
+.adm-topbar-right .adm-pill.is-open::before {
+  background: var(--a-ok);
+}
+.adm-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--a-yel);
+  color: var(--a-ink);
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  color: var(--a-fg);
-  background: var(--a-card);
-  border: 2px solid var(--a-ink);
-  padding: 8px 12px;
-  white-space: nowrap;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.adm-avatar::-webkit-details-marker {
+  display: none;
+}
+.adm-menu-email {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-sub);
+  word-break: break-all;
+  margin: 0 0 8px;
+  padding: 2px 8px 10px;
+  border-bottom: 1px solid var(--a-line);
+}
+/* rides on `.adm-menu button`'s layout (below); only the colour differs */
+.adm-menu-signout {
+  color: var(--a-red-cta);
 }
 
-.adm-sidebar a[aria-current="page"] {
-  background: var(--a-yel);
-}
-
+/* ---- main -------------------------------------------------------------- */
 .adm-main {
-  flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 20px 16px 48px;
 }
-
-@media (min-width: 900px) {
-  .adm-body {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .adm-sidebar {
-    flex-direction: column;
-    width: 180px;
-    flex-shrink: 0;
-    border-bottom: none;
-    border-right: 2px solid var(--a-line);
-    padding: 24px 16px;
-    /* The base rule scrolls this strip sideways because on a phone it is a
-       horizontal row of tabs. Once it is a column the row can't overflow, and
-       leaving it on paints a scrollbar under the last item. */
-    overflow-x: visible;
-  }
-
-  .adm-sidebar a {
-    width: 100%;
-  }
-
+@media (min-width: 760px) {
   .adm-main {
-    padding: 32px 32px 56px;
+    padding: 32px 24px 56px;
   }
 }
 
-/* ---- typography ----------------------------------------------------------- */
-
+/* ---- typography ---------------------------------------------------------- */
 .adm-h1 {
   font-family: var(--font-bowlby), Impact, sans-serif;
   font-weight: 400;
   line-height: 0.95;
-  font-size: clamp(26px, 4vw, 40px);
+  font-size: clamp(26px, 4vw, 38px);
   margin: 0 0 20px;
 }
-
 .adm-h2 {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-weight: 400;
-  line-height: 1;
-  font-size: 19px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
   margin: 0 0 12px;
 }
-
 .adm-label {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 9.5px;
@@ -182,34 +238,12 @@
   color: var(--a-sub);
 }
 
-/* ---- cards ----------------------------------------------------------------- */
-
-.adm-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 700px) {
-  .adm-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
+/* ---- cards ------------------------------------------------------------------ */
 .adm-card {
   background: var(--a-card);
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-ink);
-  padding: 16px;
+  border: 1px solid var(--a-line);
+  padding: 18px;
 }
-
-.adm-card-num {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-size: 34px;
-  line-height: 1;
-  margin: 6px 0;
-}
-
 .adm-checklist {
   list-style: none;
   margin: 0;
@@ -218,14 +252,12 @@
   flex-direction: column;
   gap: 8px;
 }
-
 .adm-checklist li {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
 }
-
 .adm-check-icon {
   display: inline-flex;
   align-items: center;
@@ -233,173 +265,192 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  border: 1.5px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
 }
-
 .adm-check-icon[data-ok="true"] {
   background: var(--a-ok);
   color: var(--a-cream);
   border-color: var(--a-ok);
 }
-
 .adm-check-icon[data-ok="false"] {
   background: var(--a-card);
   color: var(--a-sub);
 }
 
-/* ---- table ------------------------------------------------------------------ */
-
+/* ---- table ----------------------------------------------------------------- */
 .adm-table-wrap {
   overflow-x: auto;
-  border: 2px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   background: var(--a-card);
 }
-
 .adm-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
-
 .adm-table th,
 .adm-table td {
   text-align: left;
   padding: 10px 12px;
-  border-bottom: 1.5px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
   white-space: nowrap;
 }
-
 .adm-table th {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--a-sub);
+  font-weight: 700;
 }
-
 .adm-table tr:last-child td {
   border-bottom: none;
 }
-
+/* `.adm-chip`: pills for table cells. `.adm-pill` below is the same shape
+   for new markup; both read the same is-live/is-hidden/etc. modifiers. */
 .adm-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border: 1.5px solid var(--a-ink);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--a-line);
+  background: var(--a-card);
+  color: var(--a-fg);
 }
-
-.adm-chip[data-status="published"] {
+.adm-chip[data-status="published"],
+.adm-chip.is-published,
+.adm-chip.is-live,
+.adm-chip[data-order-status="fulfilled"],
+.adm-chip[data-order-status="picked_up"] {
   background: var(--a-ok);
   color: var(--a-cream);
   border-color: var(--a-ok);
 }
-
-.adm-chip[data-status="draft"] {
+.adm-chip[data-status="draft"],
+.adm-chip.is-draft,
+.adm-chip.is-hidden {
   background: var(--a-cream);
+  color: var(--a-fg);
 }
-
-.adm-chip[data-status="archived"] {
+.adm-chip[data-status="archived"],
+.adm-chip.is-archived,
+.adm-chip[data-order-status="cancelled"],
+.adm-chip[data-order-status="pending"] {
   background: var(--a-line);
   color: var(--a-sub);
 }
-
+.adm-chip[data-order-status="ready_for_pickup"] {
+  background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+}
+.adm-chip[data-order-status="refunded"] {
+  background: var(--a-red-cta);
+  color: var(--a-cream);
+  border-color: var(--a-red-cta);
+}
 .adm-empty {
   padding: 20px;
   color: var(--a-sub);
   font-size: 13px;
 }
 
-/* ---- buttons ------------------------------------------------------------------ */
-
+/* ---- buttons ----------------------------------------------------------------- */
 .adm-btn {
-  font-family: var(--font-bowlby), Impact, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 13px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  border: 2px solid var(--a-ink);
+  font-weight: 600;
+  border: 1px solid var(--a-line);
   background: var(--a-card);
   color: var(--a-fg);
-  padding: 9px 14px;
+  padding: 9px 16px;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--a-ink);
+  text-decoration: none;
+  transition:
+    border-color 0.18s ease-out,
+    background-color 0.18s ease-out;
 }
-
-.adm-btn:active {
-  box-shadow: 1px 1px 0 var(--a-ink);
-  transform: translate(2px, 2px);
+.adm-btn:hover {
+  border-color: var(--a-fg);
 }
-
 .adm-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
 }
-
 .adm-btn-primary {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.02em;
   background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+  color: var(--a-ink);
 }
-
+.adm-btn-primary:hover {
+  background: var(--a-yel-ink);
+}
 .adm-btn-danger {
   background: var(--a-red-cta);
+  border-color: var(--a-red-deep);
   color: var(--a-cream);
 }
-
+.adm-btn-danger:hover {
+  background: var(--a-red-deep);
+}
 .adm-btn-block {
   width: 100%;
+  justify-content: center;
 }
 
-/* ---- sign-in card --------------------------------------------------------------- */
-
+/* ---- sign-in card ------------------------------------------------------------- */
 .adm-signin-card {
   width: 100%;
   max-width: 360px;
   background: var(--a-card);
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 5px 5px 0 var(--a-ink);
-  padding: 24px;
+  border: 1px solid var(--a-line);
+  padding: 28px 24px;
 }
-
 .adm-field {
   display: flex;
   flex-direction: column;
   gap: 5px;
   margin-bottom: 14px;
 }
-
 .adm-field input {
   font: inherit;
   font-size: 14px;
-  padding: 9px 10px;
-  border: 2px solid var(--a-ink);
+  padding: 10px 11px;
+  border: 1px solid var(--a-line);
   background: var(--a-bg);
   color: var(--a-fg);
 }
-
 .adm-field input:focus-visible {
-  outline: 2px solid var(--a-red-cta);
+  outline: 2px solid var(--a-yel-deep);
   outline-offset: 1px;
 }
-
 .adm-error {
   font-size: 13px;
   color: var(--a-red-cta);
   margin: 0 0 14px;
 }
-
 .adm-notice {
   font-size: 13px;
   color: var(--a-fg);
   line-height: 1.5;
 }
 
-/* ---- forms (products list + editor) --------------------------------------- */
-
+/* ---- forms (products list + editor) ----------------------------------------- */
 .adm-sr-only {
   position: absolute;
   width: 1px;
@@ -411,69 +462,58 @@
   white-space: nowrap;
   border: 0;
 }
-
 .adm-input,
 .adm-textarea {
   font: inherit;
   font-size: 14px;
   padding: 9px 10px;
-  border: 2px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   background: var(--a-bg);
   color: var(--a-fg);
   width: 100%;
   box-sizing: border-box;
 }
-
 .adm-textarea {
   resize: vertical;
   font-family: inherit;
 }
-
 .adm-input:focus-visible,
 .adm-textarea:focus-visible {
-  outline: 2px solid var(--a-red-cta);
+  outline: 2px solid var(--a-yel-deep);
   outline-offset: 1px;
 }
-
 .adm-help {
   font-size: 12px;
   color: var(--a-sub);
   margin: 4px 0 0;
 }
-
-/* A single field's own validation message — smaller and tighter than
-   `.adm-error`, which sits once at the bottom of a whole form. */
+/* one field's own validation message, vs. `.adm-error`'s one-per-form */
 .adm-field-error {
   font-size: 12px;
   color: var(--a-red-cta);
   margin: 4px 0 0;
 }
-
 .adm-field-row {
   flex-direction: row;
   align-items: center;
   gap: 8px;
 }
-
 .adm-checkbox {
   width: 18px;
   height: 18px;
 }
-
 .adm-grid-2 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
-
 @media (min-width: 520px) {
   .adm-grid-2 {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* ---- products list head + tabs -------------------------------------------- */
-
+/* ---- products list head + status filter tabs -------------------------------- */
 .adm-products-head {
   display: flex;
   flex-wrap: wrap;
@@ -481,43 +521,40 @@
   justify-content: space-between;
   gap: 16px;
 }
-
 .adm-new-product {
   display: flex;
   gap: 8px;
   align-items: flex-start;
   flex-wrap: wrap;
 }
-
 .adm-new-product .adm-input {
   width: auto;
   min-width: 220px;
 }
-
+/* status-filter pills (products/orders lists), distinct from the top-bar's
+   `.adm-nav-tabs`/`.adm-nav-tab` above */
 .adm-tabs {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   margin: 4px 0 16px;
   flex-wrap: wrap;
 }
-
 .adm-tab {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
   text-decoration: none;
   color: var(--a-fg);
   background: var(--a-card);
-  border: 2px solid var(--a-ink);
-  padding: 6px 11px;
+  border: 1px solid var(--a-line);
+  border-radius: 999px;
+  padding: 6px 14px;
 }
-
 .adm-tab[aria-current="page"] {
-  background: var(--a-yel);
+  background: var(--a-ink);
+  color: var(--a-bg);
+  border-color: var(--a-ink);
 }
-
 .adm-row-link {
   display: flex;
   flex-direction: column;
@@ -525,67 +562,57 @@
   text-decoration: none;
   color: inherit;
 }
-
 .adm-product-name {
   font-weight: 600;
 }
-
 .adm-product-slug {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
   color: var(--a-sub);
 }
-
 .adm-thumb {
   display: block;
   width: 40px;
   height: 40px;
   object-fit: cover;
-  border: 1.5px solid var(--a-ink);
+  border: 1px solid var(--a-line);
+  background: var(--a-cream);
 }
-
 .adm-thumb-empty {
-  background: var(--a-ink);
+  background: var(--a-cream);
 }
-
 .adm-inv-untracked {
   color: var(--a-sub);
 }
-
 .adm-inv-edition {
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-width: 90px;
 }
-
 .adm-inv-bar {
-  height: 5px;
+  height: 4px;
   background: var(--a-line);
   width: 100%;
 }
-
 .adm-inv-bar > span {
   display: block;
   height: 100%;
   background: var(--a-ok);
 }
 
-/* ---- editor layout ---------------------------------------------------------- */
-
+/* ---- editor layout ------------------------------------------------------------ */
 .adm-editor-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
   align-items: start;
 }
-
 @media (min-width: 900px) {
   .adm-editor-grid {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   }
 }
-
 .adm-editor-left,
 .adm-editor-right {
   display: flex;
@@ -593,32 +620,27 @@
   gap: 16px;
   min-width: 0;
 }
-
 .adm-product-form {
   display: flex;
   flex-direction: column;
 }
-
 .adm-fact-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
 }
-
 @media (min-width: 520px) {
   .adm-fact-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
-
 .adm-fact-pair {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  border: 1.5px solid var(--a-line);
+  border: 1px solid var(--a-line);
   padding: 8px;
 }
-
 .adm-editor-footer {
   position: sticky;
   bottom: 0;
@@ -628,81 +650,70 @@
   align-items: center;
   gap: 10px;
   background: var(--a-card);
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-ink);
+  border: 1px solid var(--a-line);
   padding: 12px 14px;
   margin-top: 4px;
 }
-
 .adm-inline-form {
   display: inline-flex;
 }
-
 .adm-saved-note {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
   color: var(--a-ok);
 }
 
-/* ---- photos card ------------------------------------------------------------ */
-
+/* ---- photos card ---------------------------------------------------------------- */
 .adm-photo-grid {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 16px;
 }
-
 .adm-photo-row {
   display: grid;
   grid-template-columns: 72px 1fr auto;
   gap: 10px;
   align-items: start;
-  border: 1.5px solid var(--a-line);
+  border: 1px solid var(--a-line);
   padding: 10px;
 }
-
 .adm-photo-thumb {
   width: 72px;
   height: 72px;
   object-fit: cover;
-  border: 1.5px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   display: block;
+  background: var(--a-cream);
 }
-
 .adm-photo-fields {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 .adm-photo-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* ---- inventory card ---------------------------------------------------------- */
-
+/* ---- inventory card --------------------------------------------------------------- */
 .adm-radio-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 12px;
 }
-
 .adm-radio {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
 }
-
 .adm-inv-summary {
   font-size: 13px;
   margin: 14px 0 8px;
 }
-
 .adm-edition-legend {
   display: flex;
   gap: 12px;
@@ -710,61 +721,55 @@
   font-size: 11px;
   margin-bottom: 10px;
 }
-
 .adm-edition-key {
   display: flex;
   align-items: center;
   gap: 5px;
 }
-
 .adm-edition-key::before {
   content: "";
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border: 1.5px solid var(--a-ink);
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--a-line);
 }
-
 .adm-edition-key.is-available::before {
   background: var(--a-card);
 }
-
 .adm-edition-key.is-reserved::before {
   background: var(--a-yel);
+  border-color: var(--a-yel-deep);
 }
-
 .adm-edition-key.is-sold::before {
   background: var(--a-ink);
+  border-color: var(--a-ink);
 }
-
 .adm-edition-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
-  gap: 4px;
+  gap: 3px;
 }
-
 .adm-edition-cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
+  height: 26px;
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 10px;
-  border: 1.5px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   background: var(--a-card);
 }
-
 .adm-edition-cell.is-reserved {
   background: var(--a-yel);
+  border-color: var(--a-yel-deep);
 }
-
 .adm-edition-cell.is-sold {
   background: var(--a-ink);
+  border-color: var(--a-ink);
   color: var(--a-cream);
 }
 
-/* ---- status card -------------------------------------------------------------- */
-
+/* ---- status card -------------------------------------------------------------------- */
 .adm-status-list {
   display: flex;
   flex-direction: column;
@@ -772,82 +777,33 @@
   margin: 0;
   font-size: 13px;
 }
-
 .adm-status-list > div {
   display: flex;
   justify-content: space-between;
   gap: 10px;
 }
-
 .adm-status-list dt {
   color: var(--a-sub);
 }
-
 .adm-status-list dd {
   margin: 0;
   text-align: right;
 }
-
 .adm-mono-value {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
   word-break: break-all;
 }
 
-.adm-chip.is-published {
-  background: var(--a-ok);
-  color: var(--a-cream);
-  border-color: var(--a-ok);
-}
-
-.adm-chip.is-draft {
-  background: var(--a-cream);
-}
-
-.adm-chip.is-archived {
-  background: var(--a-line);
-  color: var(--a-sub);
-}
-
-/* ---- orders desk --------------------------------------------------------- */
-
+/* ---- orders desk ---------------------------------------------------------------------- */
 .adm-money {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
-
 .adm-table td.adm-items-cell {
   white-space: normal;
   max-width: 320px;
 }
-
-.adm-chip[data-order-status="paid"] {
-  background: var(--a-card);
-}
-
-.adm-chip[data-order-status="fulfilled"],
-.adm-chip[data-order-status="picked_up"] {
-  background: var(--a-ok);
-  color: var(--a-cream);
-  border-color: var(--a-ok);
-}
-
-.adm-chip[data-order-status="ready_for_pickup"] {
-  background: var(--a-yel);
-}
-
-.adm-chip[data-order-status="refunded"] {
-  background: var(--a-red-cta);
-  color: var(--a-cream);
-  border-color: var(--a-red-cta);
-}
-
-.adm-chip[data-order-status="cancelled"],
-.adm-chip[data-order-status="pending"] {
-  background: var(--a-line);
-  color: var(--a-sub);
-}
-
 .adm-order-head {
   display: flex;
   flex-wrap: wrap;
@@ -856,7 +812,6 @@
   gap: 16px;
   margin-bottom: 20px;
 }
-
 .adm-order-head-meta {
   display: flex;
   align-items: center;
@@ -866,20 +821,17 @@
   color: var(--a-sub);
   margin-top: 6px;
 }
-
 .adm-order-head-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
-
 .adm-address {
   font-style: normal;
   font-size: 13px;
   line-height: 1.5;
   margin: 0 0 12px;
 }
-
 .adm-timeline {
   list-style: none;
   margin: 0;
@@ -888,30 +840,27 @@
   flex-direction: column;
   gap: 10px;
 }
-
 .adm-timeline li {
   display: flex;
   align-items: baseline;
   gap: 8px;
   font-size: 13px;
-  border-left: 2px solid var(--a-line);
+  border-left: 1px solid var(--a-line);
   padding-left: 10px;
   position: relative;
 }
-
 .adm-timeline-dot {
-  width: 8px;
-  height: 8px;
-  border: 1.5px solid var(--a-ink);
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 1px solid var(--a-yel-deep);
   background: var(--a-yel);
   flex-shrink: 0;
-  margin-left: -15px;
+  margin-left: -14px;
 }
-
 .adm-timeline-label {
   flex: 1;
 }
-
 .adm-timeline-time {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
@@ -919,79 +868,675 @@
   white-space: nowrap;
 }
 
-/* ---- packing slip --------------------------------------------------------- */
-
+/* ---- packing slip ------------------------------------------------------------------------ */
 .adm-slip-noprint {
   margin-bottom: 16px;
 }
-
 .adm-slip-sheet {
   background: var(--a-card);
-  border: 2.5px solid var(--a-ink);
+  border: 1px solid var(--a-line);
   padding: 24px;
   max-width: 480px;
 }
-
 .adm-slip-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  border-bottom: 2px solid var(--a-ink);
+  border-bottom: 1px solid var(--a-ink);
   padding-bottom: 10px;
   margin-bottom: 16px;
 }
-
 .adm-slip-store {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-size: 20px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
 }
-
 .adm-slip-number {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 13px;
 }
-
 .adm-slip-to p {
   font-size: 13px;
   line-height: 1.5;
   margin: 6px 0 16px;
 }
-
 .adm-slip-items {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   margin-bottom: 16px;
 }
-
 .adm-slip-items th,
 .adm-slip-items td {
   text-align: left;
   padding: 6px 4px;
   border-bottom: 1px solid var(--a-line);
 }
-
 .adm-slip-thanks {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-size: 16px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
   text-align: center;
   margin: 20px 0 0;
 }
-
 @media print {
   .adm-topbar,
-  .adm-sidebar,
   .adm-slip-noprint {
     display: none !important;
   }
-
   .adm-main {
     padding: 0;
   }
-
   .adm-slip-sheet {
     border: none;
     box-shadow: none;
     max-width: none;
   }
+}
+/* ==== shared primitives — new for The Sheet; see CSS.md for markup ==== */
+
+/* ---- pill --------------------------------------------------------------- */
+.adm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--a-line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--a-card);
+  color: var(--a-fg);
+}
+.adm-pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--a-sub);
+  flex: none;
+}
+.adm-pill.is-live,
+.adm-pill.is-open {
+  color: var(--a-ok);
+  border-color: var(--a-ok);
+}
+.adm-pill.is-live::before,
+.adm-pill.is-open::before {
+  background: var(--a-ok);
+}
+.adm-pill.is-hidden,
+.adm-pill.is-closed {
+  color: var(--a-sub);
+}
+
+/* ---- toast (fixed, bottom-centre) ---------------------------------------- */
+.adm-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 16px);
+  background: var(--a-ink);
+  color: var(--a-bg);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  z-index: 60;
+  white-space: nowrap;
+}
+.adm-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.adm-toast-undo {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-weight: 700;
+  text-decoration: underline;
+  color: var(--a-yel-ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ---- search field + filter chip ------------------------------------------- */
+.adm-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--a-line);
+  background: var(--a-bg);
+  padding: 8px 13px;
+  width: 220px;
+  max-width: 100%;
+}
+.adm-search svg {
+  flex: none;
+  color: var(--a-sub);
+}
+.adm-search input {
+  border: 0;
+  background: none;
+  outline: 0;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-fg);
+  width: 100%;
+}
+.adm-search input::placeholder {
+  color: var(--a-sub);
+}
+.adm-filter-chip {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--a-line);
+  background: var(--a-bg);
+  color: var(--a-sub);
+  border-radius: 999px;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+.adm-filter-chip.is-on {
+  background: var(--a-ink);
+  color: var(--a-bg);
+  border-color: var(--a-ink);
+}
+
+/* ---- sheet (the products table) -------------------------------------------- */
+/* Row shape shared by the header and every row: handle · thumb · name ·
+   price · stock · live pill · updated · chevron. */
+.adm-sheet-cols,
+.adm-sheet-row {
+  display: grid;
+  grid-template-columns: 24px 40px minmax(160px, 1fr) 84px 140px 100px 84px 28px;
+  column-gap: 12px;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 56px;
+}
+.adm-sheet-cols {
+  border-top: 1px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
+  color: var(--a-sub);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  min-height: 34px;
+}
+.adm-sheet-row {
+  border-bottom: 1px solid var(--a-line);
+  background: var(--a-card);
+  transition:
+    background-color 0.15s ease-out,
+    box-shadow 0.18s ease-out;
+}
+.adm-sheet-row:hover {
+  background: rgba(26, 22, 18, 0.02);
+}
+.adm-sheet-row.is-dragging {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 20px rgba(26, 22, 18, 0.14);
+}
+.adm-drag-handle {
+  color: var(--a-line);
+  cursor: grab;
+  display: flex;
+}
+.adm-drag-handle:hover {
+  color: var(--a-sub);
+}
+@media (max-width: 720px) {
+  .adm-drag-handle {
+    display: none;
+  }
+}
+.adm-chevron-btn {
+  background: none;
+  border: 0;
+  color: var(--a-sub);
+  padding: 6px;
+  display: flex;
+  cursor: pointer;
+}
+.adm-chevron-btn svg {
+  transition: transform 0.15s ease-out;
+}
+.adm-sheet-row.is-expanded .adm-chevron-btn svg {
+  transform: rotate(180deg);
+}
+.adm-add-row {
+  border: 1px dashed var(--a-line);
+  color: var(--a-sub);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.adm-add-row:hover {
+  border-color: var(--a-sub);
+  color: var(--a-fg);
+}
+.adm-add-row.is-editing {
+  border-style: solid;
+  border-color: var(--a-ink);
+  background: var(--a-card);
+  cursor: default;
+}
+
+/* ---- editable cell ---------------------------------------------------------- */
+.adm-cell-edit {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+  cursor: text;
+  position: relative;
+}
+.adm-cell-edit:hover {
+  border-color: var(--a-line);
+}
+.adm-cell-edit.is-editing {
+  border: 1.5px solid var(--a-ink);
+  background: var(--a-card);
+}
+.adm-cell-input {
+  border: 0;
+  background: none;
+  outline: 0;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--a-fg);
+  width: 100%;
+}
+.adm-cell-edit.is-changed {
+  border-left: 3px solid var(--a-yel-deep);
+  padding-left: 5px;
+}
+.adm-cell-edit.is-error {
+  border-left: 3px solid var(--a-red-cta);
+  padding-left: 5px;
+}
+.adm-cell-error {
+  font-size: 11px;
+  color: var(--a-red-cta);
+  margin-top: 3px;
+}
+
+/* ---- stock text (paired with the existing `.adm-inv-bar`) ------------------ */
+.adm-stock {
+  font-size: 13px;
+}
+.adm-stock.is-low {
+  color: var(--a-yel-deep);
+  font-weight: 600;
+}
+.adm-stock.is-out {
+  color: var(--a-red-cta);
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+.adm-restock {
+  font-size: 11px;
+  color: var(--a-fg);
+  text-decoration: underline;
+  flex: none;
+}
+
+/* ---- row expand (accordion area under a sheet row) -------------------------- */
+.adm-row-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.22s ease-out;
+}
+.adm-row-expand.is-open {
+  grid-template-rows: 1fr;
+}
+.adm-row-expand-grid {
+  overflow: hidden;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.1fr 1.3fr 1fr;
+  gap: 24px;
+  background: var(--a-card);
+  border-top: 1px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
+  padding: 22px;
+}
+@media (max-width: 900px) {
+  .adm-row-expand-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.adm-group-label {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  margin: 0 0 13px;
+}
+
+/* ---- save bar (sticky, one lifted surface alongside the row-expand) -------- */
+.adm-savebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--a-ink);
+  color: var(--a-bg);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  z-index: 55;
+  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+  transform: translateY(100%);
+  transition: transform 0.22s ease-out;
+}
+.adm-savebar.is-visible {
+  transform: translateY(0);
+}
+.adm-savebar-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  margin-right: auto;
+}
+.adm-savebar button {
+  border: 0;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  cursor: pointer;
+}
+.adm-savebar-discard {
+  background: none;
+  color: var(--a-bg);
+  border: 1px solid rgba(255, 242, 201, 0.3);
+}
+.adm-savebar-save {
+  background: var(--a-yel);
+  color: var(--a-ink);
+}
+@media (min-width: 900px) {
+  .adm-savebar {
+    left: 50%;
+    right: auto;
+    width: calc(100% - 48px);
+    max-width: 1280px;
+    transform: translate(-50%, 100%);
+  }
+  .adm-savebar.is-visible {
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ---- mobile full-screen sheet (expanded row on phones) ---------------------- */
+.adm-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--a-line);
+  margin: 10px auto 14px;
+  flex: none;
+}
+.adm-mobile-sheet {
+  display: none;
+}
+@media (max-width: 720px) {
+  .adm-mobile-sheet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    background: var(--a-card);
+    z-index: 56;
+    transform: translateY(100%);
+    transition: transform 0.22s ease-out;
+    overflow-y: auto;
+  }
+  .adm-mobile-sheet.is-open {
+    transform: translateY(0);
+  }
+}
+
+/* ---- accordion (details/summary) ------------------------------------------- */
+.adm-accordion {
+  border-top: 1px solid var(--a-line);
+}
+.adm-accordion:last-of-type {
+  border-bottom: 1px solid var(--a-line);
+}
+.adm-accordion summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 2px;
+  font-weight: 500;
+  font-size: 14px;
+}
+.adm-accordion summary::-webkit-details-marker {
+  display: none;
+}
+.adm-accordion-chevron {
+  flex: none;
+  transition: transform 0.18s ease-out;
+}
+.adm-accordion[open] .adm-accordion-chevron {
+  transform: rotate(180deg);
+}
+.adm-accordion-body {
+  padding: 0 2px 16px;
+  font-size: 13.5px;
+  color: var(--a-sub);
+}
+
+/* ---- stepper ---------------------------------------------------------------- */
+.adm-stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.adm-stepper button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--a-line);
+  background: var(--a-card);
+  color: var(--a-fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.adm-stepper button:hover {
+  border-color: var(--a-fg);
+}
+.adm-stepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.adm-stepper-value {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-weight: 700;
+  min-width: 22px;
+  text-align: center;
+}
+
+/* ---- segmented control (chip group) ------------------------------------------ */
+.adm-segmented {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.adm-segmented button {
+  border: 1px solid var(--a-line);
+  border-radius: 999px;
+  background: var(--a-card);
+  color: var(--a-fg);
+  padding: 6px 14px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.adm-segmented button:hover {
+  border-color: var(--a-fg);
+}
+.adm-segmented button.is-active {
+  background: var(--a-ink);
+  color: var(--a-bg);
+  border-color: var(--a-ink);
+}
+
+/* ---- fab (phones only) --------------------------------------------------------- */
+.adm-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--a-yel);
+  border: 1px solid var(--a-yel-deep);
+  color: var(--a-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+  z-index: 40;
+  cursor: pointer;
+}
+@media (min-width: 720px) {
+  .adm-fab {
+    display: none;
+  }
+}
+
+/* ---- menu ("···" dropdown, and the top bar's owner menu) ------------------------ */
+.adm-menu-wrap {
+  position: relative;
+}
+.adm-menu-btn {
+  padding: 6px 9px;
+  border: 1px solid var(--a-line);
+  background: var(--a-card);
+  color: var(--a-fg);
+  cursor: pointer;
+  list-style: none;
+}
+.adm-menu-btn::-webkit-details-marker {
+  display: none;
+}
+.adm-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 180px;
+  background: var(--a-card);
+  border: 1px solid var(--a-line);
+  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+  z-index: 20;
+  padding: 6px;
+}
+.adm-menu button,
+.adm-menu a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: inherit;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.adm-menu button:hover,
+.adm-menu a:hover {
+  background: var(--a-cream);
+}
+
+/* ---- saving indicator --------------------------------------------------------- */
+.adm-saving {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+.adm-saving.is-saved {
+  color: var(--a-ok);
+}
+.adm-saving-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+  background: var(--a-sub);
+}
+.adm-saving.is-saved .adm-saving-icon {
+  background: var(--a-ok);
+}
+
+/* ---- sheet row name cell (product name + slug; reuses `.adm-thumb`
+   for the photo column) --------------------------------------------------- */
+.adm-name-cell {
+  min-width: 0;
+}
+.adm-name-cell-name {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.adm-name-cell-slug {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

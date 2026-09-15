@@ -80,10 +80,11 @@ export async function requestPasswordResetAction(
 
   const throttle = await checkThrottle(db, email, ip, now, PASSWORD_RESET_KIND);
   if (throttle.locked) {
-    // Recorded like every other request below — see the comment there —
-    // so a locked visitor who keeps hammering the form doesn't reset their
-    // own retry window.
-    await recordSignInAttempt(db, email, ip, false, now, PASSWORD_RESET_KIND);
+    // Not recorded as another attempt: this request never reached Better
+    // Auth's own handler, so it's not evidence of anything — recording it
+    // would just re-arm the 15-minute window on every retry while locked,
+    // the same self-sustaining lockout `signIn` had to stop doing (see
+    // `src/lib/auth.ts`).
     console.warn("[forgot-password] request throttled", {
       email,
       ip,

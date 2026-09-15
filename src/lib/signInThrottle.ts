@@ -76,10 +76,17 @@ export type ThrottleStatus = {
 
 /**
  * Whether `email` or `ip` currently has 5+ failed attempts of this `kind` in
- * the last 15 minutes. Counts only failures — a success never needs to
- * "clear" a count, since successes simply aren't counted. `kind` scopes the
- * count to one throttle (e.g. `"sign_in"` vs `"order_lookup"`) so failures
- * recorded under one kind never lock out another.
+ * the last 15 minutes. Counts only failures. `kind` scopes the count to one
+ * throttle (e.g. `"sign_in"` vs `"order_lookup"`) so failures recorded under
+ * one kind never lock out another.
+ *
+ * A success does need to clear a count, though: without `clearFailedAttempts`
+ * below, an owner who mistypes their password a few times and then gets it
+ * right would still be carrying those failures toward the next lockout, and
+ * a channel that never distinguishes "still guessing" from "got in" doesn't
+ * actually stop locking out its rightful owner. Callers that record a
+ * success (e.g. `signIn`) call `clearFailedAttempts` for that email right
+ * after.
  */
 export async function checkThrottle(
   db: Db,
@@ -145,6 +152,31 @@ export async function recordSignInAttempt(
   kind: string = SIGN_IN_KIND,
 ): Promise<void> {
   await db.insert(signInAttempts).values({ email, ip, succeeded, attemptedAt: now, kind });
+}
+
+/**
+ * Deletes `email`'s failure rows for `kind`, so a correct password stops
+ * counting the guesses that came before it. Scoped to the email, never the
+ * IP: failures recorded against a shared IP may belong to other identities
+ * being attacked from it (see `checkThrottle`'s IP channel), and one owner
+ * getting their own password right must not clear those out from under a
+ * concurrent attack on someone else. Only deletes failures — there is
+ * nothing to clear on the `succeeded: true` rows themselves.
+ */
+export async function clearFailedAttempts(
+  db: Db,
+  email: string,
+  kind: string = SIGN_IN_KIND,
+): Promise<void> {
+  await db
+    .delete(signInAttempts)
+    .where(
+      and(
+        eq(signInAttempts.email, email),
+        eq(signInAttempts.kind, kind),
+        eq(signInAttempts.succeeded, false),
+      ),
+    );
 }
 
 /** Deletes `sign_in_attempts` rows older than 24h. Meant to be called

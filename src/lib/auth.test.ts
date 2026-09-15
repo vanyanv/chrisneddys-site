@@ -412,3 +412,131 @@ describe("signIn: legacy password rehash", () => {
     expect(row?.password).toBe(currentHash);
   });
 });
+
+describe("signIn: lockout and recovery (issue #34)", () => {
+  const originalSecret = process.env.AUTH_SECRET;
+
+  beforeEach(() => {
+    process.env.AUTH_SECRET = "test-secret-lockout";
+  });
+
+  afterEach(() => {
+    if (originalSecret === undefined) delete process.env.AUTH_SECRET;
+    else process.env.AUTH_SECRET = originalSecret;
+  });
+
+  it("still locks the channel after five wrong passwords (regression guard)", async () => {
+    const db = await getDb();
+    const email = "five-wrong-guesses@example.com";
+    const ip = "203.0.113.80";
+
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS; i++) {
+      const result = await signIn(email, "wrong password!!", ip);
+      expect(result.ok).toBe(false);
+    }
+
+    const status = await checkThrottle(db, email, ip);
+    expect(status.locked).toBe(true);
+    expect(status.emailFailures).toBe(MAX_FAILED_ATTEMPTS);
+
+    const sixth = await signIn(email, "wrong password!!", ip);
+    expect(sixth.ok).toBe(false);
+    expect(sixth).toMatchObject({ retryAfterSeconds: expect.any(Number) });
+  });
+
+  it("does not increase the recorded failure count while already locked", async () => {
+    const db = await getDb();
+    const email = "locked-no-growth@example.com";
+    const ip = "203.0.113.81";
+
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS; i++) {
+      await signIn(email, "wrong password!!", ip);
+    }
+    const lockedStatus = await checkThrottle(db, email, ip);
+    expect(lockedStatus.locked).toBe(true);
+    expect(lockedStatus.emailFailures).toBe(MAX_FAILED_ATTEMPTS);
+
+    // Further attempts while locked must not record another failure —
+    // otherwise every retry restarts the 15-minute window and the owner is
+    // never able to get back in.
+    for (let i = 0; i < 3; i++) {
+      const result = await signIn(email, "wrong password!!", ip);
+      expect(result.ok).toBe(false);
+    }
+
+    const stillLocked = await checkThrottle(db, email, ip);
+    expect(stillLocked.emailFailures).toBe(MAX_FAILED_ATTEMPTS);
+    expect(stillLocked.ipFailures).toBe(MAX_FAILED_ATTEMPTS);
+  });
+
+  it("a successful sign-in clears that email's prior failures", async () => {
+    const db = await getDb();
+    const email = "mistyped-then-correct@example.com";
+    const password = "the actual correct password!!";
+    const ip = "203.0.113.82";
+    const userId = "mistyped-then-correct-user-id";
+
+    await db.insert(schema.user).values({ id: userId, name: "Owner", email, emailVerified: false });
+    await db.insert(schema.account).values({
+      id: "mistyped-then-correct-account-id",
+      accountId: userId,
+      providerId: "credential",
+      userId,
+      password: await hashPassword(password),
+    });
+
+    // Four wrong guesses — not locked yet.
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 1; i++) {
+      const result = await signIn(email, "wrong password!!", ip);
+      expect(result.ok).toBe(false);
+    }
+    expect((await checkThrottle(db, email, ip)).emailFailures).toBe(MAX_FAILED_ATTEMPTS - 1);
+
+    // The fifth attempt is the correct password.
+    const success = await signIn(email, password, ip);
+    expect(success).toEqual({ ok: true });
+
+    const afterSuccess = await checkThrottle(db, email, ip);
+    expect(afterSuccess.emailFailures).toBe(0);
+    expect(afterSuccess.locked).toBe(false);
+  });
+
+  it("clearing on success is scoped to the email, not shared IP channels or other emails", async () => {
+    const db = await getDb();
+    const ownerAEmail = "owner-a-clears@example.com";
+    const ownerAPassword = "owner a's correct password!!";
+    const ownerAUserId = "owner-a-clears-user-id";
+    const ownerBEmail = "owner-b-untouched@example.com";
+    const sharedIp = "203.0.113.83";
+
+    await db.insert(schema.user).values({
+      id: ownerAUserId,
+      name: "Owner A",
+      email: ownerAEmail,
+      emailVerified: false,
+    });
+    await db.insert(schema.account).values({
+      id: "owner-a-clears-account-id",
+      accountId: ownerAUserId,
+      providerId: "credential",
+      userId: ownerAUserId,
+      password: await hashPassword(ownerAPassword),
+    });
+
+    // Owner B's failed attempts, recorded from the same IP owner A signs in
+    // from below.
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 1; i++) {
+      await recordSignInAttempt(db, ownerBEmail, sharedIp, false);
+    }
+
+    // Owner A signs in correctly from that same shared IP.
+    const success = await signIn(ownerAEmail, ownerAPassword, sharedIp);
+    expect(success).toEqual({ ok: true });
+
+    // Owner B's own failures are untouched by owner A's success, even though
+    // they share an IP.
+    const ownerBStatus = await checkThrottle(db, ownerBEmail, sharedIp);
+    expect(ownerBStatus.emailFailures).toBe(MAX_FAILED_ATTEMPTS - 1);
+    expect(ownerBStatus.ipFailures).toBe(MAX_FAILED_ATTEMPTS - 1);
+  });
+});

@@ -35,7 +35,12 @@ import { account, user } from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
 import { hashPassword, verifyPassword, verifyPasswordDetailed } from "@/lib/password";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
-import { checkThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
+import {
+  checkThrottle,
+  clearFailedAttempts,
+  pruneSignInAttempts,
+  recordSignInAttempt,
+} from "@/lib/signInThrottle";
 
 /** An owner's session, as read back from Better Auth's `session` + `user`
  * rows. `issuedAt` is the session row's `createdAt`, in Unix seconds. */
@@ -199,7 +204,10 @@ export async function requireOwner(): Promise<OwnerSession> {
  * last 15 minutes refuses the request with the same generic error — and,
  * unlike the path below, *without* even asking Better Auth to check the
  * password, since the answer doesn't depend on it at all once a channel is
- * locked — plus a `retryAfterSeconds` hint. `ipOverride` exists only so
+ * locked — plus a `retryAfterSeconds` hint. That refusal is not itself
+ * recorded as an attempt: it never reached a password comparison, so
+ * recording it would just be the lockout re-arming its own 15-minute window
+ * on every retry, locking out the owner forever. `ipOverride` exists only so
  * tests can supply an IP directly; real callers always let it come from
  * `headers()`.
  */
@@ -226,7 +234,6 @@ export async function signIn(
 
   const throttle = await checkThrottle(db, normalizedEmail, ip, now);
   if (throttle.locked) {
-    await recordSignInAttempt(db, normalizedEmail, ip, false, now);
     console.warn("[auth] sign-in throttled", {
       email: normalizedEmail,
       ip,
@@ -266,6 +273,7 @@ export async function signIn(
 
   await applySetCookieHeader(signedIn.setCookieHeader);
   await recordSignInAttempt(db, normalizedEmail, ip, true, now);
+  await clearFailedAttempts(db, normalizedEmail);
 
   // The session is issued — a rehash failing or running slowly from here on
   // must not turn this into a failed sign-in.

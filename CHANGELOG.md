@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Admin: the products area is now one editable sheet. Price, stock and Live/Hidden change in place, a bottom Save bar collects the sweep into one save with Undo, rows expand inline for photos, copy and edition details, rows drag to set the shop order, and a new product is an inline row. Orders and Settings share the calmer shell. ([#28](https://github.com/vanyanv/chrisneddys-site/issues/28))
+- Admin: Orders and Settings adopt the same sheet system as Products. Orders gets search, status chips, two-line rows on phones and a one-surface order page; Settings gets grouped sections, a Save bar that appears only when something changed, and a Connections list. The Chris N Eddy's logo replaces the typed wordmark in the top bar, sign-in and packing slip. ([#32](https://github.com/vanyanv/chrisneddys-site/issues/32))
 - Development: `pnpm test:e2e` runs a Playwright suite against a production build on its own PGlite database (`PGLITE_DATA_DIR`) ([#28](https://github.com/vanyanv/chrisneddys-site/issues/28))
 
 ### Fixed

@@ -5,74 +5,85 @@ import { getStoreSettings } from "@/lib/orders";
 import {
   formatCents,
   formatDateTime,
-  relativeTime,
+  orderStatusPill,
   statusLabel,
   stripePaymentUrl,
 } from "../format";
-import { FulfilmentCard } from "./FulfilmentCard";
+import { AddressBlock, FulfilmentCard } from "./FulfilmentCard";
 import { RefundCard } from "./RefundCard";
+import "@/styles/admin-orders.css";
 
 export const dynamic = "force-dynamic";
 
 type Params = { id: string };
 
-function CustomerCard({ order }: { order: AdminOrderDetail }) {
+function CustomerColumn({
+  order,
+  pickupAddress,
+}: {
+  order: AdminOrderDetail;
+  pickupAddress: string | null;
+}) {
   return (
-    <div className="adm-card">
-      <h2 className="adm-h2">Customer</h2>
-      <dl className="adm-status-list">
-        <div>
-          <dt>Name</dt>
-          <dd>{order.name ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Email</dt>
-          <dd>{order.email ? <a href={`mailto:${order.email}`}>{order.email}</a> : "—"}</dd>
-        </div>
-        <div>
-          <dt>Phone</dt>
-          <dd>{order.phone ?? "—"}</dd>
-        </div>
-      </dl>
-    </div>
+    <section>
+      <h3 className="adm-group-label">Customer</h3>
+      <p className="ord-customer-line">{order.name ?? "—"}</p>
+      <p className="ord-customer-line">
+        {order.email ? <a href={`mailto:${order.email}`}>{order.email}</a> : "—"}
+      </p>
+      <p className="ord-customer-line">{order.phone ?? "—"}</p>
+
+      <h3 className="adm-group-label ord-group-label-spaced">
+        {order.fulfilment === "pickup" ? "Pickup" : "Ship to"}
+      </h3>
+      {order.fulfilment === "pickup" ? (
+        <p className="adm-address ord-mono">{pickupAddress ?? "No pickup address on file."}</p>
+      ) : (
+        <AddressBlock shipTo={order.shipTo} />
+      )}
+    </section>
   );
 }
 
-function ItemsCard({ order }: { order: AdminOrderDetail }) {
+function ItemsColumn({ order }: { order: AdminOrderDetail }) {
   return (
-    <div className="adm-card">
-      <h2 className="adm-h2">Items</h2>
-      <div className="adm-table-wrap">
-        <table className="adm-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Edition</th>
-              <th>Qty</th>
-              <th>Unit price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.productName}</td>
-                <td className="adm-money">{item.editionNumber ? `#${item.editionNumber}` : "—"}</td>
-                <td>{item.quantity}</td>
-                <td className="adm-money">{formatCents(item.unitPriceCents)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+    <section>
+      <h3 className="adm-group-label">Items</h3>
+      <ul className="ord-item-list">
+        {order.items.map((item) => (
+          <li key={item.id} className="ord-item-row">
+            <span className="ord-item-thumb" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <rect x="3" y="7" width="18" height="14" rx="1" />
+                <path d="M8 7V5a4 4 0 0 1 8 0v2" />
+              </svg>
+            </span>
+            <span className="ord-item-info">
+              <span className="ord-item-name">
+                {item.productName}
+                {item.editionNumber && (
+                  <span className="ord-item-edition"> #{item.editionNumber}</span>
+                )}
+              </span>
+              <span className="ord-item-qty">
+                {item.quantity} × {formatCents(item.unitPriceCents)}
+              </span>
+            </span>
+            <span className="ord-item-total adm-money">
+              {formatCents(item.unitPriceCents * item.quantity)}
+            </span>
+          </li>
+        ))}
+      </ul>
 
-function TotalsCard({ order }: { order: AdminOrderDetail }) {
-  return (
-    <div className="adm-card">
-      <h2 className="adm-h2">Totals</h2>
-      <dl className="adm-status-list">
+      <dl className="adm-status-list ord-totals">
         <div>
           <dt>Subtotal</dt>
           <dd className="adm-money">{formatCents(order.subtotalCents)}</dd>
@@ -85,12 +96,28 @@ function TotalsCard({ order }: { order: AdminOrderDetail }) {
           <dt>Tax</dt>
           <dd className="adm-money">{formatCents(order.taxCents)}</dd>
         </div>
-        <div>
+        <div className="ord-total-row">
           <dt>Total</dt>
           <dd className="adm-money">{formatCents(order.totalCents)}</dd>
         </div>
       </dl>
-    </div>
+    </section>
+  );
+}
+
+function ActionsColumn({ order }: { order: AdminOrderDetail }) {
+  return (
+    <section>
+      <h3 className="adm-group-label">Actions</h3>
+      <FulfilmentCard order={order} />
+      <RefundCard order={order} />
+      {order.notes && (
+        <div className="ord-notes">
+          <p className="ord-action-heading">Notes</p>
+          <p className="adm-notice">{order.notes}</p>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -114,11 +141,11 @@ function buildTimeline(order: AdminOrderDetail): TimelineEvent[] {
   return events.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-function TimelineCard({ order }: { order: AdminOrderDetail }) {
+function TimelineSection({ order }: { order: AdminOrderDetail }) {
   const events = buildTimeline(order);
   return (
-    <div className="adm-card">
-      <h2 className="adm-h2">Timeline</h2>
+    <section className="ord-timeline-section">
+      <h3 className="adm-group-label">Timeline</h3>
       <ol className="adm-timeline">
         {events.map((event) => (
           <li key={event.label}>
@@ -128,7 +155,7 @@ function TimelineCard({ order }: { order: AdminOrderDetail }) {
           </li>
         ))}
       </ol>
-    </div>
+    </section>
   );
 }
 
@@ -140,53 +167,51 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const pickupAddress =
     order.fulfilment === "pickup" ? (await getStoreSettings()).pickupAddress : null;
 
+  const pill = orderStatusPill(order.status, order.fulfilment);
+
   return (
     <>
+      <Link href="/admin/orders" className="ord-back-link">
+        ← Orders
+      </Link>
+
       <div className="adm-order-head">
         <div>
           <h1 className="adm-h1">{order.number}</h1>
           <div className="adm-order-head-meta">
-            <span className="adm-chip" data-order-status={order.status}>
-              {statusLabel(order.status)}
+            <span className={`adm-pill ${pill.pillClass}`} title={statusLabel(order.status)}>
+              {pill.label}
             </span>
-            <span>Placed {relativeTime(order.createdAt)}</span>
+            <span className="ord-head-placed">
+              Placed {formatDateTime(order.createdAt)} ·{" "}
+              {order.fulfilment === "ship" ? "Ship" : "Pickup"}
+            </span>
           </div>
         </div>
         <div className="adm-order-head-actions">
+          <Link href={`/admin/orders/${order.id}/packing-slip`} className="adm-btn">
+            Packing slip
+          </Link>
           {order.stripePaymentIntentId && (
             <a
               href={stripePaymentUrl(order.stripePaymentIntentId)}
               target="_blank"
               rel="noreferrer"
-              className="adm-btn"
+              className="ord-text-link"
             >
-              Open in Stripe →
+              Open in Stripe ↗
             </a>
           )}
-          <Link href={`/admin/orders/${order.id}/packing-slip`} className="adm-btn adm-btn-primary">
-            Packing slip
-          </Link>
         </div>
       </div>
 
-      <div className="adm-editor-grid">
-        <div className="adm-editor-left">
-          <CustomerCard order={order} />
-          <FulfilmentCard order={order} pickupAddress={pickupAddress} />
-          <ItemsCard order={order} />
-        </div>
-        <div className="adm-editor-right">
-          <TotalsCard order={order} />
-          <RefundCard order={order} />
-          {order.notes && (
-            <div className="adm-card">
-              <h2 className="adm-h2">Notes</h2>
-              <p className="adm-notice">{order.notes}</p>
-            </div>
-          )}
-          <TimelineCard order={order} />
-        </div>
+      <div className="adm-row-expand-grid">
+        <CustomerColumn order={order} pickupAddress={pickupAddress} />
+        <ItemsColumn order={order} />
+        <ActionsColumn order={order} />
       </div>
+
+      <TimelineSection order={order} />
     </>
   );
 }

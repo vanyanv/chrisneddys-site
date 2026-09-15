@@ -87,6 +87,12 @@ export default defineConfig({
       // Its own data directory — never the developer's `.pglite/dev`.
       PGLITE_DATA_DIR: ".pglite/e2e",
       AUTH_SECRET: "e2e-test-auth-secret-32-characters-minimum-length",
+      // Without this, `src/lib/siteOrigin.ts` would fall through to
+      // `brand.siteUrl` (the real, live chrisneddys.com) when building the
+      // invite/reset link `src/lib/betterAuth.ts` emails out, and spec 5
+      // (`e2e/admin-owner-accounts.spec.ts`) would try to navigate the
+      // invitee there instead of to this disposable test server.
+      SITE_ORIGIN: BASE_URL,
       OWNER_EMAILS: "owner@example.com",
       // Never actually parsed as a hash — see the module comment above.
       OWNER_PASSWORD_HASH: "unused-e2e-owner-password-hash-placeholder",

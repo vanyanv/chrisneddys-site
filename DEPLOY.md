@@ -249,7 +249,13 @@ Better Auth signs sessions with it.
 
 **Inviting an owner.** From `/admin/settings`, an existing owner invites a new
 one by email; the invitee gets a link to set their own password. There is no
-env var to edit and nothing to redeploy.
+env var to edit and nothing to redeploy. That link is always a full URL, not
+a path — it has to work from inside an email client, which has no page to
+resolve a relative link against. It points at `SITE_ORIGIN` if set, or
+otherwise at this site's own canonical domain — `SITE_ORIGIN` only matters
+when the site is being served somewhere other than that canonical domain,
+such as a Vercel preview that needs its emailed link to point back at
+itself.
 
 **Removing an owner.** Also from Settings — removing an owner revokes their
 sessions immediately. You can't remove the last owner or yourself.
@@ -303,6 +309,7 @@ and write real data). Locally they go in `.env.local`, which is gitignored.
 | `AUTH_SECRET`           | Signing `/admin` owner sessions — Better Auth signs with it. Generate with `openssl rand -base64 32`                                                                                                                    | No owner can sign in                                                                                                                             |
 | `OWNER_EMAILS`          | Comma-separated allowlist that seeds the _first_ owner account(s) on first sign-in — see **Owner accounts** above. Ignored once the `user` table has rows                                                               | Nothing to seed — with no owner accounts yet, nobody can sign in. Once accounts exist, unset has no effect                                       |
 | `OWNER_PASSWORD_HASH`   | The password those seeded accounts get, as `scrypt$<cost>$<salt>$<hash>`. Generate with `pnpm owner:password <password>`. Not read after that first sign-in — owners change their own password from Settings afterwards | Nothing to seed — with no owner accounts yet, nobody can sign in. Once accounts exist, unset has no effect                                       |
+| `SITE_ORIGIN`           | Overrides the origin used for the emailed reset/invite link (see **Owner accounts** above) — only matters when the site is served somewhere other than its canonical domain, e.g. a Vercel preview                      | The link uses this site's own canonical domain                                                                                                   |
 | `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com`                                                               | The admin's photo-upload card is disabled; it never writes into `public/`                                                                        |
 | `STRIPE_SECRET_KEY`     | Creating Checkout Sessions. Use a restricted key (`rk_...`) scoped to write on Checkout Sessions and read on Tax — see **Payments** above                                                                               | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
 | `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                                                                              | Checkout stays closed — half a Stripe setup is not enough                                                                                        |

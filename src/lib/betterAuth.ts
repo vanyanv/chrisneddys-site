@@ -48,6 +48,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDb, type Db } from "@/db/client";
 import * as schema from "@/db/schema";
 import { hashPassword, verifyPassword } from "@/lib/password";
+import { absoluteUrl } from "@/lib/siteOrigin";
 
 /**
  * What actually happened when `sendResetPassword` (below) tried to email a
@@ -128,7 +129,13 @@ async function buildAuth(db: Db) {
         // { token, newPassword } })` directly, never through Better Auth's
         // callback route either. So the link this app needs has always been
         // `/admin/reset-password/?token=<token>`, not Better Auth's default.
-        const resetUrl = `/admin/reset-password/?token=${encodeURIComponent(token)}`;
+        //
+        // Built absolute via `absoluteUrl` (`src/lib/siteOrigin.ts`):
+        // root-relative resolves fine on the settings page (which has its
+        // own origin to resolve against) but an email client has none, so a
+        // relative link here would render as literal, unclickable text in
+        // the inbox this is actually meant to reach.
+        const resetUrl = absoluteUrl(`/admin/reset-password/?token=${encodeURIComponent(token)}`);
 
         // An invited owner has a `user` row with no matching `account` row
         // at all — that absence is exactly "has never set a password",

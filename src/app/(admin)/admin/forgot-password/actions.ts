@@ -13,8 +13,21 @@
  * through it, including a thrown error, returns the one generic
  * `GENERIC_MESSAGE` — except the one case that's about this site's own
  * configuration, not about any address: Resend not being set up at all.
+ *
+ * Throttled the same way `signIn` throttles sign-in
+ * (`src/lib/signInThrottle.ts`), on both the submitted email and the caller's
+ * IP, but under its own `"password_reset"` `kind` — a distinct bucket in the
+ * shared `sign_in_attempts` table so flooding this form can never lock an
+ * owner out of signing in, and vice versa. The throttle message is decided
+ * purely from `checkThrottle`'s answer for (email, ip), before Better Auth is
+ * even asked whether the address exists, so it stays exactly as
+ * enumeration-proof as `GENERIC_MESSAGE`: identical for a known and an
+ * unknown address.
  */
+import { getDb } from "@/db/client";
+import { resolveClientIp } from "@/lib/auth";
 import { getAuth } from "@/lib/betterAuth";
+import { checkThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
 
 export type ForgotPasswordState = {
   sent?: boolean;
@@ -23,6 +36,11 @@ export type ForgotPasswordState = {
 };
 
 const GENERIC_MESSAGE = "If that address belongs to an owner, a reset link is on its way.";
+const TOO_MANY_ATTEMPTS_MESSAGE = "Too many requests for that address. Try again later.";
+
+/** Separates this throttle from owner sign-in in the shared
+ * `sign_in_attempts` table — see `src/lib/signInThrottle.ts`. */
+const PASSWORD_RESET_KIND = "password_reset";
 
 /** True once RESEND_API_KEY and EMAIL_FROM are both set — the same pair
  * `src/lib/setupChecklist.ts` checks for its "Email" checklist item, read
@@ -54,6 +72,27 @@ export async function requestPasswordResetAction(
     };
   }
 
+  const db = await getDb();
+  const ip = await resolveClientIp();
+  const now = new Date();
+
+  await pruneSignInAttempts(db, now);
+
+  const throttle = await checkThrottle(db, email, ip, now, PASSWORD_RESET_KIND);
+  if (throttle.locked) {
+    // Recorded like every other request below — see the comment there —
+    // so a locked visitor who keeps hammering the form doesn't reset their
+    // own retry window.
+    await recordSignInAttempt(db, email, ip, false, now, PASSWORD_RESET_KIND);
+    console.warn("[forgot-password] request throttled", {
+      email,
+      ip,
+      emailFailures: throttle.emailFailures,
+      ipFailures: throttle.ipFailures,
+    });
+    return { error: TOO_MANY_ATTEMPTS_MESSAGE };
+  }
+
   const auth = await getAuth();
   try {
     await auth.api.requestPasswordReset({
@@ -67,6 +106,14 @@ export async function requestPasswordResetAction(
     // success.
     console.error("[forgot-password] requestPasswordReset failed", err);
   }
+
+  // Recorded as a failure unconditionally — unlike sign-in, there's no safe
+  // "succeeded" signal here (that would mean an unknown address never counts
+  // toward the limit, since it can never truly "succeed"), and
+  // `checkThrottle` only counts `succeeded: false` rows. Fixing this to
+  // `false` is what makes every request, known address or not, count toward
+  // the same 5-per-15-minutes limit sign-in uses.
+  await recordSignInAttempt(db, email, ip, false, now, PASSWORD_RESET_KIND);
 
   return { sent: true, message: GENERIC_MESSAGE };
 }

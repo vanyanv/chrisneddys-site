@@ -50,6 +50,13 @@
       "when": 1789446882251,
       "tag": "0006_dazzling_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789448442622,
+      "tag": "0007_goofy_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }

@@ -1,33 +1,45 @@
 import "server-only";
 
 /**
- * Owner sign-in — email allowlist + a shared password, hashed and stored
- * only as `OWNER_PASSWORD_HASH`. No third-party auth service: the whole
- * credential story is `src/lib/password.ts` (scrypt) and
- * `src/lib/sessionToken.ts` (HS256 JWT via `jose`), both plain enough to
- * swap for magic-link email later without touching callers of this module.
+ * Owner sign-in — Better Auth (`src/lib/betterAuth.ts`), fronted by this
+ * module so every caller keeps calling `signIn` / `signOut` /
+ * `getOwnerSession` / `requireOwner` exactly as before. See
+ * `docs/superpowers/specs/2026-09-14-better-auth-owner-sign-in-design.md`.
  *
- * The `owners` table (`src/db/schema.ts`) is an optional allowlist upgrade:
- * once it has rows, those rows are the allowlist instead of `OWNER_EMAILS`,
- * and a first successful sign-in seeds it from `OWNER_EMAILS` when it is
- * still empty.
+ * Three things this module does that Better Auth doesn't do on its own:
+ *
+ * - **Throttle.** `src/lib/signInThrottle.ts` wraps every `signIn` call,
+ *   unchanged from the shared-password era — Better Auth's own rate
+ *   limiting stays off.
+ * - **Bootstrap.** The very first sign-in, while the `user` table is still
+ *   empty, seeds one account from `OWNER_EMAILS` + `OWNER_PASSWORD_HASH` —
+ *   see `bootstrapFirstOwnerIfNeeded` below and DEPLOY.md's "Owner
+ *   accounts" section. Once any `user` row exists, both env vars are
+ *   ignored entirely.
+ * - **Legacy rehash.** A sign-in that verifies against a pre-migration
+ *   3-field scrypt hash (`src/lib/password.ts`) is rehashed to the current
+ *   format immediately after — see `rehashLegacyPasswordIfNeeded`.
+ *
+ * Cookies: no `/api/auth/*` route is mounted (see `src/lib/betterAuth.ts`),
+ * so every `auth.api.*` call here that sets or clears a cookie is made with
+ * `returnHeaders: true` and the resulting `Set-Cookie` header is replayed
+ * onto Next's own `cookies()` store by hand (`applySetCookieHeader`) rather
+ * than Better Auth writing it directly.
  */
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getDb } from "@/db/client";
-import { owners } from "@/db/schema";
-import { verifyPassword } from "@/lib/password";
+import { and, eq } from "drizzle-orm";
+import { parseSetCookieHeader, toCookieOptions } from "better-auth/cookies";
+import { getDb, type Db } from "@/db/client";
+import { account, user } from "@/db/schema";
+import { getAuth } from "@/lib/betterAuth";
+import { hashPassword, verifyPassword, verifyPasswordDetailed } from "@/lib/password";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
 import { checkThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
-import {
-  SESSION_COOKIE_NAME,
-  SESSION_MAX_AGE_SECONDS,
-  signSessionToken,
-  verifySessionToken,
-  type OwnerSession,
-} from "@/lib/sessionToken";
 
-export type { OwnerSession };
+/** An owner's session, as read back from Better Auth's `session` + `user`
+ * rows. `issuedAt` is the session row's `createdAt`, in Unix seconds. */
+export type OwnerSession = { email: string; name: string | null; issuedAt: number };
 
 const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
 
@@ -59,21 +71,107 @@ export async function resolveClientIp(ipOverride?: string): Promise<string> {
   );
 }
 
-/** True once AUTH_SECRET, OWNER_EMAILS and OWNER_PASSWORD_HASH are all set. */
+/** True once AUTH_SECRET, OWNER_EMAILS and OWNER_PASSWORD_HASH are all set.
+ * Used by the setup checklist and the sign-in page's "not configured yet"
+ * notice — unrelated to whether sign-in actually works once owner accounts
+ * exist (at that point only `AUTH_SECRET` still matters). */
 export function isAuthConfigured(): boolean {
   return Boolean(
     process.env.AUTH_SECRET && process.env.OWNER_EMAILS && process.env.OWNER_PASSWORD_HASH,
   );
 }
 
-/** Reads and verifies the `cne_owner` cookie. Null when missing/invalid/expired. */
+/** Replays a `Set-Cookie` header Better Auth produced (from an
+ * `auth.api.*` call made with `returnHeaders: true`) onto Next's own
+ * `cookies()` store, so the browser gets the exact cookie(s) Better Auth
+ * intended — name, value and every attribute — without this module having
+ * to know its cookie name or shape. A no-op when there's nothing to set. */
+async function applySetCookieHeader(setCookieHeader: string | null): Promise<void> {
+  if (!setCookieHeader) return;
+  const store = await cookies();
+  for (const [name, attributes] of parseSetCookieHeader(setCookieHeader)) {
+    store.set(name, attributes.value, toCookieOptions(attributes));
+  }
+}
+
+/**
+ * First sign-in, empty `user` table: if `email` is allowlisted in
+ * `OWNER_EMAILS` and `password` verifies against `OWNER_PASSWORD_HASH`,
+ * creates that owner's account with that same password so the
+ * `auth.api.signInEmail` call right after this one succeeds. A no-op the
+ * moment any `user` row exists — both env vars are then ignored forever,
+ * per DEPLOY.md's "Owner accounts" section.
+ */
+async function bootstrapFirstOwnerIfNeeded(
+  db: Db,
+  normalizedEmail: string,
+  password: string,
+): Promise<void> {
+  const [existing] = await db.select({ id: user.id }).from(user).limit(1);
+  if (existing) return;
+
+  const passwordHash = process.env.OWNER_PASSWORD_HASH;
+  if (!passwordHash) return;
+  if (!ownerEmailsFromEnv().includes(normalizedEmail)) return;
+  if (!(await verifyPassword(password, passwordHash))) return;
+
+  const auth = await getAuth();
+  const name = normalizedEmail.split("@")[0] || normalizedEmail;
+  try {
+    await auth.api.signUpEmail({ body: { name, email: normalizedEmail, password } });
+  } catch (err) {
+    // Best-effort: if a concurrent sign-in already created this account
+    // between the empty-table check above and this call, the sign-in that
+    // follows still succeeds against the row that won the race.
+    console.warn("[auth] bootstrap account creation failed", err);
+  }
+}
+
+/**
+ * Rehashes `userId`'s stored credential password if (and only if) it just
+ * verified against a legacy (pre-migration) hash. Called after the session
+ * cookie is already applied, and its own errors are swallowed by the
+ * caller, so a slow or failing rehash can never turn a successful sign-in
+ * into a failure.
+ */
+async function rehashLegacyPasswordIfNeeded(
+  db: Db,
+  userId: string,
+  password: string,
+): Promise<void> {
+  const [credentialAccount] = await db
+    .select({ id: account.id, password: account.password })
+    .from(account)
+    .where(and(eq(account.userId, userId), eq(account.providerId, "credential")));
+  if (!credentialAccount?.password) return;
+
+  const { generation } = await verifyPasswordDetailed(password, credentialAccount.password);
+  if (generation !== "legacy") return;
+
+  const rehashed = await hashPassword(password);
+  await db
+    .update(account)
+    .set({ password: rehashed, updatedAt: new Date() })
+    .where(eq(account.id, credentialAccount.id));
+}
+
+/** Reads the current owner session via Better Auth, from the incoming
+ * request's cookies. Null when there is none, it's expired, or
+ * `AUTH_SECRET` isn't set. */
 export async function getOwnerSession(): Promise<OwnerSession | null> {
   const secret = process.env.AUTH_SECRET;
   if (!secret) return null;
-  const store = await cookies();
-  const token = store.get(SESSION_COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifySessionToken(token, secret);
+
+  const auth = await getAuth();
+  const headerList = await headers();
+  const result = await auth.api.getSession({ headers: headerList });
+  if (!result) return null;
+
+  return {
+    email: result.user.email,
+    name: result.user.name ?? null,
+    issuedAt: Math.floor(result.session.createdAt.getTime() / 1000),
+  };
 }
 
 /**
@@ -92,17 +190,18 @@ export async function requireOwner(): Promise<OwnerSession> {
 }
 
 /**
- * Verifies email + password and, on success, sets the session cookie.
- * Every failure path — unknown email, wrong password, auth not configured —
- * runs the same scrypt derivation and returns the same generic error, so
- * neither timing nor message tells an attacker which part was wrong.
+ * Verifies email + password through Better Auth and, on success, sets the
+ * session cookie. Every failure path — unknown email, wrong password, no
+ * `AUTH_SECRET` configured — returns the same generic error, so the message
+ * never tells an attacker which part was wrong.
  *
  * Throttled first: 5 failed attempts for either the email or the IP in the
  * last 15 minutes refuses the request with the same generic error — and,
- * unlike the paths below, *without* spending a scrypt call, since the answer
- * doesn't depend on the password at all once a channel is locked — plus a
- * `retryAfterSeconds` hint. `ipOverride` exists only so tests can supply an
- * IP directly; real callers always let it come from `headers()`.
+ * unlike the path below, *without* even asking Better Auth to check the
+ * password, since the answer doesn't depend on it at all once a channel is
+ * locked — plus a `retryAfterSeconds` hint. `ipOverride` exists only so
+ * tests can supply an IP directly; real callers always let it come from
+ * `headers()`.
  */
 export async function signIn(
   email: string,
@@ -110,10 +209,9 @@ export async function signIn(
   ipOverride?: string,
 ): Promise<{ ok: true } | { ok: false; error: string; retryAfterSeconds?: number }> {
   const secret = process.env.AUTH_SECRET;
-  const passwordHash = process.env.OWNER_PASSWORD_HASH;
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (!isAuthConfigured() || !secret || !passwordHash) {
+  if (!secret) {
     // Still spend the scrypt call so this path costs the same as a real
     // wrong-password check.
     await verifyPassword(password, "scrypt$00$00");
@@ -142,16 +240,21 @@ export async function signIn(
     };
   }
 
-  const existingOwners = await db.select({ email: owners.email, name: owners.name }).from(owners);
-  const allowlist =
-    existingOwners.length > 0
-      ? existingOwners.map((owner) => owner.email.toLowerCase())
-      : ownerEmailsFromEnv();
-  const allowed = allowlist.includes(normalizedEmail);
+  await bootstrapFirstOwnerIfNeeded(db, normalizedEmail, password);
 
-  const passwordOk = await verifyPassword(password, passwordHash);
+  const auth = await getAuth();
+  let signedIn: { userId: string; setCookieHeader: string | null } | null = null;
+  try {
+    const { headers: outHeaders, response } = await auth.api.signInEmail({
+      body: { email: normalizedEmail, password },
+      returnHeaders: true,
+    });
+    signedIn = { userId: response.user.id, setCookieHeader: outHeaders.get("set-cookie") };
+  } catch {
+    signedIn = null;
+  }
 
-  if (!allowed || !passwordOk) {
+  if (!signedIn) {
     await recordSignInAttempt(db, normalizedEmail, ip, false, now);
     console.warn("[auth] failed sign-in attempt", {
       email: normalizedEmail,
@@ -161,38 +264,32 @@ export async function signIn(
     return { ok: false, error: GENERIC_SIGN_IN_ERROR };
   }
 
-  if (existingOwners.length === 0) {
-    const seedEmails = ownerEmailsFromEnv();
-    if (seedEmails.length > 0) {
-      await db
-        .insert(owners)
-        .values(seedEmails.map((seedEmail) => ({ email: seedEmail })))
-        .onConflictDoNothing();
-    }
-  }
-
-  const matched = existingOwners.find((owner) => owner.email.toLowerCase() === normalizedEmail);
-  const token = await signSessionToken(
-    { email: normalizedEmail, name: matched?.name ?? null },
-    secret,
-  );
-
+  await applySetCookieHeader(signedIn.setCookieHeader);
   await recordSignInAttempt(db, normalizedEmail, ip, true, now);
 
-  const store = await cookies();
-  store.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  });
+  // The session is issued — a rehash failing or running slowly from here on
+  // must not turn this into a failed sign-in.
+  try {
+    await rehashLegacyPasswordIfNeeded(db, signedIn.userId, password);
+  } catch (err) {
+    console.error("[auth] failed to rehash legacy password", err);
+  }
 
   return { ok: true };
 }
 
-/** Clears the owner-session cookie. */
+/** Signs out the current owner: revokes the session server-side (rather
+ * than only clearing a cookie) and clears the cookie in the browser. */
 export async function signOut(): Promise<void> {
-  const store = await cookies();
-  store.delete(SESSION_COOKIE_NAME);
+  const auth = await getAuth();
+  const headerList = await headers();
+  try {
+    const { headers: outHeaders } = await auth.api.signOut({
+      headers: headerList,
+      returnHeaders: true,
+    });
+    await applySetCookieHeader(outHeaders.get("set-cookie"));
+  } catch (err) {
+    console.error("[auth] sign-out failed", err);
+  }
 }

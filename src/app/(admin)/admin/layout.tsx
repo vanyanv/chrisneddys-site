@@ -5,7 +5,7 @@ import { getOwnerSession, requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
-import type { OwnerSession } from "@/lib/sessionToken";
+import type { OwnerSession } from "@/lib/auth";
 
 const NAV = [
   { href: "/admin/products", label: "Products" },

@@ -173,8 +173,8 @@ export const editions = pgTable(
  * generates its own string ids (not `uuid`), so `id` is `text` here, unlike
  * every other table in this file.
  *
- * `owners` (above) is untouched by this addition — dropping it in favour of
- * `user` is a later task, not this one.
+ * `user` replaces the old `owners` allowlist table (dropped in migration
+ * `0007`).
  */
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -225,13 +225,6 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
-
-export const owners = pgTable("owners", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
-  name: text("name"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 /**

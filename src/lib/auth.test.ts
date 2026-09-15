@@ -1,11 +1,12 @@
+import { randomBytes, scrypt } from "node:crypto";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { signSessionToken, verifySessionToken } from "@/lib/sessionToken";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
 import {
   checkIpThrottle,
@@ -15,6 +16,31 @@ import {
   recordSignInAttempt,
 } from "@/lib/signInThrottle";
 
+// `@/lib/auth` carries `import "server-only"`, which throws outside a real
+// Next.js server build — see the note in `src/app/api/checkout/route.test.ts`.
+vi.mock("server-only", () => ({}));
+
+// `signIn` reads/writes the session cookie through `next/headers`, which
+// throws when called outside a real Next.js request — see the note above
+// `getSessionCookie`'s use in `src/middleware.ts`. A tiny in-memory stand-in
+// lets `signIn` run end to end in a unit test; nothing here asserts on the
+// stored cookie itself; that's Better Auth's own concern.
+const cookieStore = new Map<string, string>();
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: (name: string) => (cookieStore.has(name) ? { value: cookieStore.get(name)! } : undefined),
+    set: (name: string, value: string) => {
+      cookieStore.set(name, value);
+    },
+    delete: (name: string) => {
+      cookieStore.delete(name);
+    },
+  }),
+  headers: async () => new Headers(),
+}));
+
+const { signIn } = await import("@/lib/auth");
+
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
 
 beforeAll(async () => {
@@ -22,69 +48,20 @@ beforeAll(async () => {
   await migrate(db, { migrationsFolder });
 });
 
-describe("password hashing", () => {
-  it("round-trips: a hash produced by hashPassword verifies against the same password", async () => {
-    const hash = await hashPassword("correct horse battery staple");
-    expect(hash).toMatch(/^scrypt\$131072\$[0-9a-f]+\$[0-9a-f]+$/);
-    await expect(verifyPassword("correct horse battery staple", hash)).resolves.toBe(true);
-  });
-
-  it("rejects the wrong password", async () => {
-    const hash = await hashPassword("correct horse battery staple");
-    await expect(verifyPassword("wrong password", hash)).resolves.toBe(false);
-  });
-
-  it("rejects a malformed stored hash instead of throwing", async () => {
-    await expect(verifyPassword("anything", "not-a-real-hash")).resolves.toBe(false);
-    await expect(verifyPassword("anything", "")).resolves.toBe(false);
-  });
-
-  it("produces a different salt (and hash) on every call", async () => {
-    const a = await hashPassword("same password");
-    const b = await hashPassword("same password");
-    expect(a).not.toBe(b);
-  });
-});
-
-describe("session JWT", () => {
-  const secret = "test-secret-do-not-use-in-prod";
-
-  it("round-trips a signed token", async () => {
-    const token = await signSessionToken({ email: "owner@example.com", name: "Owner" }, secret);
-    const session = await verifySessionToken(token, secret);
-    expect(session).toEqual({
-      email: "owner@example.com",
-      name: "Owner",
-      issuedAt: expect.any(Number),
-    });
-  });
-
-  it("returns null for a token signed with a different secret", async () => {
-    const token = await signSessionToken({ email: "owner@example.com", name: null }, secret);
-    const session = await verifySessionToken(token, "a-different-secret");
-    expect(session).toBeNull();
-  });
-
-  it("returns null for garbage input", async () => {
-    await expect(verifySessionToken("not-a-jwt", secret)).resolves.toBeNull();
-  });
-
-  it("returns null for an expired token", async () => {
-    // Sign a token whose issuedAt is already 31 days in the past, so its
-    // 30-day expiry has already passed.
-    const now = Math.floor(Date.now() / 1000);
-    const thirtyOneDaysAgo = now - 60 * 60 * 24 * 31;
-    const { SignJWT } = await import("jose");
-    const token = await new SignJWT({ email: "owner@example.com", name: null })
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt(thirtyOneDaysAgo)
-      .setExpirationTime(thirtyOneDaysAgo + 60 * 60 * 24 * 30)
-      .sign(new TextEncoder().encode(secret));
-
-    const session = await verifySessionToken(token, secret);
-    expect(session).toBeNull();
-  });
-});
+/** Hashes `password` the old way: scrypt N=16384, r=8, p=1, 64-byte key —
+ * what every stored owner password looked like before the Better Auth
+ * migration. Mirrors `src/lib/betterAuth.spike.test.ts`'s `legacyHash`. */
+async function legacyHash(password: string): Promise<string> {
+  const scryptAsync = promisify(scrypt) as unknown as (
+    password: string,
+    salt: Buffer,
+    keylen: number,
+    options: Record<string, unknown>,
+  ) => Promise<Buffer>;
+  const salt = randomBytes(16);
+  const key = await scryptAsync(password, salt, 64, { N: 16384, r: 8, p: 1 });
+  return `scrypt$${salt.toString("hex")}$${key.toString("hex")}`;
+}
 
 describe("owner email allowlist normalisation", () => {
   it("lowercases and trims each entry", () => {
@@ -252,9 +229,9 @@ describe("attempt throttle kinds", () => {
     const lookup = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
     expect(lookup.locked).toBe(true);
 
-    const signIn = await checkThrottle(db, email, ip, now, "sign_in");
-    expect(signIn.locked).toBe(false);
-    expect(signIn.ipFailures).toBe(0);
+    const signInThrottle = await checkThrottle(db, email, ip, now, "sign_in");
+    expect(signInThrottle.locked).toBe(false);
+    expect(signInThrottle.ipFailures).toBe(0);
   });
 
   it("locks order lookups for an IP after 10 failed lookups, not before", async () => {
@@ -297,5 +274,141 @@ describe("attempt throttle kinds", () => {
     const status = await checkIpThrottle(db, ip, MAX_LOOKUP_ATTEMPTS, now, "order_lookup");
     expect(status.locked).toBe(false);
     expect(status.failures).toBe(MAX_LOOKUP_ATTEMPTS - 1);
+  });
+});
+
+describe("signIn: bootstrap the first owner account", () => {
+  const originalSecret = process.env.AUTH_SECRET;
+  const originalEmails = process.env.OWNER_EMAILS;
+  const originalHash = process.env.OWNER_PASSWORD_HASH;
+
+  beforeEach(() => {
+    process.env.AUTH_SECRET = "test-secret-bootstrap";
+  });
+
+  afterEach(() => {
+    if (originalSecret === undefined) delete process.env.AUTH_SECRET;
+    else process.env.AUTH_SECRET = originalSecret;
+    if (originalEmails === undefined) delete process.env.OWNER_EMAILS;
+    else process.env.OWNER_EMAILS = originalEmails;
+    if (originalHash === undefined) delete process.env.OWNER_PASSWORD_HASH;
+    else process.env.OWNER_PASSWORD_HASH = originalHash;
+  });
+
+  it("seeds the first account from OWNER_EMAILS/OWNER_PASSWORD_HASH, then ignores the env vars for good", async () => {
+    const email = "bootstrap-owner@example.com";
+    const password = "correct bootstrap password!!";
+    process.env.OWNER_EMAILS = email;
+    process.env.OWNER_PASSWORD_HASH = await hashPassword(password);
+
+    // With an empty `user` table, this is the very first sign-in attempt —
+    // it must both create the account and sign it in.
+    const first = await signIn(email, password, "203.0.113.60");
+    expect(first).toEqual({ ok: true });
+
+    const db = await getDb();
+    const seeded = await db.query.user.findMany({ where: (t, { eq }) => eq(t.email, email) });
+    expect(seeded).toHaveLength(1);
+
+    // Now that `user` has a row, OWNER_EMAILS/OWNER_PASSWORD_HASH are
+    // ignored entirely — a different email that's in the (changed) env var
+    // is never seeded, and signing in with it fails.
+    const otherEmail = "never-seeded@example.com";
+    const otherPassword = "some other password!!";
+    process.env.OWNER_EMAILS = otherEmail;
+    process.env.OWNER_PASSWORD_HASH = await hashPassword(otherPassword);
+
+    const second = await signIn(otherEmail, otherPassword, "203.0.113.61");
+    expect(second.ok).toBe(false);
+
+    const stillNoOtherAccount = await db.query.user.findMany({
+      where: (t, { eq }) => eq(t.email, otherEmail),
+    });
+    expect(stillNoOtherAccount).toHaveLength(0);
+  });
+
+  it("does not seed an account for an email outside OWNER_EMAILS, even with an empty user table", async () => {
+    process.env.OWNER_EMAILS = "allowlisted@example.com";
+    process.env.OWNER_PASSWORD_HASH = await hashPassword("whatever password!!");
+
+    const result = await signIn(
+      "not-allowlisted@example.com",
+      "whatever password!!",
+      "203.0.113.62",
+    );
+    expect(result.ok).toBe(false);
+
+    const db = await getDb();
+    const rows = await db.query.user.findMany({
+      where: (t, { eq }) => eq(t.email, "not-allowlisted@example.com"),
+    });
+    expect(rows).toHaveLength(0);
+  });
+});
+
+describe("signIn: legacy password rehash", () => {
+  const originalSecret = process.env.AUTH_SECRET;
+
+  beforeEach(() => {
+    process.env.AUTH_SECRET = "test-secret-rehash";
+  });
+
+  afterEach(() => {
+    if (originalSecret === undefined) delete process.env.AUTH_SECRET;
+    else process.env.AUTH_SECRET = originalSecret;
+  });
+
+  it("rehashes a legacy-format password to the current format after a successful sign-in", async () => {
+    const db = await getDb();
+    const email = "legacy-rehash-owner@example.com";
+    const password = "a legacy owner password!!";
+    const userId = "legacy-rehash-user-id";
+
+    await db
+      .insert(schema.user)
+      .values({ id: userId, name: "Legacy Owner", email, emailVerified: false });
+    const originalHash = await legacyHash(password);
+    await db.insert(schema.account).values({
+      id: "legacy-rehash-account-id",
+      accountId: userId,
+      providerId: "credential",
+      userId,
+      password: originalHash,
+    });
+
+    const result = await signIn(email, password, "203.0.113.70");
+    expect(result).toEqual({ ok: true });
+
+    const [row] = await db.query.account.findMany({ where: (t, { eq }) => eq(t.userId, userId) });
+    expect(row?.password).not.toBe(originalHash);
+    expect(row?.password).toMatch(/^scrypt\$131072\$[0-9a-f]+\$[0-9a-f]+$/);
+
+    // The rehashed value still verifies the same plaintext password.
+    await expect(verifyPassword(password, row!.password!)).resolves.toBe(true);
+  });
+
+  it("leaves an already-current-format password untouched", async () => {
+    const db = await getDb();
+    const email = "current-format-owner@example.com";
+    const password = "already current format password!!";
+    const userId = "current-format-user-id";
+
+    await db
+      .insert(schema.user)
+      .values({ id: userId, name: "Current Owner", email, emailVerified: false });
+    const currentHash = await hashPassword(password);
+    await db.insert(schema.account).values({
+      id: "current-format-account-id",
+      accountId: userId,
+      providerId: "credential",
+      userId,
+      password: currentHash,
+    });
+
+    const result = await signIn(email, password, "203.0.113.71");
+    expect(result).toEqual({ ok: true });
+
+    const [row] = await db.query.account.findMany({ where: (t, { eq }) => eq(t.userId, userId) });
+    expect(row?.password).toBe(currentHash);
   });
 });

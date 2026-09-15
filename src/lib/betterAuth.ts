@@ -52,6 +52,15 @@ async function buildAuth(db: Db) {
         hash: hashPassword,
         verify: ({ hash, password }) => verifyPassword(password, hash),
       },
+      // Imported lazily (rather than at module scope) so this file can
+      // still be imported into a plain Vitest module — as
+      // `betterAuth.spike.test.ts` does — without pulling in
+      // `src/lib/email.ts`'s `import "server-only"` before anything
+      // actually needs it.
+      sendResetPassword: async ({ user, url }) => {
+        const { sendPasswordReset } = await import("@/lib/email");
+        await sendPasswordReset(user.email, url);
+      },
     },
     session: {
       expiresIn: SESSION_MAX_AGE_SECONDS,

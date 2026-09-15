@@ -34,9 +34,10 @@ export const revalidate = 60;
  *   bought, and — for the Foam Trucker — the edition number assigned to it.
  * - The database is Neon Postgres, read and written through `src/db/client.ts`.
  * - The site is hosted on Vercel (`DEPLOY.md`).
- * - Owners (not customers) sign in at `/admin` — `src/lib/auth.ts` — which
- *   sets the one first-party cookie this site issues, `cne_owner`
- *   (`src/lib/sessionToken.ts`). There is no customer account or password.
+ * - Owners (not customers) sign in at `/admin` — `src/lib/auth.ts`, on
+ *   Better Auth (`src/lib/betterAuth.ts`) — which sets the one first-party
+ *   session cookie this site issues. There is no customer account or
+ *   password.
  * - The analytics are `Analytics.tsx` (GA4) and the Plausible tag in
  *   `layout.tsx`; the event list is the `TrackEvent` union in `lib/track.ts`.
  * - Before checkout, the only thing written to the browser is `cne.bag.v1`

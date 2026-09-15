@@ -2,8 +2,8 @@
  * Generic attempt throttle: reads and writes `sign_in_attempts` and decides
  * whether an email or an IP is currently locked out. Pulled out of
  * `src/lib/auth.ts` (which is `server-only`) so it can be unit tested
- * against a plain PGlite instance — same reasoning as `src/lib/password.ts`,
- * `src/lib/sessionToken.ts` and `src/lib/ownerAllowlist.ts`.
+ * against a plain PGlite instance — same reasoning as `src/lib/password.ts`
+ * and `src/lib/ownerAllowlist.ts`.
  *
  * The table backs more than owner sign-in: every function takes a `kind`
  * (default `"sign_in"`) so unrelated throttles — e.g. the order-lookup form

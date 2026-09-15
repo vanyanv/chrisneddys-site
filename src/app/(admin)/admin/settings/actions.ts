@@ -1,5 +1,6 @@
 "use server";
 
+import { requireOwner } from "@/lib/auth";
 import { saveStoreSettings } from "@/lib/settingsAdmin";
 import type { StoreSettingsPatch } from "@/lib/orders";
 
@@ -26,6 +27,8 @@ export async function saveSettingsAction(
   _prevState: SaveSettingsState | undefined,
   formData: FormData,
 ): Promise<SaveSettingsState> {
+  await requireOwner();
+
   const fieldErrors: Record<string, string> = {};
 
   const storeName = String(formData.get("storeName") ?? "").trim();

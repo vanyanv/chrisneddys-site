@@ -24,7 +24,7 @@ pnpm db:generate     # drizzle-kit generate -> drizzle/*.sql (commit the output)
 pnpm db:migrate      # apply pending migrations (also runs on build via db-prepare.mjs)
 pnpm db:seed         # upsert the seed catalogue
 pnpm db:studio       # drizzle-kit studio
-pnpm owner:password  # print an OWNER_PASSWORD_HASH for a given password
+pnpm owner:password  # print a hash for a password, or --apply <email> <password> to set an owner's password directly (break-glass)
 ```
 
 Run `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, and `pnpm test` before

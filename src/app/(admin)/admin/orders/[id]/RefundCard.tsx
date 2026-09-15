@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { AdminOrderDetail } from "@/lib/ordersAdmin";
 import { formatDateTime } from "../format";
 import { markRefundedAction, type RefundActionState } from "./actions";
@@ -10,6 +11,7 @@ const initial: RefundActionState = {};
 const TOAST_MS = 4000;
 
 export function RefundCard({ order }: { order: AdminOrderDetail }) {
+  const router = useRouter();
   const [state, formAction, pending] = useActionState(markRefundedAction, initial);
   const [armed, setArmed] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -19,10 +21,15 @@ export function RefundCard({ order }: { order: AdminOrderDetail }) {
   useEffect(() => {
     if (wasPending.current && !pending && !state?.error) {
       setToast("Marked refunded");
+      // See `useActionToast` in FulfilmentCard.tsx: this card also reads
+      // straight off the server-fetched `order` prop, so the pill needs an
+      // explicit refresh to pick up the new status after the action.
+      router.refresh();
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => setToast(null), TOAST_MS);
     }
     wasPending.current = pending;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pending, state]);
 
   useEffect(

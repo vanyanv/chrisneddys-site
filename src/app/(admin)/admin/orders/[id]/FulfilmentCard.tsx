@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { AdminOrderDetail } from "@/lib/ordersAdmin";
 import { CARRIERS, formatDateTime, trackingUrl } from "../format";
 import {
@@ -43,22 +44,11 @@ export function AddressBlock({ shipTo }: { shipTo: AdminOrderDetail["shipTo"] })
   );
 }
 
-/** Fires a toast the moment a pending action finishes without an error —
- * shared by the ship/pickup forms below. */
-function useActionToast(pending: boolean, error: string | undefined, message: string) {
+/** A toast message that clears itself after `TOAST_MS`, with a stable
+ * `showToast` setter. */
+function useToast() {
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wasPending = useRef(pending);
-
-  useEffect(() => {
-    if (wasPending.current && !pending && !error) {
-      setToast(message);
-      if (timer.current) clearTimeout(timer.current);
-      timer.current = setTimeout(() => setToast(null), TOAST_MS);
-    }
-    wasPending.current = pending;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending, error]);
 
   useEffect(
     () => () => {
@@ -67,12 +57,52 @@ function useActionToast(pending: boolean, error: string | undefined, message: st
     [],
   );
 
-  return toast;
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setToast(null), TOAST_MS);
+  }, []);
+
+  return [toast, showToast] as const;
+}
+
+/** Calls `onFire()` the moment a pending action finishes without an error,
+ * and refreshes the route — shared by the ship/pickup forms below. These
+ * forms read straight off the server-fetched `order` prop with no local
+ * optimistic state of their own (unlike the products sheet's `ProductSheet`,
+ * which patches its own `rows` state and calls `router.refresh()` as a
+ * belt-and-suspenders background sync), so without an explicit
+ * `router.refresh()` here, a Server Action completing successfully doesn't
+ * by itself re-fetch the page's data — the pill/timeline/action forms would
+ * keep showing the pre-mutation order until the next full reload.
+ *
+ * Deliberately doesn't own toast state itself: `PickupFulfilment` below has
+ * two actions (ready, picked up) that must share *one* toast rather than
+ * each get their own — picking between two independent toasts by
+ * `order.status` raced this same `router.refresh()`: the instant the
+ * refreshed order came back e.g. `ready_for_pickup`, a status-keyed ternary
+ * would swap from the just-fired "Marked ready for pickup" toast to the
+ * still-empty "picked up" one, clearing it before it had a chance to show.
+ */
+function useActionCompletion(pending: boolean, error: string | undefined, onFire: () => void) {
+  const router = useRouter();
+  const wasPending = useRef(pending);
+  const onFireRef = useRef(onFire);
+  onFireRef.current = onFire;
+
+  useEffect(() => {
+    if (wasPending.current && !pending && !error) {
+      onFireRef.current();
+      router.refresh();
+    }
+    wasPending.current = pending;
+  }, [pending, error, router]);
 }
 
 function ShipFulfilment({ order }: { order: AdminOrderDetail }) {
   const [state, formAction, pending] = useActionState(markShippedAction, shipInitial);
-  const toast = useActionToast(pending, state?.error, "Marked shipped");
+  const [toast, showToast] = useToast();
+  useActionCompletion(pending, state?.error, () => showToast("Marked shipped"));
   const url =
     order.carrier && order.trackingNumber ? trackingUrl(order.carrier, order.trackingNumber) : null;
 
@@ -142,8 +172,9 @@ function PickupFulfilment({ order }: { order: AdminOrderDetail }) {
     markPickedUpAction,
     pickedUpInitial,
   );
-  const readyToast = useActionToast(readyPending, readyState?.error, "Marked ready for pickup");
-  const pickedToast = useActionToast(pickedPending, pickedState?.error, "Marked picked up");
+  const [toast, showToast] = useToast();
+  useActionCompletion(readyPending, readyState?.error, () => showToast("Marked ready for pickup"));
+  useActionCompletion(pickedPending, pickedState?.error, () => showToast("Marked picked up"));
 
   return (
     <div className="ord-action-group">
@@ -178,7 +209,7 @@ function PickupFulfilment({ order }: { order: AdminOrderDetail }) {
       ) : (
         <p className="adm-notice">Waiting on payment.</p>
       )}
-      <OrderToast message={order.status === "ready_for_pickup" ? pickedToast : readyToast} />
+      <OrderToast message={toast} />
     </div>
   );
 }

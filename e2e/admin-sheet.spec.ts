@@ -104,7 +104,11 @@ test.describe.serial("admin products sheet", () => {
     await expect(page.getByText("1 change", { exact: true })).toHaveCount(0);
     await expect(page.getByText("2 changes", { exact: true })).toHaveCount(0);
     await expect(row.getByTestId("price-cell")).toContainText("$48.00");
-    await expect(row.getByTestId("stock-cell")).toContainText("50 / 50");
+    // 45, not the edition size 50: `e2e/db-warmup.mjs` seeds four paid
+    // orders against this same product for `admin-orders.spec.ts`, which
+    // between them claim 5 editions (2 + 1 + 1 + 1) via the real `markPaid`
+    // — the true baseline this sheet should revert to on Discard.
+    await expect(row.getByTestId("stock-cell")).toContainText("45 / 50");
   });
 
   // Flows 3 and 4 assert the real thing: `playwright.config.ts` pins

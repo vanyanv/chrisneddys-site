@@ -6,9 +6,11 @@
  * System: 1px `--a-line` hairlines, square corners except pills/circles, no
  * offset box-shadows. One lifted surface per screen — the slide-in panel /
  * bottom sheet — carries `0 12px 32px rgba(26,22,18,.14)`; nothing else
- * does. Bowlby One only on `.adm-h1`, `.adm-btn-primary`, the top-bar
- * wordmark, and `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
- * labels/pills/prices/slugs/timestamps. Full primitive reference: CSS.md.
+ * does. Bowlby One only on `.adm-h1`, `.adm-btn-primary`, and
+ * `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
+ * labels/pills/prices/slugs/timestamps. The brand itself never renders as
+ * type — `.adm-logo`/`.adm-signin-logo`/`.adm-slip-logo` are all the same
+ * `/cne-logo.webp` mark, sized per surface. Full primitive reference: CSS.md.
  */
 @import "./tokens.css";
 * {
@@ -62,12 +64,10 @@
   text-decoration: none;
   color: inherit;
 }
-.adm-wordmark {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+.adm-logo {
+  height: 22px;
+  width: auto;
+  display: block;
 }
 .adm-store-label {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
@@ -148,6 +148,9 @@
   .adm-topbar-right {
     order: 3;
     margin-left: 0;
+  }
+  .adm-logo {
+    height: 34px;
   }
 }
 /* light-surface `.adm-pill` (below) overridden here for the ink top bar */
@@ -420,6 +423,12 @@
   background: var(--a-card);
   border: 1px solid var(--a-line);
   padding: 28px 24px;
+}
+.adm-signin-logo {
+  display: block;
+  height: 36px;
+  width: auto;
+  margin: 0 auto 20px;
 }
 .adm-field {
   display: flex;
@@ -1017,15 +1026,15 @@
 .adm-slip-head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   border-bottom: 1px solid var(--a-ink);
   padding-bottom: 10px;
   margin-bottom: 16px;
 }
-.adm-slip-store {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 17px;
+.adm-slip-logo {
+  height: 24px;
+  width: auto;
+  display: block;
 }
 .adm-slip-number {
   font-family: var(--font-mono-jb), ui-monospace, monospace;

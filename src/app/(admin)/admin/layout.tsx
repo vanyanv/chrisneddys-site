@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { headers } from "next/headers";
 import { getOwnerSession, requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
@@ -65,7 +66,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="adm-topbar">
         <div className="adm-topbar-inner">
           <Link href="/admin/products" className="adm-brand">
-            <span className="adm-wordmark">CHRIS N EDDY&rsquo;S</span>
+            <Image
+              src="/cne-logo.webp"
+              alt="Chris N Eddy's"
+              width={309}
+              height={89}
+              className="adm-logo"
+              priority
+            />
             <span className="adm-store-label">STORE</span>
           </Link>
 

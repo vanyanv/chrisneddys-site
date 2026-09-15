@@ -1,12 +1,16 @@
 /**
  * The catalogue layer — the ONLY module the app reads products through.
  *
- * In production (`DATABASE_URL` set) and in local dev (no `DATABASE_URL`,
- * which runs against a file-persisted PGlite database — see
- * `src/db/client.ts`) this reads Postgres. A production build with no
- * `DATABASE_URL` — CI, or a preview deploy that has not been given one —
- * falls back to the in-repo `merch` array instead, so the site still builds
- * and renders the shop with no database reachable at all.
+ * In production (`DATABASE_URL` set), in local dev (no `DATABASE_URL`, which
+ * runs against a file-persisted PGlite database — see `src/db/client.ts`),
+ * and anywhere `PGLITE_DATA_DIR` points at a PGlite database (regardless of
+ * `NODE_ENV` — this is how the e2e harness proves admin writes reach the
+ * storefront without a real `DATABASE_URL`), this reads a real database. A
+ * production build/run with neither `DATABASE_URL` nor `PGLITE_DATA_DIR` set
+ * — CI, or a preview deploy that has not been given one — falls back to the
+ * in-repo `merch` array instead, so the site still builds and renders the
+ * shop with no database reachable at all. `hasDatabase()` in
+ * `src/db/client.ts` is the shared rule behind all of this.
  *
  * Reads are cached with `unstable_cache`, tagged `"catalogue"`, `revalidate:
  * 60`. That is the stable Next 15 API for this: the newer `"use cache"` /
@@ -15,9 +19,9 @@
  * rendering mode). Phase 2's admin can call `revalidateTag("catalogue")`
  * after a write and every cached read here picks it up immediately.
  */
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { getDb } from "@/db/client";
+import { getDb, hasDatabase } from "@/db/client";
 import { products, type AuthenticityFact } from "@/db/schema";
 import { merch, MERCH_UPDATED, type MerchProduct, type MerchView } from "@/data/merch";
 
@@ -29,16 +33,13 @@ function isTestEnv(): boolean {
 }
 
 /**
- * True for a production build with no database to talk to — CI, or a
- * preview deploy without `DATABASE_URL`. False for `pnpm dev` (a local
- * PGlite database is bootstrapped for it) and for tests (which run their
- * own PGlite instance and expect real query results).
+ * True when this process has no database to talk to — see `hasDatabase()`
+ * in `src/db/client.ts` for the shared rule (Postgres via `DATABASE_URL`,
+ * then PGlite via `PGLITE_DATA_DIR` regardless of `NODE_ENV`, then the local
+ * dev/test PGlite default, then this static fallback).
  */
 function shouldUseFallback(): boolean {
-  if (process.env.DATABASE_URL) return false;
-  if (isTestEnv()) return false;
-  if (process.env.NODE_ENV === "development") return false;
-  return true;
+  return !hasDatabase();
 }
 
 type ProductRow = typeof products.$inferSelect;
@@ -126,6 +127,7 @@ async function queryPublishedProducts(): Promise<MerchProduct[]> {
   const rows = await db.query.products.findMany({
     where: eq(products.status, "published"),
     with: { images: true },
+    orderBy: [asc(products.position), asc(products.createdAt)],
   });
   return rows.map(mapProductRow);
 }

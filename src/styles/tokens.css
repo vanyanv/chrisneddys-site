@@ -33,6 +33,14 @@
   --a-shadow: #1a1612;
   /* Red that cream text can sit on at 4.5:1. See --a-red for the display red. */
   --a-red-cta: #d0281c;
+  /* The Sheet (/admin): a shade under the primary yellow, for the 1px border
+     that keeps a flat yellow button from melting into the paper background,
+     and for its hover fill. Documented in DESIGN.md's `yellow-deep`. */
+  --a-yel-deep: #e09e0e;
+  /* The Sheet (/admin): a shade under --a-red-cta, for a destructive button's
+     border and hover fill, the same way --a-yel-deep relates to --a-yel.
+     Documented in DESIGN.md's `red-deep`. */
+  --a-red-deep: #b41d14;
   /* How much of the top of the viewport the sticky header owns, plus air: the
      header is 85px with the tab strip on a phone and 76px once the desktop
      one collapses to a single row. The surplus is not padding for its own

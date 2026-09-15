@@ -1,18 +1,19 @@
 import { fileURLToPath } from "node:url";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
-import { getDb } from "@/db/client";
+import { getDb, hasDatabase } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { editions, productImages, variants } from "@/db/schema";
+import { editions, productImages, products, variants } from "@/db/schema";
 import {
   catalogueUpdatedAt,
   getInventory,
   getProductBySlug,
   listPublishedProducts,
 } from "@/lib/catalog";
+import { addImage, createDraft, setStatus } from "@/lib/catalogAdmin";
 import { merch } from "@/data/merch";
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
@@ -117,6 +118,41 @@ describe("catalogueUpdatedAt", () => {
   });
 });
 
+// Placed after "seed idempotency" (which asserts exact row counts) since
+// this adds its own products/images.
+describe("listPublishedProducts ordering", () => {
+  it("orders by position asc, then createdAt — following a reorder", async () => {
+    const db = await getDb();
+
+    const a = await createDraft("Ordering Product A");
+    const b = await createDraft("Ordering Product B");
+    for (const draft of [a, b]) {
+      await addImage({
+        productId: draft.id,
+        kind: "view",
+        viewId: crypto.randomUUID(),
+        label: "FRONT",
+        alt: "front view alt text",
+        urlFull: "https://example.com/order.webp",
+        urlThumb: "https://example.com/order-thumb.webp",
+        width: 720,
+        height: 720,
+      });
+      await setStatus(draft.id, "published");
+    }
+
+    // b was created after a, so plain creation order already puts a first —
+    // explicitly force the opposite order via position to prove the query
+    // sorts by position rather than insertion/createdAt order.
+    await db.update(products).set({ position: 0 }).where(eq(products.id, b.id));
+    await db.update(products).set({ position: 1 }).where(eq(products.id, a.id));
+
+    const published = await listPublishedProducts();
+    const slugs = published.map((p) => p.slug);
+    expect(slugs.indexOf(b.slug)).toBeLessThan(slugs.indexOf(a.slug));
+  });
+});
+
 // Runs last: it sells editions out from under the run the earlier tests in
 // this file assert is untouched (50 of 50 available, every row "available").
 describe("getInventory after editions sell", () => {
@@ -137,5 +173,62 @@ describe("getInventory after editions sell", () => {
       available: 13,
       editionSize: 50,
     });
+  });
+});
+
+// `hasDatabase()` (in `src/db/client.ts`) is the shared rule
+// `shouldUseFallback()` here delegates to for whether the storefront reads
+// this file's PGlite/Postgres, or the static `src/data/merch.ts` fallback.
+// Vitest itself runs with `NODE_ENV=test` and `VITEST=true`, so these tests
+// save and restore all four env vars the rule reads, to exercise it as if
+// running outside Vitest without disturbing any other test in this file.
+describe("hasDatabase", () => {
+  // `NODE_ENV` is typed `readonly` (Next.js's global env augmentation), so
+  // every read/write here goes through this mutable view instead of
+  // `process.env` directly.
+  const env = process.env as Record<string, string | undefined>;
+
+  const ENV_KEYS = ["DATABASE_URL", "PGLITE_DATA_DIR", "NODE_ENV", "VITEST"] as const;
+  const original: Record<(typeof ENV_KEYS)[number], string | undefined> = {
+    DATABASE_URL: undefined,
+    PGLITE_DATA_DIR: undefined,
+    NODE_ENV: undefined,
+    VITEST: undefined,
+  };
+
+  beforeEach(() => {
+    for (const key of ENV_KEYS) {
+      original[key] = env[key];
+      delete env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const key of ENV_KEYS) {
+      if (original[key] === undefined) delete env[key];
+      else env[key] = original[key];
+    }
+  });
+
+  it("is true whenever DATABASE_URL is set, regardless of NODE_ENV", () => {
+    env.DATABASE_URL = "postgres://example";
+    env.NODE_ENV = "production";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is true when PGLITE_DATA_DIR is set even under NODE_ENV=production with no DATABASE_URL", () => {
+    env.NODE_ENV = "production";
+    env.PGLITE_DATA_DIR = ".pglite/e2e";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is true outside production with neither DATABASE_URL nor PGLITE_DATA_DIR set", () => {
+    env.NODE_ENV = "development";
+    expect(hasDatabase()).toBe(true);
+  });
+
+  it("is false under NODE_ENV=production with neither DATABASE_URL nor PGLITE_DATA_DIR set", () => {
+    env.NODE_ENV = "production";
+    expect(hasDatabase()).toBe(false);
   });
 });

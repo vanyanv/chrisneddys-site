@@ -1,0 +1,345 @@
+/**
+ * The Sheet, applied to /admin/orders and /admin/orders/[id]. Everything
+ * here is new or additive — admin.css (imported once by the admin layout,
+ * so all of its shared primitives are already in scope here too) is never
+ * edited by this file. Where a class name matches one from admin.css
+ * (`.adm-pill.is-yellow`, `a.adm-filter-chip`) this only *adds* a rule the
+ * base file doesn't define; where the shape is orders-specific (the list's
+ * column grid, the detail page's item rows) it gets its own `ord-` prefix
+ * so it can never collide with or shadow a rule products/the shell rely on.
+ */
+
+/* ---- list header --------------------------------------------------------- */
+.ord-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ord-count {
+  display: block;
+  margin-top: 6px;
+}
+.ord-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 20px;
+}
+a.adm-filter-chip {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---- status pill: the one tone admin.css doesn't already provide -------- */
+.adm-pill.is-yellow {
+  color: var(--a-yel-deep);
+  border-color: var(--a-yel-deep);
+}
+.adm-pill.is-yellow::before {
+  background: var(--a-yel-deep);
+}
+
+/* ---- list: search + sheet rows ------------------------------------------- */
+.ord-search {
+  margin: 4px 0 16px;
+}
+.ord-sheet {
+  margin-top: 4px;
+}
+.ord-cols,
+.ord-row {
+  display: grid;
+  grid-template-columns: 104px 92px minmax(150px, 1fr) minmax(190px, 1.4fr) 88px 92px 122px;
+  column-gap: 16px;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 56px;
+}
+.ord-cols {
+  border-top: 1px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
+  color: var(--a-sub);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  min-height: 34px;
+}
+.ord-row {
+  border-bottom: 1px solid var(--a-line);
+  background: var(--a-card);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease-out;
+}
+.ord-row:hover {
+  background: rgba(26, 22, 18, 0.02);
+}
+.ord-cell-num {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.ord-cell-placed {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--a-sub);
+}
+.ord-cell-customer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ord-customer-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ord-customer-email {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--a-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ord-cell-items {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--a-fg);
+}
+.ord-items-first {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ord-items-more {
+  flex: none;
+  color: var(--a-sub);
+}
+.ord-fulfil-tag {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+.ord-cell-total {
+  text-align: right;
+  font-size: 13px;
+}
+.ord-cell-status {
+  justify-self: start;
+}
+@media (max-width: 720px) {
+  .ord-cols {
+    display: none;
+  }
+  .ord-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "num status"
+      "customer total";
+    row-gap: 6px;
+    padding: 12px 16px;
+    min-height: 0;
+    align-items: start;
+  }
+  .ord-cell-num {
+    grid-area: num;
+  }
+  .ord-cell-status {
+    grid-area: status;
+    justify-self: end;
+  }
+  .ord-cell-customer {
+    grid-area: customer;
+  }
+  .ord-cell-total {
+    grid-area: total;
+    align-self: end;
+    justify-self: end;
+  }
+  .ord-cell-placed,
+  .ord-cell-items,
+  .ord-fulfil-tag {
+    display: none;
+  }
+}
+
+/* ---- detail: header strip ------------------------------------------------- */
+.ord-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--a-sub);
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+.ord-back-link:hover {
+  color: var(--a-fg);
+  text-decoration: underline;
+}
+.ord-head-placed {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--a-sub);
+}
+.ord-text-link {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  color: var(--a-fg);
+}
+
+/* ---- detail: three-column body (reuses .adm-row-expand-grid as a static,
+   always-open layout — no .adm-row-expand wrapper, so no collapse) -------- */
+.ord-group-label-spaced {
+  margin-top: 20px;
+}
+.ord-customer-line {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 4px;
+}
+.ord-mono {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+}
+
+.ord-item-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ord-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--a-line);
+}
+.ord-item-row:last-child {
+  border-bottom: 0;
+}
+.ord-item-thumb {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--a-line);
+  background: var(--a-cream);
+  color: var(--a-sub);
+}
+.ord-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ord-item-name {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.ord-item-edition {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--a-sub);
+}
+.ord-item-qty {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--a-sub);
+}
+.ord-item-total {
+  flex: none;
+  font-size: 13px;
+}
+.ord-totals {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--a-line);
+}
+.ord-total-row {
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px solid var(--a-line);
+  font-weight: 700;
+}
+
+.ord-action-group {
+  margin-bottom: 22px;
+}
+.ord-action-group:last-child {
+  margin-bottom: 0;
+}
+.ord-action-heading {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  margin: 0 0 8px;
+}
+.ord-action-form {
+  display: flex;
+  flex-direction: column;
+}
+.ord-refund-btn {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--a-line);
+  color: var(--a-fg);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease-out,
+    background-color 0.18s ease-out,
+    color 0.18s ease-out;
+}
+.ord-refund-btn:hover,
+.ord-refund-btn.is-armed {
+  border-color: var(--a-red-deep);
+  background: var(--a-red-cta);
+  color: var(--a-cream);
+}
+.ord-refund-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.ord-notes {
+  margin-top: 22px;
+}
+
+/* ---- detail: timeline (no card) ------------------------------------------- */
+.ord-timeline-section {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--a-line);
+  max-width: 480px;
+}

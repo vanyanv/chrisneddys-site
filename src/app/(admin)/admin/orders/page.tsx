@@ -1,6 +1,11 @@
 import Link from "next/link";
-import { listOrdersForAdmin, type OrdersAdminFilter } from "@/lib/ordersAdmin";
-import { formatCents, relativeTime, statusLabel } from "./format";
+import {
+  getOrdersDashboardCounts,
+  listOrdersForAdmin,
+  type OrdersAdminFilter,
+} from "@/lib/ordersAdmin";
+import { OrdersTable, type OrdersTableRow } from "./OrdersTable";
+import "@/styles/admin-orders.css";
 
 export const dynamic = "force-dynamic";
 
@@ -33,18 +38,34 @@ export default async function AdminOrdersPage({
     ? (rawStatus as OrdersAdminFilter)
     : "all";
 
-  const { rows, nextCursor } = await listOrdersForAdmin(filter, cursor);
+  const [{ rows, nextCursor }, counts] = await Promise.all([
+    listOrdersForAdmin(filter, cursor),
+    getOrdersDashboardCounts(),
+  ]);
+
+  const tableRows: OrdersTableRow[] = rows.map((row) => ({
+    ...row,
+    createdAt: row.createdAt.toISOString(),
+  }));
 
   return (
     <>
-      <h1 className="adm-h1">Orders</h1>
+      <div className="ord-head-row">
+        <div>
+          <h1 className="adm-h1">Orders</h1>
+          <span className="adm-label ord-count" aria-live="polite">
+            {rows.length} order{rows.length === 1 ? "" : "s"} &middot; {counts.toFulfil} to ship
+            &middot; {counts.readyForPickup} ready for pickup
+          </span>
+        </div>
+      </div>
 
-      <nav className="adm-tabs" aria-label="Filter by status">
+      <nav className="ord-filter-row" aria-label="Filter by status">
         {TABS.map((tab) => (
           <Link
             key={tab.key}
             href={tabHref(tab.key)}
-            className="adm-tab"
+            className={`adm-filter-chip${filter === tab.key ? " is-on" : ""}`}
             aria-current={filter === tab.key ? "page" : undefined}
           >
             {tab.label}
@@ -53,67 +74,19 @@ export default async function AdminOrdersPage({
       </nav>
 
       {rows.length === 0 ? (
-        <div className="adm-table-wrap">
-          <p className="adm-empty">
-            No orders yet. They land here the moment Stripe confirms a payment.
-          </p>
-        </div>
+        <p className="adm-empty">
+          No orders yet. They land here the moment Stripe confirms a payment.
+        </p>
       ) : (
-        <>
-          <div className="adm-table-wrap">
-            <table className="adm-table">
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Placed</th>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Fulfilment</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <Link href={`/admin/orders/${row.id}`} className="adm-row-link">
-                        <span className="adm-money">{row.number}</span>
-                      </Link>
-                    </td>
-                    <td>{relativeTime(row.createdAt)}</td>
-                    <td>
-                      <Link href={`/admin/orders/${row.id}`} className="adm-row-link">
-                        <span className="adm-product-name">{row.customerName ?? "—"}</span>
-                        <span className="adm-product-slug">{row.customerEmail ?? "—"}</span>
-                      </Link>
-                    </td>
-                    <td className="adm-items-cell">{row.itemsSummary}</td>
-                    <td>
-                      <span className="adm-chip" data-fulfilment={row.fulfilment}>
-                        {row.fulfilment === "ship" ? "Ship" : "Pickup"}
-                      </span>
-                    </td>
-                    <td className="adm-money">{formatCents(row.totalCents)}</td>
-                    <td>
-                      <span className="adm-chip" data-order-status={row.status}>
-                        {statusLabel(row.status)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <OrdersTable rows={tableRows} />
+      )}
 
-          {nextCursor && (
-            <div style={{ marginTop: 16 }}>
-              <Link href={olderHref(filter, nextCursor)} className="adm-btn">
-                Older →
-              </Link>
-            </div>
-          )}
-        </>
+      {nextCursor && (
+        <div style={{ marginTop: 16 }}>
+          <Link href={olderHref(filter, nextCursor)} className="adm-btn">
+            Older →
+          </Link>
+        </div>
       )}
     </>
   );

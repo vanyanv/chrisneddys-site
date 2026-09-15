@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Admin: the products area is now one editable sheet. Price, stock and Live/Hidden change in place, a bottom Save bar collects the sweep into one save with Undo, rows expand inline for photos, copy and edition details, rows drag to set the shop order, and a new product is an inline row. Orders and Settings share the calmer shell. ([#28](https://github.com/vanyanv/chrisneddys-site/issues/28))
+- Admin: Orders and Settings adopt the same sheet system as Products. Orders gets search, status chips, two-line rows on phones and a one-surface order page; Settings gets grouped sections, a Save bar that appears only when something changed, and a Connections list. The order page shows the new status right after marking an order shipped, ready, picked up or refunded. The Chris N Eddy's logo replaces the typed wordmark in the top bar, sign-in and packing slip. ([#32](https://github.com/vanyanv/chrisneddys-site/issues/32))
+- Development: `pnpm release` cuts a release — it dates the `[Unreleased]` section, bumps the version, writes the compare links and tags `vX.Y.Z`. A `commit-msg` hook refuses a commit that references an issue and changes shipped code without a `CHANGELOG.md` line, so entries stop going missing
+- Development: `pnpm test:e2e` runs a Playwright suite against a production build on its own PGlite database (`PGLITE_DATA_DIR`) ([#28](https://github.com/vanyanv/chrisneddys-site/issues/28))
 - Checkout Sessions now enable invoice creation, so Stripe generates an invoice for every order rather than only for subscriptions. Whether the customer is emailed it remains a per-environment Dashboard setting, which `DEPLOY.md` now spells out
 
 ### Changed

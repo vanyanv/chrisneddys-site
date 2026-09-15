@@ -10,10 +10,17 @@
  * `revalidatePath` after a write that the storefront could see — nothing
  * here touches the cache.
  */
-import { and, asc, eq, ne } from "drizzle-orm";
-import { getDb } from "@/db/client";
+import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { getDb, type Db } from "@/db/client";
 import { imageThumbSrc } from "@/lib/productImage";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
+
+/** `db ?? getDb()` — lets a function join a caller's transaction (pass `tx`)
+ * while still working standalone (pass nothing). Same pattern as
+ * `src/lib/orders.ts`'s `resolveDb`. */
+async function resolveDb(db: Db | undefined): Promise<Db> {
+  return db ?? (await getDb());
+}
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -41,13 +48,40 @@ async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
   return `${base}-${n}`;
 }
 
+/** Appends `-copy`, then `-copy-2`, `-copy-3`, … to `baseSlug` until unique. */
+async function uniqueCopySlug(baseSlug: string): Promise<string> {
+  const db = await getDb();
+  const rows = await db.select({ slug: products.slug }).from(products);
+  const taken = new Set(rows.map((r) => r.slug));
+
+  const base = `${baseSlug}-copy`;
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
+}
+
+/** One past the highest existing `position`, i.e. where a new product (or a
+ * duplicate) belongs so it lands at the end of the rack. */
+async function nextPosition(): Promise<number> {
+  const db = await getDb();
+  const [row] = await db
+    .select({ position: products.position })
+    .from(products)
+    .orderBy(desc(products.position))
+    .limit(1);
+  return (row?.position ?? -1) + 1;
+}
+
 export type CreateDraftResult = { id: string; slug: string };
 
-/** Creates a draft product with a unique slug derived from `name`. */
+/** Creates a draft product with a unique slug derived from `name`, appended
+ * at the end of the rack (`position` = current max + 1). */
 export async function createDraft(name: string): Promise<CreateDraftResult> {
   const db = await getDb();
   const trimmedName = name.trim() || "Untitled product";
   const slug = await uniqueSlug(slugify(trimmedName));
+  const position = await nextPosition();
 
   const [row] = await db
     .insert(products)
@@ -63,6 +97,7 @@ export async function createDraft(name: string): Promise<CreateDraftResult> {
       priceCents: 0,
       oneSize: true,
       status: "draft",
+      position,
     })
     .returning({ id: products.id, slug: products.slug });
 
@@ -144,6 +179,433 @@ export async function updateProduct(id: string, patch: ProductPatch): Promise<Up
   return { ok: true, oldSlug: existing.slug, newSlug: slug };
 }
 
+export type ReorderProductsResult = { ok: true };
+
+/**
+ * Sets every listed product's `position` to its index in `orderedIds`
+ * (0-based), in one transaction. Ids that don't match any product are
+ * silently ignored — the caller (a drag reorder) only ever sends ids it
+ * just rendered, so a mismatch here means a product was deleted out from
+ * under the request, not a bug worth surfacing.
+ */
+export async function reorderProducts(orderedIds: string[]): Promise<ReorderProductsResult> {
+  const db = await getDb();
+  const existing = await db.select({ id: products.id }).from(products);
+  const existingIds = new Set(existing.map((r) => r.id));
+  const ids = orderedIds.filter((id) => existingIds.has(id));
+
+  await db.transaction(async (tx) => {
+    for (const [position, id] of ids.entries()) {
+      await tx.update(products).set({ position, updatedAt: new Date() }).where(eq(products.id, id));
+    }
+  });
+
+  return { ok: true };
+}
+
+export type DuplicateProductResult =
+  | { ok: true; id: string; slug: string }
+  | { ok: false; error: string };
+
+/**
+ * Copies a product: all copy/price fields, `status` reset to `draft`, a
+ * unique `<slug>-copy` (then `-copy-2`, …) slug, appended at the end of the
+ * rack. Images are copied as new rows (same `src`/URLs); inventory is
+ * copied by mode but never by count — a `quantity` variant starts at 0, an
+ * `edition` variant gets fresh, untouched editions of the same size, and an
+ * `untracked` variant stays untracked.
+ */
+export async function duplicateProduct(id: string): Promise<DuplicateProductResult> {
+  const db = await getDb();
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
+    with: { images: true, variants: { with: { editions: true } } },
+  });
+  if (!existing) return { ok: false, error: "Product not found." };
+
+  const slug = await uniqueCopySlug(existing.slug);
+  const position = await nextPosition();
+
+  const [row] = await db
+    .insert(products)
+    .values({
+      slug,
+      name: existing.name,
+      displayName1: existing.displayName1,
+      displayName2: existing.displayName2,
+      eyebrow: existing.eyebrow,
+      description: existing.description,
+      metaDescription: existing.metaDescription,
+      limitedNote: existing.limitedNote,
+      priceCents: existing.priceCents,
+      oneSize: existing.oneSize,
+      perOrderLimit: existing.perOrderLimit,
+      status: "draft",
+      position,
+      capColor: existing.capColor,
+      details: existing.details,
+      fit: existing.fit,
+      limitedCopy: existing.limitedCopy,
+      why: existing.why,
+      authenticityCopy: existing.authenticityCopy,
+      authenticityFacts: existing.authenticityFacts,
+      photoDir: existing.photoDir,
+    })
+    .returning({ id: products.id, slug: products.slug });
+
+  if (!row) throw new Error("insert of the duplicated product returned nothing");
+
+  for (const img of existing.images) {
+    await db.insert(productImages).values({
+      productId: row.id,
+      position: img.position,
+      viewId: img.viewId,
+      label: img.label,
+      alt: img.alt,
+      src: img.src,
+      width: img.width,
+      height: img.height,
+      kind: img.kind,
+      urlFull: img.urlFull,
+      urlThumb: img.urlThumb,
+    });
+  }
+
+  const variant = existing.variants[0];
+  if (variant) {
+    // Mode is preserved (untracked stays untracked); only the count resets —
+    // a quantity variant starts at 0, an edition variant gets a same-size run
+    // of fresh, untouched editions rather than copies of the sold/reserved
+    // state of the original.
+    const inventoryQuantity =
+      variant.editionSize !== null
+        ? variant.editionSize
+        : variant.inventoryQuantity !== null
+          ? 0
+          : null;
+
+    const [newVariant] = await db
+      .insert(variants)
+      .values({
+        productId: row.id,
+        sku: slug.toUpperCase(),
+        label: variant.label,
+        priceCents: variant.priceCents,
+        inventoryQuantity,
+        editionSize: variant.editionSize,
+        position: variant.position,
+      })
+      .returning({ id: variants.id });
+
+    if (newVariant && variant.editionSize !== null) {
+      for (let number = 1; number <= variant.editionSize; number++) {
+        await db.insert(editions).values({ variantId: newVariant.id, number, status: "available" });
+      }
+    }
+  }
+
+  return { ok: true, id: row.id, slug: row.slug };
+}
+
+/** The autosaveable single-field whitelist for `updateProductField`, and
+ * each field's value type — the exact contract the panel's per-field
+ * autosave codes against. */
+export type ProductFieldValues = {
+  name: string;
+  displayName1: string;
+  displayName2: string;
+  eyebrow: string;
+  slug: string;
+  priceCents: number;
+  perOrderLimit: number;
+  oneSize: boolean;
+  description: string;
+  metaDescription: string;
+  limitedNote: string;
+  details: string[];
+  fit: string | null;
+  limitedCopy: string | null;
+  why: string | null;
+  authenticityCopy: string | null;
+  authenticityFacts: AuthenticityFact[];
+};
+
+export type ProductField = keyof ProductFieldValues;
+
+export type UpdateProductFieldResult<F extends ProductField = ProductField> =
+  | { ok: true; previous: ProductFieldValues[F] }
+  | { ok: false; error: string };
+
+/**
+ * Thin typed wrapper over `updateProduct`'s validation, for the panel's
+ * per-field autosave: writes exactly one column, with the same validation
+ * `updateProduct` applies to that field, and returns the value the column
+ * held before the write so the caller can offer "Undo".
+ */
+export async function updateProductField<F extends ProductField>(
+  id: string,
+  field: F,
+  value: ProductFieldValues[F],
+  dbOverride?: Db,
+): Promise<UpdateProductFieldResult<F>> {
+  const db = await resolveDb(dbOverride);
+  const existing = await db.query.products.findFirst({ where: eq(products.id, id) });
+  if (!existing) return { ok: false, error: "Product not found." };
+
+  const touch = { updatedAt: new Date() };
+
+  switch (field) {
+    case "slug": {
+      const slug = String(value).trim().toLowerCase();
+      if (!SLUG_PATTERN.test(slug)) {
+        return { ok: false, error: "Slug must be lowercase letters, numbers and hyphens only." };
+      }
+      const clash = await db.query.products.findFirst({
+        where: and(eq(products.slug, slug), ne(products.id, id)),
+      });
+      if (clash) return { ok: false, error: "That slug is already in use by another product." };
+      await db
+        .update(products)
+        .set({ slug, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.slug } as UpdateProductFieldResult<F>;
+    }
+    case "priceCents": {
+      const priceCents = Number(value);
+      if (!Number.isInteger(priceCents) || priceCents < 0) {
+        return { ok: false, error: "Price must be zero or a positive whole number of cents." };
+      }
+      await db
+        .update(products)
+        .set({ priceCents, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.priceCents } as UpdateProductFieldResult<F>;
+    }
+    case "perOrderLimit": {
+      const perOrderLimit = Number(value);
+      if (!Number.isInteger(perOrderLimit) || perOrderLimit < 1) {
+        return { ok: false, error: "Per-order limit must be a positive whole number." };
+      }
+      await db
+        .update(products)
+        .set({ perOrderLimit, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.perOrderLimit } as UpdateProductFieldResult<F>;
+    }
+    case "metaDescription": {
+      const metaDescription = String(value);
+      if (metaDescription.length > 155) {
+        return { ok: false, error: "Meta description must be 155 characters or fewer." };
+      }
+      await db
+        .update(products)
+        .set({ metaDescription, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.metaDescription } as UpdateProductFieldResult<F>;
+    }
+    case "oneSize": {
+      const oneSize = Boolean(value);
+      await db
+        .update(products)
+        .set({ oneSize, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.oneSize } as UpdateProductFieldResult<F>;
+    }
+    case "details": {
+      const details = Array.isArray(value) ? (value as string[]) : [];
+      await db
+        .update(products)
+        .set({ details: details.length > 0 ? details : null, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.details ?? [] } as UpdateProductFieldResult<F>;
+    }
+    case "authenticityFacts": {
+      const facts = Array.isArray(value) ? (value as AuthenticityFact[]) : [];
+      await db
+        .update(products)
+        .set({ authenticityFacts: facts.length > 0 ? facts : null, ...touch })
+        .where(eq(products.id, id));
+      return {
+        ok: true,
+        previous: existing.authenticityFacts ?? [],
+      } as UpdateProductFieldResult<F>;
+    }
+    case "name": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ name: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.name } as UpdateProductFieldResult<F>;
+    }
+    case "displayName1": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ displayName1: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.displayName1 } as UpdateProductFieldResult<F>;
+    }
+    case "displayName2": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ displayName2: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.displayName2 } as UpdateProductFieldResult<F>;
+    }
+    case "eyebrow": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ eyebrow: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.eyebrow } as UpdateProductFieldResult<F>;
+    }
+    case "description": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ description: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.description } as UpdateProductFieldResult<F>;
+    }
+    case "limitedNote": {
+      const text = String(value);
+      await db
+        .update(products)
+        .set({ limitedNote: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.limitedNote } as UpdateProductFieldResult<F>;
+    }
+    case "fit": {
+      const text = value === null ? null : String(value).trim() || null;
+      await db
+        .update(products)
+        .set({ fit: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.fit } as UpdateProductFieldResult<F>;
+    }
+    case "limitedCopy": {
+      const text = value === null ? null : String(value).trim() || null;
+      await db
+        .update(products)
+        .set({ limitedCopy: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.limitedCopy } as UpdateProductFieldResult<F>;
+    }
+    case "why": {
+      const text = value === null ? null : String(value).trim() || null;
+      await db
+        .update(products)
+        .set({ why: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.why } as UpdateProductFieldResult<F>;
+    }
+    case "authenticityCopy": {
+      const text = value === null ? null : String(value).trim() || null;
+      await db
+        .update(products)
+        .set({ authenticityCopy: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.authenticityCopy } as UpdateProductFieldResult<F>;
+    }
+    default: {
+      const _exhaustive: never = field;
+      return { ok: false, error: `Unsupported field: ${String(_exhaustive)}` };
+    }
+  }
+}
+
+/** Thrown inside `applyProductChanges`'s transaction to unwind it with the
+ * failing change's index and reason — never escapes that function. */
+class BatchValidationError extends Error {
+  constructor(
+    message: string,
+    public readonly failedIndex: number,
+  ) {
+    super(message);
+  }
+}
+
+export type ProductChange = {
+  id: string;
+  field: ProductField | "inventoryN";
+  value: unknown;
+};
+
+export type ApplyProductChangesResult =
+  | { ok: true; applied: number }
+  | { ok: false; error: string; failedIndex: number };
+
+/**
+ * The Sheet's batched Save: applies every cell edit — across any number of
+ * products — in one transaction. Each change is validated with the same
+ * rules `updateProductField` applies to its field; `field: "inventoryN"`
+ * instead sets the count (`quantity` mode) or size (`edition` mode) for
+ * whatever inventory mode the product is *currently* in via `setInventory`,
+ * and is invalid for a product with no tracked inventory (`mode:
+ * "untracked"`, including one with no variant row at all).
+ *
+ * If any change fails, the transaction rolls back — nothing in the batch is
+ * written, not even changes earlier in the array that validated fine — and
+ * the result names the failing change's index into `changes`. When the same
+ * `(id, field)` pair appears more than once, the later entry wins simply
+ * because changes are applied in array order within the same transaction.
+ */
+export async function applyProductChanges(
+  changes: ProductChange[],
+): Promise<ApplyProductChangesResult> {
+  const db = await getDb();
+
+  try {
+    const applied = await db.transaction(async (tx) => {
+      for (const [index, change] of changes.entries()) {
+        if (change.field === "inventoryN") {
+          const product = await tx.query.products.findFirst({
+            where: eq(products.id, change.id),
+            with: { variants: { with: { editions: true } } },
+          });
+          if (!product) throw new BatchValidationError("Product not found.", index);
+
+          const variant = product.variants[0];
+          const mode: InventoryMode =
+            variant && variant.editionSize !== null
+              ? "edition"
+              : variant && variant.inventoryQuantity !== null
+                ? "quantity"
+                : "untracked";
+          if (mode === "untracked") {
+            throw new BatchValidationError(
+              "This product's inventory isn't tracked — turn on quantity or edition tracking before setting a count.",
+              index,
+            );
+          }
+
+          const result = await setInventory(change.id, mode, Number(change.value), tx);
+          if (!result.ok) throw new BatchValidationError(result.error, index);
+        } else {
+          const result = await updateProductField(
+            change.id,
+            change.field,
+            change.value as ProductFieldValues[ProductField],
+            tx,
+          );
+          if (!result.ok) throw new BatchValidationError(result.error, index);
+        }
+      }
+      return changes.length;
+    });
+
+    return { ok: true, applied };
+  } catch (err) {
+    if (err instanceof BatchValidationError) {
+      return { ok: false, error: err.message, failedIndex: err.failedIndex };
+    }
+    throw err;
+  }
+}
+
 export type SetStatusResult = { ok: true; slug: string } | { ok: false; error: string };
 
 /**
@@ -201,8 +663,9 @@ export async function setInventory(
   id: string,
   mode: InventoryMode,
   n?: number,
+  dbOverride?: Db,
 ): Promise<SetInventoryResult> {
-  const db = await getDb();
+  const db = await resolveDb(dbOverride);
   const product = await db.query.products.findFirst({
     where: eq(products.id, id),
     with: { variants: { with: { editions: true } } },
@@ -437,6 +900,38 @@ export async function removeImage(imageId: string): Promise<void> {
   }
 }
 
+export type ReorderImagesResult = { ok: true };
+
+/**
+ * Sets every listed `kind: "view"` image's `position` to its index in
+ * `orderedImageIds` (0-based). Ids that don't belong to this product's view
+ * images (unknown, another product's, or a certificate/sticker) are ignored,
+ * same as `reorderProducts`.
+ */
+export async function reorderImages(
+  productId: string,
+  orderedImageIds: string[],
+): Promise<ReorderImagesResult> {
+  const db = await getDb();
+  const siblings = await db
+    .select({ id: productImages.id })
+    .from(productImages)
+    .where(and(eq(productImages.productId, productId), eq(productImages.kind, "view")));
+  const validIds = new Set(siblings.map((s) => s.id));
+  const ids = orderedImageIds.filter((imgId) => validIds.has(imgId));
+
+  await db.transaction(async (tx) => {
+    for (const [position, imgId] of ids.entries()) {
+      await tx
+        .update(productImages)
+        .set({ position, updatedAt: new Date() })
+        .where(eq(productImages.id, imgId));
+    }
+  });
+
+  return { ok: true };
+}
+
 export type AdminInventorySummary =
   | { mode: "untracked" }
   | { mode: "quantity"; quantity: number }
@@ -465,32 +960,53 @@ export type AdminProductListRow = {
   name: string;
   status: "draft" | "published" | "archived";
   priceCents: number;
+  position: number;
   updatedAt: Date;
   thumbUrl: string | null;
   inventory: AdminInventorySummary;
 };
 
-/** Every product, newest-updated first, with just enough to render the admin table. */
-export async function listProductsForAdmin(): Promise<AdminProductListRow[]> {
+async function queryProductsForList(archivedOnly: boolean) {
   const db = await getDb();
-  const rows = await db.query.products.findMany({
+  return db.query.products.findMany({
+    where: archivedOnly ? eq(products.status, "archived") : undefined,
     with: {
       images: { where: eq(productImages.kind, "view"), orderBy: asc(productImages.position) },
       variants: { with: { editions: true } },
     },
-    orderBy: (p, { desc }) => desc(p.updatedAt),
+    orderBy: (p, { asc: ordAsc }) => [ordAsc(p.position), ordAsc(p.createdAt)],
   });
+}
 
-  return rows.map((row) => ({
+type ProductListQueryRow = Awaited<ReturnType<typeof queryProductsForList>>[number];
+
+function toAdminListRow(row: ProductListQueryRow): AdminProductListRow {
+  return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     status: row.status,
     priceCents: row.priceCents,
+    position: row.position,
     updatedAt: row.updatedAt,
     thumbUrl: row.images[0] ? imageThumbSrc(row.photoDir, row.images[0]) : null,
     inventory: summarizeInventory(row.variants[0]),
-  }));
+  };
+}
+
+/** Every product (any status — the caller filters archived out of the main
+ * rack view), ordered by `position` then `createdAt`, with just enough to
+ * render the admin table/rack. */
+export async function listProductsForAdmin(): Promise<AdminProductListRow[]> {
+  const rows = await queryProductsForList(false);
+  return rows.map(toAdminListRow);
+}
+
+/** Just the archived products, same shape and order as `listProductsForAdmin`
+ * — backs the rack's "Archived (n)" list. */
+export async function listArchivedProductsForAdmin(): Promise<AdminProductListRow[]> {
+  const rows = await queryProductsForList(true);
+  return rows.map(toAdminListRow);
 }
 
 export type AdminProductImage = {

@@ -40,13 +40,18 @@
  *   instance. Tests own their own migrate/seed calls (see
  *   `src/lib/catalog.test.ts`), so nothing is bootstrapped here either.
  * - `DATABASE_URL` unset, everything else (i.e. `pnpm dev`) → a PGlite
- *   instance file-persisted at `.pglite/` (gitignored), migrated and seeded
- *   once per process so a fresh clone works with zero setup. Both steps are
- *   idempotent, so restarting `next dev` never duplicates anything.
+ *   instance file-persisted at `.pglite/dev` (gitignored), migrated and
+ *   seeded once per process so a fresh clone works with zero setup. Both
+ *   steps are idempotent, so restarting `next dev` never duplicates anything.
+ *   `PGLITE_DATA_DIR` overrides that path (relative to the repo root) — the
+ *   e2e suite (`playwright.config.ts`) points it at `.pglite/e2e` so it never
+ *   touches the developer's own `.pglite/dev` database.
  *
- * `src/lib/catalog.ts` decides on its own, separately, when to skip the
- * database entirely and read `src/data/merch.ts` instead (a production build
- * with no `DATABASE_URL` — CI, or a preview without the variable set).
+ * `hasDatabase()` (below) is the shared rule for whether there is a database
+ * to talk to at all — `src/lib/catalog.ts` calls it to decide when to skip
+ * the database entirely and read `src/data/merch.ts` instead (a production
+ * build/run with no `DATABASE_URL` and no `PGLITE_DATA_DIR` — CI, or a
+ * preview without either variable set).
  *
  * `scripts/db-prepare.mjs`, the one-shot deploy-time migrate/seed script,
  * deliberately keeps using `drizzle-orm/neon-http` rather than this module:
@@ -81,38 +86,83 @@ export type Db = PgDatabase<PgQueryResultHKT, Schema>;
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const migrationsFolder = join(root, "drizzle");
-const devDataDir = join(root, ".pglite", "dev");
+// Relative to the repo root; see the module comment above.
+const devDataDir = join(root, process.env.PGLITE_DATA_DIR ?? join(".pglite", "dev"));
 
 function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";
 }
 
-let dbPromise: Promise<Db> | null = null;
+/**
+ * Whether this process has an actual database to read/write — Postgres or a
+ * local PGlite instance — as opposed to needing the static
+ * `src/data/merch.ts` fallback that `src/lib/catalog.ts` falls back to.
+ *
+ * This is the one shared rule every "is there a database?" check in the app
+ * should use, so none of them can disagree with what `createDb()` above
+ * actually does:
+ *
+ * - `DATABASE_URL` set -> Postgres (Neon). True.
+ * - Otherwise, `PGLITE_DATA_DIR` set -> `createDb()`'s file-persisted PGlite
+ *   branch opens a database there regardless of `NODE_ENV`. True. This is
+ *   what lets the e2e harness (`playwright.config.ts`) run `next start` with
+ *   `NODE_ENV=production` and no `DATABASE_URL` while still pointing the
+ *   public storefront at the same local database the admin writes to,
+ *   instead of the static fallback.
+ * - Otherwise, outside of `NODE_ENV=production` (`pnpm dev`, Vitest) ->
+ *   `createDb()`'s default file-persisted (or in Vitest, in-memory) PGlite
+ *   instance. True.
+ * - Otherwise — a production build/run with neither `DATABASE_URL` nor
+ *   `PGLITE_DATA_DIR` set, e.g. a Vercel Preview without the variable
+ *   configured, or CI — there is no database to talk to. False.
+ */
+export function hasDatabase(): boolean {
+  if (process.env.DATABASE_URL) return true;
+  if (process.env.PGLITE_DATA_DIR) return true;
+  return process.env.NODE_ENV !== "production";
+}
+
+/**
+ * A plain module-scope `let` is NOT a true process-wide singleton under
+ * `next dev`: the App Router compiles a module into a separate instance per
+ * webpack "layer" (RSC, the SSR/page render, and the Server Actions
+ * endpoint each get their own copy of this file), so a server action's
+ * `getDb()` and a page's `getDb()` can end up creating two independent
+ * `PGlite` instances pointed at the same `devDataDir`. PGlite can't have two
+ * live instances on one data directory — this surfaced as writes made by a
+ * Server Action (e.g. the Sheet's Save) silently not showing up when the
+ * page re-rendered, and, once a third route triggered a third instance,
+ * outright `RuntimeError: Aborted()` failures. `globalThis` is the one
+ * object every layer's module instance shares within the same Node.js
+ * process, so parking the promise there (Prisma's documented fix for the
+ * same class of bug) makes `getDb()` an actual singleton in dev. Production
+ * (`DATABASE_URL` set, one bundled function, no layer-split dev compiler)
+ * and Vitest (in-memory PGlite, single process) were never affected, so
+ * this only changes behaviour for `pnpm dev`.
+ */
+const globalForDb = globalThis as unknown as {
+  __dbPromise?: Promise<Db> | null;
+  __neonPool?: Pool | null;
+};
 
 /** Creates (once per process) and returns the Drizzle client for this environment. */
 export function getDb(): Promise<Db> {
-  if (!dbPromise) dbPromise = createDb();
-  return dbPromise;
+  if (!globalForDb.__dbPromise) globalForDb.__dbPromise = createDb();
+  return globalForDb.__dbPromise;
 }
 
-// Module-level singleton: one `Pool` per process, reused across every
-// `createDb()` call and every serverless invocation this process handles —
-// never opened per-request, per the driver's own guidance for a long-lived
-// Node.js server/function (as opposed to Edge, where a Pool must live and
-// die within one request).
-let neonPool: Pool | null = null;
-
 function getNeonPool(url: string): Pool {
-  if (!neonPool) {
-    neonPool = new Pool({ connectionString: url });
+  if (!globalForDb.__neonPool) {
+    const pool = new Pool({ connectionString: url });
     // Surface idle-connection errors (e.g. Neon closing a stale socket)
     // instead of letting them become an unhandled 'error' event that
     // crashes the process.
-    neonPool.on("error", (err: Error) => {
+    pool.on("error", (err: Error) => {
       console.error("neon Pool error", err);
     });
+    globalForDb.__neonPool = pool;
   }
-  return neonPool;
+  return globalForDb.__neonPool;
 }
 
 async function createDb(): Promise<Db> {
@@ -129,7 +179,8 @@ async function createDb(): Promise<Db> {
 
   // pnpm dev, no DATABASE_URL: a durable local database, bootstrapped once.
   // PGlite's node filesystem backend does `mkdir` (not `mkdir -p`) on its
-  // data directory, so `.pglite/` itself has to exist first.
+  // data directory, so `.pglite/` (or PGLITE_DATA_DIR's parent) has to exist
+  // first.
   mkdirSync(devDataDir, { recursive: true });
   const client = new PGlite(devDataDir);
   const db = drizzlePglite(client, { schema });

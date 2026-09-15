@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
 
@@ -10,6 +11,14 @@ export function SignInForm({ next }: { next: string }) {
 
   return (
     <form action={formAction} className="adm-signin-card" noValidate>
+      <Image
+        src="/cne-logo.webp"
+        alt="Chris N Eddy's"
+        width={309}
+        height={89}
+        className="adm-signin-logo"
+        priority
+      />
       <h1 className="adm-h2">Owner sign-in</h1>
       <input type="hidden" name="next" value={next} />
 

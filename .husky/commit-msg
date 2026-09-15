@@ -1,0 +1,44 @@
+# Every user-visible change gets a CHANGELOG.md line in the same commit
+# (see CLAUDE.md, "Tracking fixes"). This hook enforces that floor.
+#
+# Escape hatch: put [skip changelog] in the commit message.
+
+msg_file="$1"
+msg=$(cat "$msg_file")
+
+case "$msg" in
+  "Merge "*|"Revert "*|"Release "*|"fixup!"*|"squash!"*) exit 0 ;;
+  *"[skip changelog]"*) exit 0 ;;
+esac
+
+# Only commits claiming to fix or build a tracked issue need an entry.
+if ! printf '%s' "$msg" | grep -Eqi '(refs|fixes|fixed|closes|resolves) #[0-9]+'; then
+  exit 0
+fi
+
+staged=$(git diff --cached --name-only)
+
+if printf '%s\n' "$staged" | grep -q '^CHANGELOG\.md$'; then
+  exit 0
+fi
+
+if ! printf '%s\n' "$staged" | grep -Eq '^(src|scripts|drizzle|e2e)/|^next\.config\.mjs$'; then
+  exit 0
+fi
+
+cat >&2 <<'MSG'
+
+  This commit references an issue and changes shipped code, but
+  CHANGELOG.md is not staged.
+
+  Add a line under ## [Unreleased] in CHANGELOG.md describing the change
+  the way an owner would read it, then stage it:
+
+      git add CHANGELOG.md
+
+  If this commit genuinely needs no entry, say so in the message:
+
+      [skip changelog]
+
+MSG
+exit 1

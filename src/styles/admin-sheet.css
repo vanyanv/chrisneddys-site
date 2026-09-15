@@ -1,0 +1,99 @@
+/**
+ * The Sheet — a few rules CSS.md's primitive set doesn't cover, kept in a
+ * separate file per the build brief (admin.css/the shared layouts are
+ * off-limits for this feature). Imported once, from
+ * `src/app/(admin)/admin/products/page.tsx`.
+ */
+
+/* `.adm-cell-edit`/`.adm-drag-handle`/`.adm-restock`/`.adm-pill` are `<div>`s
+   in CSS.md's example markup; the sheet uses real `<button>`s instead (so a
+   cell/handle/pill is focusable and has an accessible name without extra
+   tabindex plumbing), which needs the browser's default button chrome
+   stripped — admin.css never had to do this for them. */
+button.adm-cell-edit,
+button.adm-drag-handle,
+button.adm-restock,
+button.adm-pill {
+  appearance: none;
+  background: none;
+  margin: 0;
+}
+button.adm-cell-edit {
+  width: 100%;
+  text-align: left;
+  display: block;
+}
+button.adm-drag-handle,
+button.adm-restock {
+  border: 0;
+  padding: 0;
+}
+button.adm-pill {
+  cursor: pointer;
+}
+
+/* `.adm-name-cell` is a `<button>` too (so the name/slug is one focusable,
+   labelled control that opens the row), which needs the name/slug stacked
+   the way CSS.md's two-span markup implies but never states a layout for. */
+button.adm-name-cell {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+.adm-name-cell-name,
+.adm-name-cell-slug {
+  display: block;
+  max-width: 100%;
+}
+
+/* Sheet row/cols mobile collapse (<720px): the 8-column desktop grid
+   doesn't fit a phone width, and CSS.md flags this as a known gap. Two
+   lines per row — thumb+name+pill, then price+stock — drag handle,
+   updated-time and chevron drop (reorder falls back to the row menu's
+   Move up/down; tapping the name still expands the row). */
+@media (max-width: 720px) {
+  .adm-sheet-cols {
+    display: none;
+  }
+  .adm-sheet-row {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    grid-template-areas:
+      "thumb name pill"
+      "thumb price stock";
+    row-gap: 6px;
+    column-gap: 10px;
+    padding: 12px;
+    min-height: 0;
+  }
+  .adm-sheet-row > .adm-thumb,
+  .adm-sheet-row > .adm-thumb-empty {
+    grid-area: thumb;
+  }
+  .adm-sheet-row > .adm-name-cell {
+    grid-area: name;
+  }
+  .adm-sheet-row > .adm-pill {
+    grid-area: pill;
+    justify-self: end;
+  }
+  .adm-sheet-row > [data-field="price"] {
+    grid-area: price;
+  }
+  .adm-sheet-row > .adm-stock-wrap {
+    grid-area: stock;
+    justify-self: end;
+  }
+  .adm-sheet-row > .adm-updated,
+  .adm-sheet-row > .adm-chevron-btn {
+    display: none;
+  }
+}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getOrderForAdmin } from "@/lib/ordersAdmin";
 import { getStoreSettings } from "@/lib/orders";
@@ -25,7 +26,14 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
 
       <div className="adm-slip-sheet">
         <header className="adm-slip-head">
-          <span className="adm-slip-store">{settings.storeName}</span>
+          <Image
+            src="/cne-logo.webp"
+            alt={settings.storeName}
+            width={309}
+            height={89}
+            className="adm-slip-logo"
+            priority
+          />
           <span className="adm-slip-number">{order.number}</span>
         </header>
 

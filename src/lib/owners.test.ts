@@ -287,4 +287,58 @@ describe("changePassword revocation (auth.api.changePassword, revokeOtherSession
     const stillWorks = await auth.api.signInEmail({ body: { email, password } });
     expect(stillWorks.user.email).toBe(email);
   });
+
+  it("the dedicated /revoke-other-sessions endpoint — what changePasswordAction now calls instead of the revokeOtherSessions body flag above — revokes every OTHER session while leaving the caller's own session alone", async () => {
+    const auth = await getAuth();
+    const email = "revoke-other-owner@example.com";
+    const password = "the original owner password!!";
+
+    await auth.api.signUpEmail({ body: { name: "Owner", email, password } });
+
+    const deviceA = await auth.api.signInEmail({ body: { email, password }, asResponse: true });
+    const cookieA = deviceA.headers.get("set-cookie")!.split(";")[0]!;
+    const deviceB = await auth.api.signInEmail({ body: { email, password }, asResponse: true });
+    const cookieB = deviceB.headers.get("set-cookie")!.split(";")[0]!;
+
+    const status = await auth.api.revokeOtherSessions({
+      headers: new Headers({ cookie: cookieA }),
+    });
+    expect(status.status).toBe(true);
+
+    // Unlike `changePassword`'s `revokeOtherSessions: true` body flag (see
+    // the test above), this endpoint spares the caller's own session — no
+    // fresh cookie is minted, and none is needed.
+    expect(
+      (await auth.api.getSession({ headers: new Headers({ cookie: cookieA }) }))?.user.email,
+    ).toBe(email);
+    expect(await auth.api.getSession({ headers: new Headers({ cookie: cookieB }) })).toBeNull();
+  });
+});
+
+describe("resetSendStorage globalThis parking (bug: Next.js compiles betterAuth.ts once per webpack layer)", () => {
+  it("keeps the same AsyncLocalStorage instance across independent module re-evaluations, instead of each getting its own", async () => {
+    // `vi.resetModules()` clears Vitest's module registry, so the next
+    // dynamic `import()` of this specifier re-evaluates the file from
+    // scratch — a fresh top-level `const resetSendStorage = new
+    // AsyncLocalStorage()` — standing in for the App Router compiling
+    // `betterAuth.ts` into a second, independent webpack layer (RSC vs.
+    // Server Actions, say). Before the fix, `captureResetSend` calls made
+    // through one such "layer" and `sendResetPassword`'s `getStore()` reads
+    // made through another would each see their own module-scope instance;
+    // parking the storage on `globalThis` — the one object every layer
+    // shares — is what makes them the same object no matter how many times
+    // the module is re-evaluated.
+    const globalForTest = globalThis as unknown as { __resetSendStorage?: unknown };
+
+    vi.resetModules();
+    await import("@/lib/betterAuth");
+    const afterFirstReimport = globalForTest.__resetSendStorage;
+    expect(afterFirstReimport).toBeDefined();
+
+    vi.resetModules();
+    await import("@/lib/betterAuth");
+    const afterSecondReimport = globalForTest.__resetSendStorage;
+
+    expect(afterSecondReimport).toBe(afterFirstReimport);
+  });
 });

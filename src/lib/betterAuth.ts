@@ -27,6 +27,19 @@
  * `betterAuth.spike.test.ts` proves the "singleton" half of that (A3):
  * concurrent `getAuth()` calls resolve to the *same* instance rather than
  * building it twice. Nothing here needs to be built per request.
+ *
+ * The same per-webpack-layer duplication bites `resetSendStorage` below,
+ * for the same reason: `owners.ts`'s `captureResetSend` and this module's
+ * own `sendResetPassword` closure need to read and write the *same*
+ * `AsyncLocalStorage` instance, but if the two land in different compiled
+ * layers, a bare module-scope `new AsyncLocalStorage()` gives each layer
+ * its own copy — `captureResetSend` runs `fn` inside *its* copy's context,
+ * while `sendResetPassword`'s `resetSendStorage.getStore()` reads from a
+ * different, unrelated copy and always sees `undefined`. Proven in the
+ * built app (not reproducible under Vitest, which loads the module once):
+ * `inviteOwner` always fell through to its "Could not generate an invite
+ * link" fallback. Parked on `globalThis` for the same reason `getAuth()`'s
+ * promise is.
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 import { and, eq } from "drizzle-orm";
@@ -45,7 +58,14 @@ import { hashPassword, verifyPassword } from "@/lib/password";
  */
 export type ResetSendOutcome = { to: string; url: string; sent: boolean; reason?: string };
 
-const resetSendStorage = new AsyncLocalStorage<{ outcome: ResetSendOutcome | null }>();
+type ResetSendStore = { outcome: ResetSendOutcome | null };
+
+const globalForResetSendStorage = globalThis as unknown as {
+  __resetSendStorage?: AsyncLocalStorage<ResetSendStore>;
+};
+
+const resetSendStorage: AsyncLocalStorage<ResetSendStore> =
+  (globalForResetSendStorage.__resetSendStorage ??= new AsyncLocalStorage<ResetSendStore>());
 
 /**
  * Runs `fn` — an `auth.api.*` call that ends up invoking `sendResetPassword`
@@ -63,7 +83,7 @@ const resetSendStorage = new AsyncLocalStorage<{ outcome: ResetSendOutcome | nul
 export async function captureResetSend<T>(
   fn: () => Promise<T>,
 ): Promise<{ result: T; outcome: ResetSendOutcome | null }> {
-  const store: { outcome: ResetSendOutcome | null } = { outcome: null };
+  const store: ResetSendStore = { outcome: null };
   const result = await resetSendStorage.run(store, fn);
   return { result, outcome: store.outcome };
 }
@@ -91,8 +111,24 @@ async function buildAuth(db: Db) {
       // `betterAuth.spike.test.ts` does — without pulling in
       // `src/lib/email.ts`'s `import "server-only"` before anything
       // actually needs it.
-      sendResetPassword: async ({ user, url }) => {
+      sendResetPassword: async ({ user, token }) => {
         const { sendPasswordReset, sendOwnerInvite } = await import("@/lib/email");
+
+        // Deliberately building this link ourselves from `token` instead of
+        // using the `url` Better Auth hands the callback: that `url` always
+        // points at Better Auth's own GET `/reset-password/:token` redirect
+        // callback (`requestPasswordResetCallback`, in
+        // `node_modules/better-auth/dist/api/routes/password.mjs`) — a
+        // route this app deliberately never mounts (see this file's module
+        // comment: no `/api/auth/*` handler exists anywhere in `src/app`),
+        // so visiting it 404s. The real page an owner resets their password
+        // on is `src/app/(admin)/admin/reset-password/page.tsx`, which reads
+        // the token from a plain `?token=` query param and — per that
+        // route's own `actions.ts` — calls `auth.api.resetPassword({ body:
+        // { token, newPassword } })` directly, never through Better Auth's
+        // callback route either. So the link this app needs has always been
+        // `/admin/reset-password/?token=<token>`, not Better Auth's default.
+        const resetUrl = `/admin/reset-password/?token=${encodeURIComponent(token)}`;
 
         // An invited owner has a `user` row with no matching `account` row
         // at all — that absence is exactly "has never set a password",
@@ -107,11 +143,11 @@ async function buildAuth(db: Db) {
           );
 
         const sendResult = credentialAccount
-          ? await sendPasswordReset(user.email, url)
-          : await sendOwnerInvite(user.email, url);
+          ? await sendPasswordReset(user.email, resetUrl)
+          : await sendOwnerInvite(user.email, resetUrl);
 
         const store = resetSendStorage.getStore();
-        if (store) store.outcome = { to: user.email, url, ...sendResult };
+        if (store) store.outcome = { to: user.email, url: resetUrl, ...sendResult };
       },
     },
     session: {

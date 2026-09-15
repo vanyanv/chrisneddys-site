@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { applySetCookieHeader, requireOwner } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { getAuth } from "@/lib/betterAuth";
 import { inviteOwner, removeOwner } from "@/lib/owners";
 import { saveStoreSettings } from "@/lib/settingsAdmin";
@@ -114,13 +114,33 @@ export type ChangePasswordState = {
 };
 
 /**
- * Changes the signed-in owner's password via `auth.api.changePassword`,
- * always revoking every other session — a change-password card that leaves
- * a stolen session logged in isn't much of a security control. A wrong
- * current password throws (Better Auth's `INVALID_PASSWORD`); every failure
- * path returns the same generic message rather than distinguishing it,
- * since a caller who's already signed in as this owner has no other use for
- * that distinction.
+ * Changes the signed-in owner's password via `auth.api.changePassword`, then
+ * revokes every *other* session via Better Auth's dedicated
+ * `/revoke-other-sessions` endpoint (`auth.api.revokeOtherSessions`) — a
+ * change-password card that leaves a stolen session logged in isn't much of
+ * a security control.
+ *
+ * Deliberately **not** `changePassword`'s own `revokeOtherSessions: true`
+ * body flag: despite the name, that flag revokes *every* session for the
+ * user — the caller's current one included (see
+ * `node_modules/better-auth/dist/api/routes/update-user.mjs`'s
+ * `changePassword` handler: `revokeOtherSessions` triggers
+ * `deleteUserSessions` unconditionally, then mints a brand-new session and a
+ * fresh `Set-Cookie` for it). That cookie only reaches the browser on the
+ * response to *this* request; the admin layout's `requireOwner()` re-render
+ * that follows a server action happens within the same request and reads
+ * the cookies the request *arrived* with — the now-deleted session — so it
+ * redirects to sign-in, and the client then loops on that redirect. Calling
+ * `revokeOtherSessions` (the endpoint) separately, after `changePassword`
+ * with no such flag, revokes only sessions other than the caller's current
+ * one — see that same source file's `/revoke-other-sessions` handler, which
+ * filters `session.token !== ctx.context.session.session.token` — so the
+ * caller's session token never changes and no cookie swap is needed at all.
+ *
+ * A wrong current password throws (Better Auth's `INVALID_PASSWORD`); every
+ * failure path returns the same generic message rather than distinguishing
+ * it, since a caller who's already signed in as this owner has no other use
+ * for that distinction.
  */
 export async function changePasswordAction(
   _prevState: ChangePasswordState | undefined,
@@ -139,12 +159,11 @@ export async function changePasswordAction(
   const headerList = await headers();
 
   try {
-    const { headers: outHeaders } = await auth.api.changePassword({
+    await auth.api.changePassword({
       headers: headerList,
-      body: { currentPassword, newPassword, revokeOtherSessions: true },
-      returnHeaders: true,
+      body: { currentPassword, newPassword },
     });
-    await applySetCookieHeader(outHeaders.get("set-cookie"));
+    await auth.api.revokeOtherSessions({ headers: headerList });
   } catch {
     return { error: "That current password isn't right." };
   }

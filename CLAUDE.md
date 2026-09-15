@@ -53,8 +53,16 @@ fixed it. Commit messages reference the issue number (e.g. `fixes #11`).
 
 In the same commit as the fix, add a line to `CHANGELOG.md` under
 `[Unreleased]` (`### Fixed`, `### Added`, or `### Changed`) with the issue
-link, following Keep a Changelog format.
+link, following Keep a Changelog format. Write it the way an owner reads it —
+what changed for them — not the way the diff reads.
 
-When a batch of fixes is deployed: bump `version` in `package.json`, move the
-`Unreleased` section into a new dated section, and tag the release
-`vX.Y.Z`, then start a fresh empty `## [Unreleased]` section for the next fix.
+The `commit-msg` hook enforces this: a commit whose message references an
+issue and whose diff touches `src/`, `scripts/`, `drizzle/`, `e2e/` or
+`next.config.mjs` is refused unless `CHANGELOG.md` is staged too. A commit
+that genuinely needs no entry says `[skip changelog]` in its message.
+
+Releases are `pnpm release` (release-it, Node 22+). It moves `[Unreleased]`
+into a dated section, opens a fresh empty one, bumps `version` in
+`package.json`, writes the compare links, commits, and tags `vX.Y.Z`. It runs
+from `main` with a clean tree, and runs typecheck, lint and tests first.
+Entries are never generated from commit messages — only ever hand-written.

@@ -25,7 +25,7 @@ beforeAll(async () => {
 describe("password hashing", () => {
   it("round-trips: a hash produced by hashPassword verifies against the same password", async () => {
     const hash = await hashPassword("correct horse battery staple");
-    expect(hash).toMatch(/^scrypt\$[0-9a-f]+\$[0-9a-f]+$/);
+    expect(hash).toMatch(/^scrypt\$131072\$[0-9a-f]+\$[0-9a-f]+$/);
     await expect(verifyPassword("correct horse battery staple", hash)).resolves.toBe(true);
   });
 

@@ -1,0 +1,244 @@
+/**
+ * Settings — a few rules CSS.md's shared primitive set doesn't cover, kept
+ * in a separate file per the build brief (admin.css is off-limits for this
+ * feature). Imported once, from `src/app/(admin)/admin/settings/page.tsx`.
+ * The shared primitives this page reuses as-is (not redefined here):
+ * `.adm-h1`, `.adm-group-label`, `.adm-field`, `.adm-input`, `.adm-textarea`,
+ * `.adm-field-error`, `.adm-help`, `.adm-label`, `.adm-grid-2`, `.adm-pill`,
+ * `.adm-toast`, `.adm-savebar`(+buttons), `.adm-btn`, `.adm-mono-value`,
+ * `.adm-saved-note`, `.adm-error`.
+ */
+
+/* ---- header ---------------------------------------------------------- */
+.adm-settings-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin: 0 0 24px;
+}
+.adm-settings-header-text {
+  min-width: 0;
+}
+.adm-settings-lede {
+  font-size: 14px;
+  color: var(--a-sub);
+  margin: 4px 0 0;
+}
+
+/* ---- section grid ------------------------------------------------------ */
+/* The `<form>` itself is the grid container (see SettingsForm.tsx) so
+   fields and the read-only Connections section share one layout without a
+   `display: contents` wrapper. */
+.adm-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px 40px;
+}
+@media (min-width: 900px) {
+  .adm-settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.adm-settings-section {
+  min-width: 0;
+  border-top: 1px solid var(--a-line);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.adm-settings-section.is-full {
+  grid-column: 1 / -1;
+}
+
+/* ---- field label row (Returns/Terms "View ↗" link) --------------------- */
+.adm-field-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.adm-view-link {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  transition: color 0.18s ease-out;
+}
+.adm-view-link:hover {
+  color: var(--a-fg);
+}
+
+/* ---- policies: two textareas side by side, stack on phone -------------- */
+.adm-policies-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 640px) {
+  .adm-policies-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---- pickup toggle ------------------------------------------------------ */
+.adm-toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.adm-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: 38px;
+  height: 22px;
+}
+.adm-toggle-input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.adm-toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid var(--a-line);
+  background: var(--a-card);
+  transition:
+    background-color 0.18s ease-out,
+    border-color 0.18s ease-out;
+}
+.adm-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--a-sub);
+  transition:
+    transform 0.18s ease-out,
+    background-color 0.18s ease-out;
+}
+.adm-toggle-input:checked + .adm-toggle-track {
+  background: var(--a-ok);
+  border-color: var(--a-ok);
+}
+.adm-toggle-input:checked + .adm-toggle-track .adm-toggle-thumb {
+  transform: translateX(16px);
+  background: var(--a-cream);
+}
+.adm-toggle-input:focus-visible {
+  outline: none;
+}
+.adm-toggle-input:focus-visible + .adm-toggle-track {
+  outline: 2px solid var(--a-yel-deep);
+  outline-offset: 2px;
+}
+
+/* Dim the pickup address field when the toggle is off — visual only, the
+   textarea stays a normal enabled form control (still submits its value)
+   so the save payload never changes shape. */
+.adm-settings-section:has(#pickupEnabled:not(:checked)) .adm-pickup-address {
+  opacity: 0.45;
+}
+
+/* ---- shipping: "$" prefixed number fields ------------------------------- */
+.adm-dollar-field {
+  position: relative;
+}
+.adm-dollar-field::before {
+  content: "$";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--a-sub);
+  font-size: 14px;
+  pointer-events: none;
+}
+.adm-dollar-field .adm-input {
+  padding-left: 22px;
+}
+
+/* ---- connections: hairline list with status dots ------------------------ */
+.adm-conn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.adm-conn-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--a-line);
+  font-size: 13px;
+}
+.adm-conn-item:last-child {
+  border-bottom: none;
+}
+.adm-conn-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--a-sub);
+}
+.adm-conn-dot.is-ok {
+  background: var(--a-ok);
+}
+.adm-conn-label {
+  display: block;
+  font-weight: 600;
+}
+.adm-conn-detail {
+  display: block;
+  color: var(--a-sub);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.adm-conn-webhook {
+  margin-top: 4px;
+}
+.adm-webhook-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.adm-mono-field {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  background: var(--a-bg);
+}
+
+/* ---- save bar: Bowlby One primary Save, otherwise the shared mono bar --- */
+.adm-settings-savebar .adm-savebar-save {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  border: 1px solid var(--a-yel-deep);
+  padding: 10px 20px;
+}
+.adm-settings-savebar .adm-savebar-save:hover {
+  background: var(--a-yel-ink);
+}

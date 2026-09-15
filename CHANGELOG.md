@@ -13,9 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin: Orders and Settings adopt the same sheet system as Products. Orders gets search, status chips, two-line rows on phones and a one-surface order page; Settings gets grouped sections, a Save bar that appears only when something changed, and a Connections list. The order page shows the new status right after marking an order shipped, ready, picked up or refunded. The Chris N Eddy's logo replaces the typed wordmark in the top bar, sign-in and packing slip. ([#32](https://github.com/vanyanv/chrisneddys-site/issues/32))
 - Development: `pnpm release` cuts a release — it dates the `[Unreleased]` section, bumps the version, writes the compare links and tags `vX.Y.Z`. A `commit-msg` hook refuses a commit that references an issue and changes shipped code without a `CHANGELOG.md` line, so entries stop going missing
 - Development: `pnpm test:e2e` runs a Playwright suite against a production build on its own PGlite database (`PGLITE_DATA_DIR`) ([#28](https://github.com/vanyanv/chrisneddys-site/issues/28))
+- Checkout Sessions now enable invoice creation, so Stripe generates an invoice for every order rather than only for subscriptions. Whether the customer is emailed it remains a per-environment Dashboard setting, which `DEPLOY.md` now spells out
+
+### Changed
+
+- `STRIPE_SECRET_KEY` should hold a restricted key scoped to write on Checkout Sessions and read on Tax, not a full secret key. The variable name is unchanged; only the value and the guidance around it are
 
 ### Fixed
 
+- Checkout Sessions declared no product tax code and no tax behaviour, so both fell back to the Stripe account's presets. That account carries none of either, and clothing is taxed differently from the general default in several states. Line items now declare `txcd_30011000` and the shipping rate `txcd_92010001`, both tax-exclusive
+- `DEPLOY.md` claimed Stripe errors at session-creation time when Tax has no registration, so checkout would break rather than under-charge. It is the other way round: an activated Stripe Tax with no registration in the buyer's jurisdiction collects zero, returns no error and looks entirely normal. Before that, with no head office address set, Tax is not active at all and a calculation is rejected outright. Both states are now written down
 - Admin: the entire `/admin` interface rendered unstyled — correct typography on a blank white page. `admin.css` draws with 11 `--a-*` tokens that were defined only in `counter.css`, which the admin route group never loads, so every `background`, `border`, `box-shadow` and `color` in it was dropped as invalid at computed-value time. The tokens now live in `src/styles/tokens.css`, imported by both stylesheets
 - Admin: photos seeded from the repo showed as black squares in the product editor and the products table. Those rows store a stem (`front`, `angle`) resolved against the product's `photoDir`, which the admin had no field for and no code path to use — it understood only uploaded Blob URLs. Both now resolve through one helper, the way the storefront always has
 - Admin: the product slug field accepted any value. Its `pattern` was `^[a-z0-9-]+$`, which fails to compile under the `v` flag browsers apply to that attribute, so the invalid regex was discarded along with the validation

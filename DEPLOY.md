@@ -155,17 +155,52 @@ answering instead of 503ing — only once both `STRIPE_SECRET_KEY` and
 never fails the checkout or webhook it's attached to. All four are listed
 under **Environment variables** below.
 
-**Test mode first.** Use Stripe's test-mode keys (`sk_test_...`) end to end —
-a real Checkout Session, a real webhook delivery, a real (test) card — before
-ever setting live keys in Production.
+**Test mode first.** Use Stripe's test-mode keys end to end — a real Checkout
+Session, a real webhook delivery, a real (test) card — before ever setting
+live keys in Production. Use a restricted key (`rk_...`), not the full
+secret key, for `STRIPE_SECRET_KEY` in both modes: this app only calls
+`checkout.sessions.create` (write on Checkout Sessions) and verifies webhook
+signatures locally (no permission needed), and Stripe Tax calculation
+happens inside that same session-create call — so write on Checkout
+Sessions plus read on Tax, and nothing else, covers everything it does.
+Store it on Vercel as a sensitive environment variable.
 
-**Stripe Tax must be turned on.** Every Checkout Session this app creates
-sets `automatic_tax: { enabled: true }`; if the Stripe account hasn't enabled
-Tax (Dashboard → Tax → get started) and added a tax registration for
-California, Stripe returns an error at session-creation time instead of
-collecting tax, and checkout breaks outright rather than quietly under- or
-over-charging. Add the CA registration (and any other state this store ships
-to) before flipping `STRIPE_SECRET_KEY` on in Production.
+**Stripe Tax must be turned on — and registered, not just enabled.** Every
+Checkout Session this app creates sets `automatic_tax: { enabled: true }`,
+with an explicit product tax code (`txcd_30011000`, Clothing & Footwear) and
+shipping tax code (`txcd_92010001`, Shipping) at `tax_behavior: "exclusive"`,
+so the tax treatment no longer depends on the account's preset defaults.
+
+Activation comes first, and it is not the same as enabling it in code. Stripe
+Tax stays inert until a head office address is set under Dashboard → Tax →
+Settings; until then the Tax Settings status reads `pending`, no tax is
+calculated, and the Tax Calculation API rejects a request outright with
+"Stripe Tax isn't active for this account". Verified against the sandbox on
+2026-09-14: status `pending`, no head office, no preset product tax code, no
+default tax behaviour and zero registrations.
+
+Once it is active the failure mode inverts and gets much quieter. Stripe Tax
+does not error when a jurisdiction has no active registration —
+it silently calculates and collects zero tax, the session still succeeds,
+and checkout looks completely normal. This is the single most common Stripe
+Tax mistake. Before the first real transaction, every jurisdiction this
+store owes tax in must show **Collecting** under Dashboard → Tax →
+Locations: adding a registration in Stripe only records that you're already
+registered with that tax authority, it does not register you with them. A
+registration created in the sandbox does not carry over to live mode and
+must be re-created there. Nexus threshold monitoring only counts live-mode
+transactions too, so test-mode volume gives no signal — the clock starts at
+the first live sale. Whether this store is obliged to register anywhere is
+a question for a tax advisor, not something this document decides.
+
+**Invoices are on, but customer emails are opt-in.** Every Checkout Session
+this app creates sets `invoice_creation: { enabled: true }`, so Stripe
+generates an invoice for each order rather than only for subscriptions.
+Whether the customer actually receives that invoice by email depends on a
+Dashboard setting, not this code: "Successful payments" must be ticked under
+"Email customers about" in the Stripe Dashboard's customer emails settings.
+That setting lives per environment, so ticking it in the sandbox does
+nothing for live mode — it has to be turned on again there.
 
 **Webhook endpoint.** In the Stripe dashboard → Developers → Webhooks, add
 an endpoint at:
@@ -210,7 +245,7 @@ and write real data). Locally they go in `.env.local`, which is gitignored.
 | `OWNER_EMAILS`          | Comma-separated allowlist of owner addresses. Ignored once the `owners` table has rows                                                                    | Owner sign-in is off                                                                                                                             |
 | `OWNER_PASSWORD_HASH`   | The shared owner password as `scrypt$<salt>$<hash>`. Generate with `pnpm owner:password <password>`                                                       | Owner sign-in is off                                                                                                                             |
 | `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com` | The admin's photo-upload card is disabled; it never writes into `public/`                                                                        |
-| `STRIPE_SECRET_KEY`     | Creating Checkout Sessions                                                                                                                                | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
+| `STRIPE_SECRET_KEY`     | Creating Checkout Sessions. Use a restricted key (`rk_...`) scoped to write on Checkout Sessions and read on Tax — see **Payments** above                 | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
 | `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                | Checkout stays closed — half a Stripe setup is not enough                                                                                        |
 | `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails                                                                                                             | Emails are logged, never sent; a missing key never fails a checkout                                                                              |
 | `EMAIL_FROM`            | The verified "from" address, e.g. `Chris N Eddy's <orders@chrisneddys.com>`                                                                               | As above                                                                                                                                         |

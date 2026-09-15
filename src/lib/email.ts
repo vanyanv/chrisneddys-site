@@ -1,11 +1,12 @@
 /**
- * Transactional order email — confirmation, shipping notice, pickup-ready —
- * sent through Resend's REST API with plain `fetch` (no SDK: one endpoint,
- * one shape, not worth a dependency). Gated on `RESEND_API_KEY` and
- * `EMAIL_FROM` both being set; without them nothing is sent, the attempt is
- * logged, and the caller gets `{ sent: false, reason }` back rather than a
- * thrown error — a missing Resend key must never fail the webhook that
- * marks an order paid.
+ * Transactional email — order confirmation, shipping notice, pickup-ready,
+ * password reset, owner invite — sent through Resend's REST API with plain
+ * `fetch` (no SDK: one endpoint, one shape, not worth a dependency). Gated
+ * on `RESEND_API_KEY` and `EMAIL_FROM` both being set; without them nothing
+ * is sent, the attempt is logged, and the caller gets
+ * `{ sent: false, reason }` back rather than a thrown error — a missing
+ * Resend key must never fail the webhook that marks an order paid, or the
+ * auth flow that resets a password or invites an owner.
  *
  * Transactional only, in the brand's plain, direct voice: what was bought,
  * what it cost, what happens next, who to ask. No marketing content, no
@@ -104,7 +105,7 @@ function htmlBody(text: string): string {
   return `<!doctype html><html><body style="font-family:system-ui,sans-serif;white-space:pre-wrap;line-height:1.5;color:#111;max-width:560px;margin:0 auto;padding:24px">${escapeHtml(text)}</body></html>`;
 }
 
-async function sendViaResend(to: string, subject: string, text: string): Promise<EmailResult> {
+export async function sendEmail(to: string, subject: string, text: string): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
 
@@ -153,7 +154,7 @@ export async function sendOrderConfirmation(order: OrderWithItems, db?: Db): Pro
       : "We'll email you again with tracking once it ships.",
   ]);
 
-  return sendViaResend(order.email ?? "", `Order ${order.number} confirmed — ${brand.name}`, text);
+  return sendEmail(order.email ?? "", `Order ${order.number} confirmed — ${brand.name}`, text);
 }
 
 export async function sendShippingNotice(order: OrderWithItems, db?: Db): Promise<EmailResult> {
@@ -179,11 +180,7 @@ export async function sendShippingNotice(order: OrderWithItems, db?: Db): Promis
     tracking,
   );
 
-  return sendViaResend(
-    order.email ?? "",
-    `Order ${order.number} has shipped — ${brand.name}`,
-    text,
-  );
+  return sendEmail(order.email ?? "", `Order ${order.number} has shipped — ${brand.name}`, text);
 }
 
 export async function sendPickupReady(order: OrderWithItems, db?: Db): Promise<EmailResult> {
@@ -205,9 +202,34 @@ export async function sendPickupReady(order: OrderWithItems, db?: Db): Promise<E
     settings,
   );
 
-  return sendViaResend(
+  return sendEmail(
     order.email ?? "",
     `Order ${order.number} is ready for pickup — ${brand.name}`,
     text,
   );
+}
+
+export async function sendPasswordReset(to: string, url: string): Promise<EmailResult> {
+  const text = [
+    `Reset your password for the ${brand.name} admin.`,
+    "",
+    url,
+    "",
+    "This link lasts one hour and can only be used once.",
+    "If you didn't ask for this, you can ignore this email.",
+  ].join("\n");
+
+  return sendEmail(to, `Reset your password — ${brand.name}`, text);
+}
+
+export async function sendOwnerInvite(to: string, url: string): Promise<EmailResult> {
+  const text = [
+    `You've been invited to the ${brand.name} admin.`,
+    "",
+    url,
+    "",
+    "Follow this link to set your password.",
+  ].join("\n");
+
+  return sendEmail(to, `You're invited to the ${brand.name} admin`, text);
 }

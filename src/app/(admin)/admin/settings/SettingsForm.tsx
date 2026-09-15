@@ -54,9 +54,13 @@ function valuesFromSettings(settings: StoreSettings): FormValues {
 export function SettingsForm({
   settings,
   connections,
+  changePassword,
+  owners,
 }: {
   settings: StoreSettings;
   connections: ReactNode;
+  changePassword: ReactNode;
+  owners: ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(saveSettingsAction, initial);
   const fieldErrors = state?.fieldErrors ?? {};
@@ -343,6 +347,15 @@ export function SettingsForm({
           </div>
         </div>
       </form>
+
+      {/* Change-password and Owners each own their own `<form>` and submit
+          independently of the Save bar above, so they render as a second
+          grid rather than as fields inside `#settings-form` — nested
+          `<form>` elements aren't valid HTML. */}
+      <div className="adm-settings-grid adm-settings-account-grid">
+        <div className="adm-settings-section">{changePassword}</div>
+        <div className="adm-settings-section">{owners}</div>
+      </div>
 
       <div className={`adm-savebar adm-settings-savebar${dirty ? " is-visible" : ""}`}>
         <span className="adm-savebar-count">Unsaved changes</span>

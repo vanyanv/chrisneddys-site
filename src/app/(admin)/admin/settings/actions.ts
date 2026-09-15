@@ -1,8 +1,16 @@
 "use server";
 
-import { requireOwner } from "@/lib/auth";
+import { headers } from "next/headers";
+import { applySetCookieHeader, requireOwner } from "@/lib/auth";
+import { getAuth } from "@/lib/betterAuth";
+import { inviteOwner, removeOwner } from "@/lib/owners";
 import { saveStoreSettings } from "@/lib/settingsAdmin";
 import type { StoreSettingsPatch } from "@/lib/orders";
+
+/** Minimum length for a new owner password — matches
+ * `scripts/owner-password.mjs`'s `MIN_PASSWORD_LENGTH`. Better Auth's own
+ * `changePassword` has no length floor of its own to lean on here. */
+const MIN_NEW_PASSWORD_LENGTH = 12;
 
 export type SaveSettingsState = {
   ok?: boolean;
@@ -92,4 +100,114 @@ export async function saveSettingsAction(
   if (!result.ok) return { error: result.error };
 
   return { ok: true, savedAt: new Date().toISOString() };
+}
+
+// ---------------------------------------------------------------------------
+// Change password
+// ---------------------------------------------------------------------------
+
+export type ChangePasswordState = {
+  ok?: boolean;
+  error?: string;
+  /** ISO timestamp of a successful change — see `SaveSettingsState.savedAt`. */
+  savedAt?: string;
+};
+
+/**
+ * Changes the signed-in owner's password via `auth.api.changePassword`,
+ * always revoking every other session — a change-password card that leaves
+ * a stolen session logged in isn't much of a security control. A wrong
+ * current password throws (Better Auth's `INVALID_PASSWORD`); every failure
+ * path returns the same generic message rather than distinguishing it,
+ * since a caller who's already signed in as this owner has no other use for
+ * that distinction.
+ */
+export async function changePasswordAction(
+  _prevState: ChangePasswordState | undefined,
+  formData: FormData,
+): Promise<ChangePasswordState> {
+  await requireOwner();
+
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+
+  if (newPassword.length < MIN_NEW_PASSWORD_LENGTH) {
+    return { error: `Use at least ${MIN_NEW_PASSWORD_LENGTH} characters for the new password.` };
+  }
+
+  const auth = await getAuth();
+  const headerList = await headers();
+
+  try {
+    const { headers: outHeaders } = await auth.api.changePassword({
+      headers: headerList,
+      body: { currentPassword, newPassword, revokeOtherSessions: true },
+      returnHeaders: true,
+    });
+    await applySetCookieHeader(outHeaders.get("set-cookie"));
+  } catch {
+    return { error: "That current password isn't right." };
+  }
+
+  return { ok: true, savedAt: new Date().toISOString() };
+}
+
+// ---------------------------------------------------------------------------
+// Owners
+// ---------------------------------------------------------------------------
+
+export type InviteOwnerState = {
+  ok?: boolean;
+  error?: string;
+  sent?: boolean;
+  reason?: string;
+  url?: string;
+  /** ISO timestamp of a successful invite — lets the client tell "the same
+   * result rendered again" apart from "a fresh invite just went through". */
+  at?: string;
+};
+
+/** Invites a new owner by email — see `inviteOwner` (`@/lib/owners`) for
+ * the create-user-then-reset mechanics and every rule this enforces. */
+export async function inviteOwnerAction(
+  _prevState: InviteOwnerState | undefined,
+  formData: FormData,
+): Promise<InviteOwnerState> {
+  await requireOwner();
+
+  const email = String(formData.get("email") ?? "").trim();
+  const result = await inviteOwner(email);
+
+  if (!result.ok) return { error: result.error };
+  if (!result.sent) {
+    return {
+      ok: true,
+      sent: false,
+      reason: result.reason,
+      url: result.url,
+      at: new Date().toISOString(),
+    };
+  }
+  return { ok: true, sent: true, at: new Date().toISOString() };
+}
+
+export type RemoveOwnerState = {
+  ok?: boolean;
+  error?: string;
+  at?: string;
+};
+
+/** Removes an owner by email — see `removeOwner` (`@/lib/owners`) for the
+ * last-owner and self-removal rules this enforces. */
+export async function removeOwnerAction(
+  _prevState: RemoveOwnerState | undefined,
+  formData: FormData,
+): Promise<RemoveOwnerState> {
+  const session = await requireOwner();
+
+  const email = String(formData.get("email") ?? "").trim();
+  const result = await removeOwner(email, session.email);
+
+  if (!result.ok) return { error: result.error };
+  return { ok: true, at: new Date().toISOString() };
 }

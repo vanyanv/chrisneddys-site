@@ -9,13 +9,18 @@ function safeNext(next: string | string[] | undefined): string {
   return "/admin";
 }
 
+function wasJustReset(value: string | string[] | undefined): boolean {
+  return Boolean(Array.isArray(value) ? value[0] : value);
+}
+
 export default async function AdminSignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>;
+  searchParams: Promise<{ next?: string | string[]; reset?: string | string[] }>;
 }) {
   const params = await searchParams;
   const next = safeNext(params.next);
+  const justReset = wasJustReset(params.reset);
 
   if (!isAuthConfigured()) {
     return (
@@ -29,5 +34,5 @@ export default async function AdminSignInPage({
     );
   }
 
-  return <SignInForm next={next} />;
+  return <SignInForm next={next} justReset={justReset} />;
 }

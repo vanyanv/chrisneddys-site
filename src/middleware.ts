@@ -10,6 +10,12 @@ import { getSessionCookie } from "better-auth/cookies";
  * happens server-side in `requireOwner()` (`src/lib/auth.ts`), which every
  * admin page or action calls before touching any data.
  *
+ * Also exempts `/admin/forgot-password` and `/admin/reset-password` —
+ * reachable signed out, same as `/admin/sign-in`, so an owner who's locked
+ * out has a way back in. See
+ * `docs/superpowers/specs/2026-09-14-better-auth-owner-sign-in-design.md`'s
+ * "T3b" row.
+ *
  * Also stamps every matched `/admin` request with an `x-pathname` header (so
  * `requireOwner` in `src/lib/auth.ts` knows what to put in `next` for a
  * server component it can't call `usePathname` from) and every matched
@@ -27,7 +33,14 @@ export const config = {
 };
 
 const NO_STORE = "private, no-store";
-const SIGN_IN_PATHS = new Set(["/admin/sign-in", "/admin/sign-in/"]);
+const GUEST_PATHS = new Set([
+  "/admin/sign-in",
+  "/admin/sign-in/",
+  "/admin/forgot-password",
+  "/admin/forgot-password/",
+  "/admin/reset-password",
+  "/admin/reset-password/",
+]);
 
 function hasSessionCookie(request: NextRequest): boolean {
   return getSessionCookie(request) !== null;
@@ -44,7 +57,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  if (!SIGN_IN_PATHS.has(pathname) && !hasSessionCookie(request)) {
+  if (!GUEST_PATHS.has(pathname) && !hasSessionCookie(request)) {
     const signInUrl = new URL("/admin/sign-in", request.url);
     signInUrl.searchParams.set("next", pathname);
     const redirectResponse = NextResponse.redirect(signInUrl, 307);

@@ -86,7 +86,7 @@ export function isAuthConfigured(): boolean {
  * `cookies()` store, so the browser gets the exact cookie(s) Better Auth
  * intended — name, value and every attribute — without this module having
  * to know its cookie name or shape. A no-op when there's nothing to set. */
-async function applySetCookieHeader(setCookieHeader: string | null): Promise<void> {
+export async function applySetCookieHeader(setCookieHeader: string | null): Promise<void> {
   if (!setCookieHeader) return;
   const store = await cookies();
   for (const [name, attributes] of parseSetCookieHeader(setCookieHeader)) {

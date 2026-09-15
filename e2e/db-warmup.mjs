@@ -27,19 +27,57 @@
  * the one product `seedCatalogue` creates. Skipped when the `orders` table
  * already has rows (a `webServer.reuseExistingServer` local rerun, e.g.),
  * so this stays idempotent the same way `seedCatalogue` is.
+ *
+ * Also seeds the owner account `e2e/helpers.ts`'s `signInAsOwner()` (and
+ * `e2e/admin-owner-accounts.spec.ts`) signs in with, by inserting the
+ * `user` row and its `credential` `account` row directly — the same shape
+ * `src/lib/auth.ts`'s `bootstrapFirstOwnerIfNeeded` would create, and the
+ * same insert shape `src/lib/auth.test.ts` uses to seed an account for its
+ * own sign-in tests. This used to happen instead via
+ * `playwright.config.ts`'s `webServer.env` setting `OWNER_PASSWORD_HASH`
+ * and relying on that bootstrap path to consume it on the very first
+ * sign-in — but that path only fires while the `user` table is still
+ * empty, so seeding here beats it there anyway once the table already has
+ * a row, and doing it here means real sign-in never depends on
+ * `OWNER_PASSWORD_HASH` reaching the running server intact (see
+ * playwright.config.ts's comment on why that value used to need `$`
+ * escaping, and why it no longer does). Skipped when a `user` row with
+ * this email already exists, for the same idempotency reason as the order
+ * seed above.
  */
+import { randomUUID } from "node:crypto";
 import { register } from "node:module";
+import { eq } from "drizzle-orm";
 
 // See order-seed-resolve-hook.mjs: makes `@/...` and `next/cache` resolvable
 // to plain `node`, so `../src/lib/orders.ts` below can be imported as-is.
 register("./order-seed-resolve-hook.mjs", import.meta.url);
 
 const { getDb } = await import("../src/db/client.ts");
-const { orders } = await import("../src/db/schema.ts");
+const { orders, user, account } = await import("../src/db/schema.ts");
 const { createPendingOrder, markPaid, markReadyForPickup, setFulfilment } =
   await import("../src/lib/orders.ts");
+const { hashPassword } = await import("../src/lib/password.ts");
+
+// Must match `e2e/helpers.ts`'s `OWNER_EMAIL`/`OWNER_PASSWORD` exactly —
+// that's what `signInAsOwner()` and every owner-accounts spec sign in with.
+const OWNER_EMAIL = "owner@example.com";
+const OWNER_PASSWORD = "e2e-test-password-123";
 
 const db = await getDb();
+
+const existingOwner = await db
+  .select({ id: user.id })
+  .from(user)
+  .where(eq(user.email, OWNER_EMAIL))
+  .limit(1);
+if (existingOwner.length === 0) {
+  console.log("Seeding e2e owner account…");
+  await seedOwner();
+  console.log("e2e owner account seeded.");
+} else {
+  console.log("e2e owner account already present — skipping seed.");
+}
 
 const existingOrder = await db.select({ id: orders.id }).from(orders).limit(1);
 if (existingOrder.length === 0) {
@@ -48,6 +86,23 @@ if (existingOrder.length === 0) {
   console.log("e2e orders seeded.");
 } else {
   console.log("e2e orders already present — skipping seed.");
+}
+
+async function seedOwner() {
+  const userId = randomUUID();
+  await db.insert(user).values({
+    id: userId,
+    name: OWNER_EMAIL.split("@")[0],
+    email: OWNER_EMAIL,
+    emailVerified: false,
+  });
+  await db.insert(account).values({
+    id: randomUUID(),
+    accountId: userId,
+    providerId: "credential",
+    userId,
+    password: await hashPassword(OWNER_PASSWORD),
+  });
 }
 
 async function seedOrders() {

@@ -5,7 +5,7 @@ import { getOwnerSession, requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
-import type { OwnerSession } from "@/lib/sessionToken";
+import type { OwnerSession } from "@/lib/auth";
 
 const NAV = [
   { href: "/admin/products", label: "Products" },
@@ -18,7 +18,14 @@ function normalizePathname(pathname: string): string {
   return pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
 }
 
-const SIGN_IN_PATH = "/admin/sign-in";
+/** Routes reachable signed out — the sign-in page itself, plus the two
+ * password-recovery pages (`src/app/(admin)/admin/forgot-password`,
+ * `src/app/(admin)/admin/reset-password`). Everything else falls through to
+ * `requireOwner()` below. `src/middleware.ts` exempts the same three paths
+ * from its own cookie-presence check; this is the second, server-side half
+ * of that — without it `requireOwner()` would redirect a signed-out visitor
+ * away from these pages regardless of what middleware let through. */
+const GUEST_PATHS = new Set(["/admin/sign-in", "/admin/forgot-password", "/admin/reset-password"]);
 
 /**
  * "CE" from a name ("Chris Eddy" -> "CE"), or the first two letters of the
@@ -49,9 +56,9 @@ function ownerInitials(session: OwnerSession): string {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers();
   const pathname = normalizePathname(headerList.get("x-pathname") ?? "");
-  const isSignIn = pathname === SIGN_IN_PATH;
+  const isGuestPath = GUEST_PATHS.has(pathname);
 
-  const session = isSignIn ? await getOwnerSession() : await requireOwner();
+  const session = isGuestPath ? await getOwnerSession() : await requireOwner();
 
   if (!session) {
     return <div className="adm-shell adm-shell-guest">{children}</div>;

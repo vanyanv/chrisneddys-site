@@ -25,23 +25,34 @@ import { defineConfig, devices } from "@playwright/test";
  * to `next build`'s own parallel static-generation workers, the first-ever
  * migrate/seed races and corrupts the PGlite data directory.
  *
- * `OWNER_PASSWORD_HASH` below is `scrypt$<salt>$<hash>` — src/lib/password.ts's
- * format — for the plaintext password `"e2e-test-password-123"`, produced by
- * `pnpm owner:password e2e-test-password-123`. `e2e/helpers.ts` signs in with
- * that same plaintext (exported there as `OWNER_PASSWORD`).
+ * `OWNER_EMAILS`/`OWNER_PASSWORD_HASH` below no longer feed a real sign-in:
+ * `e2e/db-warmup.mjs` seeds the owner account (`e2e/helpers.ts`'s
+ * `OWNER_EMAIL`/`OWNER_PASSWORD`) directly into the database before `next
+ * build` even starts, by inserting the `user`/`account` rows itself and
+ * hashing the password with `src/lib/password.ts`'s `hashPassword` — see
+ * that file's module comment. With a `user` row already present,
+ * `src/lib/auth.ts`'s `bootstrapFirstOwnerIfNeeded` (which is the only code
+ * that ever reads `OWNER_PASSWORD_HASH`) is a no-op: it only seeds an
+ * account while the `user` table is still empty.
  *
- * Its `$`s are escaped (`\$`), same as DEPLOY.md warns for `.env` files, and
- * for the same reason even though this value never touches a `.env` file:
- * `next start` loads `.env.local` via `@next/env`, and that pass runs
- * `dotenv-expand` over the *whole* resulting environment whenever any `.env`
- * file is present — not just the keys that file defines — so an unescaped
- * `scrypt$<hex>$<hex>` already sitting in `process.env` (set right here,
- * below) gets its `$<hex>` runs "expanded" against undefined variable names
- * and silently truncated to `scrypt`, and every sign-in then fails with "That
- * email or password isn't right." Confirmed by reproducing it locally: signed
- * in fine with `.env.local` absent, failed with it present and this value
- * unescaped, passed again once escaped. `.env.local` is never touched here —
- * only the value this config sets.
+ * These two vars are kept only because `isAuthConfigured()` (`src/lib/
+ * auth.ts`) requires `AUTH_SECRET`, `OWNER_EMAILS` and `OWNER_PASSWORD_HASH`
+ * to all be set before the sign-in page will even render its form — so
+ * these just need to be non-empty, not valid. That used to matter a great
+ * deal: this value used to be the *only* thing bootstrapping the owner
+ * account, and it had to survive `next start` loading `.env.local` via
+ * `@next/env`, whose `dotenv-expand` pass runs over the *whole* resulting
+ * environment whenever any `.env*` file is present — not just the keys
+ * that file defines. That pass un-escapes a literal `\$` back to `$`, so a
+ * hash containing raw, unescaped `$<hex>` runs already sitting in
+ * `process.env` would get "expanded" against undefined variable names and
+ * silently truncated. But that only happens when some `.env*` file exists
+ * to make `@next/env` run the expand pass at all (a fresh checkout has
+ * none), so the old escaped-`\$` value was actually broken exactly on a
+ * clean checkout — a real, since-fixed harness bug, not something to
+ * preserve. Since neither var is ever parsed as a real hash anymore, this
+ * value is now a plain placeholder with no `$` in it at all, so there's no
+ * escaping question left to get right in either direction.
  */
 const PORT = 3111;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
@@ -76,14 +87,26 @@ export default defineConfig({
       // Its own data directory — never the developer's `.pglite/dev`.
       PGLITE_DATA_DIR: ".pglite/e2e",
       AUTH_SECRET: "e2e-test-auth-secret-32-characters-minimum-length",
+      // Without this, `src/lib/siteOrigin.ts` would fall through to
+      // `brand.siteUrl` (the real, live chrisneddys.com) when building the
+      // invite/reset link `src/lib/betterAuth.ts` emails out, and spec 5
+      // (`e2e/admin-owner-accounts.spec.ts`) would try to navigate the
+      // invitee there instead of to this disposable test server.
+      SITE_ORIGIN: BASE_URL,
       OWNER_EMAILS: "owner@example.com",
-      OWNER_PASSWORD_HASH:
-        "scrypt\\$49bb82fcf56a3fd47be334f724da8825\\$ec75a0afa670e1849fb2b8f745dfbe015dea49942b51f93a9c79d029543cdf7396f29981005ef523463c9e11da7249c47b14e5808bb1a206505f76d851228c1d",
-      // Keep the smoke suite away from real Stripe/Blob credentials even if
-      // .env.local has them set.
+      // Never actually parsed as a hash — see the module comment above.
+      OWNER_PASSWORD_HASH: "unused-e2e-owner-password-hash-placeholder",
+      // Keep the smoke suite away from real Stripe/Blob/Resend credentials
+      // even if .env.local has them set. Unset (not just falsy) RESEND_API_KEY
+      // and EMAIL_FROM is also what `e2e/admin-owner-accounts.spec.ts`'s
+      // forgot-password test (4) exercises: `isEmailConfigured()` in
+      // `src/app/(admin)/admin/forgot-password/page.tsx` and `actions.ts`
+      // both key off this exact pair.
       STRIPE_SECRET_KEY: "",
       STRIPE_WEBHOOK_SECRET: "",
       BLOB_READ_WRITE_TOKEN: "",
+      RESEND_API_KEY: "",
+      EMAIL_FROM: "",
     },
   },
 });

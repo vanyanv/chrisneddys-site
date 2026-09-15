@@ -233,31 +233,99 @@ skipped as "already seen."
 
 ---
 
+## Owner accounts
+
+`/admin` sign-in is per-owner accounts on Better Auth, not a shared password.
+Each owner has their own email and password, stored in the database (`user`
+and `account` tables) rather than in an environment variable.
+
+**First sign-in seeds the first account.** With no rows in the `user` table
+yet, signing in with an email from `OWNER_EMAILS` and the password matching
+`OWNER_PASSWORD_HASH` creates that owner's account with that password. After
+that first sign-in, both env vars are ignored — the database is the source of
+truth, and changing them does nothing until `user` is empty again.
+`AUTH_SECRET` is unrelated to that seeding step and is still required always:
+Better Auth signs sessions with it.
+
+**Inviting an owner.** From `/admin/settings`, an existing owner invites a new
+one by email; the invitee gets a link to set their own password. There is no
+env var to edit and nothing to redeploy. That link is always a full URL, not
+a path — it has to work from inside an email client, which has no page to
+resolve a relative link against. It points at `SITE_ORIGIN` if set, or
+otherwise at this site's own canonical domain — `SITE_ORIGIN` only matters
+when the site is being served somewhere other than that canonical domain,
+such as a Vercel preview that needs its emailed link to point back at
+itself.
+
+**Removing an owner.** Also from Settings — removing an owner revokes their
+sessions immediately. You can't remove the last owner or yourself.
+
+**Sessions** last 12 hours and are stored server-side, so they can be revoked
+rather than only outliving a cleared cookie. Changing your password (from
+Settings, or via a reset link) signs out every other device — a stolen laptop
+or an old, still-logged-in browser stops working the moment the password
+changes.
+
+**Forgot password** sends a one-hour, single-use reset link, which needs
+`RESEND_API_KEY` and `EMAIL_FROM` configured (see **Environment variables**
+below). Without them, the sign-in page says emailing isn't set up rather than
+pretending a link went out.
+
+**Break-glass: locked out with no working sign-in.** If the reset email can't
+reach you either, set the owner's password directly from a machine that can
+reach the database:
+
+```
+DATABASE_URL='...' pnpm owner:password --apply owner@example.com 'a-new-password'
+```
+
+This connects to the database named in `DATABASE_URL` and overwrites that
+owner's stored password — no redeploy, no email. It refuses if `DATABASE_URL`
+is unset, if no `user` row matches that email (invite them first), or if the
+password is under 12 characters. Run it with the **production** `DATABASE_URL`
+if that's the account you're locked out of — pointing it at your local
+database only fixes sign-in there.
+
+To print a hash for the _first-sign-in seeding_ path above instead of writing
+to the database, run the same script without `--apply`:
+
+```
+pnpm owner:password 'a-new-password'
+```
+
+This only prints — see the `$`-escaping gotcha below before pasting the
+result into a `.env` file.
+
+---
+
 ## Environment variables
 
 Set these on the Vercel project (Production, and any Preview that should read
 and write real data). Locally they go in `.env.local`, which is gitignored.
 
-| Variable                | Needed for                                                                                                                                                | Unset means                                                                                                                                      |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`          | The catalogue, orders and editions — the Neon connection string. Check the **database name** at the end of it: one Neon endpoint can host several.        | `pnpm dev` uses a file-persisted PGlite database at `.pglite/dev`; a production build falls back to the in-repo catalogue in `src/data/merch.ts` |
-| `AUTH_SECRET`           | Signing the `/admin` owner-session JWT. Generate with `openssl rand -base64 32`                                                                           | Owner sign-in is off                                                                                                                             |
-| `OWNER_EMAILS`          | Comma-separated allowlist of owner addresses. Ignored once the `owners` table has rows                                                                    | Owner sign-in is off                                                                                                                             |
-| `OWNER_PASSWORD_HASH`   | The shared owner password as `scrypt$<salt>$<hash>`. Generate with `pnpm owner:password <password>`                                                       | Owner sign-in is off                                                                                                                             |
-| `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com` | The admin's photo-upload card is disabled; it never writes into `public/`                                                                        |
-| `STRIPE_SECRET_KEY`     | Creating Checkout Sessions. Use a restricted key (`rk_...`) scoped to write on Checkout Sessions and read on Tax — see **Payments** above                 | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
-| `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                | Checkout stays closed — half a Stripe setup is not enough                                                                                        |
-| `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails                                                                                                             | Emails are logged, never sent; a missing key never fails a checkout                                                                              |
-| `EMAIL_FROM`            | The verified "from" address, e.g. `Chris N Eddy's <orders@chrisneddys.com>`                                                                               | As above                                                                                                                                         |
-| `NEXT_PUBLIC_GA_ID`     | Overrides the GA4 measurement ID — see **Analytics before launch**                                                                                        | The repo default in `Analytics.tsx` is used                                                                                                      |
-| `NEXT_PUBLIC_W3F_KEY`   | Web3Forms key for the `/contact/` form                                                                                                                    | The form still validates but falls back to mailto/phone                                                                                          |
+| Variable                | Needed for                                                                                                                                                                                                              | Unset means                                                                                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`          | The catalogue, orders and editions — the Neon connection string. Check the **database name** at the end of it: one Neon endpoint can host several.                                                                      | `pnpm dev` uses a file-persisted PGlite database at `.pglite/dev`; a production build falls back to the in-repo catalogue in `src/data/merch.ts` |
+| `AUTH_SECRET`           | Signing `/admin` owner sessions — Better Auth signs with it. Generate with `openssl rand -base64 32`                                                                                                                    | No owner can sign in                                                                                                                             |
+| `OWNER_EMAILS`          | Comma-separated allowlist that seeds the _first_ owner account(s) on first sign-in — see **Owner accounts** above. Ignored once the `user` table has rows                                                               | Nothing to seed — with no owner accounts yet, nobody can sign in. Once accounts exist, unset has no effect                                       |
+| `OWNER_PASSWORD_HASH`   | The password those seeded accounts get, as `scrypt$<cost>$<salt>$<hash>`. Generate with `pnpm owner:password <password>`. Not read after that first sign-in — owners change their own password from Settings afterwards | Nothing to seed — with no owner accounts yet, nobody can sign in. Once accounts exist, unset has no effect                                       |
+| `SITE_ORIGIN`           | Overrides the origin used for the emailed reset/invite link (see **Owner accounts** above) — only matters when the site is served somewhere other than its canonical domain, e.g. a Vercel preview                      | The link uses this site's own canonical domain                                                                                                   |
+| `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com`                                                               | The admin's photo-upload card is disabled; it never writes into `public/`                                                                        |
+| `STRIPE_SECRET_KEY`     | Creating Checkout Sessions. Use a restricted key (`rk_...`) scoped to write on Checkout Sessions and read on Tax — see **Payments** above                                                                               | Checkout stays closed; `POST /api/checkout` 503s                                                                                                 |
+| `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                                                                              | Checkout stays closed — half a Stripe setup is not enough                                                                                        |
+| `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails                                                                                                                                                                           | Emails are logged, never sent; a missing key never fails a checkout                                                                              |
+| `EMAIL_FROM`            | The verified "from" address, e.g. `Chris N Eddy's <orders@chrisneddys.com>`                                                                                                                                             | As above                                                                                                                                         |
+| `NEXT_PUBLIC_GA_ID`     | Overrides the GA4 measurement ID — see **Analytics before launch**                                                                                                                                                      | The repo default in `Analytics.tsx` is used                                                                                                      |
+| `NEXT_PUBLIC_W3F_KEY`   | Web3Forms key for the `/contact/` form                                                                                                                                                                                  | The form still validates but falls back to mailto/phone                                                                                          |
 
 Two traps worth knowing, both of which have already cost an afternoon:
 
 - **Escape `$` as `\$` in a `.env` file.** Next expands `$NAME` in env values, so
-  an unescaped `OWNER_PASSWORD_HASH=scrypt$abc$def` silently becomes `scrypt`
-  and sign-in fails with the deliberately unhelpful "That email or password
-  isn't right." Quoting does not help; only the backslash does.
+  an unescaped `OWNER_PASSWORD_HASH=scrypt$131072$abc$def` silently becomes
+  `scrypt`. That only bites during the first-sign-in seeding described in
+  **Owner accounts** above, and it fails with the deliberately unhelpful "That
+  email or password isn't right." Quoting does not help; only the backslash
+  does.
 - **Check the database name in `DATABASE_URL`.** Neon's connection snippet
   defaults to `neondb`, which may not be the database you created for this
   project. Pointing at the wrong one lets `prebuild` create this app's ten

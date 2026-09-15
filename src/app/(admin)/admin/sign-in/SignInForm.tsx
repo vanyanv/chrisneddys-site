@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
 
 const initialState: SignInState = {};
 
-export function SignInForm({ next }: { next: string }) {
+export function SignInForm({ next, justReset = false }: { next: string; justReset?: boolean }) {
   const [state, formAction, pending] = useActionState(signInAction, initialState);
 
   return (
@@ -20,6 +21,9 @@ export function SignInForm({ next }: { next: string }) {
         priority
       />
       <h1 className="adm-h2">Owner sign-in</h1>
+      {justReset ? (
+        <p className="adm-notice">Password updated. Sign in with your new password.</p>
+      ) : null}
       <input type="hidden" name="next" value={next} />
 
       <div className="adm-field">
@@ -51,6 +55,10 @@ export function SignInForm({ next }: { next: string }) {
       <button type="submit" className="adm-btn adm-btn-primary adm-btn-block" disabled={pending}>
         {pending ? "Signing in…" : "Sign in"}
       </button>
+
+      <p className="adm-notice">
+        <Link href="/admin/forgot-password">Forgot password?</Link>
+      </p>
     </form>
   );
 }

@@ -242,3 +242,69 @@
 .adm-settings-savebar .adm-savebar-save:hover {
   background: var(--a-yel-ink);
 }
+
+/* ---- account grid: Change password + Owners, below the main Save bar --- */
+/* Second instance of `.adm-settings-grid` (see the comment on that rule
+   above) — these two cards submit independently of `#settings-form`, so
+   they can't live inside it as fields, but still want the same two-column
+   layout and section rule as Store/Pickup/Shipping/Connections. */
+.adm-settings-account-grid {
+  margin-top: 28px;
+}
+
+.adm-account-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.adm-account-form .adm-btn {
+  align-self: flex-start;
+}
+
+/* ---- owners list --------------------------------------------------------- */
+.adm-owners-list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.adm-owners-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--a-line);
+}
+.adm-owners-item:last-child {
+  border-bottom: none;
+}
+.adm-owners-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.adm-owners-email {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+}
+.adm-owners-you {
+  font-weight: 400;
+  color: var(--a-sub);
+}
+.adm-owners-confirm {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+.adm-owners-invite {
+  padding-top: 4px;
+}
+.adm-owners-notice {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--a-line);
+}

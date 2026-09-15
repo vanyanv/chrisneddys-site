@@ -13,7 +13,13 @@ import {
   updateStoreSettings,
   type OrderWithItems,
 } from "@/lib/orders";
-import { sendOrderConfirmation, sendPickupReady, sendShippingNotice } from "@/lib/email";
+import {
+  sendOrderConfirmation,
+  sendOwnerInvite,
+  sendPasswordReset,
+  sendPickupReady,
+  sendShippingNotice,
+} from "@/lib/email";
 
 // `email.ts` carries `import "server-only"`, which throws outside a real
 // Next.js server build — see the note in
@@ -209,5 +215,74 @@ describe("sendPickupReady", () => {
     expect(payload.text).toContain(
       "Pickup at 5539 W. Sunset Blvd, Los Angeles, CA 90028. Bring this email.",
     );
+  });
+});
+
+describe("sendPasswordReset", () => {
+  it("is gated on RESEND_API_KEY / EMAIL_FROM and never throws when they're unset", async () => {
+    const result = await sendPasswordReset(
+      "owner@example.com",
+      "https://chrisneddys.com/admin/reset-password?token=abc123",
+    );
+    expect(result).toEqual({
+      sent: false,
+      reason: "Resend isn't configured (RESEND_API_KEY / EMAIL_FROM).",
+    });
+  });
+
+  it("posts a single-link, plain-text reset email to Resend", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const url = "https://chrisneddys.com/admin/reset-password?token=abc123";
+    const result = await sendPasswordReset("owner@example.com", url);
+    expect(result).toEqual({ sent: true });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, init] = fetchMock.mock.calls[0]!;
+    const payload = JSON.parse(init.body);
+    expect(payload.to).toBe("owner@example.com");
+    expect(payload.subject).toBe("Reset your password — Chris N Eddy's");
+
+    const text: string = payload.text;
+    expect(text.split(url)).toHaveLength(2); // occurs exactly once
+    expect(text).toContain("one hour");
+    expect(text).toContain("once");
+    expect(text).toContain("ignore this email");
+  });
+});
+
+describe("sendOwnerInvite", () => {
+  it("is gated on RESEND_API_KEY / EMAIL_FROM and never throws when they're unset", async () => {
+    const result = await sendOwnerInvite(
+      "newowner@example.com",
+      "https://chrisneddys.com/admin/accept-invite?token=xyz789",
+    );
+    expect(result).toEqual({
+      sent: false,
+      reason: "Resend isn't configured (RESEND_API_KEY / EMAIL_FROM).",
+    });
+  });
+
+  it("posts a single-link, plain-text invite email to Resend", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const url = "https://chrisneddys.com/admin/accept-invite?token=xyz789";
+    const result = await sendOwnerInvite("newowner@example.com", url);
+    expect(result).toEqual({ sent: true });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, init] = fetchMock.mock.calls[0]!;
+    const payload = JSON.parse(init.body);
+    expect(payload.to).toBe("newowner@example.com");
+    expect(payload.subject).toBe("You're invited to the Chris N Eddy's admin");
+
+    const text: string = payload.text;
+    expect(text.split(url)).toHaveLength(2); // occurs exactly once
+    expect(text).toContain("invited");
+    expect(text).toContain("set your password");
   });
 });

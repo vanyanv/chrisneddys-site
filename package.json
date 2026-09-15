@@ -28,6 +28,7 @@
     "@electric-sql/pglite": "^0.5.8",
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/blob": "^2.8.0",
+    "better-auth": "^1.7.5",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.12",
     "next": "^15.5.25",

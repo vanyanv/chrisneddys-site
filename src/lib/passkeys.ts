@@ -55,6 +55,7 @@ import { getAuthenticatorName } from "@better-auth/passkey";
 import { getDb } from "@/db/client";
 import { passkey as passkeyTable, user } from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
+import { redactEmail } from "@/lib/logRedaction";
 import {
   applySetCookieHeader,
   GENERIC_SIGN_IN_ERROR,
@@ -281,7 +282,7 @@ export async function finishPasskeySignIn(
   const throttle = await checkThrottle(db, throttleEmail, ip, now);
   if (throttle.locked) {
     console.warn("[auth] passkey sign-in throttled", {
-      email: throttleEmail,
+      email: redactEmail(throttleEmail),
       ip,
       emailFailures: throttle.emailFailures,
       ipFailures: throttle.ipFailures,
@@ -309,7 +310,10 @@ export async function finishPasskeySignIn(
 
   if (!verified) {
     await recordSignInAttempt(db, throttleEmail, ip, false, now);
-    console.warn("[auth] failed passkey sign-in attempt", { email: throttleEmail, ip });
+    console.warn("[auth] failed passkey sign-in attempt", {
+      email: redactEmail(throttleEmail),
+      ip,
+    });
     return { ok: false, error: GENERIC_SIGN_IN_ERROR };
   }
 

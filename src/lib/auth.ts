@@ -36,6 +36,7 @@ import { account, user } from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
 import { hashPassword, verifyPassword, verifyPasswordDetailed } from "@/lib/password";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
+import { redactEmail } from "@/lib/logRedaction";
 import {
   checkThrottle,
   clearFailedAttempts,
@@ -270,7 +271,7 @@ export async function signIn(
   const throttle = await checkThrottle(db, normalizedEmail, ip, now);
   if (throttle.locked) {
     console.warn("[auth] sign-in throttled", {
-      email: normalizedEmail,
+      email: redactEmail(normalizedEmail),
       ip,
       emailFailures: throttle.emailFailures,
       ipFailures: throttle.ipFailures,
@@ -300,7 +301,7 @@ export async function signIn(
     await recordSignInAttempt(db, normalizedEmail, ip, false, now);
     const failuresNow = throttle.emailFailures + 1;
     console.warn("[auth] failed sign-in attempt", {
-      email: normalizedEmail,
+      email: redactEmail(normalizedEmail),
       ip,
       count: failuresNow,
     });

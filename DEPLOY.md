@@ -1,12 +1,18 @@
 # Deploying chrisneddys.com
 
-The site is a Next.js static export (`output: "export"`), so `pnpm build` writes a
-plain directory of files to `out/` and there is no server at runtime. Everything
-below is therefore host configuration, not application code — a static export
-cannot redirect, set a header, or canonicalise a hostname on its own.
+The site is a Next.js app with a server: storefront pages are prerendered and
+revalidated, while `/admin/*` and `/api/*` run per request. Headers and the cache
+policy ship from `headers()` in `next.config.mjs`, so they apply on any host; the
+one thing that is still host configuration is the apex → www redirect, which a
+Next.js app cannot do for itself before its own router sees the request.
 
-Two of these are SEO-critical and have to be right on day one, because both are
-expensive to correct later:
+**Opening the store for the first time is a separate document — see
+[`GO-LIVE.md`](GO-LIVE.md)**, which orders the Neon, Vercel, Resend and Stripe
+setup and says what each account asks of you. This file explains how the pieces
+are wired.
+
+Two things have to be right on day one, because both are expensive to correct
+later:
 
 1. **One canonical host.** If both `chrisneddys.com` and `www.chrisneddys.com`
    answer with 200, the entire site exists twice. Link equity splits across the

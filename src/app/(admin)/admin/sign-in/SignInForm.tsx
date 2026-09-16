@@ -7,7 +7,15 @@ import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
 
 const initialState: SignInState = {};
 
-export function SignInForm({ next, justReset = false }: { next: string; justReset?: boolean }) {
+export function SignInForm({
+  next,
+  justReset = false,
+  sessionExpired = false,
+}: {
+  next: string;
+  justReset?: boolean;
+  sessionExpired?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(signInAction, initialState);
 
   return (
@@ -23,6 +31,10 @@ export function SignInForm({ next, justReset = false }: { next: string; justRese
       <h1 className="adm-h2">Owner sign-in</h1>
       {justReset ? (
         <p className="adm-notice">Password updated. Sign in with your new password.</p>
+      ) : sessionExpired ? (
+        <p className="adm-notice">
+          You were signed out. Sessions last 12 hours &mdash; sign in again to keep going.
+        </p>
       ) : null}
       <input type="hidden" name="next" value={next} />
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
 import "@/styles/admin.css";
+import { OfflineIndicator } from "@/app/(admin)/admin/OfflineIndicator";
 
 const bowlby = Bowlby_One({
   subsets: ["latin"],
@@ -37,11 +38,18 @@ export const metadata: Metadata = {
  * (top bar, sidebar nav, sign-in redirect) lives in the nested
  * `src/app/(admin)/admin/layout.tsx`, which needs `requireOwner()`'s
  * `x-pathname` read and so stays a regular (non-root) layout.
+ *
+ * `OfflineIndicator` (issue #36 phase 5, "When it breaks") is mounted here
+ * rather than in any one page's shell, so it shows up over every `/admin`
+ * route — signed in or not, including sign-in itself.
  */
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <OfflineIndicator />
+      </body>
     </html>
   );
 }

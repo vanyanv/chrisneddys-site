@@ -1595,3 +1595,99 @@
     padding: 0 var(--rack-space-lg) var(--rack-space-lg);
   }
 }
+
+/* ---------------------------------------------------------------------- */
+/* When it breaks: 404, error boundary, offline (issue #36 phase 5)       */
+/*                                                                        */
+/* Shared by `admin/not-found.tsx` and `admin/error.tsx` — both are a     */
+/* full-page centred card in the same restrained, work-tool register as   */
+/* the rest of The Rack: no halftone, no marquee red. `.rack-offline` is  */
+/* its own thing below: a small fixed toast rather than a full page,      */
+/* since it has to sit on top of whatever the owner was already doing.    */
+/* ---------------------------------------------------------------------- */
+
+.rack-break-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rack-space-xl);
+}
+.rack-break-card {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+.rack-break-code {
+  margin-bottom: var(--rack-space-sm);
+}
+.rack-break-heading {
+  font-size: 32px;
+  line-height: 1.05;
+  margin-bottom: var(--rack-space-md);
+}
+.rack-break-body {
+  color: var(--rack-muted);
+  margin-bottom: var(--rack-space-xl);
+}
+.rack-break-actions {
+  display: flex;
+  gap: var(--rack-space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.rack-break-digest {
+  margin-top: var(--rack-space-xl);
+  color: var(--rack-muted);
+}
+
+/* ---- offline indicator -------------------------------------------------- */
+
+/* Mounted once, in `(admin)/layout.tsx`, so it can appear over any admin
+   route including the signed-out sign-in/forgot-password/reset-password
+   pages — those never import this stylesheet on their own, so every value
+   here carries a plain hex fallback rather than relying on `--rack-*`
+   being defined. */
+.rack-offline {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 0);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: calc(100vw - 32px);
+  background: var(--rack-ink, #1a1612);
+  color: var(--rack-paper, #fff8e7);
+  border: 1px solid var(--rack-ink, #1a1612);
+  padding: 10px 15px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 22px rgba(26, 22, 18, 0.3);
+  animation: rack-offline-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rack-offline-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--rack-red-cta, #d0281c);
+  flex: none;
+}
+@keyframes rack-offline-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rack-offline {
+    animation-duration: 0.001ms;
+  }
+}

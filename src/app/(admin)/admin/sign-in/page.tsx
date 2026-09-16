@@ -16,11 +16,20 @@ function wasJustReset(value: string | string[] | undefined): boolean {
 export default async function AdminSignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[]; reset?: string | string[] }>;
+  searchParams: Promise<{
+    next?: string | string[];
+    reset?: string | string[];
+    expired?: string | string[];
+  }>;
 }) {
   const params = await searchParams;
   const next = safeNext(params.next);
   const justReset = wasJustReset(params.reset);
+  // Set by `src/middleware.ts` and `requireOwner()` (`src/lib/auth.ts`)
+  // whenever this redirect happened because a session that used to exist
+  // stopped working, rather than because nobody was ever signed in — see
+  // issue #36 phase 5's "signed out" state.
+  const sessionExpired = wasJustReset(params.expired);
 
   if (!isAuthConfigured()) {
     return (
@@ -34,5 +43,5 @@ export default async function AdminSignInPage({
     );
   }
 
-  return <SignInForm next={next} justReset={justReset} />;
+  return <SignInForm next={next} justReset={justReset} sessionExpired={sessionExpired} />;
 }

@@ -5,7 +5,6 @@ import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { listOwners } from "@/lib/owners";
 import { getSettingsForAdmin } from "@/lib/settingsAdmin";
-import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { SettingsForm } from "./SettingsForm";
 import { ConnectionsCard } from "./ConnectionsCard";
@@ -41,13 +40,13 @@ const SETTINGS_NAV = [
 
 export default async function AdminSettingsPage() {
   const session = await requireOwner();
-  const [settings, owners, shopSettings] = await Promise.all([
-    getSettingsForAdmin(),
-    listOwners(session.email),
-    getStoreSettings(),
-  ]);
+  // `getSettingsForAdmin()` already reads the same `store_settings` row
+  // `isShopOpenFor` needs — a separate `getStoreSettings()` call here would
+  // just be the identical query run twice against PGlite's one serialized
+  // connection (issue #38).
+  const [settings, owners] = await Promise.all([getSettingsForAdmin(), listOwners(session.email)]);
 
-  const shopOpen = isShopOpenFor(shopSettings);
+  const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
 
   return (

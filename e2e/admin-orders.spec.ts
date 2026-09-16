@@ -97,38 +97,49 @@ test.describe.serial("admin orders desk", () => {
     orderId.ready = await idFromRow(readyRow);
   });
 
+  /**
+   * Clicks a status chip and waits for the filtered URL, retrying the click
+   * if nothing navigated.
+   *
+   * The chips are plain Next `<Link>`s in a server component, so each one is
+   * a soft navigation. A click that lands while the router is still settling
+   * the PREVIOUS soft navigation is swallowed: React re-renders the nav and
+   * the anchor the event was dispatched at is gone before the router sees
+   * it, so no navigation ever starts and the URL simply stays where it was.
+   * Waiting longer cannot fix that — the click is lost, not slow — which is
+   * why this retries the click rather than raising a timeout. A real owner
+   * does exactly the same thing: click it again.
+   */
+  async function clickStatusChip(label: string, expected: RegExp, present = true) {
+    await expect(async () => {
+      await page
+        .getByRole("navigation", { name: "Filter by status" })
+        .getByRole("link", { name: label })
+        .click();
+      if (present) {
+        await expect(page).toHaveURL(expected, { timeout: 3_000 });
+      } else {
+        await expect(page).not.toHaveURL(expected, { timeout: 3_000 });
+      }
+    }).toPass({ timeout: 30_000 });
+  }
+
   test("2. status chips filter the list via ?status=", async () => {
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Paid (to fulfil)" })
-      .click();
-    await expect(page).toHaveURL(/status=paid/);
+    await clickStatusChip("Paid (to fulfil)", /status=paid/);
     await expect(rowByEmail(page, EMAILS.ship)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.shipped)).toHaveCount(0);
     await expect(rowByEmail(page, EMAILS.ready)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Ready for pickup" })
-      .click();
-    await expect(page).toHaveURL(/status=ready_for_pickup/);
+    await clickStatusChip("Ready for pickup", /status=ready_for_pickup/);
     await expect(rowByEmail(page, EMAILS.ready)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.ship)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Fulfilled" })
-      .click();
-    await expect(page).toHaveURL(/status=fulfilled/);
+    await clickStatusChip("Fulfilled", /status=fulfilled/);
     await expect(rowByEmail(page, EMAILS.shipped)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "All" })
-      .click();
-    await expect(page).not.toHaveURL(/status=/);
+    await clickStatusChip("All", /status=/, false);
     await expect(rowByEmail(page, EMAILS.ship)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.shipped)).toBeVisible();

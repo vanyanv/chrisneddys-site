@@ -63,6 +63,16 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   timeout: 60_000,
+  // Playwright's default expect timeout is 5s, which is too tight here.
+  // These specs assert on state that arrives via a Server Action plus the
+  // revalidation that follows it, and the whole suite shares one worker on
+  // a 4-core box that is also running `next start`, so a perfectly healthy
+  // "owner removed, list re-rendered" round trip can exceed 5s under load
+  // and fail an assertion that would have passed a moment later. Assertions
+  // poll, so a higher ceiling costs nothing when things are fast — it only
+  // stops a slow machine from being reported as a broken one. The 60s
+  // per-test timeout above is unchanged, so genuinely hung work still fails.
+  expect: { timeout: 15_000 },
   reporter: "list",
   use: {
     baseURL: BASE_URL,

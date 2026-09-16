@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-16
+
 ### Added
 
 - Admin: `/admin` now opens on Today — a work queue of what actually needs doing, rather than bouncing you to the products list. It shows orders waiting to be packed oldest first, flags one that has been waiting more than a day, counts numbers held in open checkouts, and surfaces anything still unconfigured in setup. Money taken today, how many are left in the run, and what just happened sit alongside it. Every row is real data or it isn't shown ([#36](https://github.com/vanyanv/chrisneddys-site/issues/36))
@@ -81,3 +83,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2026-09-12
 
 Initial tracked version.
+
+[Unreleased]: https://github.com/vanyanv/chrisneddys-site/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/vanyanv/chrisneddys-site/releases/tag/v0.4.0

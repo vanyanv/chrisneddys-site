@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AdminProduct, InventoryMode } from "@/lib/catalogAdmin";
 import { imageThumbSrc } from "@/lib/productImage";
 import { setInventoryPlainAction } from "./actions";
@@ -70,6 +70,15 @@ export function RackProductPanel({
   onStatusChange: (status: "draft" | "published" | "archived") => Promise<boolean>;
 }) {
   const [product, setProduct] = useState(initialProduct);
+  // Re-seed from the prop when the catalogue hands down a freshly loaded
+  // copy after a save (issue #40). Without this the panel keeps whatever it
+  // was given when it opened, so its heading and run summary went on showing
+  // pre-save values while the footer said "Saved just now".
+  //
+  // This cannot clobber someone mid-edit: every field reads
+  // `pendingApi.getValue(...) ?? product.X`, so an unsaved edit lives in the
+  // pending store and still wins over anything re-seeded here.
+  useEffect(() => setProduct(initialProduct), [initialProduct]);
   const [modeBusy, setModeBusy] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
 

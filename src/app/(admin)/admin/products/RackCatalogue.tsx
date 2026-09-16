@@ -143,6 +143,23 @@ export function RackCatalogue({
         return next;
       }),
     );
+
+    // Re-load every product this save touched into `productCache` (issue
+    // #40). `router.refresh()` below re-renders the server components — the
+    // card grid picks that up through `initialRows` — but the open panel
+    // renders from this client-side cache, which was filled when the panel
+    // opened and never invalidated afterwards. So the panel's heading and
+    // run summary kept showing pre-save values until the page was reloaded,
+    // directly under a footer reading "Saved just now". `status` already had
+    // a bespoke workaround for this (it is passed to the panel as its own
+    // prop rather than read off the cached product); this fixes the cause,
+    // so anything else the panel derives stays correct too.
+    for (const id of new Set(changes.map((c) => c.id))) {
+      void loadProductForPanelAction(id).then((product) => {
+        if (product) setProductCache((prev) => ({ ...prev, [id]: product }));
+      });
+    }
+
     router.refresh();
   });
 

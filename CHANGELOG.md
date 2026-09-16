@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Shop: the order status page gives the answer the room. Once you look an order up, the result sits beside the form instead of below it, leads with the order number and a one-word state you can scan, names what you bought properly, and draws the three steps as one connected track rather than three loose dots ([#41](https://github.com/vanyanv/chrisneddys-site/issues/41))
+
+### Fixed
+
+- Shop: an order never said what was in it. Every product added in the new admin recorded a blank name onto its orders, so the order status page showed an edition number with nothing beside it — and the same blank went onto the packing slip and the receipt email. Orders now record the name the shop actually shows ([#41](https://github.com/vanyanv/chrisneddys-site/issues/41))
+- Admin: saving a product left the panel showing the old values. The heading kept reading "No name yet" after a name was saved, and the run kept reporting the old size — both directly under a footer saying the save had worked, and both only correcting themselves on a reload. The run count is the number you check before publishing a drop, so it mattered more than it looked ([#40](https://github.com/vanyanv/chrisneddys-site/issues/40))
+
 ## [0.4.0] - 2026-09-16
 
 ### Added

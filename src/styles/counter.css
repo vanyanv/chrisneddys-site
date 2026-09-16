@@ -5911,8 +5911,26 @@ h3 {
    (`.cne-ck-field`/`.cne-ck-input`/`.cne-ck-underline`) rather than a boxed
    generic input — `--ck-rule` is scoped to `.cne-ck` there, so it's set
    again here for the same rule colour. */
+/* Order status (/shop/order).
+   One column until there is an answer, two once there is: the form is the
+   whole point of the page while you are still asking, and secondary the
+   moment it has been answered — so the result takes the wider column and
+   the form steps back beside it rather than sitting above it at full size
+   with the answer pushed below the fold. */
 .cne-ord {
   max-width: 46ch;
+}
+.cne-ord.has-result {
+  max-width: none;
+  display: grid;
+  gap: 28px;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .cne-ord.has-result {
+    grid-template-columns: minmax(260px, 20rem) minmax(0, 34rem);
+    gap: 40px;
+  }
 }
 .cne-ord-form {
   --ck-rule: rgba(26, 22, 18, 0.16);
@@ -5926,27 +5944,66 @@ h3 {
 }
 
 .cne-ord-result {
-  margin-top: 30px;
-  padding: 18px;
+  padding: 20px;
   border: 2.5px solid var(--a-ink);
   background: var(--a-card);
-  box-shadow: 4px 4px 0 var(--a-shadow);
+  box-shadow: 6px 6px 0 var(--a-shadow);
+}
+/* Only the stacked layout needs the gap; in two columns the grid owns it. */
+.cne-ord:not(.has-result) .cne-ord-result,
+.cne-ord.has-result .cne-ord-result {
+  margin-top: 0;
+}
+
+.cne-ord-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 .cne-ord-number {
   font-family: var(--font-display);
-  font-size: 24px;
-  margin: 6px 0 3px;
+  font-size: clamp(26px, 5vw, 34px);
+  line-height: 1;
+  margin: 6px 0 0;
 }
+.cne-ord-badge {
+  flex: none;
+  padding: 5px 10px;
+  border: 2px solid var(--a-ink);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cne-ord-badge.is-paid {
+  background: var(--a-yel);
+}
+.cne-ord-badge.is-ready,
+.cne-ord-badge.is-done {
+  background: var(--a-ink);
+  color: var(--a-card);
+}
+/* A refund is the one state that is not progress — it reads differently on
+   purpose rather than as another shade of "going fine". */
+.cne-ord-badge.is-refunded {
+  background: transparent;
+  border-style: dashed;
+  color: var(--a-sub);
+}
+
 .cne-ord-headline {
-  margin: 0 0 16px;
+  margin: 10px 0 18px;
   font-weight: 700;
+  font-size: 15px;
 }
 
 .cne-ord-items {
   display: grid;
-  gap: 8px;
-  margin: 0 0 16px;
-  padding: 12px 0;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 14px 0;
   border-top: 1px solid var(--a-line);
   border-bottom: 1px solid var(--a-line);
 }
@@ -5954,59 +6011,77 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   font-size: 13.5px;
 }
+/* What they bought is the first thing they are looking for, so it is set
+   like a name rather than like a table cell. */
+.cne-ord-item-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.3;
+}
 .cne-ord-numchip {
+  flex: none;
   display: inline-flex;
   align-items: baseline;
   gap: 3px;
+  padding: 5px 9px;
+  border: 2px solid var(--a-ink);
+  background: var(--a-cream);
   font-family: var(--font-mono);
+  font-size: 14px;
   font-weight: 700;
-  font-size: 13px;
-  border: 1.5px solid var(--a-ink);
-  padding: 3px 7px;
-  flex: none;
 }
 .cne-ord-numchip .eyebrow {
-  font-size: 8.5px;
-  letter-spacing: 0.1em;
+  font-size: 9px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--a-sub);
-  font-weight: 700;
-  margin-right: 1px;
 }
 .cne-ord-numchip .of {
+  font-size: 11px;
   color: var(--a-sub);
-  font-weight: 500;
 }
 
-/* Two cues, not one: a filled/hollow dot and the label's own weight — a
-   step that hasn't happened is never told apart by colour alone. */
+/* The timeline is a track, not three loose dots: a rule runs behind the
+   dots so the steps read as one journey, and the done part of it is inked
+   while the rest stays faint. */
 .cne-ord-timeline {
+  position: relative;
   display: grid;
-  gap: 14px;
-  margin: 0 0 16px;
-  padding: 0;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 0 0 0 26px;
   list-style: none;
 }
+.cne-ord-timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--a-line);
+}
 .cne-ord-timeline li {
+  position: relative;
   display: grid;
-  grid-template-columns: 16px 1fr;
-  column-gap: 10px;
-  row-gap: 2px;
+  gap: 1px;
 }
 .cne-ord-dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 999px;
+  position: absolute;
+  left: -26px;
+  top: 3px;
+  width: 14px;
+  height: 14px;
   border: 2px solid var(--a-line);
+  border-radius: 50%;
   background: var(--a-card);
-  margin-top: 2px;
 }
 .cne-ord-timeline li.is-done .cne-ord-dot {
-  border-color: var(--a-ok);
-  background: var(--a-ok);
+  background: var(--a-ink);
+  border-color: var(--a-ink);
 }
 .cne-ord-step-label {
   font-weight: 700;
@@ -6014,10 +6089,9 @@ h3 {
   color: var(--a-sub);
 }
 .cne-ord-timeline li.is-done .cne-ord-step-label {
-  color: var(--a-fg);
+  color: var(--a-ink);
 }
 .cne-ord-step-detail {
-  grid-column: 2;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--a-sub);

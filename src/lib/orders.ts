@@ -27,6 +27,7 @@ import {
   variants,
   type ShipTo,
 } from "@/db/schema";
+import { customerFacingProductName } from "@/lib/productName";
 
 export type Fulfilment = "ship" | "pickup";
 export type OrderStatus =
@@ -458,7 +459,7 @@ export async function createPendingOrder(
           editionNumbers.push(e.number);
           itemRows.push({
             productId: product.id,
-            productName: product.name,
+            productName: customerFacingProductName(product),
             variantId: variant.id,
             sku: variant.sku,
             unitPriceCents,
@@ -481,7 +482,7 @@ export async function createPendingOrder(
 
         itemRows.push({
           productId: product.id,
-          productName: product.name,
+          productName: customerFacingProductName(product),
           variantId: variant.id,
           sku: variant.sku,
           unitPriceCents,
@@ -491,7 +492,7 @@ export async function createPendingOrder(
         // Untracked: no stock constraint to lock or check.
         itemRows.push({
           productId: product.id,
-          productName: product.name,
+          productName: customerFacingProductName(product),
           variantId: variant.id,
           sku: variant.sku,
           unitPriceCents,

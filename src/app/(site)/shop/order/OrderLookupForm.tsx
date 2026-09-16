@@ -36,6 +36,26 @@ function statusHeadline(result: OrderLookupResult): string {
   }
 }
 
+/** The one-word state for the badge, and the tone that colours it. A
+ * refund is the only state that is not progress, so it is the only one
+ * drawn in a different colour rather than another shade of "going fine". */
+function statusBadge(result: OrderLookupResult): { label: string; tone: string } {
+  switch (result.status) {
+    case "paid":
+      return { label: "Paid", tone: "paid" };
+    case "fulfilled":
+      return { label: "Shipped", tone: "done" };
+    case "ready_for_pickup":
+      return { label: "Ready", tone: "ready" };
+    case "picked_up":
+      return { label: "Picked up", tone: "done" };
+    case "refunded":
+      return { label: "Refunded", tone: "refunded" };
+    default:
+      return { label: "", tone: "paid" };
+  }
+}
+
 function formatWhen(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {
     weekday: "short",
@@ -50,7 +70,7 @@ export function OrderLookupForm() {
   const [state, formAction, pending] = useActionState(lookupOrderAction, initialState);
 
   return (
-    <div className="cne-ord">
+    <div className={`cne-ord${state.result ? " has-result" : ""}`}>
       <form action={formAction} noValidate className="cne-ord-form">
         <div className="cne-ck-field">
           <label className="cne-ck-label" htmlFor="order-number">
@@ -106,17 +126,23 @@ export function OrderLookupForm() {
 
 function OrderResult({ result }: { result: OrderLookupResult }) {
   const steps = orderTimeline(result);
+  const badge = statusBadge(result);
 
   return (
-    <div className="cne-ord-result" role="status" aria-live="polite">
-      <div className="cne-eyebrow">Order</div>
-      <h2 className="cne-ord-number">{result.number}</h2>
+    <article className="cne-ord-result" role="status" aria-live="polite">
+      <header className="cne-ord-head">
+        <div>
+          <div className="cne-eyebrow">Order</div>
+          <h2 className="cne-ord-number">{result.number}</h2>
+        </div>
+        <span className={`cne-ord-badge is-${badge.tone}`}>{badge.label}</span>
+      </header>
       <p className="cne-ord-headline">{statusHeadline(result)}</p>
 
       <ul className="cne-ord-items">
         {result.items.map((item, i) => (
           <li key={i}>
-            <span>
+            <span className="cne-ord-item-name">
               {item.name}
               {item.editionNumber == null && ` × ${item.quantity}`}
             </span>
@@ -173,6 +199,6 @@ function OrderResult({ result }: { result: OrderLookupResult }) {
           {result.refundedAt && <>Refunded {formatWhen(result.refundedAt)}.</>}
         </p>
       )}
-    </div>
+    </article>
   );
 }

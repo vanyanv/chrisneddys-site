@@ -232,6 +232,14 @@ test.describe.serial("admin products — the rack's catalogue", () => {
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("Saved");
 
+    // Issue #40: the panel renders from a client-side cache filled when it
+    // opened. Until that cache was invalidated on save, the heading went on
+    // reading "No name yet" here — under a footer saying the save had
+    // worked — and only a reload fixed it. Asserted WITHOUT reloading,
+    // because a reload is exactly what used to hide the bug.
+    await expect(panel(page).getByRole("heading", { name: "E2E TEE" })).toBeVisible();
+    await expect(panel(page).getByRole("heading", { name: "No name yet" })).toHaveCount(0);
+
     const card = page.locator(`[data-testid="product-card"][data-id="${e2eTeeId}"]`);
     await expect(card).toBeVisible();
     await expect(card.locator(".rack-pill")).toHaveText("Draft");

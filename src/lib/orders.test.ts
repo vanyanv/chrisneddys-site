@@ -364,6 +364,51 @@ describe("store settings", () => {
   });
 });
 
+describe("the name recorded on an order (issue #41)", () => {
+  it("records what the shop calls the product, for a product created the way the admin creates one", async () => {
+    // The Rack's "New product" makes a draft with an EMPTY `name` and its
+    // panel only ever writes `displayName1`/`displayName2` — so this is the
+    // shape of every product created in the current admin. `order_items`
+    // snapshots a name at checkout so a later rename cannot rewrite
+    // history; snapshotting `products.name` recorded an empty string here,
+    // and an order that cannot say what was bought breaks the order-status
+    // page, the packing slip and the receipt email at once.
+    const draft = await createDraft("");
+    await updateProductField(draft.id, "displayName1", "THE DEMO CAP");
+    await updateProductField(draft.id, "displayName2", "RED");
+    await updateProductField(draft.id, "priceCents", 4200);
+    await setInventory(draft.id, "quantity", 3);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/demo-cap.webp",
+      urlThumb: "https://example.com/demo-cap-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+    await setStatus(draft.id, "published");
+
+    const reservation = await createPendingOrder({
+      items: [{ slug: draft.slug, quantity: 1 }],
+      fulfilment: "ship",
+    });
+    if ("code" in reservation)
+      throw new Error(`expected a reservation, got error ${reservation.code}`);
+
+    const db = await getDb();
+    const rows = await db
+      .select({ productName: schema.orderItems.productName })
+      .from(schema.orderItems)
+      .where(eq(schema.orderItems.orderId, reservation.orderId));
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.productName).toBe("THE DEMO CAP RED");
+  });
+});
+
 describe("plain-quantity product", () => {
   it("only decrements inventory_quantity once the order is paid", async () => {
     const draft = await createDraft("Quantity Order Test Product");

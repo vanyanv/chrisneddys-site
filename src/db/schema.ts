@@ -11,7 +11,7 @@
  * `stripe_events`, `store_settings`) and the `editions.order_id` foreign
  * key — see `src/lib/orders.ts` for the module that reads and writes it.
  */
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -270,39 +270,57 @@ export const storeSettings = pgTable("store_settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const orders = pgTable("orders", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  /** `CNE-1001`, `CNE-1002`, … — see `orderNumberSeq` / `nextOrderNumber`. */
-  number: text("number").notNull().unique(),
-  status: orderStatusEnum("status").notNull().default("pending"),
-  fulfilment: fulfilmentEnum("fulfilment").notNull(),
-  /**
-   * Null until known. `createPendingOrder` may not have an email yet (the
-   * cart hasn't reached Stripe Checkout); `markPaid` always fills both this
-   * and `name` in from Stripe.
-   */
-  email: text("email"),
-  name: text("name"),
-  phone: text("phone"),
-  shipTo: jsonb("ship_to").$type<ShipTo>(),
-  subtotalCents: integer("subtotal_cents").notNull(),
-  shippingCents: integer("shipping_cents").notNull(),
-  taxCents: integer("tax_cents").notNull(),
-  totalCents: integer("total_cents").notNull(),
-  currency: text("currency").notNull().default("usd"),
-  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
-  carrier: text("carrier"),
-  trackingNumber: text("tracking_number"),
-  /** Set on creation for a pending order, cleared on payment. Reservations
-   * with an `expires_at` in the past are fair game for `releaseExpiredReservations`. */
-  expiresAt: timestamp("expires_at", { withTimezone: true }),
-  paidAt: timestamp("paid_at", { withTimezone: true }),
-  fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
-  refundedAt: timestamp("refunded_at", { withTimezone: true }),
-  notes: text("notes"),
-  ...timestamps,
-});
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** `CNE-1001`, `CNE-1002`, … — see `orderNumberSeq` / `nextOrderNumber`. */
+    number: text("number").notNull().unique(),
+    status: orderStatusEnum("status").notNull().default("pending"),
+    fulfilment: fulfilmentEnum("fulfilment").notNull(),
+    /**
+     * Null until known. `createPendingOrder` may not have an email yet (the
+     * cart hasn't reached Stripe Checkout); `markPaid` always fills both this
+     * and `name` in from Stripe.
+     */
+    email: text("email"),
+    name: text("name"),
+    phone: text("phone"),
+    shipTo: jsonb("ship_to").$type<ShipTo>(),
+    subtotalCents: integer("subtotal_cents").notNull(),
+    shippingCents: integer("shipping_cents").notNull(),
+    taxCents: integer("tax_cents").notNull(),
+    totalCents: integer("total_cents").notNull(),
+    currency: text("currency").notNull().default("usd"),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    carrier: text("carrier"),
+    trackingNumber: text("tracking_number"),
+    /** Set on creation for a pending order, cleared on payment. Reservations
+     * with an `expires_at` in the past are fair game for `releaseExpiredReservations`. */
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
+    refundedAt: timestamp("refunded_at", { withTimezone: true }),
+    notes: text("notes"),
+    ...timestamps,
+  },
+  (t) => [
+    /**
+     * Issue #36 phase 7 (Customers): a customer is a *projection* over
+     * `orders`, grouped by the normalized (trimmed, lower-cased) email —
+     * there is no separate `customers` table (see `src/lib/customersAdmin.ts`
+     * for the full reasoning). `email` is only ever non-null from `markPaid`
+     * onward, so this index only ever covers orders that were actually paid
+     * — a guest mid-checkout (`createPendingOrder`, no email yet) is never
+     * in it. Partial on "not null" so a pending/cancelled order with no
+     * email never costs this index anything.
+     */
+    index("orders_email_lower_idx")
+      .on(sql`lower(trim(${t.email}))`)
+      .where(sql`${t.email} is not null`),
+  ],
+);
 
 export const orderItems = pgTable("order_items", {
   id: uuid("id").primaryKey().defaultRandom(),

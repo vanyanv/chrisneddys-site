@@ -29,6 +29,9 @@ export default function OrderDetailLoading() {
             Orders
           </span>
           <span className="rack-tab" aria-current="false">
+            Customers
+          </span>
+          <span className="rack-tab" aria-current="false">
             Settings
           </span>
         </div>

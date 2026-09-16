@@ -57,6 +57,13 @@
       "when": 1789448442622,
       "tag": "0007_goofy_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789538685266,
+      "tag": "0008_complex_jamie_braddock",
+      "breakpoints": true
     }
   ]
 }

@@ -3,19 +3,22 @@ import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
-import { listOwners } from "@/lib/owners";
-import { getSettingsForAdmin } from "@/lib/settingsAdmin";
+import { listCustomersForAdmin } from "@/lib/customersAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
-import { SettingsForm } from "./SettingsForm";
-import { ConnectionsCard } from "./ConnectionsCard";
-import { ChangePasswordCard } from "./ChangePasswordCard";
-import { OwnersCard } from "./OwnersCard";
+import { CustomersTable, type CustomersTableRow } from "./CustomersTable";
 import "@/styles/admin-rack.css";
-import "@/styles/admin-settings.css";
+import "@/styles/admin-customers.css";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * `/admin/customers` — "Everyone who's bought" (issue #36 phase 7). A
+ * customer here is a projection over `orders` grouped by normalized email,
+ * not a stored row — see `src/lib/customersAdmin.ts` for the full reasoning
+ * and the identity-key caveat. Own shell, same convention as every other
+ * signed-in admin route now that `admin/layout.tsx` draws none itself.
+ */
 const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
@@ -24,30 +27,21 @@ const NAV = [
   { href: "/admin/settings", label: "Settings" },
 ];
 
-/** The left-hand wayfinding column in `Settings.dc.html` — plain anchors
- * into the sections below rather than separate routes, since every field
- * here reads and writes the same one `store_settings` row (plus the
- * owner-account tables for the last two). The design draws only "The shop"
- * tab and marks it active; there's no scroll-spy here to move that
- * highlight as an owner scrolls, so it stays the default the design shows. */
-const SETTINGS_NAV = [
-  { href: "#settings-shop", label: "The shop" },
-  { href: "#settings-shipping", label: "Shipping" },
-  { href: "#settings-policies", label: "Policies" },
-  { href: "#settings-connections", label: "Connections" },
-  { href: "#settings-owners", label: "Owners" },
-  { href: "#settings-signin", label: "Sign-in & passkeys" },
-];
-
-export default async function AdminSettingsPage() {
+export default async function AdminCustomersPage() {
   const session = await requireOwner();
-  const [settings, owners, shopSettings] = await Promise.all([
-    getSettingsForAdmin(),
-    listOwners(session.email),
-    getStoreSettings(),
-  ]);
+  const [customers, settings] = await Promise.all([listCustomersForAdmin(), getStoreSettings()]);
 
-  const shopOpen = isShopOpenFor(shopSettings);
+  const rows: CustomersTableRow[] = customers.map((c) => ({
+    key: c.key,
+    email: c.email,
+    name: c.name,
+    orderCount: c.orderCount,
+    totalSpentCents: c.totalSpentCents,
+    firstOrderAt: c.firstOrderAt ? c.firstOrderAt.toISOString() : null,
+    refundedCount: c.refundedCount,
+  }));
+
+  const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
 
   return (
@@ -70,7 +64,7 @@ export default async function AdminSettingsPage() {
               key={item.href}
               href={item.href}
               className="rack-tab"
-              aria-current={item.href === "/admin/settings" ? "page" : undefined}
+              aria-current={item.href === "/admin/customers" ? "page" : undefined}
             >
               {item.label}
             </Link>
@@ -94,24 +88,26 @@ export default async function AdminSettingsPage() {
         </div>
       </nav>
 
-      <div className="rack-settings-body">
-        <nav className="rack-settings-nav" aria-label="Settings sections">
-          {SETTINGS_NAV.map((item, i) => (
-            <a key={item.href} href={item.href} className={i === 0 ? "is-active" : ""}>
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="rack-settings-content">
-          <SettingsForm
-            settings={settings}
-            shopOpen={shopOpen}
-            connections={<ConnectionsCard />}
-            changePassword={<ChangePasswordCard />}
-            owners={<OwnersCard owners={owners} />}
-          />
+      <div className="rack-page-header">
+        <div>
+          <h1 className="rack-page-title rack-bow">Customers</h1>
         </div>
+        <div className="rack-page-header-right">
+          <span className="rack-page-count rack-mono">
+            {rows.length} customer{rows.length === 1 ? "" : "s"}
+          </span>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 22px 22px" }}>
+        {rows.length === 0 ? (
+          <p className="adm-empty">
+            No customers yet. They show up here once an order is paid — a name and email with
+            nothing behind it yet is just a checkout in progress.
+          </p>
+        ) : (
+          <CustomersTable rows={rows} />
+        )}
       </div>
     </div>
   );

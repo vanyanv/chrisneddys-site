@@ -38,6 +38,9 @@ export default function SettingsLoading() {
           <span className="rack-tab" aria-current="false">
             Orders
           </span>
+          <span className="rack-tab" aria-current="false">
+            Customers
+          </span>
           <span className="rack-tab" aria-current="page">
             Settings
           </span>

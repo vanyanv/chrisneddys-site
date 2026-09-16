@@ -33,6 +33,9 @@ export default function OrdersLoading() {
             Products
           </span>
           <span className="rack-tab" aria-current="false">
+            Customers
+          </span>
+          <span className="rack-tab" aria-current="false">
             Settings
           </span>
         </div>

@@ -1,0 +1,205 @@
+/**
+ * `/admin/customers` and `/admin/customers/[email]` (issue #36 phase 7).
+ * Same pattern as `admin-orders.css`: the shared chrome (`.rack-*`,
+ * `.adm-*`) lives in `admin-rack.css`/`admin.css`, already in scope
+ * wherever this file is imported — everything here is new, `cust-`
+ * prefixed so it can never collide with or shadow a rule another route
+ * relies on.
+ */
+
+/* ---- list: sheet rows ---------------------------------------------------- */
+.cust-sheet {
+  margin-top: 4px;
+}
+.cust-cols,
+.cust-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(190px, 1.8fr) 80px 100px 120px 100px;
+  column-gap: 16px;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 56px;
+}
+.cust-cols {
+  border-top: 1px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
+  color: var(--a-sub);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  min-height: 34px;
+}
+.cust-row {
+  border-bottom: 1px solid var(--a-line);
+  background: var(--a-card);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease-out;
+}
+.cust-row:hover {
+  background: rgba(26, 22, 18, 0.02);
+}
+.cust-cell-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cust-cell-email {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--a-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cust-cell-num {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  text-align: right;
+}
+.cust-cell-money {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+.cust-cell-date {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--a-sub);
+}
+@media (max-width: 720px) {
+  .cust-cols {
+    display: none;
+  }
+  .cust-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name money"
+      "email orders";
+    row-gap: 6px;
+    padding: 12px 16px;
+    min-height: 0;
+    align-items: start;
+  }
+  .cust-cell-name {
+    grid-area: name;
+  }
+  .cust-cell-money {
+    grid-area: money;
+    align-self: end;
+    justify-self: end;
+  }
+  .cust-cell-email {
+    grid-area: email;
+  }
+  .cust-cell-num:last-of-type {
+    grid-area: orders;
+    justify-self: end;
+    text-align: right;
+  }
+  .cust-cell-num:first-of-type {
+    display: none;
+  }
+  .cust-cell-date {
+    display: none;
+  }
+}
+
+/* ---- detail: header ------------------------------------------------------- */
+.cust-header-meta {
+  font-size: 12px;
+  color: var(--a-sub);
+  margin-top: 5px;
+}
+
+/* ---- detail: this customer's orders, nested in a `.rack-order-card` ------ */
+.cust-orders-list {
+  display: flex;
+  flex-direction: column;
+}
+.cust-order-row {
+  display: grid;
+  grid-template-columns: 96px 116px minmax(0, 1fr) 84px auto;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--a-line);
+  text-decoration: none;
+  color: inherit;
+}
+.cust-order-row:last-child {
+  border-bottom: 0;
+}
+.cust-order-row:hover .cust-order-num {
+  text-decoration: underline;
+}
+.cust-order-num {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.cust-order-date {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--a-sub);
+}
+.cust-order-items {
+  font-size: 13px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cust-order-total {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+@media (max-width: 640px) {
+  .cust-order-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "num status"
+      "items total"
+      "date date";
+    row-gap: 4px;
+  }
+  .cust-order-num {
+    grid-area: num;
+  }
+  .cust-order-date {
+    grid-area: date;
+  }
+  .cust-order-items {
+    grid-area: items;
+  }
+  .cust-order-total {
+    grid-area: total;
+    justify-self: end;
+  }
+  .cust-order-status {
+    grid-area: status;
+    justify-self: end;
+  }
+}
+
+/* ---- detail: numbers-owned side panel -------------------------------------- */
+.cust-number-chips {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.cust-number-chip {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  border: 1.5px solid var(--rack-ink);
+  padding: 9px 13px;
+}

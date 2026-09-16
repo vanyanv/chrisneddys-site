@@ -6,76 +6,53 @@ import { signInAsOwner, OWNER_EMAIL, OWNER_PASSWORD } from "./helpers";
  * `docs/superpowers/specs/2026-09-14-better-auth-owner-sign-in-design.md`
  * and DEPLOY.md's "Owner accounts" section.
  *
- * TWO REAL PRODUCT BUGS were found writing this file, both in `src/`, both
- * out of scope for this file to fix (see this repo's task rules). Each is
- * exercised here with `expect.soft` so the rest of the test still runs and
- * every other assertion gets a real answer, rather than the whole test
- * aborting on the first known-bad assertion:
+ * TWO REAL PRODUCT BUGS were found writing this file, both in `src/`. Both
+ * are now fixed (issues #53 and #54); every assertion below is a real
+ * `expect`, not `expect.soft`.
  *
- * 1. **Changing your own password signs *you* out too**, not just other
- *    devices. `ChangePasswordCard` always calls `auth.api.changePassword`
- *    with `revokeOtherSessions: true` and expects to stay signed in on the
- *    device that made the change (the toast says "Every other device was
- *    signed out", implying this one wasn't) — matching
- *    `owners.test.ts`'s "changePassword revocation" describe block, which
- *    proves the fresh cookie Better Auth mints for the *acting* device
- *    keeps working when replayed by hand through `auth.api.getSession`.
- *    In the real, built app the equivalent browser request instead lands
- *    back on `/admin/sign-in` and never shows the confirmation toast —
- *    reproduced by test 2 and test 3 below. The most likely place for this
- *    to go wrong is `src/lib/auth.ts`'s `applySetCookieHeader` /
- *    `src/app/(admin)/admin/settings/actions.ts`'s `changePasswordAction`:
- *    the fresh `Set-Cookie` Better Auth returns has to actually reach the
- *    browser and replace the old one for the acting session to survive,
- *    and something in that path isn't landing right. The password change
- *    itself does persist correctly either way (proven by test 2's "new
- *    password works, old one doesn't", and by every later spec file's
- *    `signInAsOwner()` still working, which depends on this file restoring
- *    `OWNER_PASSWORD` afterwards).
+ * 1. **Changing your own password used to sign *you* out too**, not just
+ *    other devices (#54). `ChangePasswordCard` calls `auth.api.
+ *    changePassword`, and it's tempting to pass that call's own
+ *    `revokeOtherSessions: true` body flag to get "every other device signed
+ *    out" — but despite the name, that flag revokes *every* session for the
+ *    user, the caller's current one included (`node_modules/better-auth/
+ *    dist/api/routes/update-user.mjs`'s `changePassword` handler:
+ *    `revokeOtherSessions` triggers `deleteUserSessions` unconditionally,
+ *    then mints a brand-new session and a fresh `Set-Cookie` for it). That
+ *    fresh cookie only reaches the browser on the response to *that*
+ *    request; the admin layout's `requireOwner()` re-render that follows a
+ *    server action happens within the *same* request and reads the cookies
+ *    the request *arrived* with — the now-deleted session — so it redirects
+ *    to sign-in and the browser loops there. `changePasswordAction`
+ *    (`src/app/(admin)/admin/settings/actions.ts`) now calls
+ *    `auth.api.changePassword` with no such flag, then separately calls
+ *    Better Auth's dedicated `auth.api.revokeOtherSessions` endpoint, which
+ *    filters out the caller's own session token before revoking
+ *    (`revoke-other-sessions`'s handler in the same source file) — so the
+ *    acting session's cookie never changes and there's nothing to reach the
+ *    browser in the first place. Tests 2 and 3 prove the acting device
+ *    stays signed in and sees the confirmation toast.
  *
- * 2. **Inviting an owner never surfaces a link.** `OwnersCard`'s "Send
- *    invite" reproducibly shows "Couldn't generate an invite link. Try
- *    again." instead of the expected set-password link — reproduced by
- *    test 5. The server never logs an error and `auth.api.
- *    requestPasswordReset` itself doesn't throw — `src/lib/owners.ts`'s
- *    `inviteOwner` reaches its own `if (!outcome) return { ok:false, error:
- *    "Could not generate an invite link. Try again." }` fallback, meaning
- *    Better Auth's `sendResetPassword` hook (`src/lib/betterAuth.ts`) ran to
- *    completion but never recorded an outcome into `captureResetSend`'s
- *    `AsyncLocalStorage`. The exact same call, made outside the built app
- *    (a standalone script importing `inviteOwner` directly against the same
- *    PGlite database), succeeds and returns a real `{ sent: false, url }` —
- *    so the bug is specific to running inside the compiled/bundled app, not
- *    the logic itself. Likely mechanism: `src/lib/betterAuth.ts`'s
- *    `resetSendStorage` (the `AsyncLocalStorage` `captureResetSend` reads
- *    and writes) is a plain module-scope singleton, unlike `getAuth()`'s
- *    promise cache a few lines below it, which is deliberately parked on
- *    `globalThis` specifically *because* Next can compile a shared module
- *    more than once across different Server Component / Server Action
- *    bundle layers (see that file's own module comment). If
- *    `src/lib/owners.ts` and whichever call site first builds the cached
- *    `auth` instance land in different layers, `owners.ts`'s
- *    `captureResetSend` sets up a `run()` context on *its* copy of
- *    `resetSendStorage` while the real `sendResetPassword` closure (bound
- *    into the cached singleton) reads `getStore()` from a *different*
- *    copy — always `undefined`, so `store.outcome` is silently never set.
- *    Test 6 is split in two because of this: 6a (self-removal is refused)
- *    needs no second owner and passes; 6b (removing a second owner) needs
- *    one, which today only exists via invite, so it fails at the same step
- *    as test 5 — not a third bug.
- *
- * Because of bug 1, tests 2 and 3 can't rely on staying signed in right
- * after changing a password, so both always re-sign-in explicitly before
- * their next step rather than assuming the previous session survived —
- * which also means restoring `OWNER_EMAIL` back to `OWNER_PASSWORD` in a
- * `finally` block works reliably regardless of bug 1. Every other spec
- * file's `signInAsOwner()` depends on that restoration, so a final
- * `afterAll` double-checks it independently, in case a mid-test crash skips
- * a `finally` block.
- *
- * With invite broken (bug 2), tests 2 and 3 also can't get a second,
- * disposable owner account the normal way, so both change and restore the
- * seeded `OWNER_EMAIL` account's own password instead of an invited one.
+ * 2. **Inviting an owner used to never surface a link** (#53). `OwnersCard`'s
+ *    "Send invite" reproducibly showed "Couldn't generate an invite link.
+ *    Try again." instead of the expected set-password link.
+ *    `src/lib/owners.ts`'s `inviteOwner` learns what Better Auth's
+ *    `sendResetPassword` hook (`src/lib/betterAuth.ts`) actually did via
+ *    `captureResetSend`, and that channel was an `AsyncLocalStorage`: the
+ *    App Router compiles `betterAuth.ts` once per webpack layer (RSC, SSR,
+ *    Server Actions), and a `run()` context started through one layer's
+ *    copy of the module is invisible to a `getStore()` read through
+ *    another's — reproducible only in the built app, never under Vitest
+ *    (which loads the module once). `captureResetSend` now hands
+ *    `sendResetPassword` a plain `Map`, keyed by email and parked on
+ *    `globalThis` the same way `getAuth()`'s promise cache already is, so
+ *    every layer's copy of the module reads and writes the exact same
+ *    object — no async context has to survive anything. See
+ *    `betterAuth.ts`'s module comment and `owners.test.ts`'s
+ *    "resetSendOutcomes globalThis parking" block. Test 5 proves the link
+ *    now shows up and the invitee can sign in with it; 6b (which needs a
+ *    second owner, and previously failed at the same invite step as test 5)
+ *    now proves removing one works too.
  */
 
 const TEMP_PASSWORD_2 = "temp-password-for-change-test-1";
@@ -110,13 +87,13 @@ async function newSignedInContext(
  * while `useActionState` has a submission in flight and back to "Change
  * password" once it resolves (`ChangePasswordCard.tsx`), so waiting on that
  * reflects exactly when the server action has returned. Deliberately not
- * `page.waitForLoadState("networkidle")`: per bug 1 above, a successful
- * change can leave the *acting* page's client-side router stuck retofetching
- * the now-invalid session in the background — network activity that never
- * goes idle — which would make `networkidle` hang for the test's entire
- * timeout instead of ever returning. Doesn't wait for the confirmation
- * *toast* specifically — see bug 1 above, it doesn't always appear — so
- * callers that need that check for it separately. */
+ * `page.waitForLoadState("networkidle")`: before #54 was fixed, a successful
+ * change left the *acting* page's client-side router stuck retofetching the
+ * now-invalid session in the background — network activity that never went
+ * idle — which made `networkidle` hang for the test's entire timeout instead
+ * of ever returning; kept this way since it's the more precise wait either
+ * way. Doesn't wait for the confirmation *toast* specifically, so callers
+ * that need that check for it separately. */
 async function submitChangePasswordForm(page: Page, current: string, next: string): Promise<void> {
   await page.getByLabel("Current password", { exact: true }).fill(current);
   await page.getByLabel("New password", { exact: true }).fill(next);
@@ -128,12 +105,10 @@ async function submitChangePasswordForm(page: Page, current: string, next: strin
 
 /** Signs in as `OWNER_EMAIL` with `from`, changes the password to `to`, and
  * re-signs-in from a *fresh* browser context to confirm `to` now actually
- * works — the reliable way to change/restore this account's password given
- * bug 1 (the change itself always sticks; only the same-session
- * toast/redirect is broken, and reusing that same session's cookie jar for
- * the verification step isn't worth the risk of tripping over the same bug
- * a second time). Throws if `to` doesn't end up working, so a broken
- * restoration is never silent. */
+ * works, rather than trusting that the page that made the change is still
+ * in a good state — cheap insurance against ever trusting a stale session
+ * for this restoration step. Throws if `to` doesn't end up working, so a
+ * broken restoration is never silent. */
 async function changeOwnerPasswordAndVerify(
   browser: Browser,
   from: string,
@@ -189,10 +164,10 @@ async function ensureOwnerPasswordRestored(browser: Browser): Promise<void> {
   }
 }
 
-// Not `.serial`: with two known product bugs below (1 and 2 in the module
-// comment), tests 2/3 and 5/6b are expected to fail, and `.serial` would
-// skip every test after the first failure — this file wants every test to
-// run and report independently. `workers: 1` + `fullyParallel: false`
+// Not `.serial`: `.serial` skips every test after the first failure, and
+// this file wants a failure in one test (say, a regression in #53 or #54)
+// to still let every other test run and report independently rather than
+// aborting the whole file. `workers: 1` + `fullyParallel: false`
 // (playwright.config.ts) already keeps execution in declaration order
 // without `.serial`'s stop-on-failure behaviour.
 test.describe("owner accounts", () => {
@@ -222,15 +197,12 @@ test.describe("owner accounts", () => {
       await page.goto("/admin/settings");
       await submitChangePasswordForm(page, OWNER_PASSWORD, TEMP_PASSWORD_2);
 
-      // Expected per the design (src/app/(admin)/admin/settings/
-      // ChangePasswordCard.tsx) — reproducibly fails today, bug 1 above.
-      await expect
-        .soft(
-          page.getByText("Password changed. Every other device was signed out.", { exact: true }),
-        )
-        .toBeVisible();
+      // Per the design (src/app/(admin)/admin/settings/ChangePasswordCard.tsx).
+      await expect(
+        page.getByText("Password changed. Every other device was signed out.", { exact: true }),
+      ).toBeVisible();
 
-      // The new password works on a fresh sign-in, regardless of bug 1.
+      // The new password works on a fresh sign-in.
       await submitSignIn(page, OWNER_EMAIL, TEMP_PASSWORD_2);
       await page.waitForURL((u) => !u.pathname.includes("sign-in"), { timeout: 30_000 });
       await page.goto("/admin/products");
@@ -259,21 +231,18 @@ test.describe("owner accounts", () => {
       // Change the password in context A only.
       await a.page.goto("/admin/settings");
       await submitChangePasswordForm(a.page, OWNER_PASSWORD, TEMP_PASSWORD_3);
-      await expect
-        .soft(
-          a.page.getByText("Password changed. Every other device was signed out.", {
-            exact: true,
-          }),
-        )
-        .toBeVisible();
+      await expect(
+        a.page.getByText("Password changed. Every other device was signed out.", {
+          exact: true,
+        }),
+      ).toBeVisible();
 
       // Context B's cookie is completely untouched by A's change (a
       // separate context/cookie jar) — navigating it now must hit the
       // revoked session server-side (`requireOwner()` -> `auth.api.
       // getSession`) and bounce to sign-in, proving real session revocation
       // rather than a cleared cookie in the same browser context. This is
-      // the core thing this spec exists to prove, and it holds regardless
-      // of bug 1 above.
+      // the core thing this spec exists to prove.
       await b.page.goto("/admin/settings");
       await b.page.waitForURL(/\/admin\/sign-in/, { timeout: 30_000 });
       // issue #44 restyled the guest sign-in screen onto The Rack — the
@@ -282,14 +251,12 @@ test.describe("owner accounts", () => {
       await expect(b.page.getByRole("heading", { name: "Sign in." })).toBeVisible();
 
       // Context A's own session should still be good — only *other*
-      // sessions are supposed to be revoked. Reproducibly fails today, bug
-      // 1 above: A is bounced to sign-in here too.
+      // sessions are supposed to be revoked.
       await a.page.goto("/admin/settings");
-      await expect.soft(a.page.getByRole("heading", { name: "Settings", level: 1 })).toBeVisible();
+      await expect(a.page.getByRole("heading", { name: "Settings", level: 1 })).toBeVisible();
     } finally {
-      // Restore OWNER_PASSWORD from fresh contexts — never trusting that
-      // context A's own session survived the change (it may not have, per
-      // bug 1) or that its cookie jar is still in a good state.
+      // Restore OWNER_PASSWORD from fresh contexts rather than trusting
+      // that context A's own cookie jar is still in a good state.
       await changeOwnerPasswordAndVerify(browser, TEMP_PASSWORD_3, OWNER_PASSWORD);
       await a.context.close();
       await b.context.close();
@@ -331,9 +298,9 @@ test.describe("owner accounts", () => {
     await page.getByLabel("Invite an owner", { exact: true }).fill(email);
     await page.getByRole("button", { name: "Send invite", exact: true }).click();
 
-    // See this file's module comment (bug 2): reproducibly fails here with
-    // "Couldn't generate an invite link. Try again." instead of showing the
-    // set-password link.
+    // See this file's module comment (#53): this used to reliably show
+    // "Couldn't generate an invite link. Try again." instead of the
+    // set-password link below.
     const notice = page.locator(".adm-mono-value");
     await expect(notice).toBeVisible();
     const link = (await notice.textContent())?.trim();
@@ -367,9 +334,8 @@ test.describe("owner accounts", () => {
   });
 
   test("6b. removing a second owner works", async ({ page }) => {
-    // Needs a second owner, which today only exists via invite — see this
-    // file's module comment (bug 2). Expected to fail at the invite step,
-    // the same known bug as test 5, not a separate one.
+    // Needs a second owner, which only exists via invite — see this file's
+    // module comment (#53).
     const email = `removable-${Date.now()}@example.com`;
 
     await signInAsOwner(page);

@@ -315,29 +315,28 @@ describe("changePassword revocation (auth.api.changePassword, revokeOtherSession
   });
 });
 
-describe("resetSendStorage globalThis parking (bug: Next.js compiles betterAuth.ts once per webpack layer)", () => {
-  it("keeps the same AsyncLocalStorage instance across independent module re-evaluations, instead of each getting its own", async () => {
+describe("resetSendOutcomes globalThis parking (bug: Next.js compiles betterAuth.ts once per webpack layer)", () => {
+  it("keeps the same Map instance across independent module re-evaluations, instead of each getting its own", async () => {
     // `vi.resetModules()` clears Vitest's module registry, so the next
     // dynamic `import()` of this specifier re-evaluates the file from
-    // scratch — a fresh top-level `const resetSendStorage = new
-    // AsyncLocalStorage()` — standing in for the App Router compiling
-    // `betterAuth.ts` into a second, independent webpack layer (RSC vs.
-    // Server Actions, say). Before the fix, `captureResetSend` calls made
-    // through one such "layer" and `sendResetPassword`'s `getStore()` reads
-    // made through another would each see their own module-scope instance;
-    // parking the storage on `globalThis` — the one object every layer
-    // shares — is what makes them the same object no matter how many times
-    // the module is re-evaluated.
-    const globalForTest = globalThis as unknown as { __resetSendStorage?: unknown };
+    // scratch — a fresh top-level `const resetSendOutcomes = new Map()` —
+    // standing in for the App Router compiling `betterAuth.ts` into a
+    // second, independent webpack layer (RSC vs. Server Actions, say).
+    // Parking the map on `globalThis` — the one object every layer shares —
+    // is what makes it the same object no matter how many times the module
+    // is re-evaluated, which is what lets `captureResetSend` (reading
+    // through one layer's copy) see an outcome `sendResetPassword` wrote
+    // through a different layer's copy.
+    const globalForTest = globalThis as unknown as { __resetSendOutcomes?: unknown };
 
     vi.resetModules();
     await import("@/lib/betterAuth");
-    const afterFirstReimport = globalForTest.__resetSendStorage;
+    const afterFirstReimport = globalForTest.__resetSendOutcomes;
     expect(afterFirstReimport).toBeDefined();
 
     vi.resetModules();
     await import("@/lib/betterAuth");
-    const afterSecondReimport = globalForTest.__resetSendStorage;
+    const afterSecondReimport = globalForTest.__resetSendOutcomes;
 
     expect(afterSecondReimport).toBe(afterFirstReimport);
   });

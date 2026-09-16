@@ -95,7 +95,7 @@ export async function inviteOwner(email: string, db?: Db): Promise<InviteOwnerRe
   });
 
   const auth = await getAuth();
-  const { outcome } = await captureResetSend(() =>
+  const { outcome } = await captureResetSend(normalized, () =>
     auth.api.requestPasswordReset({ body: { email: normalized } }),
   );
 

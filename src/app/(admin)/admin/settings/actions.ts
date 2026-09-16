@@ -283,11 +283,21 @@ export async function listPasskeysAction(): Promise<OwnerPasskey[]> {
   return listOwnerPasskeys();
 }
 
+/** Step 1 of adding a passkey — see `startPasskeyEnrollment`
+ * (`@/lib/passkeys`) for what the challenge is and how step 2 reads it
+ * back. `requireOwner()` here is the whole security property of enrolment:
+ * a passkey can only ever be added from inside an already-authenticated
+ * session, so getting one registered is never a way *in*. */
 export async function startAddPasskeyAction(name?: string): Promise<StartEnrollmentResult> {
   await requireOwner();
   return startPasskeyEnrollment(name);
 }
 
+/** Step 2 of adding a passkey: hands the authenticator's attestation back
+ * for verification — see `finishPasskeyEnrollment` (`@/lib/passkeys`).
+ * Gated on `requireOwner()` for the same reason step 1 is, and separately
+ * from it: the two halves are separate requests, so checking only the
+ * first would leave the one that actually writes the credential open. */
 export async function finishAddPasskeyAction(
   response: RegistrationResponseJSON,
   name?: string,
@@ -296,6 +306,11 @@ export async function finishAddPasskeyAction(
   return finishPasskeyEnrollment(response, name);
 }
 
+/** Removes one of the signed-in owner's passkeys — see
+ * `removeOwnerPasskey` (`@/lib/passkeys`), which deliberately allows
+ * removing the last one, since the password path never stops working.
+ * Ownership of `id` is checked by Better Auth's own endpoint rather than
+ * here, so this only has to establish that *some* owner is signed in. */
 export async function removePasskeyAction(
   id: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {

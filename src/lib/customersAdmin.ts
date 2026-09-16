@@ -134,6 +134,12 @@ export type AdminCustomerDetail = {
   email: string;
   name: string | null;
   phone: string | null;
+  /** City off the most recent order that actually has a ship-to address —
+   * `orders.ship_to` (`src/db/schema.ts`), the same column `AddressBlock`
+   * already renders on the order detail page. Null for a customer whose
+   * every order was pickup (no ship-to at all) or who simply hasn't got
+   * one yet, same "genuinely missing, not invented" rule as `phone`. */
+  city: string | null;
   orderCount: number;
   totalSpentCents: number;
   firstOrderAt: Date | null;
@@ -189,6 +195,7 @@ export async function getCustomerForAdmin(key: string): Promise<AdminCustomerDet
     .map((d) => d.getTime());
   const firstOrderAt = paidTimes.length > 0 ? new Date(Math.min(...paidTimes)) : null;
   const phone = rows.find((o) => o.phone)?.phone ?? null;
+  const city = rows.find((o) => o.shipTo?.city)?.shipTo?.city ?? null;
 
   const orderIds = rows.map((o) => o.id);
   const items =
@@ -233,6 +240,7 @@ export async function getCustomerForAdmin(key: string): Promise<AdminCustomerDet
     email: latest.email ?? normalized,
     name: latest.name,
     phone,
+    city,
     orderCount: rows.length,
     totalSpentCents,
     firstOrderAt,

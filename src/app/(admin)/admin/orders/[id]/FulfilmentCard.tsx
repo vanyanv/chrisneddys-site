@@ -18,6 +18,57 @@ const pickedUpInitial: FulfilmentActionState = {};
 
 const TOAST_MS = 4000;
 
+/** First name off the order, for a reassurance line ("Sends Anh a tracking
+ * email…") — falls back to "the guest" rather than leaving a sentence with
+ * nothing in the blank when a name isn't on file. */
+function firstName(name: string | null): string {
+  const trimmed = name?.trim();
+  return trimmed ? trimmed.split(/\s+/)[0]! : "the guest";
+}
+
+const COPY_RESET_MS = 2000;
+
+/** "Copy address" under the Ship-to card — plain-text clipboard copy of
+ * exactly what `AddressBlock` renders, for pasting into a carrier's own
+ * label form. Clipboard access can be denied (no permission, an insecure
+ * context) with nothing else to fall back to, so a failed copy just leaves
+ * the button as it was rather than pretending it worked. */
+function CopyAddressButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopied(true);
+        if (timer.current) clearTimeout(timer.current);
+        timer.current = setTimeout(() => setCopied(false), COPY_RESET_MS);
+      })
+      .catch(() => {
+        // No clipboard access — nothing else to fall back to.
+      });
+  }, [text]);
+
+  return (
+    <button
+      type="button"
+      className="rack-btn"
+      style={{ width: "100%", marginTop: 15 }}
+      onClick={handleCopy}
+    >
+      {copied ? "Copied" : "Copy address"}
+    </button>
+  );
+}
+
 /** The order's address — shown in the detail page's Customer column, for
  * both a ship order (the customer's address) and a pickup order (handled
  * separately by the page, via the store's `pickupAddress`). Exported so
@@ -25,22 +76,35 @@ const TOAST_MS = 4000;
  * fulfilment actions. */
 export function AddressBlock({ shipTo }: { shipTo: AdminOrderDetail["shipTo"] }) {
   if (!shipTo) return <p className="adm-notice">No address on file yet.</p>;
+  const addressText = [
+    shipTo.name,
+    shipTo.line1,
+    shipTo.line2,
+    `${shipTo.city}, ${shipTo.state} ${shipTo.postalCode}`,
+    shipTo.country,
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
+
   return (
-    <address className="adm-address ord-mono">
-      {shipTo.name}
-      <br />
-      {shipTo.line1}
-      <br />
-      {shipTo.line2 && (
-        <>
-          {shipTo.line2}
-          <br />
-        </>
-      )}
-      {shipTo.city}, {shipTo.state} {shipTo.postalCode}
-      <br />
-      {shipTo.country}
-    </address>
+    <>
+      <address className="adm-address ord-mono">
+        {shipTo.name}
+        <br />
+        {shipTo.line1}
+        <br />
+        {shipTo.line2 && (
+          <>
+            {shipTo.line2}
+            <br />
+          </>
+        )}
+        {shipTo.city}, {shipTo.state} {shipTo.postalCode}
+        <br />
+        {shipTo.country}
+      </address>
+      <CopyAddressButton text={addressText} />
+    </>
   );
 }
 
@@ -150,8 +214,11 @@ function ShipFulfilment({ order }: { order: AdminOrderDetail }) {
             />
           </div>
           <button type="submit" className="adm-btn adm-btn-primary" disabled={pending}>
-            {pending ? "Marking…" : "Mark shipped"}
+            {pending ? "Marking…" : "Mark shipped & email guest"}
           </button>
+          <p className="adm-help">
+            Sends {firstName(order.name)} a tracking email as soon as this is marked shipped.
+          </p>
           {state?.error && (
             <p className="adm-field-error" role="alert">
               {state.error}
@@ -198,8 +265,11 @@ function PickupFulfilment({ order }: { order: AdminOrderDetail }) {
         <form action={readyFormAction} className="ord-action-form">
           <input type="hidden" name="orderId" value={order.id} />
           <button type="submit" className="adm-btn adm-btn-primary" disabled={readyPending}>
-            {readyPending ? "Marking…" : "Mark ready for pickup"}
+            {readyPending ? "Marking…" : "Mark ready & email guest"}
           </button>
+          <p className="adm-help">
+            Sends {firstName(order.name)} a pickup-ready email as soon as this is marked ready.
+          </p>
           {readyState?.error && (
             <p className="adm-field-error" role="alert">
               {readyState.error}

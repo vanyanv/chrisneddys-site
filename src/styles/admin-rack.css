@@ -472,6 +472,10 @@
 .rack-edcell.is-sold {
   background: var(--rack-ink);
 }
+.rack-edcell.is-current {
+  outline: 2px solid var(--rack-red-cta);
+  outline-offset: 1px;
+}
 .rack-edlegend {
   display: flex;
   gap: var(--rack-space-md);
@@ -1262,10 +1266,18 @@
   color: var(--rack-muted);
   font-size: 12px;
 }
+.run-held-time.is-urgent {
+  color: var(--rack-red-cta);
+  font-weight: 700;
+}
 
 .run-detail-line {
   font-size: 13px;
   margin: 0 0 8px;
+}
+.run-detail-line.is-urgent {
+  color: var(--rack-red-cta);
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------------- */

@@ -267,6 +267,12 @@ export const storeSettings = pgTable("store_settings", {
   shipCountries: jsonb("ship_countries").$type<string[]>().notNull().default(["US"]),
   returnsPolicy: text("returns_policy"),
   termsText: text("terms_text"),
+  /** The customer-facing "ships within" clause (e.g. "3 business days") —
+   * optional, folded into `shopCopy.ts`'s `shippingReturnsNote` sentence
+   * only when set. `null` (not empty) means the owner hasn't said, so the
+   * storefront sentence reads exactly as it always has, with no dangling
+   * "Ships within ." */
+  shipsWithin: text("ships_within"),
   /**
    * A deliberate, temporary "the counter's closed" switch the owner flips
    * from `/admin/settings` once the shop has already opened — separate from

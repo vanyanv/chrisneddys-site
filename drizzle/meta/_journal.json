@@ -71,6 +71,13 @@
       "when": 1789546847325,
       "tag": "0009_icy_apocalypse",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789549945873,
+      "tag": "0010_neat_eternity",
+      "breakpoints": true
     }
   ]
 }

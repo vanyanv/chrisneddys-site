@@ -114,6 +114,7 @@ export type StoreSettingsPatch = Partial<{
   shipCountries: string[];
   returnsPolicy: string | null;
   termsText: string | null;
+  shipsWithin: string | null;
   shopPaused: boolean;
   pauseNote: string | null;
 }>;
@@ -128,6 +129,11 @@ const COUNTRY_PATTERN = /^[A-Z]{2}$/;
 /** Long enough for "Back Thursday" or a sentence, short enough that it
  * can't turn into a second returns policy pasted into the wrong field. */
 const PAUSE_NOTE_MAX_LENGTH = 140;
+
+/** Long enough for "5-7 business days", short enough that it can't turn
+ * into a second sentence folded into `shopCopy.ts`'s one-line shipping
+ * clause ("Ships within {this}."). */
+const SHIPS_WITHIN_MAX_LENGTH = 60;
 
 function isNonNegativeInt(n: number): boolean {
   return Number.isInteger(n) && n >= 0;
@@ -171,6 +177,17 @@ export async function updateStoreSettings(
       ok: false,
       error: `Keep the pause note under ${PAUSE_NOTE_MAX_LENGTH} characters.`,
       field: "pauseNote",
+    };
+  }
+  if (
+    patch.shipsWithin !== undefined &&
+    patch.shipsWithin !== null &&
+    patch.shipsWithin.length > SHIPS_WITHIN_MAX_LENGTH
+  ) {
+    return {
+      ok: false,
+      error: `Keep "Ships within" under ${SHIPS_WITHIN_MAX_LENGTH} characters.`,
+      field: "shipsWithin",
     };
   }
 

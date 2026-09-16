@@ -24,6 +24,12 @@ function formatCountdown(until: Date): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+/** A hold with under a minute left reads as urgent — it's about to lapse
+ * and go back on the shelf while this page is still open. */
+function isHoldUrgent(until: Date): boolean {
+  return until.getTime() - Date.now() < 60_000;
+}
+
 function customerLabel(row: RunNumberRow): string {
   if (!row.order) return "—";
   return row.order.customerEmail ?? "Guest — not signed in";
@@ -99,7 +105,11 @@ export function RunBoard({ run }: { run: RunForAdmin }) {
                 <li key={row.number} className="run-held-row">
                   <span className="run-held-number rack-mono">#{row.number}</span>
                   <span className="run-held-customer">{customerLabel(row)}</span>
-                  <span className="run-held-time rack-mono">
+                  <span
+                    className={`run-held-time rack-mono${
+                      row.reservedUntil && isHoldUrgent(row.reservedUntil) ? " is-urgent" : ""
+                    }`}
+                  >
                     {row.reservedUntil ? formatCountdown(row.reservedUntil) : "—"}
                   </span>
                 </li>
@@ -127,7 +137,11 @@ export function RunBoard({ run }: { run: RunForAdmin }) {
               <p className="run-detail-line">Held right now.</p>
               <p className="run-detail-line">{customerLabel(selected)}</p>
               {selected.reservedUntil && (
-                <p className="run-detail-line rack-mono">
+                <p
+                  className={`run-detail-line rack-mono${
+                    isHoldUrgent(selected.reservedUntil) ? " is-urgent" : ""
+                  }`}
+                >
                   {formatCountdown(selected.reservedUntil)} left on the hold
                 </p>
               )}

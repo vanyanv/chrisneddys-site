@@ -71,8 +71,19 @@ export function shippingReturnsNote(settings: StoreSettings): ShippingReturnsNot
     facts.push(`or pick up at ${pickupAddress}`);
   }
 
+  // Optional, and deliberately its own sentence rather than a fourth
+  // `facts` entry: "Ships flat $8 in the US · free over $75 · Ships within
+  // 3 business days." reads as though "Ships" were a fact of the same kind
+  // as the other two, when it's really a separate promise about timing.
+  // Unset, the line reads exactly as it always has — no dangling clause,
+  // no trailing "Ships within .".
+  const shipsWithin = settings.shipsWithin?.trim();
+  const line = shipsWithin
+    ? `${facts.join(" · ")}. Ships within ${shipsWithin}.`
+    : `${facts.join(" · ")}.`;
+
   return {
-    line: `${facts.join(" · ")}.`,
+    line,
     hasTerms: Boolean(settings.termsText?.trim()),
   };
 }

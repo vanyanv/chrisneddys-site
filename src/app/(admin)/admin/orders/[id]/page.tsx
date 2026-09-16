@@ -1,10 +1,15 @@
+import { and, asc, eq, isNotNull } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
+import { getDb } from "@/db/client";
+import { orderItems } from "@/db/schema";
 import { getOrderForAdmin, type AdminOrderDetail } from "@/lib/ordersAdmin";
+import { getCustomerForAdmin, type AdminCustomerDetail } from "@/lib/customersAdmin";
+import { getRunForAdmin, type RunForAdmin } from "@/lib/runAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import {
@@ -91,6 +96,46 @@ function ItemsCard({ order }: { order: AdminOrderDetail }) {
   );
 }
 
+/**
+ * The order's own numbered edition, if it has one — a small direct read on
+ * `orderItems` (the same table/columns `customersAdmin.ts`'s
+ * `getCustomerForAdmin` already reads for its own "numbers they own" panel)
+ * rather than through `ordersAdmin.ts`: its `AdminOrderItem` type doesn't
+ * carry `productId`, so it can't drive `getRunForAdmin` on its own. Lowest
+ * edition number first, in the rare case an order somehow holds more than
+ * one — same tie-break `ordersAdmin.ts`'s own item list uses.
+ */
+async function getOrderEdition(
+  orderId: string,
+): Promise<{ productId: string; number: number } | null> {
+  const db = await getDb();
+  const [row] = await db
+    .select({ productId: orderItems.productId, editionNumber: orderItems.editionNumber })
+    .from(orderItems)
+    .where(and(eq(orderItems.orderId, orderId), isNotNull(orderItems.editionNumber)))
+    .orderBy(asc(orderItems.editionNumber))
+    .limit(1);
+  if (!row || row.editionNumber === null) return null;
+  return { productId: row.productId, number: row.editionNumber };
+}
+
+/** "1ST", "2ND", "3RD", "4TH", … — for the customer history line
+ * ("3RD ORDER · $152.00 LIFETIME"). */
+function ordinalLabel(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}TH`;
+  switch (n % 10) {
+    case 1:
+      return `${n}ST`;
+    case 2:
+      return `${n}ND`;
+    case 3:
+      return `${n}RD`;
+    default:
+      return `${n}TH`;
+  }
+}
+
 type TimelineEvent = { label: string; date: Date };
 
 /** No column tracks exactly when an order became ready-for-pickup, was
@@ -111,7 +156,56 @@ function buildTimeline(order: AdminOrderDetail): TimelineEvent[] {
   return events.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-function TimelineCard({ order }: { order: AdminOrderDetail }) {
+/** "Where #35 sits in the run" — the same edition-map cells/legend Today's
+ * "The run" panel and the customer page's "Numbers they own" already draw
+ * (`.rack-edgrid`/`.rack-edcell`, `admin-rack.css`), reused here rather than
+ * a third copy of the same grid. Only rendered when this order actually
+ * holds a numbered edition (`run`/`number` both real reads) — no run, no
+ * row. */
+function RunPositionMini({ run, number }: { run: RunForAdmin; number: number }) {
+  return (
+    <div className="rack-hairline">
+      <div className="rack-eyebrow" style={{ marginBottom: 11 }}>
+        Where #{number} sits in the run
+      </div>
+      <div className="rack-edgrid">
+        {run.numbers.map((row) => (
+          <span
+            key={row.number}
+            className={`rack-edcell ${
+              row.status === "sold" ? "is-sold" : row.status === "reserved" ? "is-reserved" : ""
+            }${row.number === number ? " is-current" : ""}`}
+            title={`#${row.number} — ${row.status}`}
+          />
+        ))}
+      </div>
+      <div className="rack-edlegend">
+        <span>
+          <i className="is-available"></i>
+          {run.counts.available} going
+        </span>
+        <span>
+          <i className="is-reserved"></i>
+          {run.counts.reserved} held
+        </span>
+        <span>
+          <i className="is-sold"></i>
+          {run.counts.sold} sold
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TimelineCard({
+  order,
+  run,
+  editionNumber,
+}: {
+  order: AdminOrderDetail;
+  run: RunForAdmin | null;
+  editionNumber: number | null;
+}) {
   const events = buildTimeline(order);
   return (
     <section className="rack-order-card ord-timeline-card">
@@ -131,11 +225,27 @@ function TimelineCard({ order }: { order: AdminOrderDetail }) {
           <p className="adm-notice">{order.notes}</p>
         </div>
       )}
+      {run && editionNumber !== null && <RunPositionMini run={run} number={editionNumber} />}
     </section>
   );
 }
 
-function CustomerCard({ order }: { order: AdminOrderDetail }) {
+function CustomerCard({
+  order,
+  history,
+}: {
+  order: AdminOrderDetail;
+  history: AdminCustomerDetail | undefined;
+}) {
+  // Newest-first list (`getCustomerForAdmin`'s own order), so this order's
+  // position counting from the *oldest* — "3rd order" — is the total minus
+  // how many places down from the top it sits. `-1` (not found) is only
+  // reachable if the email on this order and the one `history` was looked
+  // up under have since diverged — real, but rare enough that it's simpler
+  // to just say nothing than to show a wrong ordinal.
+  const orderIndex = history?.orders.findIndex((o) => o.id === order.id) ?? -1;
+  const ordinal = history && orderIndex >= 0 ? history.orderCount - orderIndex : null;
+
   return (
     <section className="rack-order-card">
       <h3 className="rack-eyebrow rack-order-card-head">Customer</h3>
@@ -144,6 +254,14 @@ function CustomerCard({ order }: { order: AdminOrderDetail }) {
         {order.email ? <a href={`mailto:${order.email}`}>{order.email}</a> : "—"}
       </p>
       <p className="ord-customer-line">{order.phone ?? "—"}</p>
+      {history && ordinal !== null && (
+        <div
+          className="rack-hairline ord-mono"
+          style={{ fontSize: 11, color: "var(--rack-muted)", letterSpacing: "0.06em" }}
+        >
+          {ordinalLabel(ordinal)} ORDER · {formatCents(history.totalSpentCents)} LIFETIME
+        </div>
+      )}
     </section>
   );
 }
@@ -174,6 +292,12 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const { id } = await params;
   const [order, settings] = await Promise.all([getOrderForAdmin(id), getStoreSettings()]);
   if (!order) notFound();
+
+  const [edition, history] = await Promise.all([
+    getOrderEdition(order.id),
+    order.email ? getCustomerForAdmin(order.email) : Promise.resolve(undefined),
+  ]);
+  const run = edition ? ((await getRunForAdmin(edition.productId)) ?? null) : null;
 
   const pickupAddress = order.fulfilment === "pickup" ? settings.pickupAddress : null;
   const pill = orderStatusPill(order.status, order.fulfilment);
@@ -266,7 +390,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       <div className="rack-order-grid">
         <div className="rack-order-main">
           <ItemsCard order={order} />
-          <TimelineCard order={order} />
+          <TimelineCard order={order} run={run} editionNumber={edition?.number ?? null} />
         </div>
 
         <div className="rack-order-side">
@@ -274,7 +398,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             <h3 className="rack-eyebrow rack-order-card-head">Next</h3>
             <FulfilmentCard order={order} />
           </div>
-          <CustomerCard order={order} />
+          <CustomerCard order={order} history={history} />
           <ShipToCard order={order} pickupAddress={pickupAddress} />
         </div>
       </div>

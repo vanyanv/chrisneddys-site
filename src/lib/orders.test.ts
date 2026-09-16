@@ -408,6 +408,37 @@ describe("store settings", () => {
       expect(after.pauseNote).toBe(before.pauseNote);
     });
   });
+
+  // The "Ships within" clause (`shopCopy.ts`'s `shippingReturnsNote`) — an
+  // optional field, same shape as `pauseNote` above: `null` by default,
+  // settable, and length-capped so it can't turn into a second sentence.
+  describe("shipsWithin", () => {
+    it("is null until the owner sets it", async () => {
+      const settings = await getStoreSettings();
+      expect(settings.shipsWithin).toBeNull();
+    });
+
+    it("accepts and persists a value, and can be cleared back to null", async () => {
+      const set = await updateStoreSettings({ shipsWithin: "3 business days" });
+      expect(set.ok).toBe(true);
+      expect((await getStoreSettings()).shipsWithin).toBe("3 business days");
+
+      const cleared = await updateStoreSettings({ shipsWithin: null });
+      expect(cleared.ok).toBe(true);
+      expect((await getStoreSettings()).shipsWithin).toBeNull();
+    });
+
+    it("rejects a value over the length limit, without writing anything", async () => {
+      const before = await getStoreSettings();
+      const result = await updateStoreSettings({ shipsWithin: "x".repeat(61) });
+      expect(result.ok).toBe(false);
+      if (result.ok) throw new Error("expected the update to be rejected");
+      expect(result.field).toBe("shipsWithin");
+
+      const after = await getStoreSettings();
+      expect(after.shipsWithin).toBe(before.shipsWithin);
+    });
+  });
 });
 
 describe("the name recorded on an order (issue #41)", () => {

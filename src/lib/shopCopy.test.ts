@@ -30,6 +30,7 @@ const base: StoreSettings = {
   shipCountries: ["US"],
   returnsPolicy: "Returns accepted within 14 days of delivery, unworn and in original packaging.",
   termsText: "All sales are final once an edition ships.",
+  shipsWithin: null,
   shopPaused: false,
   pauseNote: null,
   updatedAt: new Date("2026-09-01T00:00:00Z"),
@@ -93,6 +94,27 @@ describe("shippingReturnsNote", () => {
       shippingFreeOverCents: null,
     });
     expect(note!.line.startsWith("Ships flat $6.75 in the US")).toBe(true);
+  });
+
+  it("reads exactly as it always has when 'ships within' is unset — no dangling clause", () => {
+    expect(shippingReturnsNote(base)!.line).toBe(
+      "Ships flat $6 in the US · free over $75 · or pick up at 5539 W. Sunset Blvd..",
+    );
+    expect(shippingReturnsNote({ ...base, shipsWithin: "   " })!.line).toBe(
+      shippingReturnsNote(base)!.line,
+    );
+  });
+
+  it("appends 'Ships within …' as its own sentence once it's set", () => {
+    const note = shippingReturnsNote({ ...base, shipsWithin: "3 business days" });
+    expect(note!.line).toBe(
+      "Ships flat $6 in the US · free over $75 · or pick up at 5539 W. Sunset Blvd.. Ships within 3 business days.",
+    );
+  });
+
+  it("trims the owner's 'ships within' text", () => {
+    const note = shippingReturnsNote({ ...base, shipsWithin: "  3 business days  " });
+    expect(note!.line.endsWith("Ships within 3 business days.")).toBe(true);
   });
 });
 

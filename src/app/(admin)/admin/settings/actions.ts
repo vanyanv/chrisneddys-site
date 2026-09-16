@@ -80,6 +80,14 @@ export async function saveSettingsAction(
   const returnsPolicy = String(formData.get("returnsPolicy") ?? "").trim();
   const termsText = String(formData.get("termsText") ?? "").trim();
 
+  // Optional — folded into `shopCopy.ts`'s shipping sentence only when set.
+  // Length is also enforced server-side in `updateStoreSettings` (the
+  // source of truth), same pattern as the pause note below.
+  const shipsWithin = String(formData.get("shipsWithin") ?? "").trim();
+  if (shipsWithin.length > 60) {
+    fieldErrors.shipsWithin = 'Keep "Ships within" under 60 characters.';
+  }
+
   // issue #43: the pause toggle and its optional note. Length is also
   // enforced server-side in `updateStoreSettings` (the source of truth for
   // validation) — this is just where a bad value becomes a labelled field
@@ -104,6 +112,7 @@ export async function saveSettingsAction(
     shipCountries,
     returnsPolicy: returnsPolicy || null,
     termsText: termsText || null,
+    shipsWithin: shipsWithin || null,
     shopPaused,
     pauseNote: pauseNote || null,
   };

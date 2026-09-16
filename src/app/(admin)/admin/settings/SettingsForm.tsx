@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { StoreSettings } from "@/lib/settingsAdmin";
+import { shippingReturnsNote } from "@/lib/shopCopy";
 import { saveSettingsAction, type SaveSettingsState } from "./actions";
 
 const initial: SaveSettingsState = {};
@@ -30,6 +31,7 @@ type FormValues = {
   shippingFlatDollars: string;
   shippingFreeOverDollars: string;
   shipCountries: string;
+  shipsWithin: string;
   returnsPolicy: string;
   termsText: string;
   /** issue #43: the deliberate, temporary pause — see `shopPaused`'s note on
@@ -51,10 +53,41 @@ function valuesFromSettings(settings: StoreSettings): FormValues {
         ? (settings.shippingFreeOverCents / 100).toFixed(2)
         : "",
     shipCountries: settings.shipCountries.join(", "),
+    shipsWithin: settings.shipsWithin ?? "",
     returnsPolicy: settings.returnsPolicy ?? "",
     termsText: settings.termsText ?? "",
     shopPaused: settings.shopPaused,
     pauseNote: settings.pauseNote ?? "",
+  };
+}
+
+function dollarsToCents(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? Math.round(parsed * 100) : 0;
+}
+
+/**
+ * The live settings row `shippingReturnsNote` (`@/lib/shopCopy` — the exact
+ * helper the storefront calls) would see if the form were saved right now.
+ * Starts from the last-saved `settings` and overlays only the fields this
+ * form actually edits, so the preview can never drift out of sync with a
+ * column this form doesn't touch.
+ */
+function previewStoreSettings(base: StoreSettings, values: FormValues): StoreSettings {
+  return {
+    ...base,
+    pickupEnabled: values.pickupEnabled,
+    pickupAddress: values.pickupAddress,
+    shippingFlatCents: dollarsToCents(values.shippingFlatDollars),
+    shippingFreeOverCents: values.shippingFreeOverDollars.trim()
+      ? dollarsToCents(values.shippingFreeOverDollars)
+      : null,
+    shipCountries: values.shipCountries
+      .split(",")
+      .map((c) => c.trim().toUpperCase())
+      .filter(Boolean),
+    shipsWithin: values.shipsWithin.trim() || null,
+    returnsPolicy: values.returnsPolicy,
   };
 }
 
@@ -94,6 +127,7 @@ export function SettingsForm({
   const [savedAt, setSavedAt] = useState<string | undefined>(undefined);
 
   const dirty = JSON.stringify(values) !== JSON.stringify(baselineRef.current);
+  const shippingPreview = shippingReturnsNote(previewStoreSettings(settings, values));
 
   const setField = useCallback(<K extends keyof FormValues>(key: K, value: FormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -360,6 +394,27 @@ export function SettingsForm({
           </div>
 
           <div className="adm-field">
+            <label htmlFor="shipsWithin" className="adm-label">
+              Ships within (optional)
+            </label>
+            <input
+              id="shipsWithin"
+              name="shipsWithin"
+              type="text"
+              className="adm-input"
+              value={values.shipsWithin}
+              onChange={(event) => setField("shipsWithin", event.target.value)}
+              placeholder="3 business days"
+              maxLength={60}
+            />
+            <p className="adm-help">
+              Shown in the shipping line below once set — leave it blank to say nothing about
+              timing, same as today.
+            </p>
+            <FieldError message={fieldErrors.shipsWithin} />
+          </div>
+
+          <div className="adm-field">
             <label htmlFor="shipCountries" className="adm-label">
               Ship to (ISO-2 country codes, comma-separated)
             </label>
@@ -375,6 +430,27 @@ export function SettingsForm({
             />
             <p className="adm-help">Default US. Add more as two-letter codes, e.g. US, CA.</p>
             <FieldError message={fieldErrors.shipCountries} />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 11,
+              marginTop: 18,
+              padding: "13px 15px",
+              background: "var(--rack-paper)",
+              border: "1px dashed var(--rack-rule)",
+            }}
+          >
+            <span className="rack-eyebrow" style={{ flex: "none" }}>
+              Reads as
+            </span>
+            <span className="rack-mono" style={{ fontSize: 12.5 }}>
+              {shippingPreview
+                ? `"${shippingPreview.line}"`
+                : "Add a returns policy below to preview this line — California law requires one before it can show."}
+            </span>
           </div>
         </div>
 
@@ -450,7 +526,14 @@ export function SettingsForm({
         <button type="button" className="adm-savebar-discard" onClick={discard}>
           Discard
         </button>
-        <button type="submit" form="settings-form" className="adm-savebar-save" disabled={pending}>
+        <button
+          type="submit"
+          form="settings-form"
+          className="adm-savebar-save"
+          disabled={pending}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+        >
+          {pending && <span className="rack-spin" aria-hidden="true" />}
           {pending ? "Saving…" : "Save"}
         </button>
       </div>

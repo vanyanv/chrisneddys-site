@@ -41,19 +41,24 @@ function isHoldUrgent(until: Date, now: number): boolean {
  * the resolution the countdown itself displays; nothing here re-reads the
  * database, so a hold that lapses while the page is open still needs a
  * reload to leave the list.
+ *
+ * `serverNow` seeds it rather than `Date.now()`. Calling `Date.now()` during
+ * render means the server and the first client render read two different
+ * clocks, and if they fall either side of a second boundary React hydrates
+ * a countdown — and now a bar width — against markup that disagrees. One
+ * timestamp taken on the server and serialised into the payload is the same
+ * number in both renders, so the first paint always matches and the effect
+ * below takes over from there.
  */
-function useNow(active: boolean): number {
-  // Starts unset and is filled on mount, so the server render and the first
-  // client render agree (they both fall back to render-time `Date.now()`)
-  // rather than hydrating against a timestamp a second stale.
-  const [now, setNow] = useState<number | null>(null);
+function useNow(serverNow: number, active: boolean): number {
+  const [now, setNow] = useState(serverNow);
   useEffect(() => {
     if (!active) return;
     setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [active]);
-  return now ?? Date.now();
+  return now;
 }
 
 /**
@@ -89,10 +94,10 @@ function cellClass(status: RunNumberRow["status"]): string {
  * select interaction; every number it shows came straight from
  * `getRunForAdmin`'s server-side join, not anything computed here.
  */
-export function RunBoard({ run }: { run: RunForAdmin }) {
+export function RunBoard({ run, serverNow }: { run: RunForAdmin; serverNow: number }) {
   const held = useMemo(() => run.numbers.filter((n) => n.status === "reserved"), [run.numbers]);
   // Only tick while something is actually counting down.
-  const now = useNow(held.length > 0);
+  const now = useNow(serverNow, held.length > 0);
   const firstInteresting = run.numbers.find((n) => n.status !== "available") ?? null;
   const [selectedNumber, setSelectedNumber] = useState<number | null>(
     firstInteresting?.number ?? null,

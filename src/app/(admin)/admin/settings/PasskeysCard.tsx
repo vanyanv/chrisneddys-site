@@ -96,6 +96,11 @@ export function PasskeysCard({ passkeys: initialPasskeys }: { passkeys: OwnerPas
       setConfirmId(null);
       showToast("Passkey removed");
       await refresh();
+    } catch {
+      // `handleAdd` above already does this; without it here a rejected
+      // action or a failed re-read left the row sitting there with no
+      // explanation, and an unhandled rejection behind it.
+      setRemoveError("Couldn't update passkeys. Reload and try again.");
     } finally {
       setRemovingId(null);
     }

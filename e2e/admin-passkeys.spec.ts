@@ -14,10 +14,15 @@ import { signInAsOwner, OWNER_EMAIL, OWNER_PASSWORD } from "./helpers";
  * authenticator is configured per-page via CDP, and test 3 specifically
  * needs a *second*, authenticator-less page to stand in for "a different
  * browser that never enrolled a passkey" — sharing one page throughout
- * would make that impossible to represent. State that has to survive
- * between tests (the passkey itself) lives in the database instead, the
- * same way `admin-owner-accounts.spec.ts` carries state across its own
- * `describe.serial` blocks.
+ * would make that impossible to represent.
+ *
+ * Every test here enrols whatever passkey it needs, under its own name, and
+ * none reads another's. That is deliberate rather than tidy: these are
+ * separate top-level tests, not a `describe.serial` block, so nothing makes
+ * one a dependency of another — `workers: 1` and `fullyParallel: false`
+ * fix the order they run in, but running any one of them alone still has
+ * to work, and `retries: 0` means a cascade from an earlier failure would
+ * be reported as several unrelated ones.
  */
 
 /** Enables Chromium's virtual authenticator on `page` — a platform
@@ -76,18 +81,29 @@ test("1. enroll a passkey in Settings, then sign back in with only that passkey"
 
 test("2. removing a passkey never breaks password sign-in (rule 3)", async ({ browser }) => {
   const page = await browser.newPage();
+  await addVirtualAuthenticator(page);
   await signInAsOwner(page);
   await page.goto("/admin/settings");
 
-  // Left behind by test 1 — remove it, taking the account back to zero
-  // passkeys, and prove the password path is entirely unaffected. Scoped to
-  // the passkey's own list row: "Remove" also appears in the unrelated
-  // Owners card below it on the same page.
-  const passkeyRow = page.getByRole("listitem").filter({ hasText: "E2E virtual key" });
+  // Enrolled here rather than inherited from test 1. These are separate
+  // top-level tests, not a `describe.serial` block: `workers: 1` and
+  // `fullyParallel: false` happen to run them in order today, but neither
+  // makes test 1 a dependency of test 2 — and running this test on its own
+  // (`-g "removing a passkey"`) skips test 1 entirely, which would leave
+  // this one failing on a passkey that was never created.
+  const NAME = "E2E removable key";
+  await page.getByLabel("Name this device (optional)").fill(NAME);
+  await page.getByRole("button", { name: "Add a passkey" }).click();
+  await expect(page.getByText(NAME)).toBeVisible({ timeout: 15_000 });
+
+  // Now remove it and prove the password path is entirely unaffected.
+  // Scoped to the passkey's own list row: "Remove" also appears in the
+  // unrelated Owners card below it on the same page.
+  const passkeyRow = page.getByRole("listitem").filter({ hasText: NAME });
   await expect(passkeyRow).toBeVisible();
   await passkeyRow.getByRole("button", { name: "Remove" }).click();
   await passkeyRow.getByRole("button", { name: "Confirm remove" }).click();
-  await expect(page.getByText("E2E virtual key")).toHaveCount(0);
+  await expect(page.getByText(NAME)).toHaveCount(0);
 
   await signOut(page);
 

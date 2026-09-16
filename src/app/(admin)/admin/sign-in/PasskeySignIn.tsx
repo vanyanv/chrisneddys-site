@@ -24,6 +24,11 @@ export function PasskeySignIn({ next }: { next: string }) {
   const [supported, setSupported] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Stays true for the rest of this page's life: the cool-down outlasts any
+  // retry the owner could usefully make, so re-enabling the button would
+  // only invite attempts that are certain to fail — and each one is another
+  // recorded attempt.
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     setSupported(browserSupportsWebAuthn());
@@ -53,6 +58,16 @@ export function PasskeySignIn({ next }: { next: string }) {
       const result = await passkeySignInFinishAction(response, next);
       // A successful finish redirects server-side and never returns here —
       // reaching this line means it didn't.
+      if (typeof result?.retryAfterSeconds === "number") {
+        // The same wording the password form shows for the same lockout
+        // (`SignInForm`), because it is the same throttle on the same
+        // table. Without this a locked-out owner was told their credential
+        // was wrong and left free to keep trying — which is the exact
+        // thing issue #45 was about: warn before the lock, not after.
+        setError("Too many attempts. Try again in a few minutes.");
+        setLocked(true);
+        return;
+      }
       if (result?.error) setError(result.error);
     } catch {
       setError("Couldn't sign in with a passkey. Try again, or use your password below.");
@@ -67,7 +82,7 @@ export function PasskeySignIn({ next }: { next: string }) {
         type="button"
         className="rack-btn-primary rack-guest-submit"
         onClick={handleClick}
-        disabled={pending}
+        disabled={pending || locked}
       >
         {pending ? (
           <>

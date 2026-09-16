@@ -111,7 +111,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
         </div>
       </div>
 
-      <RunBoard run={run} />
+      <RunBoard run={run} serverNow={Date.now()} />
     </div>
   );
 }

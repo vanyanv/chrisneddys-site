@@ -76,6 +76,27 @@ describe("inviteOwner", () => {
     expect(accounts).toHaveLength(0);
   });
 
+  it("hands back the owner row it created, matching what listOwners will show (#38)", async () => {
+    const email = "invite-returns-row@example.com";
+
+    const result = await inviteOwner(email);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("unreachable");
+
+    // The settings card lists this row immediately, before `/admin/settings`
+    // has re-rendered, so it has to carry the same values the re-render
+    // will — including the database-defaulted `createdAt` the list sorts on.
+    expect(result.owner.email).toBe(email);
+    expect(result.owner.isYou).toBe(false);
+    expect(result.owner.createdAt).toBeInstanceOf(Date);
+
+    const listed = await listOwners("someone-else@example.com");
+    const fromList = listed.find((owner) => owner.email === email);
+    expect(fromList).toBeTruthy();
+    expect(result.owner.name).toBe(fromList!.name);
+    expect(result.owner.createdAt.getTime()).toBe(fromList!.createdAt.getTime());
+  });
+
   it("refuses an email that already has an owner account, without creating a duplicate row", async () => {
     const email = "invite-dupe@example.com";
     await insertOwner(email);

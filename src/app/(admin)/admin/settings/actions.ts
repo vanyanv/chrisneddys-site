@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { requireOwner } from "@/lib/auth";
 import { getAuth } from "@/lib/betterAuth";
-import { inviteOwner, removeOwner } from "@/lib/owners";
+import { inviteOwner, removeOwner, type OwnerRow } from "@/lib/owners";
 import {
   finishPasskeyEnrollment,
   listOwnerPasskeys,
@@ -215,6 +215,9 @@ export type InviteOwnerState = {
   /** ISO timestamp of a successful invite — lets the client tell "the same
    * result rendered again" apart from "a fresh invite just went through". */
   at?: string;
+  /** The owner row just created, so the card can list them immediately
+   * rather than waiting on `/admin/settings` to re-render (#38). */
+  owner?: OwnerRow;
 };
 
 /** Invites a new owner by email — see `inviteOwner` (`@/lib/owners`) for
@@ -235,16 +238,20 @@ export async function inviteOwnerAction(
       sent: false,
       reason: result.reason,
       url: result.url,
+      owner: result.owner,
       at: new Date().toISOString(),
     };
   }
-  return { ok: true, sent: true, at: new Date().toISOString() };
+  return { ok: true, sent: true, owner: result.owner, at: new Date().toISOString() };
 }
 
 export type RemoveOwnerState = {
   ok?: boolean;
   error?: string;
   at?: string;
+  /** The address just removed, so the card can drop the row immediately
+   * rather than waiting on `/admin/settings` to re-render (#38). */
+  email?: string;
 };
 
 /** Removes an owner by email — see `removeOwner` (`@/lib/owners`) for the
@@ -259,7 +266,7 @@ export async function removeOwnerAction(
   const result = await removeOwner(email, session.email);
 
   if (!result.ok) return { error: result.error };
-  return { ok: true, at: new Date().toISOString() };
+  return { ok: true, email, at: new Date().toISOString() };
 }
 
 // ---------------------------------------------------------------------------

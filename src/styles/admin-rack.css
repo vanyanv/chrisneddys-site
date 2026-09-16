@@ -1270,6 +1270,19 @@
   color: var(--rack-red-cta);
   font-weight: 700;
 }
+/* The per-hold progress bar (issue #50), drawn under the row rather than
+   beside it: `.run-held-row` is a three-column grid and a fourth child
+   would take an implicit column, squeezing the customer's email. It drains
+   left to right as the hold runs down, and turns red with the countdown
+   above it rather than on a threshold of its own, so the two can't
+   disagree. */
+.run-held-bar {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+}
+.run-held-bar.is-urgent > i {
+  background: var(--rack-red-cta);
+}
 
 .run-detail-line {
   font-size: 13px;

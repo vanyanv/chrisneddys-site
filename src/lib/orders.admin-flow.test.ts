@@ -15,6 +15,7 @@ import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { editions, products, variants } from "@/db/schema";
 import {
+  appendOrderNote,
   createPendingOrder,
   getOrder,
   markPaid,
@@ -148,6 +149,44 @@ describe("pickup: paid -> ready_for_pickup -> picked_up", () => {
 });
 
 describe("refund", () => {
+  /**
+   * The reason is the desk's only record of why money went back, and a
+   * refund is one-way — a second `markRefunded` on the same order is
+   * refused, because the status is already `refunded`. So a reason written
+   * *after* the refund commits could never be retried if its own write
+   * failed, leaving a refund on the books with nothing saying why. It goes
+   * in the refund's own transaction; these pin that it lands with it, and
+   * that it appends rather than replacing whatever is already there.
+   */
+  it("files the refund reason with the refund itself", async () => {
+    const orderId = await createPaidOrder("ship");
+
+    const result = await markRefunded(orderId, { note: "Refund reason: arrived damaged" });
+    expect(result.ok).toBe(true);
+
+    const order = await getOrder(orderId);
+    expect(order?.status).toBe("refunded");
+    expect(order?.notes).toBe("Refund reason: arrived damaged");
+  });
+
+  it("appends the reason to notes an order already had", async () => {
+    const orderId = await createPaidOrder("ship");
+    await appendOrderNote(orderId, "Partial refund of $5.00 in Stripe");
+
+    await markRefunded(orderId, { note: "Refund reason: changed their mind" });
+
+    const order = await getOrder(orderId);
+    expect(order?.notes).toBe(
+      "Partial refund of $5.00 in Stripe\nRefund reason: changed their mind",
+    );
+  });
+
+  it("leaves notes alone when no reason was given", async () => {
+    const orderId = await createPaidOrder("ship");
+    await markRefunded(orderId, {});
+    expect((await getOrder(orderId))?.notes).toBeNull();
+  });
+
   it("refunds a fulfilled (shipped) order", async () => {
     const orderId = await createPaidOrder("ship");
     await setFulfilment(orderId, { carrier: "FedEx", trackingNumber: "999988887777" });

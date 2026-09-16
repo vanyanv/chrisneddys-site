@@ -15,7 +15,6 @@ import { orderItems, orders, variants, type ShipTo } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
 import * as email from "@/lib/email";
 import {
-  appendOrderNote,
   getOrder,
   listOrders,
   markPickedUp as transitionPickedUp,
@@ -365,8 +364,9 @@ export type MarkRefundedInput = {
    * same transition — see `markRefunded` in `src/lib/orders.ts` for why this
    * defaults to `false` rather than following the refund automatically. */
   release?: boolean;
-  /** Filed as an order note (`appendOrderNote`), never a new column and
-   * never shown to the customer — the desk's own memory of why. */
+  /** Filed as an order note, never a new column and never shown to the
+   * customer — the desk's own memory of why. Written inside the same
+   * transaction as the refund, so a refund can never land without it. */
   reason?: string;
 };
 
@@ -378,11 +378,12 @@ export async function markRefunded(
   input: MarkRefundedInput = {},
 ): Promise<OrderMutationResult> {
   await requireOwner();
-  const result = await transitionRefunded(orderId, { release: input.release });
-  if (!result.ok) return result;
-
   const reason = input.reason?.trim();
-  if (reason) await appendOrderNote(orderId, `Refund reason: ${reason}`);
+  const result = await transitionRefunded(orderId, {
+    release: input.release,
+    note: reason ? `Refund reason: ${reason}` : undefined,
+  });
+  if (!result.ok) return result;
 
   await notifyBestEffort("refunded", orderId, result.releasedEditionNumbers.length > 0);
   return { ok: true };

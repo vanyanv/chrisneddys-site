@@ -45,6 +45,12 @@ function CopyAddressButton({ text }: { text: string }) {
   );
 
   const handleCopy = useCallback(() => {
+    // `navigator.clipboard` is undefined outside a secure context — an
+    // admin reached over plain HTTP on a phone, say. Reading `.writeText`
+    // off it would throw synchronously, before the `.catch()` below is
+    // attached, so the silent-failure path that catch exists for would
+    // never run.
+    if (!navigator.clipboard) return;
     navigator.clipboard
       .writeText(text)
       .then(() => {

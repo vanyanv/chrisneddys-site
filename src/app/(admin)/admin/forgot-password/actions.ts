@@ -34,6 +34,13 @@ export type ForgotPasswordState = {
   message?: string;
   error?: string;
 };
+// Deliberately nothing here identifies the address the request was for.
+// `actions.test.ts` asserts this action's result for a known owner is
+// *deeply equal* to its result for an unknown address, and echoing the
+// email back — however harmless it looks, since it is the caller's own
+// input — would make those two objects differ and quietly retire the one
+// assertion that pins this form's enumeration-resistance. The client
+// remembers which address it submitted instead (`ForgotPasswordForm`).
 
 const GENERIC_MESSAGE = "If that address belongs to an owner, a reset link is on its way.";
 const TOO_MANY_ATTEMPTS_MESSAGE = "Too many requests for that address. Try again later.";

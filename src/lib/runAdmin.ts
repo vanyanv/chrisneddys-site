@@ -38,6 +38,13 @@ export type RunNumberRow = {
   /** Set only while `status === "reserved"` — when the hold lapses on its
    * own, nobody is emailed about it (issue #36's decisions: no chasing). */
   reservedUntil: Date | null;
+  /** When this hold began: the holding order's `createdAt`, which
+   * `createPendingOrder` writes in the same transaction that sets
+   * `reservedUntil`. Together they give the hold's real length, so the
+   * progress bar beside a held row is measured rather than assumed from
+   * `holdMinutes`' 30-minute default — that default is a parameter, not a
+   * fact about any particular hold. Null for a number nobody is holding. */
+  holdStartedAt: Date | null;
   /** The order currently holding or having bought this number — set for
    * both `reserved` and `sold`, null for `available`. */
   order: RunOrderRef | null;
@@ -89,6 +96,7 @@ export async function getRunForAdmin(productId: string): Promise<RunForAdmin | u
       customerName: orders.name,
       customerEmail: orders.email,
       paidAt: orders.paidAt,
+      orderCreatedAt: orders.createdAt,
     })
     .from(editions)
     .leftJoin(orders, eq(editions.orderId, orders.id))
@@ -99,6 +107,7 @@ export async function getRunForAdmin(productId: string): Promise<RunForAdmin | u
     number: row.number,
     status: row.status,
     reservedUntil: row.reservedUntil,
+    holdStartedAt: row.status === "reserved" ? row.orderCreatedAt : null,
     order:
       row.orderId !== null
         ? {

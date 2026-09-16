@@ -104,14 +104,22 @@ describe("listOwnerPasskeys", () => {
     setRequestHeaders(headers);
     await expect(listOwnerPasskeys()).resolves.toEqual([]);
 
-    await insertRawPasskey(db, owner!.id, { name: "  MacBook  " });
+    // Explicit, distinct timestamps: the assertion below is about newest
+    // first, and three rows taking the column's `defaultNow()` can land on
+    // the same microsecond, leaving the order down to whatever the planner
+    // felt like. That tie is what made this test intermittent.
+    await insertRawPasskey(db, owner!.id, {
+      name: "  MacBook  ",
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+    });
     // A known AAGUID (from `commonAuthenticatorNames`) with no owner-supplied
     // name falls back to that provider's name, not the raw GUID.
     await insertRawPasskey(db, owner!.id, {
       aaguid: "08987058-cadc-4b81-b6e1-30de50dcbe96",
+      createdAt: new Date("2026-02-01T00:00:00Z"),
     });
     // Neither a name nor a recognizable AAGUID: falls back to "Passkey".
-    await insertRawPasskey(db, owner!.id);
+    await insertRawPasskey(db, owner!.id, { createdAt: new Date("2026-03-01T00:00:00Z") });
 
     // A different owner's passkey must never show up in this list.
     const otherEmail = "passkey-list-other-owner@example.com";

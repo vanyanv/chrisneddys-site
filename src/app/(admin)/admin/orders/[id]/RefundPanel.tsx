@@ -30,7 +30,8 @@ function formatNumberList(numbers: number[]): string {
  * (issue #42): a "put number N back in the run" toggle, off by default —
  * see `markRefunded` in `src/lib/orders.ts` for why release is never
  * inferred from the refund itself — and an optional reason, filed as an
- * order note (`appendOrderNote`) that the customer never sees. Both are
+ * order note, written in the refund's own transaction, that the customer
+ * never sees. Both are
  * skipped entirely when the order has no numbered items to release (a
  * plain-quantity product has no per-unit number for the toggle to name).
  *

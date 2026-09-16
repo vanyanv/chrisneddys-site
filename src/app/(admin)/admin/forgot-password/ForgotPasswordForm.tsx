@@ -22,10 +22,23 @@ function CheckIcon() {
 }
 
 export function ForgotPasswordForm() {
-  const [state, formAction, pending] = useActionState(requestPasswordResetAction, initialState);
-  // Held only so "Send it again" can resubmit without retyping — never
-  // read to decide anything server-side.
-  const [email, setEmail] = useState("");
+  // The address this form last submitted, snapshotted out of the FormData
+  // at submit time rather than tracked from the input's `onChange`. The
+  // email field stays editable while a request is in flight, so typing into
+  // it before the confirmation lands would otherwise leave "Send it again"
+  // pointing at a different address than the one the panel says a link went
+  // to. Snapshotting here, in a client wrapper around the action, keeps the
+  // server action's own result free of the address — `actions.test.ts`
+  // pins that its answer for a known owner and an unknown one are deeply
+  // equal, and carrying the email in it would have broken that.
+  const [sentEmail, setSentEmail] = useState("");
+  const [state, formAction, pending] = useActionState(
+    async (previous: ForgotPasswordState | undefined, formData: FormData) => {
+      setSentEmail(String(formData.get("email") ?? ""));
+      return requestPasswordResetAction(previous, formData);
+    },
+    initialState,
+  );
   // `useActionState`'s `state` is replaced wholesale on every submit, so a
   // throttled "Send it again" (returns `{ error }`, no `sent`) would
   // otherwise flip this whole panel back to the empty request form —
@@ -59,7 +72,7 @@ export function ForgotPasswordForm() {
         </p>
 
         <form action={formAction}>
-          <input type="hidden" name="email" value={email} />
+          <input type="hidden" name="email" value={sentEmail} />
           <div className={pending ? "rack-guest-notice" : "rack-guest-notice is-done"}>
             {pending ? (
               <>
@@ -121,14 +134,7 @@ export function ForgotPasswordForm() {
         <label className="adm-label" htmlFor="email">
           Email
         </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          onChange={(event) => setEmail(event.target.value)}
-        />
+        <input id="email" name="email" type="email" autoComplete="email" required />
       </div>
 
       {state.error ? (

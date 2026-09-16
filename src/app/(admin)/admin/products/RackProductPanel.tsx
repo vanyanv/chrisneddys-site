@@ -684,8 +684,8 @@ function RunSection({
        * the other. */}
       {locked ? (
         <RunWarning>
-          <strong>This locks the moment number one sells.</strong> Fifty is a promise printed on
-          fifty certificates, so the field stays read-only from here on.
+          <strong>This locks the moment number one sells.</strong> The size of the run is a promise
+          printed on every certificate, so the field stays read-only from here on.
         </RunWarning>
       ) : (
         <RunWarning>

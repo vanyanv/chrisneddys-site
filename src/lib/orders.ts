@@ -1090,7 +1090,7 @@ export type MarkRefundedResult =
  */
 export async function markRefunded(
   orderId: string,
-  patch: { refundedAt?: Date; release?: boolean },
+  patch: { refundedAt?: Date; release?: boolean; note?: string },
   db?: Db,
 ): Promise<MarkRefundedResult> {
   const database = await resolveDb(db);
@@ -1106,6 +1106,23 @@ export async function markRefunded(
       },
     );
     if (!result.ok) return result;
+
+    // The desk's record of *why* the money went back, written in the same
+    // transaction as the refund itself rather than after it. Refunding is
+    // one-way — a second attempt is refused because the order is already
+    // `refunded` — so a note written separately that failed could never be
+    // retried, leaving a refund on the books with nothing saying why.
+    if (patch.note) {
+      const existing = await tx.query.orders.findFirst({ where: eq(orders.id, orderId) });
+      await tx
+        .update(orders)
+        .set({
+          notes: existing?.notes ? `${existing.notes}\n${patch.note}` : patch.note,
+          updatedAt: new Date(),
+        })
+        .where(eq(orders.id, orderId));
+    }
+
     if (!patch.release) return { ok: true, releasedEditionNumbers: [] };
 
     const sold = await tx

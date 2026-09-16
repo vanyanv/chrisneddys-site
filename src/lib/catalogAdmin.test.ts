@@ -27,6 +27,14 @@ import {
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
 
+/** Gives a fresh draft a price and a run size — the two `setStatus` gates
+ * (issue #36's decisions comment) that most tests here aren't themselves
+ * about, so they can get past them without restating the same two calls. */
+async function makePriceableAndSized(id: string, priceCents = 1000): Promise<void> {
+  await updateProductField(id, "priceCents", priceCents);
+  await setInventory(id, "quantity", 10);
+}
+
 beforeAll(async () => {
   const db = (await getDb()) as unknown as PgliteDatabase<typeof schema>;
   await migrate(db, { migrationsFolder });
@@ -132,6 +140,7 @@ describe("setStatus", () => {
     const before = await getProductForAdmin(draft.id);
     expect(before?.publishedAt).toBeNull();
 
+    await makePriceableAndSized(draft.id);
     await addImage({
       productId: draft.id,
       kind: "view",
@@ -160,6 +169,7 @@ describe("setStatus", () => {
 
   it("refuses to publish a product with no photo, and takes no action", async () => {
     const draft = await createDraft("Photoless Product");
+    await makePriceableAndSized(draft.id);
 
     const result = await setStatus(draft.id, "published");
     expect(result).toEqual({
@@ -174,6 +184,7 @@ describe("setStatus", () => {
 
   it("allows publishing once a view photo exists", async () => {
     const draft = await createDraft("Photographed Product");
+    await makePriceableAndSized(draft.id);
     await addImage({
       productId: draft.id,
       kind: "view",
@@ -197,6 +208,86 @@ describe("setStatus", () => {
     const draft = await createDraft("Never Photographed Product");
     expect((await setStatus(draft.id, "draft")).ok).toBe(true);
     expect((await setStatus(draft.id, "archived")).ok).toBe(true);
+  });
+
+  // The unnamed-draft decision (issue #36's decisions comment): the second
+  // hat is `[SECOND COLOURWAY]` with no name, price or run size, and the
+  // catalogue must refuse to publish it — enforced here in the data layer,
+  // not just by disabling a button — until all three (plus the existing
+  // photo gate) are real.
+  describe("the unnamed-draft gate", () => {
+    async function addPhoto(id: string): Promise<void> {
+      await addImage({
+        productId: id,
+        kind: "view",
+        viewId: crypto.randomUUID(),
+        label: "FRONT",
+        alt: "front view alt text",
+        urlFull: "https://example.com/gate.webp",
+        urlThumb: "https://example.com/gate-thumb.webp",
+        width: 720,
+        height: 720,
+      });
+    }
+
+    it('createDraft("") leaves the name genuinely blank, not a placeholder', async () => {
+      const draft = await createDraft("");
+      const admin = await getProductForAdmin(draft.id);
+      expect(admin?.name).toBe("");
+      expect(admin?.displayName1).toBe("");
+      expect(admin?.displayName2).toBe("");
+      // Still needs a real, unique slug — "draft" stands in for the slug
+      // base only, never for the name a customer or the rack would see.
+      expect(admin?.slug).toBeTruthy();
+    });
+
+    it("refuses to publish a nameless draft, even with a price, a run size and a photo", async () => {
+      const draft = await createDraft("");
+      await makePriceableAndSized(draft.id);
+      await addPhoto(draft.id);
+
+      const result = await setStatus(draft.id, "published");
+      expect(result).toEqual({ ok: false, error: "Give it a name before publishing." });
+
+      const admin = await getProductForAdmin(draft.id);
+      expect(admin?.status).toBe("draft");
+    });
+
+    it("refuses to publish a named draft with no price", async () => {
+      const draft = await createDraft("Second Colourway");
+      await setInventory(draft.id, "quantity", 10);
+      await addPhoto(draft.id);
+
+      const result = await setStatus(draft.id, "published");
+      expect(result).toEqual({ ok: false, error: "Set a price before publishing." });
+    });
+
+    it("refuses to publish a named, priced draft with no run size (still untracked)", async () => {
+      const draft = await createDraft("Second Colourway");
+      await updateProductField(draft.id, "priceCents", 4800);
+      await addPhoto(draft.id);
+
+      const result = await setStatus(draft.id, "published");
+      expect(result).toEqual({ ok: false, error: "Set a run size before publishing." });
+    });
+
+    it("publishes once it has a name, a price, a run size and a photo", async () => {
+      const draft = await createDraft("Second Colourway");
+      await makePriceableAndSized(draft.id, 4800);
+      await addPhoto(draft.id);
+
+      const result = await setStatus(draft.id, "published");
+      expect(result.ok).toBe(true);
+
+      const admin = await getProductForAdmin(draft.id);
+      expect(admin?.status).toBe("published");
+    });
+
+    it("a draft can still move to draft/archived with none of the four in place", async () => {
+      const draft = await createDraft("");
+      expect((await setStatus(draft.id, "draft")).ok).toBe(true);
+      expect((await setStatus(draft.id, "archived")).ok).toBe(true);
+    });
   });
 });
 
@@ -321,6 +412,7 @@ describe("reorderProducts", () => {
     const c = await createDraft("Reorder Product C");
 
     for (const draft of [a, b, c]) {
+      await makePriceableAndSized(draft.id);
       await addImage({
         productId: draft.id,
         kind: "view",

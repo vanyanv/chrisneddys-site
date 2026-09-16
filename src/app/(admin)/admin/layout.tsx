@@ -60,9 +60,15 @@ export function ownerInitials(session: OwnerSession): string {
  * to `/admin/products` — it's the one page this phase moves onto The
  * Rack's visual system, which has its own top bar/tabs (`rack-topbar` in
  * `src/styles/admin-rack.css`), not this one's `adm-topbar`. So this layout
- * only does the auth gate for it and hands back `children` untouched;
- * Products, Orders and Settings still get the Sheet chrome below exactly as
- * they always have.
+ * only does the auth gate for it and hands back `children` untouched.
+ *
+ * Phase 2 (issue #36) moves `/admin/products` itself onto The Rack the same
+ * way — its `page.tsx` and `loading.tsx` own their own `rack-topbar` shell
+ * now, same reasoning as Today. `/admin/products/<id>`, the standalone full
+ * editor, is deliberately NOT included in that check: it isn't part of this
+ * phase's artboards and still renders inside the Sheet chrome below, on the
+ * unchanged `ProductEditor`/`PhotosEditor`. Orders and Settings are
+ * untouched either way.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers();
@@ -75,7 +81,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <div className="adm-shell adm-shell-guest">{children}</div>;
   }
 
-  if (pathname === "/admin") {
+  if (pathname === "/admin" || pathname === "/admin/products") {
     return <>{children}</>;
   }
 

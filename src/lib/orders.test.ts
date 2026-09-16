@@ -8,7 +8,13 @@ import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { editions, products, variants } from "@/db/schema";
 import { getInventory } from "@/lib/catalog";
-import { addImage, createDraft, setInventory, setStatus } from "@/lib/catalogAdmin";
+import {
+  addImage,
+  createDraft,
+  setInventory,
+  setStatus,
+  updateProductField,
+} from "@/lib/catalogAdmin";
 import {
   createPendingOrder,
   getOrder,
@@ -362,6 +368,7 @@ describe("plain-quantity product", () => {
   it("only decrements inventory_quantity once the order is paid", async () => {
     const draft = await createDraft("Quantity Order Test Product");
     await setInventory(draft.id, "quantity", 5);
+    await updateProductField(draft.id, "priceCents", 1000);
     await addImage({
       productId: draft.id,
       kind: "view",
@@ -406,6 +413,7 @@ describe("plain-quantity product", () => {
   it("blocks a second reservation that would oversell the remaining stock", async () => {
     const draft = await createDraft("Tight Quantity Product");
     await setInventory(draft.id, "quantity", 2);
+    await updateProductField(draft.id, "priceCents", 1000);
     await addImage({
       productId: draft.id,
       kind: "view",

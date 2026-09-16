@@ -13,7 +13,13 @@ import {
   getProductBySlug,
   listPublishedProducts,
 } from "@/lib/catalog";
-import { addImage, createDraft, setStatus } from "@/lib/catalogAdmin";
+import {
+  addImage,
+  createDraft,
+  setInventory,
+  setStatus,
+  updateProductField,
+} from "@/lib/catalogAdmin";
 import { merch } from "@/data/merch";
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
@@ -127,6 +133,8 @@ describe("listPublishedProducts ordering", () => {
     const a = await createDraft("Ordering Product A");
     const b = await createDraft("Ordering Product B");
     for (const draft of [a, b]) {
+      await updateProductField(draft.id, "priceCents", 1000);
+      await setInventory(draft.id, "quantity", 10);
       await addImage({
         productId: draft.id,
         kind: "view",

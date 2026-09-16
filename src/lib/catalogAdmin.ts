@@ -75,12 +75,22 @@ async function nextPosition(): Promise<number> {
 
 export type CreateDraftResult = { id: string; slug: string };
 
-/** Creates a draft product with a unique slug derived from `name`, appended
- * at the end of the rack (`position` = current max + 1). */
+/**
+ * Creates a draft product with a unique slug derived from `name`, appended
+ * at the end of the rack (`position` = current max + 1).
+ *
+ * `name` may be blank — The Rack's "New product" tile creates a draft with
+ * no name at all rather than forcing a placeholder like "Untitled product"
+ * on it (issue #36's decisions comment: an unnamed draft is a first-class
+ * state, not something to paper over). A blank name still needs a slug, so
+ * `"draft"` stands in for the slug base only, never for `name` or
+ * `displayName1` — those stay genuinely empty until the owner types
+ * something, and `setStatus` refuses to publish while they are.
+ */
 export async function createDraft(name: string): Promise<CreateDraftResult> {
   const db = await getDb();
-  const trimmedName = name.trim() || "Untitled product";
-  const slug = await uniqueSlug(slugify(trimmedName));
+  const trimmedName = name.trim();
+  const slug = await uniqueSlug(slugify(trimmedName) || "draft");
   const position = await nextPosition();
 
   const [row] = await db
@@ -613,10 +623,24 @@ export type SetStatusResult = { ok: true; slug: string } | { ok: false; error: s
  * ever published; an unpublish/republish cycle keeps that original
  * timestamp rather than treating every publish as a new "first" one.
  *
- * Refuses to publish a product with no gallery photo: `firstView` (in
- * `src/data/merch.ts`) has to return something for the shop index and the
- * product page to render, and a product with zero `view` images is exactly
- * the case that used to render an empty $0 line instead.
+ * Refuses to publish a product that isn't ready — an unnamed draft (issue
+ * #36's decisions comment) is a first-class state, not a placeholder, so
+ * this is the one place that honesty is actually enforced rather than just
+ * a disabled button in the UI:
+ *
+ *  - a name (`displayName1` — the line the shop actually renders; a blank
+ *    `[SECOND COLOURWAY]`-style draft has none until the owner types one),
+ *  - a price (`priceCents` above zero — the $0 a fresh draft starts at isn't
+ *    a real price),
+ *  - a run size (the variant tracks a quantity or an edition size — plain
+ *    `untracked` means the owner hasn't decided how many exist yet), and
+ *  - a gallery photo: `firstView` (in `src/data/merch.ts`) has to return
+ *    something for the shop index and the product page to render, and a
+ *    product with zero `view` images is exactly the case that used to
+ *    render an empty $0 line instead.
+ *
+ * Each is checked in the order the panel lays the fields out, so the first
+ * error an owner sees is always the first field they'd need to fix.
  */
 export async function setStatus(
   id: string,
@@ -625,12 +649,30 @@ export async function setStatus(
   const db = await getDb();
   const existing = await db.query.products.findFirst({
     where: eq(products.id, id),
-    with: { images: { where: eq(productImages.kind, "view") } },
+    with: {
+      images: { where: eq(productImages.kind, "view") },
+      variants: true,
+    },
   });
   if (!existing) return { ok: false, error: "Product not found." };
 
-  if (status === "published" && existing.images.length === 0) {
-    return { ok: false, error: "Add at least one photo before publishing." };
+  if (status === "published") {
+    if (existing.displayName1.trim() === "") {
+      return { ok: false, error: "Give it a name before publishing." };
+    }
+    if (existing.priceCents <= 0) {
+      return { ok: false, error: "Set a price before publishing." };
+    }
+    const variant = existing.variants[0];
+    const hasRunSize = Boolean(
+      variant && (variant.editionSize !== null || variant.inventoryQuantity !== null),
+    );
+    if (!hasRunSize) {
+      return { ok: false, error: "Set a run size before publishing." };
+    }
+    if (existing.images.length === 0) {
+      return { ok: false, error: "Add at least one photo before publishing." };
+    }
   }
 
   const publishedAt =
@@ -957,7 +999,15 @@ function summarizeInventory(
 export type AdminProductListRow = {
   id: string;
   slug: string;
+  /** The internal working title — set once at creation, not shown on the
+   * rack card. `displayName1`/`displayName2` are what a customer (and now
+   * the rack's card/panel) actually sees. */
   name: string;
+  /** The shop's name — line 1. Empty for an unnamed draft (issue #36's
+   * decisions comment): the rack renders that honestly rather than falling
+   * back to `name` or a made-up placeholder. */
+  displayName1: string;
+  displayName2: string;
   status: "draft" | "published" | "archived";
   priceCents: number;
   position: number;
@@ -985,6 +1035,8 @@ function toAdminListRow(row: ProductListQueryRow): AdminProductListRow {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    displayName1: row.displayName1,
+    displayName2: row.displayName2,
     status: row.status,
     priceCents: row.priceCents,
     position: row.position,

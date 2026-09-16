@@ -22,8 +22,9 @@ export default async function ResetPasswordPage({
   // earlier since there's nothing to even try submitting.
   if (!token) {
     return (
-      <div className="adm-signin-card">
-        <h1 className="adm-h2">Reset password</h1>
+      <div className="rack-guest-card">
+        <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+        <h1 className="rack-bow rack-guest-title">Reset password.</h1>
         <p className="adm-notice">
           This reset link is missing its token, so it can&rsquo;t be used.
         </p>

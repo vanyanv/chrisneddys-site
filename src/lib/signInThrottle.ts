@@ -14,11 +14,11 @@
 import { and, eq, gte, lt, sql, type SQL } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { signInAttempts } from "@/db/schema";
+import { LOCKOUT_WINDOW_MS, MAX_FAILED_ATTEMPTS } from "@/lib/signInPolicy";
 
 /** A channel (email or IP) is locked once it has this many failed attempts
  * inside `LOCKOUT_WINDOW_MS`. */
-export const MAX_FAILED_ATTEMPTS = 5;
-export const LOCKOUT_WINDOW_MS = 15 * 60 * 1000;
+export { MAX_FAILED_ATTEMPTS, LOCKOUT_WINDOW_MS } from "@/lib/signInPolicy";
 /** Default `kind` for owner sign-in — see the module doc comment. */
 export const SIGN_IN_KIND = "sign_in";
 /** How long `sign_in_attempts` rows are kept before `pruneSignInAttempts`
@@ -177,6 +177,17 @@ export async function clearFailedAttempts(
         eq(signInAttempts.succeeded, false),
       ),
     );
+}
+
+/** Tries left on a channel before it locks, given `failures` already
+ * recorded against it. Lets a caller warn "N tries left" ahead of the
+ * lockout itself — `checkThrottle`'s `locked` flag only turns true once
+ * this would already be 0, which is too late to be a useful warning. */
+export function remainingSignInAttempts(
+  failures: number,
+  maxAttempts: number = MAX_FAILED_ATTEMPTS,
+): number {
+  return Math.max(0, maxAttempts - failures);
 }
 
 /** Deletes `sign_in_attempts` rows older than 24h. Meant to be called

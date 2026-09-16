@@ -1,47 +1,127 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useActionState } from "react";
+import { RESET_LINK_EXPIRY_MINUTES } from "@/lib/signInPolicy";
 import { requestPasswordResetAction, type ForgotPasswordState } from "./actions";
 
 const initialState: ForgotPasswordState = {};
 
-export function ForgotPasswordForm() {
-  const [state, formAction, pending] = useActionState(requestPasswordResetAction, initialState);
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+      <path d="M3 8.5l3.2 3.2L13 4.5" />
+    </svg>
+  );
+}
 
-  if (state.sent) {
+export function ForgotPasswordForm() {
+  // The address this form last submitted, snapshotted out of the FormData
+  // at submit time rather than tracked from the input's `onChange`. The
+  // email field stays editable while a request is in flight, so typing into
+  // it before the confirmation lands would otherwise leave "Send it again"
+  // pointing at a different address than the one the panel says a link went
+  // to. Snapshotting here, in a client wrapper around the action, keeps the
+  // server action's own result free of the address — `actions.test.ts`
+  // pins that its answer for a known owner and an unknown one are deeply
+  // equal, and carrying the email in it would have broken that.
+  const [sentEmail, setSentEmail] = useState("");
+  const [state, formAction, pending] = useActionState(
+    async (previous: ForgotPasswordState | undefined, formData: FormData) => {
+      setSentEmail(String(formData.get("email") ?? ""));
+      return requestPasswordResetAction(previous, formData);
+    },
+    initialState,
+  );
+  // `useActionState`'s `state` is replaced wholesale on every submit, so a
+  // throttled "Send it again" (returns `{ error }`, no `sent`) would
+  // otherwise flip this whole panel back to the empty request form —
+  // losing the fact that a link genuinely did go out earlier. Once the
+  // confirmation has been shown, it stays shown; a failed resend surfaces
+  // its error inline instead of un-confirming the first send.
+  const [everSent, setEverSent] = useState(false);
+  // The message from the *first* successful send — kept around so a later
+  // throttled resend (which returns no `message` of its own) doesn't blank
+  // this line out.
+  const [sentMessage, setSentMessage] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (state.sent) {
+      setEverSent(true);
+      setSentMessage(state.message);
+    }
+  }, [state.sent, state.message]);
+
+  if (everSent) {
+    const resendFailed = !pending && !state.sent && Boolean(state.error);
     return (
-      <div className="adm-signin-card">
-        <Image
-          src="/cne-logo.webp"
-          alt="Chris N Eddy's"
-          width={309}
-          height={89}
-          className="adm-signin-logo"
-          priority
-        />
-        <h1 className="adm-h2">Forgot password</h1>
-        <p className="adm-notice">{state.message}</p>
-        <p className="adm-notice">
-          <Link href="/admin/sign-in">Back to sign in</Link>
+      <div className="rack-guest-card">
+        <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+        <h1 className="rack-bow rack-guest-title">
+          Check your
+          <br />
+          inbox.
+        </h1>
+        <p className="rack-guest-lede">
+          {sentMessage} It works once, and it expires in {RESET_LINK_EXPIRY_MINUTES} minutes.
         </p>
+
+        <form action={formAction}>
+          <input type="hidden" name="email" value={sentEmail} />
+          <div className={pending ? "rack-guest-notice" : "rack-guest-notice is-done"}>
+            {pending ? (
+              <>
+                <span className="rack-spin" aria-hidden="true" />
+                <span>Sending&hellip;</span>
+              </>
+            ) : (
+              <>
+                <CheckIcon />
+                <span>Link sent</span>
+              </>
+            )}
+          </div>
+          {pending ? (
+            <div className="rack-edbar">
+              <i className="rack-sweep" style={{ width: "100%" }} />
+            </div>
+          ) : null}
+
+          <div className="rack-hairline">
+            <span style={{ fontSize: 13, color: "var(--rack-muted)" }}>
+              Nothing after a minute?{" "}
+              <button type="submit" className="rack-link-button" disabled={pending}>
+                Send it again
+              </button>
+            </span>
+          </div>
+          {resendFailed ? (
+            <p className="adm-error" role="alert">
+              {state.error}
+            </p>
+          ) : null}
+        </form>
+
+        <p className="rack-guest-privacy">
+          We never email you a password, and we never say whether an address has an account. Both on
+          purpose.
+        </p>
+
+        <Link href="/admin/sign-in" className="rack-btn rack-guest-back">
+          <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+            <path d="M10 3L5 8l5 5" />
+          </svg>
+          Back to sign in
+        </Link>
       </div>
     );
   }
 
   return (
-    <form action={formAction} className="adm-signin-card" noValidate>
-      <Image
-        src="/cne-logo.webp"
-        alt="Chris N Eddy's"
-        width={309}
-        height={89}
-        className="adm-signin-logo"
-        priority
-      />
-      <h1 className="adm-h2">Forgot password</h1>
-      <p className="adm-notice">
+    <form action={formAction} className="rack-guest-card" noValidate>
+      <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+      <h1 className="rack-bow rack-guest-title">Forgot password?</h1>
+      <p className="rack-guest-lede">
         Enter your email. If it belongs to an owner, we&rsquo;ll send a link to reset the password.
       </p>
 
@@ -58,8 +138,15 @@ export function ForgotPasswordForm() {
         </p>
       ) : null}
 
-      <button type="submit" className="adm-btn adm-btn-primary adm-btn-block" disabled={pending}>
-        {pending ? "Sending…" : "Send reset link"}
+      <button type="submit" className="rack-btn-primary rack-guest-submit" disabled={pending}>
+        {pending ? (
+          <>
+            <span className="rack-spin" aria-hidden="true" />
+            Sending&hellip;
+          </>
+        ) : (
+          "Send reset link"
+        )}
       </button>
 
       <p className="adm-notice">

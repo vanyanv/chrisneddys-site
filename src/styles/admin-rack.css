@@ -472,6 +472,10 @@
 .rack-edcell.is-sold {
   background: var(--rack-ink);
 }
+.rack-edcell.is-current {
+  outline: 2px solid var(--rack-red-cta);
+  outline-offset: 1px;
+}
 .rack-edlegend {
   display: flex;
   gap: var(--rack-space-md);
@@ -863,6 +867,30 @@
   text-decoration: underline;
 }
 
+/* Standing notice under the edition-size field — one box, two messages:
+ * a forward-looking warning while the run is still editable, and the
+ * existing "why this is now read-only" copy once it locks. Same treatment
+ * as `.rack-refund-warning`, just yellow (a caution, not the red refund
+ * warning's dead stop). */
+.rack-run-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: var(--rack-space-md) var(--rack-space-lg);
+  border: 1px solid var(--rack-yellow-deep);
+  background: var(--rack-cream);
+  margin-top: var(--rack-space-sm);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.rack-run-warning svg {
+  color: var(--rack-yellow-deep);
+  margin-top: 2px;
+}
+.rack-run-warning p {
+  margin: 0;
+}
+
 .rack-status-row {
   display: flex;
   align-items: center;
@@ -894,6 +922,14 @@
 .rack-chip:disabled {
   cursor: default;
   opacity: 0.6;
+}
+/* The live "what's still missing" caption below the status chips — an
+ * `.rack-eyebrow` in Signal Red rather than muted ink, so it reads as a
+ * blocker rather than a label. */
+.rack-publish-checklist {
+  width: 100%;
+  margin: 0;
+  color: var(--rack-red-cta);
 }
 
 .rack-empty-note {
@@ -1230,10 +1266,31 @@
   color: var(--rack-muted);
   font-size: 12px;
 }
+.run-held-time.is-urgent {
+  color: var(--rack-red-cta);
+  font-weight: 700;
+}
+/* The per-hold progress bar (issue #50), drawn under the row rather than
+   beside it: `.run-held-row` is a three-column grid and a fourth child
+   would take an implicit column, squeezing the customer's email. It drains
+   left to right as the hold runs down, and turns red with the countdown
+   above it rather than on a threshold of its own, so the two can't
+   disagree. */
+.run-held-bar {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+}
+.run-held-bar.is-urgent > i {
+  background: var(--rack-red-cta);
+}
 
 .run-detail-line {
   font-size: 13px;
   margin: 0 0 8px;
+}
+.run-detail-line.is-urgent {
+  color: var(--rack-red-cta);
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -1306,6 +1363,106 @@
   display: block;
   margin-bottom: var(--rack-space-sm);
 }
+
+.rack-refund-reason {
+  margin-bottom: 0;
+}
+
+/* The "put number N back in the run" toggle — off by default (see
+   `markRefunded` in src/lib/orders.ts), so its track and thumb start in the
+   same muted-rule state as an unchecked settings toggle and only turn
+   `--rack-green` once the owner actually flips it. */
+.rack-refund-release {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rack-space-md);
+  border: 1px solid var(--rack-ink);
+  background: var(--rack-cream);
+  padding: 16px var(--rack-space-lg);
+}
+.rack-refund-release-badge {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--rack-ink);
+  background: var(--rack-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex: none;
+}
+.rack-refund-release-copy {
+  flex: 1;
+  min-width: 0;
+}
+.rack-refund-release-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.rack-refund-release-help {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  line-height: 1.5;
+}
+.rack-refund-release-toggle {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: 44px;
+  height: 24px;
+}
+.rack-refund-release-input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.rack-refund-release-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid var(--rack-rule);
+  background: var(--rack-card);
+  transition:
+    background-color var(--rack-dur-2) var(--rack-ease-move),
+    border-color var(--rack-dur-2) var(--rack-ease-move);
+}
+.rack-refund-release-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--rack-muted);
+  transition:
+    transform var(--rack-dur-2) var(--rack-ease-move),
+    background-color var(--rack-dur-2) var(--rack-ease-move);
+}
+.rack-refund-release-input:checked + .rack-refund-release-track {
+  background: var(--rack-green);
+  border-color: var(--rack-green);
+}
+.rack-refund-release-input:checked + .rack-refund-release-track .rack-refund-release-thumb {
+  transform: translateX(20px);
+  background: var(--rack-card);
+}
+.rack-refund-release-input:focus-visible + .rack-refund-release-track {
+  outline: 2px solid var(--rack-yellow-deep);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rack-refund-release-track,
+  .rack-refund-release-thumb {
+    transition-duration: 0.001ms;
+  }
+}
+
 .rack-refund-warning {
   display: flex;
   align-items: flex-start;
@@ -1690,4 +1847,230 @@
   .rack-offline {
     animation-duration: 0.001ms;
   }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Guest auth: sign-in, forgot-password, reset-password (issue #44)       */
+/* Full-page shell — logo + "Store" tag top-left, shop-status pill top-   */
+/* right, the Hollywood address in the footer — the same chrome every     */
+/* signed-in Rack screen carries, drawn once in `admin/layout.tsx` around */
+/* whichever of the three guest pages is active. Each page then supplies  */
+/* one centered card built from `.rack-guest-*` plus the shared `.adm-*`  */
+/* field/button/error primitives every other Rack form already uses.     */
+/* ---------------------------------------------------------------------- */
+
+.rack-guest-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.rack-guest-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rack-space-xl) 26px;
+  gap: var(--rack-space-lg);
+}
+.rack-guest-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 26px 40px;
+}
+.rack-guest-footer {
+  text-align: center;
+  padding-bottom: var(--rack-space-xl);
+}
+
+.rack-guest-card {
+  width: 100%;
+  max-width: 384px;
+}
+.rack-guest-eyebrow {
+  margin: 0;
+}
+.rack-guest-title {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: var(--rack-text-display);
+  line-height: 1;
+  margin: 11px 0 7px;
+}
+.rack-guest-lede {
+  color: var(--rack-muted);
+  margin: 0 0 var(--rack-space-xl);
+}
+.rack-guest-banner {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 var(--rack-space-lg);
+}
+
+.rack-guest-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+}
+.rack-guest-submit:disabled {
+  cursor: progress;
+  opacity: 0.9;
+}
+
+/* issue #51: "Continue with a passkey" + its caption, and the divider that
+   separates it from the email/password fields below. */
+.rack-guest-passkey-caption {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: var(--rack-space-sm) 0 0;
+  text-align: center;
+}
+.rack-guest-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  margin: var(--rack-space-xl) 0;
+}
+.rack-guest-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--rack-rule);
+}
+
+/* The "N tries left" warning (sign-in) — a step down from `.adm-error`:
+   still on-brand ink text, but the yellow-cream card marks it as a caution
+   rather than a hard stop, since the owner can still just try again. */
+.rack-guest-warning {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-sm);
+  padding: 11px 13px;
+  margin-top: var(--rack-space-lg);
+  border: 1px solid var(--rack-yellow-deep);
+  background: var(--rack-cream);
+  font-size: 13px;
+}
+.rack-guest-warning svg {
+  color: var(--rack-yellow-deep);
+}
+
+.rack-guest-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rack-space-sm);
+  flex-wrap: wrap;
+}
+.rack-guest-link-row a {
+  font-size: 13px;
+  text-decoration: underline;
+  color: var(--rack-muted);
+}
+.rack-guest-link-row a:hover {
+  color: var(--rack-red-cta);
+}
+
+.rack-link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  color: var(--rack-muted);
+  cursor: pointer;
+}
+.rack-link-button:hover {
+  color: var(--rack-red-cta);
+}
+.rack-link-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+.rack-guest-back {
+  width: 100%;
+  margin-top: var(--rack-space-xl);
+}
+
+/* Forgot-password: "sent" confirmation panel. */
+.rack-guest-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-md);
+  padding: var(--rack-space-lg) 18px;
+  border: var(--rack-border);
+  background: var(--rack-card);
+}
+.rack-guest-notice.is-done {
+  color: var(--rack-green);
+}
+.rack-guest-notice svg {
+  flex: none;
+}
+
+@keyframes rack-sweep {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.rack-sweep {
+  transform-origin: left;
+  animation: rack-sweep 1.6s var(--rack-ease-move) infinite;
+}
+
+.rack-guest-privacy {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: var(--rack-space-xl) 0 0;
+  padding-top: var(--rack-space-md);
+  border-top: var(--rack-border);
+}
+
+/* Reset-password: strength meter + live rules checklist. Only two rows
+   back real, enforced rules (length, and the two fields matching) — issue
+   #44 explicitly omits a breach-list row and a password-reuse row, since
+   nothing in this codebase checks either one. */
+.rack-strength-bars {
+  display: flex;
+  gap: 3px;
+  margin: var(--rack-space-md) 0 11px;
+}
+.rack-strength-bars > span {
+  flex: 1;
+  height: 4px;
+  background: var(--rack-rule);
+}
+.rack-strength-bars > span.is-filled.level-weak {
+  background: var(--rack-red-cta);
+}
+.rack-strength-bars > span.is-filled.level-fair {
+  background: var(--rack-yellow-deep);
+}
+.rack-strength-bars > span.is-filled.level-strong {
+  background: var(--rack-green);
+}
+
+.rack-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0 0 var(--rack-space-xl);
+}
+.rack-rule-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-sm);
+  font-size: 13px;
+  color: var(--rack-muted);
+}
+.rack-rule-item.is-met {
+  color: var(--rack-green);
+}
+.rack-rule-item svg {
+  flex: none;
 }

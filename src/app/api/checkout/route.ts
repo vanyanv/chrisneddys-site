@@ -10,10 +10,12 @@
  *
  * Gated on `isShopOpenFor(settings)` (`hasPaymentKeys()` — `STRIPE_SECRET_KEY`
  * + `STRIPE_WEBHOOK_SECRET` both set — plus a published returns policy and a
- * support email on the store settings row) — a 503 with no reservation made.
- * `hasPaymentKeys()` alone is checked first, before the body is even parsed,
- * so a shop with no Stripe key at all fails closed without touching the
- * database.
+ * support email on the store settings row) and, separately, on
+ * `isShopPausedFor(settings)` (the owner's own temporary pause, distinct
+ * from pre-launch — see `shopStatus.ts`) — either one is a 503 with no
+ * reservation made, and each carries its own message. `hasPaymentKeys()`
+ * alone is checked first, before the body is even parsed, so a shop with no
+ * Stripe key at all fails closed without touching the database.
  */
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
@@ -32,7 +34,8 @@ import {
   type Fulfilment,
   type QuoteLineError,
 } from "@/lib/orders";
-import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
+import { pauseCheckoutMessage } from "@/lib/shopCopy";
+import { hasPaymentKeys, isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -201,6 +204,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const settings = await getStoreSettings();
   if (!isShopOpenFor(settings)) {
     return NextResponse.json({ error: "The shop isn't open yet." }, { status: 503 });
+  }
+  // Checked separately from, and after, `isShopOpenFor`: pre-launch and a
+  // deliberate pause are different reasons checkout is closed, and each
+  // needs its own message — see `isShopPausedFor` (`shopStatus.ts`) for why
+  // they're never merged into one gate. A stale product-page tab open from
+  // before the owner paused the shop still hits this on submit, so pausing
+  // stops an in-flight order even without the buy button's own disabled
+  // state having caught it first.
+  if (isShopPausedFor(settings)) {
+    return NextResponse.json({ error: pauseCheckoutMessage(settings.pauseNote) }, { status: 503 });
   }
   if (fulfilment === "pickup" && !settings.pickupEnabled) {
     return badRequest("Pickup isn't available right now.");

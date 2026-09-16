@@ -28,27 +28,30 @@
  * concurrent `getAuth()` calls resolve to the *same* instance rather than
  * building it twice. Nothing here needs to be built per request.
  *
- * The same per-webpack-layer duplication bites `resetSendStorage` below,
- * for the same reason: `owners.ts`'s `captureResetSend` and this module's
- * own `sendResetPassword` closure need to read and write the *same*
- * `AsyncLocalStorage` instance, but if the two land in different compiled
- * layers, a bare module-scope `new AsyncLocalStorage()` gives each layer
- * its own copy — `captureResetSend` runs `fn` inside *its* copy's context,
- * while `sendResetPassword`'s `resetSendStorage.getStore()` reads from a
- * different, unrelated copy and always sees `undefined`. Proven in the
- * built app (not reproducible under Vitest, which loads the module once):
- * `inviteOwner` always fell through to its "Could not generate an invite
- * link" fallback. Parked on `globalThis` for the same reason `getAuth()`'s
- * promise is.
+ * The same per-webpack-layer duplication used to bite the way `owners.ts`'s
+ * `captureResetSend` learns what `sendResetPassword` (below) actually did:
+ * an earlier version held that outcome in an `AsyncLocalStorage`, and if the
+ * `run()` call and the matching `getStore()` read landed in two different
+ * compiled layers' copies of this module, the read always saw `undefined`
+ * — proven in the built app (not reproducible under Vitest, which loads the
+ * module once), where `inviteOwner` always fell through to its "Could not
+ * generate an invite link" fallback. Parking that storage on `globalThis`,
+ * the same way `getAuth()`'s promise is, fixed the sharing problem, but
+ * `resetSendOutcomes` below goes a step further and drops `AsyncLocalStorage`
+ * entirely: a plain `Map` keyed by email, read back with a synchronous
+ * lookup, has nothing that depends on an async context surviving a layer
+ * boundary in the first place — see that constant's own comment.
  */
-import { AsyncLocalStorage } from "node:async_hooks";
 import { and, eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { passkey } from "@better-auth/passkey";
 import { getDb, type Db } from "@/db/client";
 import * as schema from "@/db/schema";
+import { brand } from "@/data/brand";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { absoluteUrl } from "@/lib/siteOrigin";
+import { absoluteUrl, getSiteOrigin } from "@/lib/siteOrigin";
+import { RESET_LINK_EXPIRY_SECONDS } from "@/lib/signInPolicy";
 
 /**
  * What actually happened when `sendResetPassword` (below) tried to email a
@@ -59,38 +62,125 @@ import { absoluteUrl } from "@/lib/siteOrigin";
  */
 export type ResetSendOutcome = { to: string; url: string; sent: boolean; reason?: string };
 
-type ResetSendStore = { outcome: ResetSendOutcome | null };
-
-const globalForResetSendStorage = globalThis as unknown as {
-  __resetSendStorage?: AsyncLocalStorage<ResetSendStore>;
+/**
+ * Where `sendResetPassword` (below) leaves its outcome for `captureResetSend`
+ * to read back — a plain `Map` keyed by the normalized email, not an
+ * `AsyncLocalStorage`. See this file's module comment for why: Next can
+ * compile this module once per webpack layer, and an `AsyncLocalStorage`
+ * context started in one layer's copy is never visible to a `getStore()` in
+ * another layer's copy. A `Map` sidesteps that question entirely — every
+ * layer's copy reads `globalForResetSendOutcomes.__resetSendOutcomes`, so
+ * they all resolve to the exact same object no matter how many times the
+ * module itself gets re-evaluated, and reading an entry back is an ordinary
+ * synchronous lookup rather than something that has to keep threading
+ * through every `await` between the write and the read.
+ *
+ * Keyed by email rather than a per-call token because the hook only ever
+ * receives `user.email`, nothing that identifies which caller started the
+ * request. `inviteOwner` already refuses a second invite to an email that's
+ * still mid-flight, so two genuinely concurrent writes for the same key
+ * aren't a realistic case here. An entry nobody ever reads back — a plain
+ * "forgot password" request, which doesn't go through `captureResetSend` at
+ * all — expires off a short timer instead of sitting in memory forever.
+ */
+const globalForResetSendOutcomes = globalThis as unknown as {
+  __resetSendOutcomes?: Map<string, ResetSendOutcome>;
 };
 
-const resetSendStorage: AsyncLocalStorage<ResetSendStore> =
-  (globalForResetSendStorage.__resetSendStorage ??= new AsyncLocalStorage<ResetSendStore>());
+const resetSendOutcomes: Map<string, ResetSendOutcome> =
+  (globalForResetSendOutcomes.__resetSendOutcomes ??= new Map());
+
+const RESET_SEND_OUTCOME_TTL_MS = 30_000;
+
+function normalizeResetSendKey(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/** Records `outcome` for `email`, self-cleaning after `RESET_SEND_OUTCOME_TTL_MS`
+ * if nothing ever claimed it (see the map's own comment above). */
+function rememberResetSendOutcome(email: string, outcome: ResetSendOutcome): void {
+  const key = normalizeResetSendKey(email);
+  resetSendOutcomes.set(key, outcome);
+  const timer = setTimeout(() => {
+    if (resetSendOutcomes.get(key) === outcome) resetSendOutcomes.delete(key);
+  }, RESET_SEND_OUTCOME_TTL_MS);
+  timer.unref?.();
+}
 
 /**
  * Runs `fn` — an `auth.api.*` call that ends up invoking `sendResetPassword`
- * below (`requestPasswordReset` is the only one that does) — with a scoped
- * slot for that call's send outcome, and returns both. Better Auth awaits
- * `sendResetPassword` in place rather than firing it into a background queue
- * (this instance configures no `advanced.backgroundTasks.handler`, and
- * Better Auth's own `runInBackgroundOrAwait` only backgrounds a call when
- * one is set), so by the time `fn` resolves, the outcome — if `fn` reached
- * `sendResetPassword` at all — is already recorded. `AsyncLocalStorage`
- * rather than a plain module-level variable so two calls in flight at once
- * (unlikely for a single-owner action, but not impossible) never read back
- * each other's outcome.
+ * below for `email` (`requestPasswordReset` is the only one that does) —
+ * and returns both its result and whatever outcome that hook recorded for
+ * `email`. Better Auth awaits `sendResetPassword` in place rather than
+ * firing it into a background queue (this instance configures no
+ * `advanced.backgroundTasks.handler`, and Better Auth's own
+ * `runInBackgroundOrAwait` only backgrounds a call when one is set), so by
+ * the time `fn` resolves, the outcome — if `fn` reached `sendResetPassword`
+ * at all — is already recorded. Clears any stale leftover for `email` first
+ * so a previous, unclaimed write (say, an earlier "forgot password" attempt
+ * for the same address) can never be mistaken for this call's own outcome.
  */
 export async function captureResetSend<T>(
+  email: string,
   fn: () => Promise<T>,
 ): Promise<{ result: T; outcome: ResetSendOutcome | null }> {
-  const store: ResetSendStore = { outcome: null };
-  const result = await resetSendStorage.run(store, fn);
-  return { result, outcome: store.outcome };
+  const key = normalizeResetSendKey(email);
+  resetSendOutcomes.delete(key);
+  const result = await fn();
+  const outcome = resetSendOutcomes.get(key) ?? null;
+  if (outcome) resetSendOutcomes.delete(key);
+  return { result, outcome };
 }
 
 /** 12 hours, in seconds — see the design doc's "Sessions" section. */
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
+
+/**
+ * The WebAuthn Relying Party ID for the passkey plugin below — the domain a
+ * registered credential is scoped to. Must be the exact host (no port,
+ * no scheme) the browser sees in its address bar when the ceremony runs, or
+ * a registrable parent of it; the browser itself refuses to create or use a
+ * credential otherwise. There's no per-request origin to read here (this
+ * instance is a per-process singleton — see this file's module comment), so
+ * this reuses `getSiteOrigin()` exactly as `absoluteUrl` (above) does: the
+ * `SITE_ORIGIN` override the e2e harness and any preview needing one can set
+ * (`playwright.config.ts` points it at its own disposable server), then
+ * `VERCEL_URL` on a Vercel preview, then `brand.siteUrl` in production.
+ *
+ * A plain `pnpm dev` with none of those set falls through to
+ * `brand.siteUrl`'s real production host, which will not match
+ * `http://localhost:3000`'s origin — passkeys will not register or sign in
+ * locally unless `SITE_ORIGIN` is set to `http://localhost:<port>` in
+ * `.env.local`. Password sign-in is entirely unaffected either way.
+ *
+ * **This function must never throw**, which is why it doesn't simply read
+ * `new URL(getSiteOrigin()).hostname`. It runs inside `buildAuth` below, so
+ * anything it throws takes down the whole `auth` instance — not just
+ * passkeys, but `signInEmail`, `getSession` and `requireOwner` with it,
+ * locking every owner out of the admin. And `SITE_ORIGIN` is a hand-set
+ * environment variable: `SITE_ORIGIN=chrisneddys.com`, with the scheme left
+ * off the way every other variable in `DEPLOY.md` is a bare value, is not a
+ * hypothetical typo. `new URL()` rejects it outright, and
+ * `"www.chrisneddys.com:443"` is worse still — it parses, reading
+ * `www.chrisneddys.com:` as the scheme, and yields an empty hostname with
+ * no error at all. So a malformed origin falls back to `brand.siteUrl`'s
+ * host: passkeys registered against the wrong RP ID simply won't be offered
+ * by the browser, which is a bad passkey day, not a lockout. The password
+ * is always still there (issue #51's rule 1).
+ */
+export function passkeyRpID(): string {
+  const fallback = new URL(brand.siteUrl).hostname;
+  try {
+    return new URL(getSiteOrigin()).hostname || fallback;
+  } catch {
+    console.warn(
+      "[auth] SITE_ORIGIN is not a valid absolute origin; passkeys will use",
+      fallback,
+      "as their relying-party ID. Set SITE_ORIGIN to a full origin, scheme included (e.g. https://example.com).",
+    );
+    return fallback;
+  }
+}
 
 async function buildAuth(db: Db) {
   return betterAuth({
@@ -98,6 +188,11 @@ async function buildAuth(db: Db) {
     database: drizzleAdapter(db, { provider: "pg", schema }),
     emailAndPassword: {
       enabled: true,
+      // #44 draws a 30-minute reset link. Better Auth defaults this to
+      // 3600s, so leaving it unset meant the forgot-password panel's
+      // sentence was the only thing claiming a lifetime, with nothing
+      // holding the config to it. Both now read the same constant.
+      resetPasswordTokenExpiresIn: RESET_LINK_EXPIRY_SECONDS,
       // A reset is the flow an owner uses when they think a session was
       // stolen, so every session that existed under the old password must
       // die along with it — otherwise whoever it is stays signed in right
@@ -162,13 +257,30 @@ async function buildAuth(db: Db) {
           ? await sendPasswordReset(user.email, resetUrl)
           : await sendOwnerInvite(user.email, resetUrl);
 
-        const store = resetSendStorage.getStore();
-        if (store) store.outcome = { to: user.email, url: resetUrl, ...sendResult };
+        rememberResetSendOutcome(user.email, { to: user.email, url: resetUrl, ...sendResult });
       },
     },
     session: {
       expiresIn: SESSION_MAX_AGE_SECONDS,
     },
+    // Issue #51: passkeys are an *addition* to email+password, never a
+    // replacement — nothing above this changes, and every endpoint this
+    // plugin adds (`/passkey/*`) is invoked the same way `signIn`/`signOut`
+    // above already invoke Better Auth's own endpoints: directly, as
+    // `auth.api.*` calls from server actions (`src/lib/passkeys.ts`), never
+    // through a mounted `/api/auth/*` route — see that file's module
+    // comment for why that works with no route handler at all.
+    plugins: [
+      passkey({
+        rpID: passkeyRpID(),
+        rpName: brand.name,
+        // Registration defaults to requiring a session (`requireSession`
+        // defaults to `true`, which this leaves alone) — issue #51's rule
+        // 2: a passkey can only ever be enrolled from inside an
+        // authenticated session, enforced by the plugin itself, not by
+        // anything bolted on here.
+      }),
+    ],
   });
 }
 

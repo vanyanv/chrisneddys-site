@@ -1,9 +1,19 @@
 "use server";
 
 import { headers } from "next/headers";
+import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { requireOwner } from "@/lib/auth";
 import { getAuth } from "@/lib/betterAuth";
-import { inviteOwner, removeOwner } from "@/lib/owners";
+import { inviteOwner, removeOwner, type OwnerRow } from "@/lib/owners";
+import {
+  finishPasskeyEnrollment,
+  listOwnerPasskeys,
+  removeOwnerPasskey,
+  startPasskeyEnrollment,
+  type FinishEnrollmentResult,
+  type OwnerPasskey,
+  type StartEnrollmentResult,
+} from "@/lib/passkeys";
 import { saveStoreSettings } from "@/lib/settingsAdmin";
 import type { StoreSettingsPatch } from "@/lib/orders";
 
@@ -80,6 +90,24 @@ export async function saveSettingsAction(
   const returnsPolicy = String(formData.get("returnsPolicy") ?? "").trim();
   const termsText = String(formData.get("termsText") ?? "").trim();
 
+  // Optional — folded into `shopCopy.ts`'s shipping sentence only when set.
+  // Length is also enforced server-side in `updateStoreSettings` (the
+  // source of truth), same pattern as the pause note below.
+  const shipsWithin = String(formData.get("shipsWithin") ?? "").trim();
+  if (shipsWithin.length > 60) {
+    fieldErrors.shipsWithin = 'Keep "Ships within" under 60 characters.';
+  }
+
+  // issue #43: the pause toggle and its optional note. Length is also
+  // enforced server-side in `updateStoreSettings` (the source of truth for
+  // validation) — this is just where a bad value becomes a labelled field
+  // error instead of the form's generic top-level one.
+  const shopPaused = formData.get("shopPaused") === "on";
+  const pauseNote = String(formData.get("pauseNote") ?? "").trim();
+  if (pauseNote.length > 140) {
+    fieldErrors.pauseNote = "Keep the pause note under 140 characters.";
+  }
+
   if (Object.keys(fieldErrors).length > 0) {
     return { error: "Fix the highlighted fields.", fieldErrors };
   }
@@ -94,6 +122,9 @@ export async function saveSettingsAction(
     shipCountries,
     returnsPolicy: returnsPolicy || null,
     termsText: termsText || null,
+    shipsWithin: shipsWithin || null,
+    shopPaused,
+    pauseNote: pauseNote || null,
   };
 
   const result = await saveStoreSettings(patch);
@@ -184,6 +215,9 @@ export type InviteOwnerState = {
   /** ISO timestamp of a successful invite — lets the client tell "the same
    * result rendered again" apart from "a fresh invite just went through". */
   at?: string;
+  /** The owner row just created, so the card can list them immediately
+   * rather than waiting on `/admin/settings` to re-render (#38). */
+  owner?: OwnerRow;
 };
 
 /** Invites a new owner by email — see `inviteOwner` (`@/lib/owners`) for
@@ -204,16 +238,20 @@ export async function inviteOwnerAction(
       sent: false,
       reason: result.reason,
       url: result.url,
+      owner: result.owner,
       at: new Date().toISOString(),
     };
   }
-  return { ok: true, sent: true, at: new Date().toISOString() };
+  return { ok: true, sent: true, owner: result.owner, at: new Date().toISOString() };
 }
 
 export type RemoveOwnerState = {
   ok?: boolean;
   error?: string;
   at?: string;
+  /** The address just removed, so the card can drop the row immediately
+   * rather than waiting on `/admin/settings` to re-render (#38). */
+  email?: string;
 };
 
 /** Removes an owner by email — see `removeOwner` (`@/lib/owners`) for the
@@ -228,5 +266,54 @@ export async function removeOwnerAction(
   const result = await removeOwner(email, session.email);
 
   if (!result.ok) return { error: result.error };
-  return { ok: true, at: new Date().toISOString() };
+  return { ok: true, email, at: new Date().toISOString() };
+}
+
+// ---------------------------------------------------------------------------
+// Passkeys (issue #51) — called directly from `PasskeysCard.tsx`, not bound
+// to a `<form>`: enrollment is a two-step ceremony (a WebAuthn prompt in the
+// browser runs between the "start" and "finish" calls), which
+// `useActionState`'s single form-submit-to-result shape has no room for.
+// ---------------------------------------------------------------------------
+
+/** The signed-in owner's registered passkeys, newest first — read on every
+ * call rather than cached, so the card always shows what's actually stored. */
+export async function listPasskeysAction(): Promise<OwnerPasskey[]> {
+  await requireOwner();
+  return listOwnerPasskeys();
+}
+
+/** Step 1 of adding a passkey — see `startPasskeyEnrollment`
+ * (`@/lib/passkeys`) for what the challenge is and how step 2 reads it
+ * back. `requireOwner()` here is the whole security property of enrolment:
+ * a passkey can only ever be added from inside an already-authenticated
+ * session, so getting one registered is never a way *in*. */
+export async function startAddPasskeyAction(name?: string): Promise<StartEnrollmentResult> {
+  await requireOwner();
+  return startPasskeyEnrollment(name);
+}
+
+/** Step 2 of adding a passkey: hands the authenticator's attestation back
+ * for verification — see `finishPasskeyEnrollment` (`@/lib/passkeys`).
+ * Gated on `requireOwner()` for the same reason step 1 is, and separately
+ * from it: the two halves are separate requests, so checking only the
+ * first would leave the one that actually writes the credential open. */
+export async function finishAddPasskeyAction(
+  response: RegistrationResponseJSON,
+  name?: string,
+): Promise<FinishEnrollmentResult> {
+  await requireOwner();
+  return finishPasskeyEnrollment(response, name);
+}
+
+/** Removes one of the signed-in owner's passkeys — see
+ * `removeOwnerPasskey` (`@/lib/passkeys`), which deliberately allows
+ * removing the last one, since the password path never stops working.
+ * Ownership of `id` is checked by Better Auth's own endpoint rather than
+ * here, so this only has to establish that *some* owner is signed in. */
+export async function removePasskeyAction(
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireOwner();
+  return removeOwnerPasskey(id);
 }

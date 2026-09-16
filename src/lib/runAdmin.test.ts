@@ -126,6 +126,9 @@ describe("getRunForAdmin", () => {
 
     const run = await getRunForAdmin(draft.id);
     expect(run).toBeDefined();
+    // Carried off the product row this query already loads, so the run page
+    // needs no second read of the whole product just to print it.
+    expect(run).toHaveProperty("productEyebrow");
     expect(run?.counts).toEqual({ available: 3, reserved: 1, sold: 1 });
     expect(run?.locked).toBe(true);
 
@@ -140,9 +143,17 @@ describe("getRunForAdmin", () => {
       paidAt: expect.any(Date),
     });
 
+    // Only a held number carries a hold start, and it has to sit before
+    // `reservedUntil` — the run board divides by the gap between them to
+    // draw the progress bar, so an equal or inverted pair would have it
+    // measuring nothing (issue #50).
+    expect(sold?.holdStartedAt).toBeNull();
+
     const held = run?.numbers.find((n) => n.status === "reserved");
     expect(held?.reservedUntil).toBeInstanceOf(Date);
     expect(held?.reservedUntil && held.reservedUntil.getTime()).toBeGreaterThan(Date.now());
+    expect(held?.holdStartedAt).toBeInstanceOf(Date);
+    expect(held!.holdStartedAt!.getTime()).toBeLessThan(held!.reservedUntil!.getTime());
     expect(held?.order).toEqual({
       orderId: heldCart.orderId,
       orderNumber: expect.any(String),
@@ -157,6 +168,7 @@ describe("getRunForAdmin", () => {
     for (const row of stillAvailable ?? []) {
       expect(row.order).toBeNull();
       expect(row.reservedUntil).toBeNull();
+      expect(row.holdStartedAt).toBeNull();
     }
   });
 });

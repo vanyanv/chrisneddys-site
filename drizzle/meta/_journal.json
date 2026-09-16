@@ -64,6 +64,27 @@
       "when": 1789538685266,
       "tag": "0008_complex_jamie_braddock",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789546847325,
+      "tag": "0009_icy_apocalypse",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789549945873,
+      "tag": "0010_neat_eternity",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789580029614,
+      "tag": "0011_normal_jackpot",
+      "breakpoints": true
     }
   ]
 }

@@ -114,6 +114,9 @@ export type StoreSettingsPatch = Partial<{
   shipCountries: string[];
   returnsPolicy: string | null;
   termsText: string | null;
+  shipsWithin: string | null;
+  shopPaused: boolean;
+  pauseNote: string | null;
 }>;
 
 export type UpdateStoreSettingsResult =
@@ -122,6 +125,15 @@ export type UpdateStoreSettingsResult =
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/;
+
+/** Long enough for "Back Thursday" or a sentence, short enough that it
+ * can't turn into a second returns policy pasted into the wrong field. */
+const PAUSE_NOTE_MAX_LENGTH = 140;
+
+/** Long enough for "5-7 business days", short enough that it can't turn
+ * into a second sentence folded into `shopCopy.ts`'s one-line shipping
+ * clause ("Ships within {this}."). */
+const SHIPS_WITHIN_MAX_LENGTH = 60;
 
 function isNonNegativeInt(n: number): boolean {
   return Number.isInteger(n) && n >= 0;
@@ -155,6 +167,28 @@ export async function updateStoreSettings(
     if (bad !== undefined) {
       return { ok: false, error: `"${bad}" is not an uppercase ISO-2 country code.` };
     }
+  }
+  if (
+    patch.pauseNote !== undefined &&
+    patch.pauseNote !== null &&
+    patch.pauseNote.length > PAUSE_NOTE_MAX_LENGTH
+  ) {
+    return {
+      ok: false,
+      error: `Keep the pause note under ${PAUSE_NOTE_MAX_LENGTH} characters.`,
+      field: "pauseNote",
+    };
+  }
+  if (
+    patch.shipsWithin !== undefined &&
+    patch.shipsWithin !== null &&
+    patch.shipsWithin.length > SHIPS_WITHIN_MAX_LENGTH
+  ) {
+    return {
+      ok: false,
+      error: `Keep "Ships within" under ${SHIPS_WITHIN_MAX_LENGTH} characters.`,
+      field: "shipsWithin",
+    };
   }
 
   // Also ensures the row exists before the update below.
@@ -1015,26 +1049,101 @@ export async function markPickedUp(orderId: string, db?: Db): Promise<OrderMutat
   return transitionOrder(database, orderId, ["ready_for_pickup", "paid"], { status: "picked_up" });
 }
 
-/** Refunded orders keep their editions `sold` — v1 doesn't resell a
- * refunded number. Allowed from any post-payment status a full refund could
- * reasonably arrive during — `paid`/`fulfilled` (shipped orders) and
+export type MarkRefundedResult =
+  | { ok: true; releasedEditionNumbers: number[] }
+  | { ok: false; error: string };
+
+/**
+ * Allowed from any post-payment status a full refund could reasonably
+ * arrive during — `paid`/`fulfilled` (shipped orders) and
  * `ready_for_pickup`/`picked_up` (pickup orders; Stripe doesn't care which
- * side of the counter the item is on). */
+ * side of the counter the item is on).
+ *
+ * `patch.release` decides what happens to this order's editions, and
+ * defaults to `false` — a refunded order's editions stay `sold` unless the
+ * caller explicitly asks otherwise. That default is deliberate, not an
+ * oversight left over from v1: a refund often means the hat is coming back,
+ * but not always (a partial refund as a goodwill gesture, a chargeback the
+ * customer keeps the item through) and not always sellable even when it
+ * does (worn, damaged, missing its box) — there is no way to infer any of
+ * that from the refund alone, so the number only goes back into the run
+ * when a human on the desk says so.
+ *
+ * When `release` is true, every edition still `sold` and pointing at this
+ * order goes back to `available` (and `order_id` is cleared, unlike the
+ * pending-hold release in `releaseOrder` — there's no later Stripe event
+ * that could still land for a *refunded* order the way a late payment can
+ * for a *cancelled* one, so nothing benefits from keeping the pointer, and
+ * clearing it means "available" never points at a refunded order id) in the
+ * same transaction as the status flip, so a refund and its release land
+ * together or not at all — never a refund with the number quietly still
+ * burned, and never a released number on an order that turns out not to be
+ * refunded after all. The variant's `inventory_quantity` mirror (edition
+ * products only ever use it as a read-side count, see
+ * `syncVariantAvailableMirror`) is kept in sync the same way every other
+ * edition-status change here keeps it in sync.
+ *
+ * Returns the numbers actually released (empty if `release` was false, or
+ * true but this order had no `sold` editions to release — a plain-quantity
+ * order, say) so callers can decide whether the refund email needs the
+ * "number N has gone back into the run" line.
+ */
 export async function markRefunded(
   orderId: string,
-  patch: { refundedAt?: Date },
+  patch: { refundedAt?: Date; release?: boolean; note?: string },
   db?: Db,
-): Promise<OrderMutationResult> {
+): Promise<MarkRefundedResult> {
   const database = await resolveDb(db);
-  return transitionOrder(
-    database,
-    orderId,
-    ["paid", "fulfilled", "ready_for_pickup", "picked_up"],
-    {
-      status: "refunded",
-      refundedAt: patch.refundedAt ?? new Date(),
-    },
-  );
+
+  return database.transaction(async (tx) => {
+    const result = await transitionOrder(
+      tx,
+      orderId,
+      ["paid", "fulfilled", "ready_for_pickup", "picked_up"],
+      {
+        status: "refunded",
+        refundedAt: patch.refundedAt ?? new Date(),
+      },
+    );
+    if (!result.ok) return result;
+
+    // The desk's record of *why* the money went back, written in the same
+    // transaction as the refund itself rather than after it. Refunding is
+    // one-way — a second attempt is refused because the order is already
+    // `refunded` — so a note written separately that failed could never be
+    // retried, leaving a refund on the books with nothing saying why.
+    if (patch.note) {
+      const existing = await tx.query.orders.findFirst({ where: eq(orders.id, orderId) });
+      await tx
+        .update(orders)
+        .set({
+          notes: existing?.notes ? `${existing.notes}\n${patch.note}` : patch.note,
+          updatedAt: new Date(),
+        })
+        .where(eq(orders.id, orderId));
+    }
+
+    if (!patch.release) return { ok: true, releasedEditionNumbers: [] };
+
+    const sold = await tx
+      .select({ id: editions.id, number: editions.number, variantId: editions.variantId })
+      .from(editions)
+      .where(and(eq(editions.orderId, orderId), eq(editions.status, "sold")))
+      .orderBy(asc(editions.number));
+    if (sold.length === 0) return { ok: true, releasedEditionNumbers: [] };
+
+    await tx
+      .update(editions)
+      .set({ status: "available", reservedUntil: null, orderId: null })
+      .where(and(eq(editions.orderId, orderId), eq(editions.status, "sold")));
+
+    const touchedVariants = new Set(sold.map((e) => e.variantId));
+    for (const variantId of touchedVariants) {
+      await syncVariantAvailableMirror(tx, variantId);
+    }
+
+    return { ok: true, releasedEditionNumbers: sold.map((e) => e.number) };
+  });
 }
 
 /** Appends a line to `orders.notes`, keeping whatever was already there —

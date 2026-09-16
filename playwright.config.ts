@@ -53,9 +53,17 @@ import { defineConfig, devices } from "@playwright/test";
  * preserve. Since neither var is ever parsed as a real hash anymore, this
  * value is now a plain placeholder with no `$` in it at all, so there's no
  * escaping question left to get right in either direction.
+ *
+ * `localhost`, not `127.0.0.1` (issue #51): WebAuthn's Relying Party ID must
+ * be a valid domain string per the spec — an IP address literal doesn't
+ * qualify, and Chromium enforces that when a passkey ceremony runs, virtual
+ * authenticator or not. `localhost` is the one hostname every browser (and
+ * `@better-auth/passkey`'s own `rpID` default) treats as a valid RP ID and a
+ * secure context without TLS, so the e2e harness has to serve from it for
+ * `e2e/admin-passkeys.spec.ts` to be able to drive a real ceremony at all.
  */
 const PORT = 3111;
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -112,8 +120,25 @@ export default defineConfig({
       // forgot-password test (4) exercises: `isEmailConfigured()` in
       // `src/app/(admin)/admin/forgot-password/page.tsx` and `actions.ts`
       // both key off this exact pair.
-      STRIPE_SECRET_KEY: "",
-      STRIPE_WEBHOOK_SECRET: "",
+      //
+      // STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET are non-empty placeholders,
+      // not real credentials — `getStripe()` (`src/lib/stripe.ts`) is never
+      // actually called anywhere in this suite (no spec drives `/api/checkout`
+      // all the way through, since that really would need a live Stripe
+      // account), so no request is ever made with them and Stripe stays as
+      // disabled here as ever. What they DO need to be is *present*:
+      // `hasPaymentKeys()` (`src/lib/shopStatus.ts`) — and therefore
+      // `isShopOpenFor()` — checks only that both env vars are set, and it
+      // gates the paused-shop UI issue #43 added (`e2e/shop-pause.spec.ts`):
+      // `paused` on the product/shop pages is `isShopOpenFor(settings) &&
+      // isShopPausedFor(settings)`, so with these blank the pause banner and
+      // disabled buy button could never render at all, paused or not. Every
+      // other spec still sees a closed shop exactly as before: `returnsPolicy`
+      // (the other half of `isShopOpenFor`) stays unset for everyone except
+      // `shop-pause.spec.ts`, which sets and then restores it through the
+      // Settings form.
+      STRIPE_SECRET_KEY: "sk_test_e2e_disabled_placeholder",
+      STRIPE_WEBHOOK_SECRET: "whsec_e2e_disabled_placeholder",
       BLOB_READ_WRITE_TOKEN: "",
       RESEND_API_KEY: "",
       EMAIL_FROM: "",

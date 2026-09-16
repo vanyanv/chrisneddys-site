@@ -25,8 +25,11 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.7.5",
     "@electric-sql/pglite": "^0.5.8",
     "@neondatabase/serverless": "^1.1.0",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.3",
     "@vercel/blob": "^2.8.0",
     "better-auth": "^1.7.5",
     "drizzle-orm": "^0.45.2",

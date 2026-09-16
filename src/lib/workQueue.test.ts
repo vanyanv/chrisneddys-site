@@ -16,8 +16,8 @@ import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { orders } from "@/db/schema";
-import { createPendingOrder, markPaid } from "@/lib/orders";
-import { getWorkQueue } from "@/lib/workQueue";
+import { createPendingOrder, markPaid, markReadyForPickup } from "@/lib/orders";
+import { getHealthyConnections, getWorkQueue } from "@/lib/workQueue";
 
 // `setupChecklist.ts` (read by `getWorkQueue`) and the `@/lib/auth` it pulls
 // in both carry `import "server-only"`, which throws outside a real
@@ -85,11 +85,13 @@ async function setPaidAt(orderId: string, when: Date): Promise<void> {
   await db.update(orders).set({ paidAt: when }).where(eq(orders.id, orderId));
 }
 
-// Threaded from "adds a to-pack item…" into the two tests after it, the
-// same way `orders.test.ts` threads its order ids across a describe block.
+// Threaded from "adds a to-pack item…" into the tests after it, the same
+// way `orders.test.ts` threads its order ids across a describe block.
 let shipOlderId = "";
 let shipOlderNumber = "";
 let shipNewerNumber = "";
+let pickupOrderId = "";
+let pickupOrderNumber = "";
 
 describe("getWorkQueue", () => {
   it("is empty once setup is complete and nothing needs the owner's attention", async () => {
@@ -128,6 +130,8 @@ describe("getWorkQueue", () => {
     shipOlderId = older.orderId;
     shipOlderNumber = older.number;
     shipNewerNumber = newer.number;
+    pickupOrderId = pickup.orderId;
+    pickupOrderNumber = pickup.number;
 
     const queue = await getWorkQueue();
     const toPack = queue.find((i) => i.kind === "to-pack");
@@ -136,6 +140,57 @@ describe("getWorkQueue", () => {
     expect(toPack.orderNumbers).toEqual([shipOlderNumber, shipNewerNumber]);
     expect(toPack.orderNumbers).not.toContain(pickup.number);
     expect(queue.some((i) => i.kind === "stale-order")).toBe(false);
+  });
+
+  it("adds its own to-prepare-pickup item for the paid pickup order, separate from to-pack", async () => {
+    const queue = await getWorkQueue();
+    const pickup = queue.find((i) => i.kind === "to-prepare-pickup");
+    if (pickup?.kind !== "to-prepare-pickup") throw new Error("expected a to-prepare-pickup item");
+    expect(pickup.count).toBe(1);
+    expect(pickup.orderNumbers).toEqual([pickupOrderNumber]);
+    expect(pickup.totalCents).toBe(5400);
+
+    // The ship backlog from the previous test is unaffected — pickup gets
+    // its own row rather than being folded into or subtracted from it.
+    const toPack = queue.find((i) => i.kind === "to-pack");
+    if (toPack?.kind !== "to-pack") throw new Error("expected a to-pack item");
+    expect(toPack.count).toBe(2);
+  });
+
+  it("drops a pickup order from to-prepare-pickup once it's marked ready (waiting on the customer now, not the owner)", async () => {
+    const result = await markReadyForPickup(pickupOrderId);
+    if (!result.ok) throw new Error("expected markReadyForPickup to succeed");
+
+    const queue = await getWorkQueue();
+    expect(queue.some((i) => i.kind === "to-prepare-pickup")).toBe(false);
+  });
+
+  it("counts several paid pickup orders oldest-first, capping the shown numbers at three", async () => {
+    const first = await createPaidOrder("pickup");
+    const second = await createPaidOrder("pickup");
+    const third = await createPaidOrder("pickup");
+    const fourth = await createPaidOrder("pickup");
+    await setPaidAt(first.orderId, new Date(Date.now() - 4 * 60 * 60 * 1000));
+    await setPaidAt(second.orderId, new Date(Date.now() - 3 * 60 * 60 * 1000));
+    await setPaidAt(third.orderId, new Date(Date.now() - 2 * 60 * 60 * 1000));
+    await setPaidAt(fourth.orderId, new Date(Date.now() - 1 * 60 * 60 * 1000));
+
+    const queue = await getWorkQueue();
+    const pickup = queue.find((i) => i.kind === "to-prepare-pickup");
+    if (pickup?.kind !== "to-prepare-pickup") throw new Error("expected a to-prepare-pickup item");
+    expect(pickup.count).toBe(4);
+    expect(pickup.orderNumbers).toEqual([first.number, second.number, third.number]);
+    expect(pickup.moreCount).toBe(1);
+
+    // Restore the state the later "ordering" test expects: exactly one
+    // paid pickup order waiting (`pickupOrderNumber`, re-created here since
+    // the original was marked ready in the previous test).
+    for (const extra of [second, third, fourth]) {
+      const ready = await markReadyForPickup(extra.orderId);
+      if (!ready.ok) throw new Error("expected markReadyForPickup to succeed");
+    }
+    pickupOrderId = first.orderId;
+    pickupOrderNumber = first.number;
   });
 
   it("singles out the oldest ship order once it crosses the staleness threshold", async () => {
@@ -166,10 +221,34 @@ describe("getWorkQueue", () => {
     expect(held.count).toBe(1);
   });
 
-  it("orders items setup, then to-pack, then the stale order, then held editions", async () => {
+  it("orders items setup, then to-pack, then the stale order, then to-prepare-pickup, then held editions", async () => {
     delete process.env.RESEND_API_KEY;
 
     const queue = await getWorkQueue();
-    expect(queue.map((i) => i.kind)).toEqual(["setup", "to-pack", "stale-order", "held-editions"]);
+    expect(queue.map((i) => i.kind)).toEqual([
+      "setup",
+      "to-pack",
+      "stale-order",
+      "to-prepare-pickup",
+      "held-editions",
+    ]);
+  });
+});
+
+describe("getHealthyConnections", () => {
+  it("lists every checked system that's currently fine, in a fixed reading order", () => {
+    expect(getHealthyConnections()).toEqual(["payments", "photos", "email", "the database"]);
+  });
+
+  it("drops a system the moment its env var goes missing, without touching the others", () => {
+    delete process.env.RESEND_API_KEY;
+    expect(getHealthyConnections()).toEqual(["payments", "photos", "the database"]);
+
+    delete process.env.STRIPE_SECRET_KEY;
+    expect(getHealthyConnections()).toEqual(["photos", "the database"]);
+  });
+
+  it("never mentions owner-sign-in", () => {
+    expect(getHealthyConnections()).not.toContain("owner sign-in");
   });
 });

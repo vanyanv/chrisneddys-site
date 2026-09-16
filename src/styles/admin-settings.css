@@ -262,15 +262,18 @@
   align-self: flex-start;
 }
 
-/* ---- owners list --------------------------------------------------------- */
-.adm-owners-list {
+/* ---- owners + passkey lists (shared shape, separate names so a
+   selector meaning "an owner" cannot match a passkey row) --------------------------------------------------------- */
+.adm-owners-list,
+.adm-passkey-list {
   list-style: none;
   margin: 0 0 20px;
   padding: 0;
   display: flex;
   flex-direction: column;
 }
-.adm-owners-item {
+.adm-owners-item,
+.adm-passkey-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -278,15 +281,18 @@
   padding: 10px 0;
   border-bottom: 1px solid var(--a-line);
 }
-.adm-owners-item:last-child {
+.adm-owners-item:last-child,
+.adm-passkey-item:last-child {
   border-bottom: none;
 }
-.adm-owners-who {
+.adm-owners-who,
+.adm-passkey-who {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
-.adm-owners-email {
+.adm-owners-email,
+.adm-passkey-label {
   font-size: 13px;
   font-weight: 600;
   word-break: break-all;
@@ -295,7 +301,8 @@
   font-weight: 400;
   color: var(--a-sub);
 }
-.adm-owners-confirm {
+.adm-owners-confirm,
+.adm-passkey-confirm {
   display: flex;
   flex: none;
   gap: 8px;
@@ -307,4 +314,18 @@
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--a-line);
+}
+
+/* ---- sign-in & passkeys (issue #51): Change password + Passkeys stacked
+   in the same section, since both are about how the signed-in owner gets
+   back in --------------------------------------------------------------- */
+.adm-settings-signin-group {
+  gap: 28px;
+}
+.adm-passkeys-block {
+  padding-top: 20px;
+  border-top: 1px solid var(--a-line);
+}
+.adm-passkeys-add {
+  padding-top: 4px;
 }

@@ -15,12 +15,13 @@ type Params = { id: string };
  * is a print sheet, not a screen with navigation; `@media print` in
  * `admin-rack.css` hides everything but `.rack-slip-sheet` besides. Each
  * item's edition badge only appears when the item actually carries one —
- * "Number X of Y" is real inventory data (`editionNumber`/the product's
- * `editionSize`, via `catalogAdmin`), not decoration, so a non-numbered
- * item (an untracked or count-mode product) gets none rather than a made-up
- * one. Item photos aren't shown: `getOrderForAdmin` doesn't join back to
- * the product's image, only its name/sku/edition, so there's nothing real
- * to put in that spot — see this phase's report. */
+ * "Number X of Y" is real inventory data (`editionNumber`/the variant's
+ * `editionSize`, projected onto `AdminOrderItem` by `getOrderForAdmin` in
+ * `src/lib/ordersAdmin.ts`), not decoration, so a non-numbered item (an
+ * untracked or count-mode product) gets none rather than a made-up one.
+ * Item photos aren't shown: `getOrderForAdmin` doesn't join back to the
+ * product's image, only its name/sku/edition, so there's nothing real to
+ * put in that spot — see this phase's report. */
 export default async function PackingSlipPage({ params }: { params: Promise<Params> }) {
   const { id } = await params;
   const order = await getOrderForAdmin(id);
@@ -39,6 +40,9 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
             order.shipTo.country,
           ]
         : [order.name ?? "Customer"];
+
+  const numberedItems = order.items.filter((item) => item.editionNumber !== null);
+  const soleNumberedItem = numberedItems.length === 1 ? numberedItems[0] : null;
 
   return (
     <div className="rack-slip-page">
@@ -110,16 +114,14 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
               />
               <div style={{ flex: 1 }}>
                 <div className="rack-slip-item-name">{item.productName}</div>
-                <div className="rack-slip-item-meta">
-                  SKU {item.sku.toUpperCase()}
-                  {item.editionNumber && ` · #${item.editionNumber}`}
-                </div>
+                <div className="rack-slip-item-meta">{item.variantLabel.toUpperCase()}</div>
               </div>
               {item.editionNumber && (
                 <div className="rack-slip-edition">
                   <div className="rack-eyebrow">Number</div>
                   <div className="rack-bow rack-mono rack-slip-edition-num">
                     {item.editionNumber}
+                    {item.editionSize && <span>/{item.editionSize}</span>}
                   </div>
                 </div>
               )}
@@ -128,10 +130,14 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
           ))}
         </div>
 
-        {order.items.some((item) => item.editionNumber) && (
+        {numberedItems.length > 0 && (
           <div className="rack-slip-callout">
             <div className="rack-bow" style={{ fontSize: 19 }}>
-              That number is yours.
+              {soleNumberedItem
+                ? `Number ${soleNumberedItem.editionNumber}${
+                    soleNumberedItem.editionSize ? ` of ${soleNumberedItem.editionSize}` : ""
+                  }. That's yours.`
+                : "Those numbers are yours."}
             </div>
             <p>No restock and no second run, so this number belongs to one item and one person.</p>
           </div>
@@ -144,6 +150,12 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
             </div>
             <p>
               Email <strong>{settings.supportEmail}</strong> with the order number.
+              {settings.returnsPolicy && (
+                <>
+                  <br />
+                  {settings.returnsPolicy}
+                </>
+              )}
             </p>
           </div>
           <div className="rack-slip-order-ref">

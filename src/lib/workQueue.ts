@@ -9,10 +9,14 @@
  * a sales-pace projection, and an "in the mail"/delivered distinction: none
  * of those are observable from data this system actually keeps).
  *
- * "Shipping only" per the design's admin annotation: every read here counts
- * `fulfilment: "ship"` orders only. Pickup orders still exist in the schema
- * and still show on the untouched `/admin/orders` sheet; they just aren't
- * part of Today's queue.
+ * Both fulfilment methods reach the queue now (issue #49). A paid `ship`
+ * order becomes a "to-pack" row and a paid `pickup` order becomes its own
+ * "to-prepare-pickup" row — same shape, same real-data rule, counted and
+ * ordered independently so a customer who chose pickup can never go
+ * missing from "what needs doing right now" the way an earlier version of
+ * this file deliberately left them out. The "To pack" KPI tile on Today
+ * stays ship-only, matching what `Overview.dc.html`'s stat card actually
+ * labels — pickup's own aggregate lives in the queue, not that tile.
  */
 import { and, asc, desc, eq, gte, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db/client";
@@ -41,7 +45,8 @@ function daysSince(date: Date): number {
 }
 
 // ---------------------------------------------------------------------------
-// To-pack orders (shipping only, oldest first)
+// Paid orders waiting on fulfilment — ship ("to-pack") and pickup
+// ("to-prepare-pickup"), oldest first
 // ---------------------------------------------------------------------------
 
 export type ToPackOrder = {
@@ -52,9 +57,14 @@ export type ToPackOrder = {
   totalCents: number;
 };
 
-/** Paid, unshipped, ship-fulfilment orders — oldest first, so index 0 is
- * always the one that's been waiting longest. */
-async function getToPackOrders(): Promise<ToPackOrder[]> {
+/** Paid orders for one fulfilment method that still need the owner to do
+ * something — pack and ship it, or pull and prepare it for pickup — oldest
+ * first, so index 0 is always the one that's been waiting longest. Shared
+ * by both queue rows below; they differ only in which `fulfilment` they
+ * filter to. */
+async function getPaidOrdersAwaitingFulfilment(
+  fulfilment: "ship" | "pickup",
+): Promise<ToPackOrder[]> {
   const db = await getDb();
   const rows = await db
     .select({
@@ -65,13 +75,25 @@ async function getToPackOrders(): Promise<ToPackOrder[]> {
       totalCents: orders.totalCents,
     })
     .from(orders)
-    .where(and(eq(orders.status, "paid"), eq(orders.fulfilment, "ship")))
+    .where(and(eq(orders.status, "paid"), eq(orders.fulfilment, fulfilment)))
     .orderBy(asc(orders.paidAt));
 
   // `paidAt` is always stamped in the same transaction that sets
   // `status: "paid"` (see `markPaid` in src/lib/orders.ts), so it's never
   // null for a row this query can return.
   return rows.map((row) => ({ ...row, paidAt: row.paidAt as Date }));
+}
+
+async function getToPackOrders(): Promise<ToPackOrder[]> {
+  return getPaidOrdersAwaitingFulfilment("ship");
+}
+
+/** The pickup counterpart of `getToPackOrders` — paid pickup orders that
+ * haven't been marked ready yet. Once an order is `ready_for_pickup` it's
+ * waiting on the customer, not the owner, so it deliberately drops out of
+ * this list the same way a shipped order drops out of `getToPackOrders`. */
+async function getToPreparePickupOrders(): Promise<ToPackOrder[]> {
+  return getPaidOrdersAwaitingFulfilment("pickup");
 }
 
 // ---------------------------------------------------------------------------
@@ -211,6 +233,13 @@ export type WorkQueueItem =
       moreCount: number;
     }
   | {
+      kind: "to-prepare-pickup";
+      count: number;
+      totalCents: number;
+      orderNumbers: string[];
+      moreCount: number;
+    }
+  | {
       kind: "stale-order";
       orderId: string;
       orderNumber: string;
@@ -225,14 +254,17 @@ export type WorkQueueItem =
 /**
  * The work queue itself, in the order an owner would want to work through
  * it: a broken setup first (nothing downstream works right until it's
- * fixed), then the general backlog of orders to pack, then the single
- * oldest one if it's crossed `STALE_HOURS`, then numbers currently tied up
- * in someone else's open checkout (informational — they release on their
- * own, see `releaseExpiredReservations`).
+ * fixed), then the general backlog of ship orders to pack, then the single
+ * oldest one if it's crossed `STALE_HOURS`, then the pickup counterpart of
+ * that same backlog (issue #49 — pickup gets its own row rather than being
+ * silently folded into or excluded from the ship count), then numbers
+ * currently tied up in someone else's open checkout (informational — they
+ * release on their own, see `releaseExpiredReservations`).
  *
  * Every item type is independently optional: an empty array means nothing
  * needs the owner's attention right now, which the caller renders as the
- * "Nothing else is waiting" line.
+ * "Nothing else is waiting" line — see `getHealthyConnections` below for
+ * the separate, always-on line about what's actually known to be fine.
  */
 export async function getWorkQueue(): Promise<WorkQueueItem[]> {
   const items: WorkQueueItem[] = [];
@@ -277,10 +309,51 @@ export async function getWorkQueue(): Promise<WorkQueueItem[]> {
     }
   }
 
+  const toPreparePickup = await getToPreparePickupOrders();
+  if (toPreparePickup.length > 0) {
+    items.push({
+      kind: "to-prepare-pickup",
+      count: toPreparePickup.length,
+      totalCents: toPreparePickup.reduce((sum, o) => sum + o.totalCents, 0),
+      orderNumbers: toPreparePickup.slice(0, 3).map((o) => o.number),
+      moreCount: Math.max(0, toPreparePickup.length - 3),
+    });
+  }
+
   const held = await getHeldEditionsCount();
   if (held > 0) {
     items.push({ kind: "held-editions", count: held });
   }
 
   return items;
+}
+
+// ---------------------------------------------------------------------------
+// Today's always-on health line (issue #50)
+// ---------------------------------------------------------------------------
+
+/** Reading order + label for each checklist item that's fine to mention on
+ * Today's health line — `owner-sign-in` is left out, same reasoning as
+ * `getWorkQueue`'s skip above: it can never be genuinely broken here. */
+const HEALTH_LABEL_ORDER: [key: string, label: string][] = [
+  ["payments", "payments"],
+  ["photo-storage", "photos"],
+  ["email", "email"],
+  ["database", "the database"],
+];
+
+/**
+ * The systems genuinely known to be fine right now, in the order Today's
+ * footer reads them out. Anything broken is left out here on purpose — it's
+ * already sitting in `getWorkQueue`'s list as its own urgent "setup" row, so
+ * this line never has to repeat it, and it never claims a system is fine
+ * when the checklist above says otherwise. There is no fourth, unlisted
+ * thing being silently vouched for: every entry here is one of the same
+ * `process.env` reads `getSetupChecklist` already makes, nothing more.
+ */
+export function getHealthyConnections(): string[] {
+  const checklist = getSetupChecklist();
+  return HEALTH_LABEL_ORDER.filter(([key]) => checklist.find((c) => c.key === key)?.ok).map(
+    ([, label]) => label,
+  );
 }

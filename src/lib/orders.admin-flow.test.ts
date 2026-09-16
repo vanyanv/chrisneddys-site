@@ -9,10 +9,13 @@ import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
+import { editions, products, variants } from "@/db/schema";
 import {
+  appendOrderNote,
   createPendingOrder,
   getOrder,
   markPaid,
@@ -49,6 +52,17 @@ async function createPaidOrder(fulfilment: "ship" | "pickup"): Promise<string> {
   });
 
   return reservation.orderId;
+}
+
+async function truckerVariantId(): Promise<string> {
+  const db = await getDb();
+  const product = await db.query.products.findFirst({
+    where: eq(products.slug, FOAM_TRUCKER_SLUG),
+  });
+  if (!product) throw new Error("expected the seeded foam trucker product");
+  const [variant] = await db.select().from(variants).where(eq(variants.productId, product.id));
+  if (!variant) throw new Error("expected the seeded foam trucker variant");
+  return variant.id;
 }
 
 describe("ship: paid -> fulfilled with carrier + tracking", () => {
@@ -135,6 +149,44 @@ describe("pickup: paid -> ready_for_pickup -> picked_up", () => {
 });
 
 describe("refund", () => {
+  /**
+   * The reason is the desk's only record of why money went back, and a
+   * refund is one-way — a second `markRefunded` on the same order is
+   * refused, because the status is already `refunded`. So a reason written
+   * *after* the refund commits could never be retried if its own write
+   * failed, leaving a refund on the books with nothing saying why. It goes
+   * in the refund's own transaction; these pin that it lands with it, and
+   * that it appends rather than replacing whatever is already there.
+   */
+  it("files the refund reason with the refund itself", async () => {
+    const orderId = await createPaidOrder("ship");
+
+    const result = await markRefunded(orderId, { note: "Refund reason: arrived damaged" });
+    expect(result.ok).toBe(true);
+
+    const order = await getOrder(orderId);
+    expect(order?.status).toBe("refunded");
+    expect(order?.notes).toBe("Refund reason: arrived damaged");
+  });
+
+  it("appends the reason to notes an order already had", async () => {
+    const orderId = await createPaidOrder("ship");
+    await appendOrderNote(orderId, "Partial refund of $5.00 in Stripe");
+
+    await markRefunded(orderId, { note: "Refund reason: changed their mind" });
+
+    const order = await getOrder(orderId);
+    expect(order?.notes).toBe(
+      "Partial refund of $5.00 in Stripe\nRefund reason: changed their mind",
+    );
+  });
+
+  it("leaves notes alone when no reason was given", async () => {
+    const orderId = await createPaidOrder("ship");
+    await markRefunded(orderId, {});
+    expect((await getOrder(orderId))?.notes).toBeNull();
+  });
+
   it("refunds a fulfilled (shipped) order", async () => {
     const orderId = await createPaidOrder("ship");
     await setFulfilment(orderId, { carrier: "FedEx", trackingNumber: "999988887777" });
@@ -194,5 +246,84 @@ describe("refund", () => {
     const result = await markRefunded(orderId, {});
     expect(result.ok).toBe(true);
     expect((await getOrder(orderId))?.status).toBe("refunded");
+  });
+
+  describe("release", () => {
+    it("release: false (the default) leaves the edition sold and reports nothing released", async () => {
+      const orderId = await createPaidOrder("ship");
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      expect(editionNumber).toEqual(expect.any(Number));
+
+      const result = await markRefunded(orderId, {});
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.releasedEditionNumbers).toEqual([]);
+
+      const db = await getDb();
+      const [edition] = await db
+        .select({ status: editions.status, orderId: editions.orderId })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      expect(edition?.status).toBe("sold");
+      expect(edition?.orderId).toBe(orderId);
+    });
+
+    it("release: true puts the edition back to available and reports its number", async () => {
+      const orderId = await createPaidOrder("ship");
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      expect(editionNumber).toEqual(expect.any(Number));
+
+      const result = await markRefunded(orderId, { release: true });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.releasedEditionNumbers).toEqual([editionNumber]);
+
+      const db = await getDb();
+      const [edition] = await db
+        .select({
+          status: editions.status,
+          orderId: editions.orderId,
+          reservedUntil: editions.reservedUntil,
+        })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      expect(edition?.status).toBe("available");
+      expect(edition?.orderId).toBeNull();
+      expect(edition?.reservedUntil).toBeNull();
+    });
+
+    it("a failed refund (already refunded) releases nothing, even with release: true", async () => {
+      const orderId = await createPaidOrder("ship");
+      const first = await markRefunded(orderId, {});
+      expect(first.ok).toBe(true);
+
+      const second = await markRefunded(orderId, { release: true });
+      expect(second.ok).toBe(false);
+
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      const db = await getDb();
+      const [edition] = await db
+        .select({ status: editions.status })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      // Still sold — the first (non-releasing) refund is the one that stuck.
+      expect(edition?.status).toBe("sold");
+    });
   });
 });

@@ -199,7 +199,7 @@ test.describe.serial("admin orders desk", () => {
 
     await page.getByLabel("Carrier").selectOption("UPS");
     await page.getByLabel("Tracking number").fill("1Z999AA10123456784");
-    await page.getByRole("button", { name: "Mark shipped", exact: true }).click();
+    await page.getByRole("button", { name: "Mark shipped & email guest", exact: true }).click();
 
     await expect(page.getByRole("status").filter({ hasText: "Marked shipped" })).toBeVisible();
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
@@ -214,7 +214,7 @@ test.describe.serial("admin orders desk", () => {
     await page.goto(`/admin/orders/${orderId.pickup}`);
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("TO PREPARE");
 
-    await page.getByRole("button", { name: "Mark ready for pickup", exact: true }).click();
+    await page.getByRole("button", { name: "Mark ready & email guest", exact: true }).click();
     await expect(
       page.getByRole("status").filter({ hasText: "Marked ready for pickup" }),
     ).toBeVisible();

@@ -1,5 +1,9 @@
+import Image from "next/image";
 import { headers } from "next/headers";
 import { getOwnerSession, requireOwner } from "@/lib/auth";
+import { getStoreSettings } from "@/lib/orders";
+import { isShopOpenFor } from "@/lib/shopStatus";
+import "@/styles/admin-rack.css";
 
 /** Strips the trailing slash `trailingSlash: true` adds, except for "/". */
 function normalizePathname(pathname: string): string {
@@ -27,8 +31,13 @@ const GUEST_PATHS = new Set(["/admin/sign-in", "/admin/forgot-password", "/admin
  * draws none at all, since it's a print sheet, not a screen with
  * navigation. That was every route the Sheet's shell still served, so this
  * layout no longer renders any shell for a signed-in owner at all — only
- * the bare guest shell for the sign-in/forgot-password/reset-password
- * pages, which were never on The Rack and never had a top bar.
+ * the guest shell for the sign-in/forgot-password/reset-password pages
+ * (issue #44 puts that guest shell on The Rack too: the same logo-plus-tab
+ * top bar treatment as every signed-in route, minus the tabs a guest can't
+ * use, plus the shop-status pill and the Hollywood address every other
+ * Rack screen carries in some form — those three pages used to render
+ * inside a bare centered box, `.adm-shell-guest`/`.adm-signin-card` from
+ * `admin.css`, which is why they still looked like the pre-Rack Sheet).
  *
  * `ownerInitials` used to live here too, called from the shell this layout
  * rendered. It's moved to `./ownerDisplay.ts` now that this function has no
@@ -52,7 +61,33 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = isGuestPath ? await getOwnerSession() : await requireOwner();
 
   if (!session) {
-    return <div className="adm-shell adm-shell-guest">{children}</div>;
+    const settings = await getStoreSettings();
+    const shopOpen = isShopOpenFor(settings);
+
+    return (
+      <div className="rack-root rack-guest-shell">
+        <div className="rack-guest-topbar">
+          <div className="rack-brand">
+            <Image
+              src="/cne-logo.webp"
+              alt="Chris N Eddy's"
+              width={309}
+              height={89}
+              className="rack-logo"
+              priority
+            />
+            <span className="rack-wordmark-tag rack-mono">STORE</span>
+          </div>
+          <span className={`rack-store-pill rack-mono ${shopOpen ? "" : "is-closed"}`}>
+            <i></i>Store: {shopOpen ? "Open" : "Closed"}
+          </span>
+        </div>
+        <main className="rack-guest-main">{children}</main>
+        <footer className="rack-guest-footer">
+          <span className="rack-mono">5539 W. SUNSET BLVD &middot; HOLLYWOOD</span>
+        </footer>
+      </div>
+    );
   }
 
   return <>{children}</>;

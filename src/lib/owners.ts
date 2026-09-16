@@ -56,8 +56,8 @@ export async function listOwners(currentEmail: string, db?: Db): Promise<OwnerRo
 }
 
 export type InviteOwnerResult =
-  | { ok: true; sent: true }
-  | { ok: true; sent: false; reason: string; url: string }
+  | { ok: true; sent: true; owner: OwnerRow }
+  | { ok: true; sent: false; reason: string; url: string; owner: OwnerRow }
   | { ok: false; error: string };
 
 /**
@@ -87,15 +87,27 @@ export async function inviteOwner(email: string, db?: Db): Promise<InviteOwnerRe
   }
 
   const name = normalized.split("@")[0] || normalized;
-  await database.insert(user).values({
-    id: randomUUID(),
-    name,
-    email: normalized,
-    emailVerified: false,
-  });
+  // `.returning()` rather than rebuilding the row from what we passed in:
+  // `createdAt` is a database default, and the settings list orders by it.
+  // Handing the real row back lets the card show the new owner straight
+  // away instead of waiting on a whole re-render of `/admin/settings` —
+  // see `OwnersCard` (#38).
+  const [inserted] = await database
+    .insert(user)
+    .values({
+      id: randomUUID(),
+      name,
+      email: normalized,
+      emailVerified: false,
+    })
+    .returning({ email: user.email, name: user.name, createdAt: user.createdAt });
+  if (!inserted) {
+    return { ok: false, error: "Could not create that owner account. Try again." };
+  }
+  const owner: OwnerRow = { ...inserted, isYou: false };
 
   const auth = await getAuth();
-  const { outcome } = await captureResetSend(() =>
+  const { outcome } = await captureResetSend(normalized, () =>
     auth.api.requestPasswordReset({ body: { email: normalized } }),
   );
 
@@ -111,9 +123,10 @@ export async function inviteOwner(email: string, db?: Db): Promise<InviteOwnerRe
       sent: false,
       reason: outcome.reason ?? "The email could not be sent.",
       url: outcome.url,
+      owner,
     };
   }
-  return { ok: true, sent: true };
+  return { ok: true, sent: true, owner };
 }
 
 export type RemoveOwnerResult = { ok: true } | { ok: false; error: string };

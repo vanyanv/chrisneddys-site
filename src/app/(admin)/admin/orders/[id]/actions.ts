@@ -53,6 +53,12 @@ export async function markRefundedAction(
   const orderId = String(formData.get("orderId") ?? "");
   if (!orderId) return { error: "Missing order id." };
 
-  const result = await markRefunded(orderId);
+  // An unchecked checkbox sends no `release` entry at all — `has` (not a
+  // value comparison) is what makes the toggle's off-by-default behaviour
+  // hold even if a form is ever submitted without JS.
+  const release = formData.has("release");
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  const result = await markRefunded(orderId, { release, reason: reason || undefined });
   return result.ok ? {} : { error: result.error };
 }

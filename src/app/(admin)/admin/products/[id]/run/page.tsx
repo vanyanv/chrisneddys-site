@@ -100,12 +100,13 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
             The run
           </h1>
           <span className="rack-page-count rack-mono">
+            {run.productEyebrow ? `${run.productEyebrow.toUpperCase()} · ` : ""}
             {run.editionSize} MADE &middot; {run.locked ? "LOCKED" : "OPEN"}
           </span>
         </div>
       </div>
 
-      <RunBoard run={run} />
+      <RunBoard run={run} serverNow={Date.now()} />
     </div>
   );
 }

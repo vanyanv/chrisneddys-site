@@ -36,18 +36,24 @@ import { account, user } from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
 import { hashPassword, verifyPassword, verifyPasswordDetailed } from "@/lib/password";
 import { parseOwnerEmails } from "@/lib/ownerAllowlist";
+import { redactEmail } from "@/lib/logRedaction";
 import {
   checkThrottle,
   clearFailedAttempts,
   pruneSignInAttempts,
   recordSignInAttempt,
+  remainingSignInAttempts,
 } from "@/lib/signInThrottle";
 
 /** An owner's session, as read back from Better Auth's `session` + `user`
  * rows. `issuedAt` is the session row's `createdAt`, in Unix seconds. */
 export type OwnerSession = { email: string; name: string | null; issuedAt: number };
 
-const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
+/** Exported so `src/lib/passkeys.ts` can return the exact same wording on
+ * every failure path a passkey sign-in can take too — a wrong password and
+ * an unrecognized (or rejected) passkey must read identically, so neither
+ * ever tells an attacker which one was tried. */
+export const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
 
 function ownerEmailsFromEnv(): string[] {
   return parseOwnerEmails(process.env.OWNER_EMAILS);
@@ -106,8 +112,10 @@ export async function applySetCookieHeader(setCookieHeader: string | null): Prom
  * from a first-ever visit and the sign-in page only claims "you were signed
  * out" when that actually happened. Scoped to `/admin` and `httpOnly` —
  * nothing outside the admin, and no client script, has any use for it.
+ * Exported so `src/lib/passkeys.ts`'s passkey sign-in marks the same cookie
+ * a password sign-in does.
  */
-async function markSignedInBefore(): Promise<void> {
+export async function markSignedInBefore(): Promise<void> {
   const store = await cookies();
   store.set(SIGNED_IN_BEFORE_COOKIE, "1", {
     httpOnly: true,
@@ -240,7 +248,10 @@ export async function signIn(
   email: string,
   password: string,
   ipOverride?: string,
-): Promise<{ ok: true } | { ok: false; error: string; retryAfterSeconds?: number }> {
+): Promise<
+  | { ok: true }
+  | { ok: false; error: string; retryAfterSeconds?: number; remainingAttempts?: number }
+> {
   const secret = process.env.AUTH_SECRET;
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -260,7 +271,7 @@ export async function signIn(
   const throttle = await checkThrottle(db, normalizedEmail, ip, now);
   if (throttle.locked) {
     console.warn("[auth] sign-in throttled", {
-      email: normalizedEmail,
+      email: redactEmail(normalizedEmail),
       ip,
       emailFailures: throttle.emailFailures,
       ipFailures: throttle.ipFailures,
@@ -288,12 +299,23 @@ export async function signIn(
 
   if (!signedIn) {
     await recordSignInAttempt(db, normalizedEmail, ip, false, now);
+    const failuresNow = throttle.emailFailures + 1;
     console.warn("[auth] failed sign-in attempt", {
-      email: normalizedEmail,
+      email: redactEmail(normalizedEmail),
       ip,
-      count: throttle.emailFailures + 1,
+      count: failuresNow,
     });
-    return { ok: false, error: GENERIC_SIGN_IN_ERROR };
+    return {
+      ok: false,
+      error: GENERIC_SIGN_IN_ERROR,
+      // `checkThrottle` locks on *either* channel hitting the limit, so the
+      // honest countdown is the worse of the two. Counting only this email's
+      // failures would promise "4 tries left" to someone whose IP is one
+      // attempt from a lockout — a number that is wrong in exactly the moment
+      // it matters. In the ordinary case (an owner on their own connection)
+      // the two channels move together and this reads the same either way.
+      remainingAttempts: remainingSignInAttempts(Math.max(failuresNow, throttle.ipFailures + 1)),
+    };
   }
 
   await applySetCookieHeader(signedIn.setCookieHeader);

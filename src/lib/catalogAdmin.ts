@@ -13,6 +13,10 @@
 import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
 import { getDb, type Db } from "@/db/client";
 import { imageThumbSrc } from "@/lib/productImage";
+import {
+  missingPublishRequirements,
+  PUBLISH_REQUIREMENT_MESSAGES,
+} from "@/lib/publishRequirements";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
 
 /** `db ?? getDb()` — lets a function join a caller's transaction (pass `tx`)
@@ -623,24 +627,11 @@ export type SetStatusResult = { ok: true; slug: string } | { ok: false; error: s
  * ever published; an unpublish/republish cycle keeps that original
  * timestamp rather than treating every publish as a new "first" one.
  *
- * Refuses to publish a product that isn't ready — an unnamed draft (issue
- * #36's decisions comment) is a first-class state, not a placeholder, so
- * this is the one place that honesty is actually enforced rather than just
- * a disabled button in the UI:
- *
- *  - a name (`displayName1` — the line the shop actually renders; a blank
- *    `[SECOND COLOURWAY]`-style draft has none until the owner types one),
- *  - a price (`priceCents` above zero — the $0 a fresh draft starts at isn't
- *    a real price),
- *  - a run size (the variant tracks a quantity or an edition size — plain
- *    `untracked` means the owner hasn't decided how many exist yet), and
- *  - a gallery photo: `firstView` (in `src/data/merch.ts`) has to return
- *    something for the shop index and the product page to render, and a
- *    product with zero `view` images is exactly the case that used to
- *    render an empty $0 line instead.
- *
- * Each is checked in the order the panel lays the fields out, so the first
- * error an owner sees is always the first field they'd need to fix.
+ * Refuses to publish a product that isn't ready — see `PublishReadiness`
+ * and `missingPublishRequirements` in `@/lib/publishRequirements` for what
+ * "ready" means and the order it's checked in. That module is the pure,
+ * server-free leaf both this function and the rack panel's live checklist
+ * (`RackProductPanel.tsx`) import, so the two can never drift apart.
  */
 export async function setStatus(
   id: string,
@@ -657,21 +648,18 @@ export async function setStatus(
   if (!existing) return { ok: false, error: "Product not found." };
 
   if (status === "published") {
-    if (existing.displayName1.trim() === "") {
-      return { ok: false, error: "Give it a name before publishing." };
-    }
-    if (existing.priceCents <= 0) {
-      return { ok: false, error: "Set a price before publishing." };
-    }
     const variant = existing.variants[0];
-    const hasRunSize = Boolean(
-      variant && (variant.editionSize !== null || variant.inventoryQuantity !== null),
-    );
-    if (!hasRunSize) {
-      return { ok: false, error: "Set a run size before publishing." };
-    }
-    if (existing.images.length === 0) {
-      return { ok: false, error: "Add at least one photo before publishing." };
+    const missing = missingPublishRequirements({
+      hasName: existing.displayName1.trim() !== "",
+      hasPrice: existing.priceCents > 0,
+      hasRunSize: Boolean(
+        variant && (variant.editionSize !== null || variant.inventoryQuantity !== null),
+      ),
+      hasPhoto: existing.images.length > 0,
+    });
+    const firstMissing = missing[0];
+    if (firstMissing) {
+      return { ok: false, error: PUBLISH_REQUIREMENT_MESSAGES[firstMissing] };
     }
   }
 

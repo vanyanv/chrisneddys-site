@@ -6,6 +6,7 @@ import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import {
+  getHealthyConnections,
   getRecentActivity,
   getTodayStats,
   getWorkQueue,
@@ -84,6 +85,14 @@ function TagIcon() {
     </svg>
   );
 }
+function PickupIcon() {
+  return (
+    <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+      <path d="M8 14s5-4.5 5-8a5 5 0 0 0-10 0c0 3.5 5 8 5 8z" />
+      <circle cx="8" cy="6" r="1.6" />
+    </svg>
+  );
+}
 function CheckIcon() {
   return (
     <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
@@ -135,6 +144,18 @@ function describeQueueItem(item: WorkQueueItem): QueueRowContent {
         ctaLabel: "Pack it",
         ctaHref: `/admin/orders/${item.orderId}`,
       };
+    case "to-prepare-pickup": {
+      const numbers =
+        item.orderNumbers.join(", ") + (item.moreCount > 0 ? ` +${item.moreCount}` : "");
+      return {
+        icon: <PickupIcon />,
+        tone: "default",
+        title: `${plural(item.count, "order")} to prepare for pickup`,
+        meta: `${numbers} · ${formatMoney(item.totalCents)}`,
+        ctaLabel: "Get them ready",
+        ctaHref: "/admin/orders?status=paid",
+      };
+    }
     case "held-editions":
       return {
         icon: <TagIcon />,
@@ -176,6 +197,36 @@ function ActivityRow({ entry }: { entry: RecentActivityEntry }) {
   );
 }
 
+function joinWithAnd(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function capitalize(text: string): string {
+  return text.length > 0 ? text[0]!.toUpperCase() + text.slice(1) : text;
+}
+
+/**
+ * The always-on health line under the queue (issue #50) — a persistent
+ * footer rather than only a fallback for an empty queue, so a busy day
+ * still gets confirmation the systems that ARE checked are fine. Built
+ * from `getHealthyConnections`, which only ever lists a system that's
+ * genuinely known to be ok right now (the same env-var reads
+ * `getSetupChecklist` makes) — anything broken is already its own urgent
+ * "setup" row in the queue above, so this line never repeats or contradicts
+ * it, and never claims a system this app doesn't actually check. `null`
+ * means there's nothing honest left to say (every checked system is
+ * broken, which the queue itself is already shouting about).
+ */
+function healthFooterText(queueIsEmpty: boolean, healthyConnections: string[]): string | null {
+  if (healthyConnections.length === 0) return queueIsEmpty ? "Nothing is waiting." : null;
+
+  const verb = healthyConnections.length === 1 ? "is" : "are all";
+  const sentence = `${capitalize(joinWithAnd(healthyConnections))} ${verb} fine.`;
+  return queueIsEmpty ? `Nothing is waiting. ${sentence}` : sentence;
+}
+
 export default async function TodayPage() {
   const session = await requireOwner();
   const [settings, stats, queue, activity] = await Promise.all([
@@ -184,6 +235,7 @@ export default async function TodayPage() {
     getWorkQueue(),
     getRecentActivity(5),
   ]);
+  const healthFooter = healthFooterText(queue.length === 0, getHealthyConnections());
 
   const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
@@ -301,10 +353,10 @@ export default async function TodayPage() {
             />
           ))}
 
-          {queue.length === 0 && (
+          {healthFooter && (
             <div className="rack-queue-clear">
               <CheckIcon />
-              <span>Nothing is waiting. Today&apos;s all clear.</span>
+              <span>{healthFooter}</span>
             </div>
           )}
         </section>

@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { StoreSettings } from "@/lib/settingsAdmin";
+import { shippingReturnsNote } from "@/lib/shopCopy";
 import { saveSettingsAction, type SaveSettingsState } from "./actions";
 
 const initial: SaveSettingsState = {};
@@ -30,8 +31,14 @@ type FormValues = {
   shippingFlatDollars: string;
   shippingFreeOverDollars: string;
   shipCountries: string;
+  shipsWithin: string;
   returnsPolicy: string;
   termsText: string;
+  /** issue #43: the deliberate, temporary pause — see `shopPaused`'s note on
+   * `storeSettings` (`src/db/schema.ts`) for why this is a second flag
+   * rather than folded into the pre-launch readout above it on this page. */
+  shopPaused: boolean;
+  pauseNote: string;
 };
 
 function valuesFromSettings(settings: StoreSettings): FormValues {
@@ -46,8 +53,41 @@ function valuesFromSettings(settings: StoreSettings): FormValues {
         ? (settings.shippingFreeOverCents / 100).toFixed(2)
         : "",
     shipCountries: settings.shipCountries.join(", "),
+    shipsWithin: settings.shipsWithin ?? "",
     returnsPolicy: settings.returnsPolicy ?? "",
     termsText: settings.termsText ?? "",
+    shopPaused: settings.shopPaused,
+    pauseNote: settings.pauseNote ?? "",
+  };
+}
+
+function dollarsToCents(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? Math.round(parsed * 100) : 0;
+}
+
+/**
+ * The live settings row `shippingReturnsNote` (`@/lib/shopCopy` — the exact
+ * helper the storefront calls) would see if the form were saved right now.
+ * Starts from the last-saved `settings` and overlays only the fields this
+ * form actually edits, so the preview can never drift out of sync with a
+ * column this form doesn't touch.
+ */
+function previewStoreSettings(base: StoreSettings, values: FormValues): StoreSettings {
+  return {
+    ...base,
+    pickupEnabled: values.pickupEnabled,
+    pickupAddress: values.pickupAddress,
+    shippingFlatCents: dollarsToCents(values.shippingFlatDollars),
+    shippingFreeOverCents: values.shippingFreeOverDollars.trim()
+      ? dollarsToCents(values.shippingFreeOverDollars)
+      : null,
+    shipCountries: values.shipCountries
+      .split(",")
+      .map((c) => c.trim().toUpperCase())
+      .filter(Boolean),
+    shipsWithin: values.shipsWithin.trim() || null,
+    returnsPolicy: values.returnsPolicy,
   };
 }
 
@@ -56,6 +96,7 @@ export function SettingsForm({
   shopOpen,
   connections,
   changePassword,
+  passkeys,
   owners,
 }: {
   settings: StoreSettings;
@@ -64,10 +105,17 @@ export function SettingsForm({
    * returns policy + a support email. There's no stored "shop open" flag
    * to flip: `Settings.dc.html`'s big open/closed switch has nothing real
    * behind it here, so this renders the same status as a read-only readout
-   * instead — see this phase's report. */
+   * instead — see this phase's report. The "Pause" toggle below (issue #43)
+   * is the real switch this readout has no equivalent of: it only exists
+   * once the shop is already open, is read straight off `settings` rather
+   * than passed in separately, and is orthogonal to this prop entirely. */
   shopOpen: boolean;
   connections: ReactNode;
   changePassword: ReactNode;
+  /** issue #51: passkeys, in the same "Sign-in & passkeys" section as
+   * `changePassword` — a distinct card, not folded into that one, since it
+   * owns its own list and its own add/remove actions. */
+  passkeys: ReactNode;
   owners: ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(saveSettingsAction, initial);
@@ -84,6 +132,7 @@ export function SettingsForm({
   const [savedAt, setSavedAt] = useState<string | undefined>(undefined);
 
   const dirty = JSON.stringify(values) !== JSON.stringify(baselineRef.current);
+  const shippingPreview = shippingReturnsNote(previewStoreSettings(settings, values));
 
   const setField = useCallback(<K extends keyof FormValues>(key: K, value: FormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -183,6 +232,54 @@ export function SettingsForm({
       </div>
 
       <form id="settings-form" ref={formRef} action={formAction} className="adm-settings-grid">
+        {/* issue #43: a deliberate, temporary pause — distinct from the
+            pre-launch readout above, which is read-only and about whether
+            Stripe/returns/support-email are configured at all. This is a
+            real switch the owner flips once the shop is already open, and
+            it's part of the same save as everything else on this form. */}
+        <div className="adm-settings-section">
+          <h2 className="adm-group-label">Pause</h2>
+
+          <label className="adm-toggle-row">
+            <span className="adm-toggle">
+              <input
+                id="shopPaused"
+                name="shopPaused"
+                type="checkbox"
+                checked={values.shopPaused}
+                onChange={(event) => setField("shopPaused", event.target.checked)}
+                className="adm-toggle-input"
+              />
+              <span className="adm-toggle-track" aria-hidden="true">
+                <span className="adm-toggle-thumb" />
+              </span>
+            </span>
+            Pause the shop
+          </label>
+          <p className="adm-help">
+            Every product page and the shop index stay up and every link still works — only the buy
+            button changes, to the note below (or &ldquo;Shop paused&rdquo; if you leave it blank).
+            Checkout refuses new orders the whole time this is on.
+          </p>
+
+          <div className="adm-field">
+            <label htmlFor="pauseNote" className="adm-label">
+              Note to customers (optional)
+            </label>
+            <input
+              id="pauseNote"
+              name="pauseNote"
+              type="text"
+              className="adm-input"
+              value={values.pauseNote}
+              onChange={(event) => setField("pauseNote", event.target.value)}
+              placeholder="Back Thursday"
+              maxLength={140}
+            />
+            <FieldError message={fieldErrors.pauseNote} />
+          </div>
+        </div>
+
         <div className="adm-settings-section">
           <h2 className="adm-group-label">Store</h2>
 
@@ -302,6 +399,27 @@ export function SettingsForm({
           </div>
 
           <div className="adm-field">
+            <label htmlFor="shipsWithin" className="adm-label">
+              Ships within (optional)
+            </label>
+            <input
+              id="shipsWithin"
+              name="shipsWithin"
+              type="text"
+              className="adm-input"
+              value={values.shipsWithin}
+              onChange={(event) => setField("shipsWithin", event.target.value)}
+              placeholder="3 business days"
+              maxLength={60}
+            />
+            <p className="adm-help">
+              Shown in the shipping line below once set — leave it blank to say nothing about
+              timing, same as today.
+            </p>
+            <FieldError message={fieldErrors.shipsWithin} />
+          </div>
+
+          <div className="adm-field">
             <label htmlFor="shipCountries" className="adm-label">
               Ship to (ISO-2 country codes, comma-separated)
             </label>
@@ -317,6 +435,27 @@ export function SettingsForm({
             />
             <p className="adm-help">Default US. Add more as two-letter codes, e.g. US, CA.</p>
             <FieldError message={fieldErrors.shipCountries} />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 11,
+              marginTop: 18,
+              padding: "13px 15px",
+              background: "var(--rack-paper)",
+              border: "1px dashed var(--rack-rule)",
+            }}
+          >
+            <span className="rack-eyebrow" style={{ flex: "none" }}>
+              Reads as
+            </span>
+            <span className="rack-mono" style={{ fontSize: 12.5 }}>
+              {shippingPreview
+                ? `"${shippingPreview.line}"`
+                : "Add a returns policy below to preview this line — California law requires one before it can show."}
+            </span>
           </div>
         </div>
 
@@ -379,8 +518,9 @@ export function SettingsForm({
           grid rather than as fields inside `#settings-form` — nested
           `<form>` elements aren't valid HTML. */}
       <div className="adm-settings-grid adm-settings-account-grid">
-        <div id="settings-signin" className="adm-settings-section">
-          {changePassword}
+        <div id="settings-signin" className="adm-settings-section adm-settings-signin-group">
+          <div>{changePassword}</div>
+          <div className="adm-passkeys-block">{passkeys}</div>
         </div>
         <div id="settings-owners" className="adm-settings-section">
           {owners}
@@ -392,7 +532,14 @@ export function SettingsForm({
         <button type="button" className="adm-savebar-discard" onClick={discard}>
           Discard
         </button>
-        <button type="submit" form="settings-form" className="adm-savebar-save" disabled={pending}>
+        <button
+          type="submit"
+          form="settings-form"
+          className="adm-savebar-save"
+          disabled={pending}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+        >
+          {pending && <span className="rack-spin" aria-hidden="true" />}
           {pending ? "Saving…" : "Save"}
         </button>
       </div>

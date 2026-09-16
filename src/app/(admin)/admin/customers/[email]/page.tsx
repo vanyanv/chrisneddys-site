@@ -203,6 +203,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
             <div className="rack-mono cust-header-meta">
               {customer.email}
               {customer.phone ? ` · ${customer.phone}` : ""}
+              {customer.city ? ` · ${customer.city.toUpperCase()}` : ""}
             </div>
           </div>
         </div>

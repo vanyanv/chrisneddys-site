@@ -267,6 +267,21 @@ export const storeSettings = pgTable("store_settings", {
   shipCountries: jsonb("ship_countries").$type<string[]>().notNull().default(["US"]),
   returnsPolicy: text("returns_policy"),
   termsText: text("terms_text"),
+  /**
+   * A deliberate, temporary "the counter's closed" switch the owner flips
+   * from `/admin/settings` once the shop has already opened — separate from
+   * `isShopOpenFor`'s pre-launch gate (`src/lib/shopStatus.ts`), which is a
+   * one-way readiness check with no stored flag of its own. Pre-launch and
+   * paused are different failure modes with different customer-facing
+   * copy (see `shopCopy.ts`'s `pauseNotice`/`pauseCheckoutMessage` versus
+   * `TERMS_PENDING`), so they get separate booleans rather than one
+   * "shop open" flag standing in for both.
+   */
+  shopPaused: boolean("shop_paused").notNull().default(false),
+  /** The optional short line customers see while paused, e.g. "Back
+   * Thursday" — `null` (not just empty) when the owner hasn't set one, so
+   * `shopCopy.ts` can tell "no note" apart from "an empty string was saved". */
+  pauseNote: text("pause_note"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

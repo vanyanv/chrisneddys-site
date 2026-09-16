@@ -32,6 +32,11 @@ type FormValues = {
   shipCountries: string;
   returnsPolicy: string;
   termsText: string;
+  /** issue #43: the deliberate, temporary pause — see `shopPaused`'s note on
+   * `storeSettings` (`src/db/schema.ts`) for why this is a second flag
+   * rather than folded into the pre-launch readout above it on this page. */
+  shopPaused: boolean;
+  pauseNote: string;
 };
 
 function valuesFromSettings(settings: StoreSettings): FormValues {
@@ -48,6 +53,8 @@ function valuesFromSettings(settings: StoreSettings): FormValues {
     shipCountries: settings.shipCountries.join(", "),
     returnsPolicy: settings.returnsPolicy ?? "",
     termsText: settings.termsText ?? "",
+    shopPaused: settings.shopPaused,
+    pauseNote: settings.pauseNote ?? "",
   };
 }
 
@@ -64,7 +71,10 @@ export function SettingsForm({
    * returns policy + a support email. There's no stored "shop open" flag
    * to flip: `Settings.dc.html`'s big open/closed switch has nothing real
    * behind it here, so this renders the same status as a read-only readout
-   * instead — see this phase's report. */
+   * instead — see this phase's report. The "Pause" toggle below (issue #43)
+   * is the real switch this readout has no equivalent of: it only exists
+   * once the shop is already open, is read straight off `settings` rather
+   * than passed in separately, and is orthogonal to this prop entirely. */
   shopOpen: boolean;
   connections: ReactNode;
   changePassword: ReactNode;
@@ -183,6 +193,54 @@ export function SettingsForm({
       </div>
 
       <form id="settings-form" ref={formRef} action={formAction} className="adm-settings-grid">
+        {/* issue #43: a deliberate, temporary pause — distinct from the
+            pre-launch readout above, which is read-only and about whether
+            Stripe/returns/support-email are configured at all. This is a
+            real switch the owner flips once the shop is already open, and
+            it's part of the same save as everything else on this form. */}
+        <div className="adm-settings-section">
+          <h2 className="adm-group-label">Pause</h2>
+
+          <label className="adm-toggle-row">
+            <span className="adm-toggle">
+              <input
+                id="shopPaused"
+                name="shopPaused"
+                type="checkbox"
+                checked={values.shopPaused}
+                onChange={(event) => setField("shopPaused", event.target.checked)}
+                className="adm-toggle-input"
+              />
+              <span className="adm-toggle-track" aria-hidden="true">
+                <span className="adm-toggle-thumb" />
+              </span>
+            </span>
+            Pause the shop
+          </label>
+          <p className="adm-help">
+            Every product page and the shop index stay up and every link still works — only the buy
+            button changes, to the note below (or &ldquo;Shop paused&rdquo; if you leave it blank).
+            Checkout refuses new orders the whole time this is on.
+          </p>
+
+          <div className="adm-field">
+            <label htmlFor="pauseNote" className="adm-label">
+              Note to customers (optional)
+            </label>
+            <input
+              id="pauseNote"
+              name="pauseNote"
+              type="text"
+              className="adm-input"
+              value={values.pauseNote}
+              onChange={(event) => setField("pauseNote", event.target.value)}
+              placeholder="Back Thursday"
+              maxLength={140}
+            />
+            <FieldError message={fieldErrors.pauseNote} />
+          </div>
+        </div>
+
         <div className="adm-settings-section">
           <h2 className="adm-group-label">Store</h2>
 

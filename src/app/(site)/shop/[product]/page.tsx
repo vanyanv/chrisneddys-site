@@ -10,8 +10,8 @@ import {
   listPublishedProducts,
 } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/orders";
-import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
-import { isShopOpenFor } from "@/lib/shopStatus";
+import { editionFlag, pauseNotice, shippingReturnsNote } from "@/lib/shopCopy";
+import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { EditionMap } from "@/components/shop/EditionMap";
 import { ProductGallery } from "@/components/shop/ProductGallery";
@@ -90,6 +90,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const note = shippingReturnsNote(settings);
   const flag = editionFlag(inventory?.editionSize ?? null);
   const shopOpen = isShopOpenFor(settings);
+  // Only meaningful once the shop is actually open — a pre-launch shop
+  // can't also be "paused", and the two states never mix on the page: the
+  // `!shopOpen` notice below is pre-launch's own copy, untouched, and this
+  // is the second, separate one (see `isShopPausedFor`'s note).
+  const paused = shopOpen && isShopPausedFor(settings);
+  const pauseCopy = paused ? pauseNotice(settings.pauseNote) : null;
 
   return (
     <>
@@ -121,7 +127,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         </div>
       </div>
 
-      <BuyProvider product={product} soldOut={soldOut} maxQty={maxQty}>
+      <BuyProvider
+        product={product}
+        soldOut={soldOut}
+        paused={paused}
+        pauseNote={settings.pauseNote}
+        maxQty={maxQty}
+      >
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
           <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
@@ -164,11 +176,34 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               )
             )}
 
+            {/* Pre-launch's own notice, unchanged — the shop has simply
+                never opened, and adding to the bag is still allowed while
+                it isn't. Mutually exclusive with the pause banner below:
+                `paused` is only ever true once `shopOpen` already is. */}
             {!shopOpen && (
               <p className="cne-shopnotice">
                 The shop isn&rsquo;t taking orders yet. Add this to your bag anyway: it stays saved
                 on this device until checkout opens.
               </p>
+            )}
+
+            {/* The pause state (issue #43): the owner has shut the counter
+                for a few days from `/admin/settings`, on a shop that was
+                already open. Everything above — the photo, the price, the
+                edition map — stays exactly as it is; only this pill, this
+                card, and the buy button below (`BuyProvider`'s `paused`
+                prop) change. */}
+            {paused && pauseCopy && (
+              <>
+                <span className="cne-status-pill is-paused">
+                  <i aria-hidden="true" />
+                  Shop paused
+                </span>
+                <div className="cne-pause-card">
+                  <p className="cne-pause-head">{pauseCopy.heading}</p>
+                  <p className="cne-pause-body">{pauseCopy.body}</p>
+                </div>
+              </>
             )}
 
             {/* One size fits most, so there is no variant grid at all. The

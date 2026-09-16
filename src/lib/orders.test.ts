@@ -362,6 +362,52 @@ describe("store settings", () => {
     expect(settings.pickupEnabled).toBe(true);
     expect(settings.pickupAddress).toBe("5539 W. Sunset Blvd, Los Angeles, CA 90028");
   });
+
+  // issue #43 — the pause switch is stored on the same row, through the
+  // same `updateStoreSettings`, alongside every other shop setting.
+  describe("shop pause", () => {
+    it("defaults to not paused, with no note", async () => {
+      const settings = await getStoreSettings();
+      expect(settings.shopPaused).toBe(false);
+      expect(settings.pauseNote).toBeNull();
+    });
+
+    it("persists shopPaused and an optional note together", async () => {
+      const result = await updateStoreSettings({ shopPaused: true, pauseNote: "Back Thursday" });
+      expect(result.ok).toBe(true);
+
+      const settings = await getStoreSettings();
+      expect(settings.shopPaused).toBe(true);
+      expect(settings.pauseNote).toBe("Back Thursday");
+
+      // Reset so later tests in this file see the shop open again.
+      const reset = await updateStoreSettings({ shopPaused: false, pauseNote: null });
+      expect(reset.ok).toBe(true);
+    });
+
+    it("allows pausing with no note at all", async () => {
+      const result = await updateStoreSettings({ shopPaused: true, pauseNote: null });
+      expect(result.ok).toBe(true);
+
+      const settings = await getStoreSettings();
+      expect(settings.shopPaused).toBe(true);
+      expect(settings.pauseNote).toBeNull();
+
+      const reset = await updateStoreSettings({ shopPaused: false });
+      expect(reset.ok).toBe(true);
+    });
+
+    it("rejects a pause note over the length limit, without writing anything", async () => {
+      const before = await getStoreSettings();
+      const result = await updateStoreSettings({ pauseNote: "x".repeat(141) });
+      expect(result.ok).toBe(false);
+      if (result.ok) throw new Error("expected the update to be rejected");
+      expect(result.field).toBe("pauseNote");
+
+      const after = await getStoreSettings();
+      expect(after.pauseNote).toBe(before.pauseNote);
+    });
+  });
 });
 
 describe("the name recorded on an order (issue #41)", () => {

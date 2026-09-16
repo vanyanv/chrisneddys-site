@@ -41,6 +41,7 @@ import {
   clearFailedAttempts,
   pruneSignInAttempts,
   recordSignInAttempt,
+  remainingSignInAttempts,
 } from "@/lib/signInThrottle";
 
 /** An owner's session, as read back from Better Auth's `session` + `user`
@@ -240,7 +241,10 @@ export async function signIn(
   email: string,
   password: string,
   ipOverride?: string,
-): Promise<{ ok: true } | { ok: false; error: string; retryAfterSeconds?: number }> {
+): Promise<
+  | { ok: true }
+  | { ok: false; error: string; retryAfterSeconds?: number; remainingAttempts?: number }
+> {
   const secret = process.env.AUTH_SECRET;
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -288,12 +292,23 @@ export async function signIn(
 
   if (!signedIn) {
     await recordSignInAttempt(db, normalizedEmail, ip, false, now);
+    const failuresNow = throttle.emailFailures + 1;
     console.warn("[auth] failed sign-in attempt", {
       email: normalizedEmail,
       ip,
-      count: throttle.emailFailures + 1,
+      count: failuresNow,
     });
-    return { ok: false, error: GENERIC_SIGN_IN_ERROR };
+    return {
+      ok: false,
+      error: GENERIC_SIGN_IN_ERROR,
+      // `checkThrottle` locks on *either* channel hitting the limit, so the
+      // honest countdown is the worse of the two. Counting only this email's
+      // failures would promise "4 tries left" to someone whose IP is one
+      // attempt from a lockout — a number that is wrong in exactly the moment
+      // it matters. In the ordinary case (an owner on their own connection)
+      // the two channels move together and this reads the same either way.
+      remainingAttempts: remainingSignInAttempts(Math.max(failuresNow, throttle.ipFailures + 1)),
+    };
   }
 
   await applySetCookieHeader(signedIn.setCookieHeader);

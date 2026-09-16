@@ -179,6 +179,17 @@ export async function clearFailedAttempts(
     );
 }
 
+/** Tries left on a channel before it locks, given `failures` already
+ * recorded against it. Lets a caller warn "N tries left" ahead of the
+ * lockout itself — `checkThrottle`'s `locked` flag only turns true once
+ * this would already be 0, which is too late to be a useful warning. */
+export function remainingSignInAttempts(
+  failures: number,
+  maxAttempts: number = MAX_FAILED_ATTEMPTS,
+): number {
+  return Math.max(0, maxAttempts - failures);
+}
+
 /** Deletes `sign_in_attempts` rows older than 24h. Meant to be called
  * opportunistically (e.g. once per `signIn` call) rather than on a schedule —
  * cheap and idempotent, and keeps the table from growing forever without a

@@ -1,11 +1,33 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
 
 const initialState: SignInState = {};
+
+/** The board's "That password didn't match. **3 tries left** before a
+ * cool-down." warning — issue #44. The actual wording stays whatever
+ * `signInAction` returns (a deliberately generic "that email or password
+ * isn't right", so a wrong guess never tells an attacker which half was
+ * wrong); only the tries-left clause is added on top of it. */
+function TriesLeftWarning({ message, remaining }: { message: string; remaining: number }) {
+  return (
+    <div className="rack-guest-warning" role="alert">
+      <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+        <path d="M8 5v4M8 11.2v.1" />
+        <circle cx="8" cy="8" r="6" />
+      </svg>
+      <span>
+        {message}{" "}
+        <strong>
+          {remaining} {remaining === 1 ? "try" : "tries"} left
+        </strong>{" "}
+        before a cool-down.
+      </span>
+    </div>
+  );
+}
 
 export function SignInForm({
   next,
@@ -17,25 +39,22 @@ export function SignInForm({
   sessionExpired?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(signInAction, initialState);
+  const locked = typeof state.retryAfterSeconds === "number";
 
   return (
-    <form action={formAction} className="adm-signin-card" noValidate>
-      <Image
-        src="/cne-logo.webp"
-        alt="Chris N Eddy's"
-        width={309}
-        height={89}
-        className="adm-signin-logo"
-        priority
-      />
-      <h1 className="adm-h2">Owner sign-in</h1>
+    <form action={formAction} className="rack-guest-card" noValidate>
+      <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+      <h1 className="rack-bow rack-guest-title">Sign in.</h1>
+      <p className="rack-guest-lede">Two owners. Nobody else gets in.</p>
+
       {justReset ? (
-        <p className="adm-notice">Password updated. Sign in with your new password.</p>
+        <p className="rack-guest-banner">Password updated. Sign in with your new password.</p>
       ) : sessionExpired ? (
-        <p className="adm-notice">
+        <p className="rack-guest-banner">
           You were signed out. Sessions last 12 hours &mdash; sign in again to keep going.
         </p>
       ) : null}
+
       <input type="hidden" name="next" value={next} />
 
       <div className="adm-field">
@@ -58,19 +77,35 @@ export function SignInForm({
         />
       </div>
 
-      {state.error ? (
-        <p className="adm-error" role="alert">
-          {state.retryAfterSeconds ? "Too many attempts. Try again in a few minutes." : state.error}
-        </p>
-      ) : null}
-
-      <button type="submit" className="adm-btn adm-btn-primary adm-btn-block" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+      <button type="submit" className="rack-btn-primary rack-guest-submit" disabled={pending}>
+        {pending ? (
+          <>
+            <span className="rack-spin" aria-hidden="true" />
+            Signing in&hellip;
+          </>
+        ) : (
+          "Sign in"
+        )}
       </button>
 
-      <p className="adm-notice">
-        <Link href="/admin/forgot-password">Forgot password?</Link>
-      </p>
+      {state.error ? (
+        locked ? (
+          <p className="adm-error" role="alert">
+            Too many attempts. Try again in a few minutes.
+          </p>
+        ) : typeof state.remainingAttempts === "number" && state.remainingAttempts > 0 ? (
+          <TriesLeftWarning message={state.error} remaining={state.remainingAttempts} />
+        ) : (
+          <p className="adm-error" role="alert">
+            {state.error}
+          </p>
+        )
+      ) : null}
+
+      <div className="rack-hairline rack-guest-link-row">
+        <Link href="/admin/forgot-password">Trouble getting in?</Link>
+        <span className="rack-eyebrow">5 tries per 15 min</span>
+      </div>
     </form>
   );
 }

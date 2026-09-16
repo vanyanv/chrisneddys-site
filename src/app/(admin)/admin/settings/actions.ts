@@ -80,6 +80,16 @@ export async function saveSettingsAction(
   const returnsPolicy = String(formData.get("returnsPolicy") ?? "").trim();
   const termsText = String(formData.get("termsText") ?? "").trim();
 
+  // issue #43: the pause toggle and its optional note. Length is also
+  // enforced server-side in `updateStoreSettings` (the source of truth for
+  // validation) — this is just where a bad value becomes a labelled field
+  // error instead of the form's generic top-level one.
+  const shopPaused = formData.get("shopPaused") === "on";
+  const pauseNote = String(formData.get("pauseNote") ?? "").trim();
+  if (pauseNote.length > 140) {
+    fieldErrors.pauseNote = "Keep the pause note under 140 characters.";
+  }
+
   if (Object.keys(fieldErrors).length > 0) {
     return { error: "Fix the highlighted fields.", fieldErrors };
   }
@@ -94,6 +104,8 @@ export async function saveSettingsAction(
     shipCountries,
     returnsPolicy: returnsPolicy || null,
     termsText: termsText || null,
+    shopPaused,
+    pauseNote: pauseNote || null,
   };
 
   const result = await saveStoreSettings(patch);

@@ -5,6 +5,7 @@ import { TERMS_PENDING, firstView } from "@/data/merch";
 import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
 import { getStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
+import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -39,6 +40,10 @@ export default async function ShopPage() {
   const inventories = await Promise.all(merch.map((product) => getInventory(product.slug)));
   const settings = await getStoreSettings();
   const note = shippingReturnsNote(settings);
+  // Same "only true once the shop has actually opened" rule the product
+  // page follows (issue #43) — pre-launch has its own, unrelated "still
+  // being sorted" copy below, and never this one.
+  const paused = isShopOpenFor(settings) && isShopPausedFor(settings);
 
   return (
     <>
@@ -101,9 +106,16 @@ export default async function ShopPage() {
                     </div>
                   )}
                   <p>One size fits most. {product.limitedNote}</p>
+                  {/* The index card's own "buy button": the whole card is a
+                      link to the product page (which stays reachable either
+                      way), so only this line's words change while paused —
+                      sold-out first, since a run that's actually gone stays
+                      "SOLD OUT" rather than the temporary paused label. */}
                   <span className="cne-drop-go">
                     {line?.soldOut ? (
                       "SOLD OUT"
+                    ) : paused ? (
+                      "SHOP PAUSED"
                     ) : (
                       <>
                         SECURE YOUR NUMBER <span aria-hidden="true">→</span>

@@ -278,6 +278,49 @@ describe("sendRefundConfirmation", () => {
     expect(result).toEqual({ sent: false, reason: "No recipient email address." });
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("omits the release line when the order wasn't released", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const order = await paidPickupOrder();
+    const refundResult = await markRefunded(order.id, {});
+    expect(refundResult.ok).toBe(true);
+    const refunded = await getOrder(order.id);
+    if (!refunded) throw new Error("expected the refunded order to exist");
+
+    // No `options` at all — the webhook's own backstop call site never
+    // passes one, so this is also the "not explicitly told to" default.
+    await sendRefundConfirmation(refunded);
+
+    const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(payload.text).not.toContain("gone back into the run");
+    expect(payload.html).not.toContain("gone back into the run");
+  });
+
+  it("states the released number when the order was released", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const order = await paidPickupOrder();
+    const editionNumber = order.items[0]?.editionNumber;
+    expect(editionNumber).toEqual(expect.any(Number));
+
+    const refundResult = await markRefunded(order.id, { release: true });
+    expect(refundResult.ok).toBe(true);
+    if (refundResult.ok) expect(refundResult.releasedEditionNumbers).toEqual([editionNumber]);
+    const refunded = await getOrder(order.id);
+    if (!refunded) throw new Error("expected the refunded order to exist");
+
+    await sendRefundConfirmation(refunded, { released: true });
+
+    const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    const line = `Number ${editionNumber} has gone back into the run, so somebody else gets to have it.`;
+    expect(payload.text).toContain(line);
+    expect(payload.html).toContain(line);
+  });
 });
 
 describe("sendPickupReady", () => {

@@ -88,6 +88,58 @@ describe("POST /api/checkout — shop closed", () => {
     const after = await getInventory(SLUG);
     expect(after?.available).toBe(before?.available);
   });
+
+  // issue #43 — a pre-launch shop that also happens to have `shopPaused`
+  // left on (e.g. flipped once in a half-configured environment) must still
+  // read as pre-launch, never as paused: `isShopOpenFor` is checked first in
+  // the route, exactly so this can't get confused.
+  it("keeps the pre-launch message even when shopPaused is also set", async () => {
+    const set = await updateStoreSettings({ returnsPolicy: null, shopPaused: true });
+    expect(set.ok).toBe(true);
+
+    const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "pickup" });
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toMatch(/shop isn't open/i);
+    expect(createMock).not.toHaveBeenCalled();
+
+    // Reset for the "shop open" tests below.
+    const reset = await updateStoreSettings({ shopPaused: false });
+    expect(reset.ok).toBe(true);
+  });
+});
+
+describe("POST /api/checkout — shop paused (issue #43)", () => {
+  it("503s with a distinct message and no reservation while paused", async () => {
+    const set = await updateStoreSettings({ shopPaused: true, pauseNote: "Back Thursday" });
+    expect(set.ok).toBe(true);
+
+    const before = await getInventory(SLUG);
+    const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "pickup" });
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body.error).toContain("paused");
+    expect(body.error).toContain("Back Thursday");
+    expect(body.error).not.toMatch(/isn't open yet/i);
+    expect(createMock).not.toHaveBeenCalled();
+
+    const after = await getInventory(SLUG);
+    expect(after?.available).toBe(before?.available);
+
+    const reset = await updateStoreSettings({ shopPaused: false, pauseNote: null });
+    expect(reset.ok).toBe(true);
+  });
+
+  it("stops a stale tab's checkout even with no note set", async () => {
+    const set = await updateStoreSettings({ shopPaused: true, pauseNote: null });
+    expect(set.ok).toBe(true);
+
+    const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "pickup" });
+    expect(res.status).toBe(503);
+    expect(createMock).not.toHaveBeenCalled();
+
+    const reset = await updateStoreSettings({ shopPaused: false });
+    expect(reset.ok).toBe(true);
+  });
 });
 
 describe("POST /api/checkout — shop open", () => {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { AdminProduct, InventoryMode } from "@/lib/catalogAdmin";
 import { imageThumbSrc } from "@/lib/productImage";
+import { joinRequirements, missingPublishRequirements } from "@/lib/publishRequirements";
 import { setInventoryPlainAction } from "./actions";
 import { PhotosEditor } from "./PhotosEditor";
 import { RowMenu, type RowMenuAction } from "./RowMenu";
@@ -217,6 +218,21 @@ export function RackProductPanel({
 
   const cover = product.views[0] ? imageThumbSrc(product.photoDir, product.views[0]) : null;
 
+  // What this draft is still missing before the Live chip will take —
+  // computed from the on-screen (name/price) or last-committed (run mode,
+  // photos — both save immediately, never through `pendingApi`) state, so
+  // it reads the same thing `setStatus` will check the moment it's clicked,
+  // not a half-typed guess. `changeStatus` still hits that real gate on
+  // click regardless: this is a preview, so an owner can see what's
+  // outstanding before reaching for the button, not a second copy of the
+  // rule that could fall out of step with it.
+  const publishGaps = missingPublishRequirements({
+    hasName: dn1.trim() !== "",
+    hasPrice: priceCents > 0,
+    hasRunSize: product.inventory.mode !== "untracked",
+    hasPhoto: product.views.length > 0,
+  });
+
   const pendingForThis = Array.from(pendingApi.pending.values()).filter(
     (e) => e.id === product.id,
   ).length;
@@ -343,6 +359,11 @@ export function RackProductPanel({
             </button>
           ))}
         </div>
+        {status !== "published" && publishGaps.length > 0 && (
+          <p className="rack-eyebrow rack-publish-checklist">
+            Needs {joinRequirements(publishGaps)} before it can go live
+          </p>
+        )}
       </div>
 
       <details className="adm-accordion rack-hairline">
@@ -547,6 +568,22 @@ export function RackProductPanel({
   );
 }
 
+/** The bordered, iconed callout under the edition-size field — same
+ * treatment as `RefundPanel.tsx`'s `.rack-refund-warning`, just yellow (a
+ * caution, not that one's dead stop) and reused for both the pre-lock and
+ * post-lock copy `RunSection` renders below. */
+function RunWarning({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rack-run-warning">
+      <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+        <path d="M8 5v4M8 11.2v.1" />
+        <circle cx="8" cy="8" r="6" />
+      </svg>
+      <p>{children}</p>
+    </div>
+  );
+}
+
 /** "The run" — locked once the first number sells (issue #36's `n-run`
  * annotation: "the count locks the moment number one sells"). Contextual to
  * whichever inventory mode the product is currently in. */
@@ -634,13 +671,29 @@ function RunSection({
           }}
           onKeyDown={(e) => revertOnEscape(e, String(inventoryN))}
         />
-        {locked && (
-          <p className="adm-help">
-            This locks the moment number one sells. Fifty is a promise printed on fifty
-            certificates, so the field stays read-only from here on.
-          </p>
-        )}
       </div>
+      {/* Two different messages for two different situations, not one moved
+       * around: while the run is still editable this warns what's about to
+       * become permanent (a decision screen, not just a disabled field
+       * after the fact); once `assertEditionSizeUnlocked` in
+       * `@/lib/catalogAdmin` has actually locked it, the copy switches to
+       * explaining why the field in front of the owner is now read-only.
+       * `admin-run.spec.ts` spec 2 pins the unlocked copy to NOT contain
+       * the locked copy's "locks the moment number one sells" phrase, so
+       * the two stay visibly distinct rather than one being a substring of
+       * the other. */}
+      {locked ? (
+        <RunWarning>
+          <strong>This locks the moment number one sells.</strong> Fifty is a promise printed on
+          fifty certificates, so the field stays read-only from here on.
+        </RunWarning>
+      ) : (
+        <RunWarning>
+          <strong>Set this once.</strong> Every number becomes a promise printed on a certificate
+          the instant it sells, so the size locks for good the moment the first one does. Get it
+          right now, while it&rsquo;s still just a number on a screen.
+        </RunWarning>
+      )}
       <div className="rack-edgrid" style={{ marginTop: 8 }}>
         {product.editions.map((edition) => (
           <span

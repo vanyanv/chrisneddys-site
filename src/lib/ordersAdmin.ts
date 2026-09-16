@@ -15,6 +15,7 @@ import { orderItems, orders, type ShipTo } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
 import * as email from "@/lib/email";
 import {
+  appendOrderNote,
   getOrder,
   listOrders,
   markPickedUp as transitionPickedUp,
@@ -263,13 +264,18 @@ export async function getOrdersDashboardCounts(): Promise<OrdersDashboardCounts>
 // ---------------------------------------------------------------------------
 
 /**
- * Best-effort shipping/pickup-ready email. Any failure — a missing Resend
- * config, a thrown error mid-send — is swallowed here and never blocks (or
- * rolls back) the status change that already committed.
+ * Best-effort shipping/pickup-ready/refund email. Any failure — a missing
+ * Resend config, a thrown error mid-send — is swallowed here and never
+ * blocks (or rolls back) the status change that already committed.
+ *
+ * `released` only matters for `kind === "refunded"` — it's whether
+ * `markRefunded` actually put editions back in the pool, so the email can
+ * say so (or, when it's false, stay silent rather than guess).
  */
 async function notifyBestEffort(
   kind: "shipped" | "pickup_ready" | "refunded",
   orderId: string,
+  released = false,
 ): Promise<void> {
   try {
     const order = await getOrder(orderId);
@@ -280,7 +286,7 @@ async function notifyBestEffort(
     } else if (kind === "pickup_ready") {
       await email.sendPickupReady(order);
     } else {
-      await email.sendRefundConfirmation(order);
+      await email.sendRefundConfirmation(order, { released });
     }
   } catch {
     // Best-effort only — see the doc comment above.
@@ -324,14 +330,30 @@ export async function markPickedUp(orderId: string): Promise<OrderMutationResult
   return transitionPickedUp(orderId);
 }
 
+export type MarkRefundedInput = {
+  /** Puts this order's editions back in the `available` pool as part of the
+   * same transition — see `markRefunded` in `src/lib/orders.ts` for why this
+   * defaults to `false` rather than following the refund automatically. */
+  release?: boolean;
+  /** Filed as an order note (`appendOrderNote`), never a new column and
+   * never shown to the customer — the desk's own memory of why. */
+  reason?: string;
+};
+
 /** paid | fulfilled -> refunded, for the case the Stripe webhook missed it.
  * The refund itself always happens in Stripe first — this only marks the
  * order so the desk matches reality. */
-export async function markRefunded(orderId: string): Promise<OrderMutationResult> {
+export async function markRefunded(
+  orderId: string,
+  input: MarkRefundedInput = {},
+): Promise<OrderMutationResult> {
   await requireOwner();
-  const result = await transitionRefunded(orderId, {});
+  const result = await transitionRefunded(orderId, { release: input.release });
   if (!result.ok) return result;
 
-  await notifyBestEffort("refunded", orderId);
+  const reason = input.reason?.trim();
+  if (reason) await appendOrderNote(orderId, `Refund reason: ${reason}`);
+
+  await notifyBestEffort("refunded", orderId, result.releasedEditionNumbers.length > 0);
   return { ok: true };
 }

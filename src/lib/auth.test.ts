@@ -444,6 +444,26 @@ describe("signIn: lockout and recovery (issue #34)", () => {
     expect(sixth).toMatchObject({ retryAfterSeconds: expect.any(Number) });
   });
 
+  it("counts down remainingAttempts on each wrong guess ahead of the lockout (issue #44)", async () => {
+    const email = "counts-down-tries@example.com";
+    const ip = "203.0.113.84";
+
+    const first = await signIn(email, "wrong password!!", ip);
+    expect(first).toMatchObject({ ok: false, remainingAttempts: MAX_FAILED_ATTEMPTS - 1 });
+
+    const second = await signIn(email, "wrong password!!", ip);
+    expect(second).toMatchObject({ ok: false, remainingAttempts: MAX_FAILED_ATTEMPTS - 2 });
+
+    // The attempt that actually trips the lock reports the lockout instead
+    // — `retryAfterSeconds`, no `remainingAttempts` left to report.
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS - 2; i++) {
+      await signIn(email, "wrong password!!", ip);
+    }
+    const locking = await signIn(email, "wrong password!!", ip);
+    expect(locking).toMatchObject({ ok: false, retryAfterSeconds: expect.any(Number) });
+    expect((locking as { remainingAttempts?: number }).remainingAttempts).toBeUndefined();
+  });
+
   it("does not increase the recorded failure count while already locked", async () => {
     const db = await getDb();
     const email = "locked-no-growth@example.com";

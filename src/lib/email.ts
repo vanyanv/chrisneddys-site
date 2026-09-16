@@ -494,12 +494,23 @@ export async function sendPickupReady(order: OrderWithItems, db?: Db): Promise<E
  *
  * What the design's mock shows but the schema doesn't back: a card's last
  * four digits (Stripe doesn't hand this back on `charge.refunded`, and
- * nothing here stores it) and "number N has gone back into the run" — per
- * `markRefunded` in `src/lib/orders.ts`, a refunded order's editions stay
- * `sold`; v1 doesn't resell a refunded number. Both are left out rather
- * than invented.
+ * nothing here stores it) — left out rather than invented.
+ *
+ * `options.released` is the "number N has gone back into the run" line.
+ * Only the desk's owner-triggered refund can ever set it true (the
+ * webhook's own backstop call always leaves it `false` — a Stripe-side
+ * refund carries no opinion on whether the number should resell, see
+ * `markRefunded` in `src/lib/orders.ts`), and even there it's the owner's
+ * explicit choice on the `RefundPanel` toggle, not something inferred from
+ * the refund itself. When it's true, the released numbers are just the
+ * order's own edition numbers — `markRefunded` releases the whole order's
+ * editions or none of them, so there's no partial case to represent here.
  */
-export async function sendRefundConfirmation(order: OrderWithItems, db?: Db): Promise<EmailResult> {
+export async function sendRefundConfirmation(
+  order: OrderWithItems,
+  options: { released?: boolean } = {},
+  db?: Db,
+): Promise<EmailResult> {
   const database = db ?? (await getDb());
   const [settings, sizes] = await Promise.all([
     getStoreSettings(database),
@@ -513,13 +524,23 @@ export async function sendRefundConfirmation(order: OrderWithItems, db?: Db): Pr
   const amount = centsToPrice(order.totalCents);
   const intro = `${amount} is on its way back to you. Banks take five to ten days, and there's nothing else for you to do.`;
 
+  const numbers = options.released ? editionNumbersOf(order) : [];
+  const releaseLine =
+    numbers.length > 0
+      ? numbers.length === 1
+        ? `Number ${numbers[0]} has gone back into the run, so somebody else gets to have it.`
+        : `Numbers ${formatNumberList(numbers)} have gone back into the run, so somebody else gets to have them.`
+      : null;
+
   const text = textBody(`${heading}\n\n${intro}`, order, sizes, settings, [
+    ...(releaseLine ? [releaseLine] : []),
     "Something not right about how this went? Reply here and it'll reach a person.",
   ]);
 
   const rowsHtml = [
     ...order.items.map((item) => htmlItemRow(item, sizes)),
     htmlTotals(order, "Refunded"),
+    ...(releaseLine ? [htmlNote(releaseLine)] : []),
     htmlNote("Something not right about how this went? Reply here and it'll reach a person."),
   ].join("");
 

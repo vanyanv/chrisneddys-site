@@ -9,38 +9,13 @@
  * does. Bowlby One only on `.adm-h1`, `.adm-btn-primary`, and
  * `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
  * labels/pills/prices/slugs/timestamps. The brand itself never renders as
- * type — `.adm-logo`/`.adm-signin-logo`/`.adm-slip-logo` are all the same
+ * type — `.adm-logo`/`.rack-logo`/`.adm-slip-logo` are all the same
  * `/cne-logo.webp` mark, sized per surface. Full primitive reference: CSS.md.
  */
 @import "./tokens.css";
 * {
   box-sizing: border-box;
 }
-.adm-shell {
-  min-height: 100vh;
-  background: var(--a-bg);
-  color: var(--a-fg);
-  font-family: var(--font-inter), system-ui, sans-serif;
-}
-.adm-shell-guest {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--adm-gutter, 20px);
-}
-.adm-shell :focus-visible {
-  outline: 2px solid var(--a-yel-deep);
-  outline-offset: 2px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .adm-shell *,
-  .adm-shell *::before,
-  .adm-shell *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-}
-
 /* ---- top bar --------------------------------------------------------- */
 .adm-topbar {
   background: var(--a-ink);
@@ -416,20 +391,7 @@
   justify-content: center;
 }
 
-/* ---- sign-in card ------------------------------------------------------------- */
-.adm-signin-card {
-  width: 100%;
-  max-width: 360px;
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  padding: 28px 24px;
-}
-.adm-signin-logo {
-  display: block;
-  height: 36px;
-  width: auto;
-  margin: 0 auto 20px;
-}
+/* ---- fields (shared by every admin form, guest and signed-in) --------- */
 .adm-field {
   display: flex;
   flex-direction: column;

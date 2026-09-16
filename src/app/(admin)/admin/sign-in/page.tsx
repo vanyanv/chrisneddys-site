@@ -33,8 +33,9 @@ export default async function AdminSignInPage({
 
   if (!isAuthConfigured()) {
     return (
-      <div className="adm-signin-card">
-        <h1 className="adm-h2">Store admin</h1>
+      <div className="rack-guest-card">
+        <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+        <h1 className="rack-bow rack-guest-title">Store admin.</h1>
         <p className="adm-notice">
           Owner sign-in isn&rsquo;t configured yet. Set AUTH_SECRET, OWNER_EMAILS and
           OWNER_PASSWORD_HASH.

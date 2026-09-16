@@ -13,8 +13,9 @@ function isEmailConfigured(): boolean {
 export default function ForgotPasswordPage() {
   if (!isEmailConfigured()) {
     return (
-      <div className="adm-signin-card">
-        <h1 className="adm-h2">Forgot password</h1>
+      <div className="rack-guest-card">
+        <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
+        <h1 className="rack-bow rack-guest-title">Forgot password?</h1>
         <p className="adm-notice">
           Emailing isn&rsquo;t set up for this site yet, so no reset link can be sent. Ask whoever
           manages deployment to set RESEND_API_KEY and EMAIL_FROM, or reset a password directly with{" "}

@@ -49,3 +49,29 @@ export function isShopOpenFor(settings: StoreSettings): boolean {
     Boolean(settings.supportEmail?.trim())
   );
 }
+
+/**
+ * Whether the owner has deliberately paused a shop that is otherwise open.
+ *
+ * This is a second, separate gate from `isShopOpenFor` and is never folded
+ * into it. Pre-launch (`isShopOpenFor` false) is a one-way readiness check
+ * with no switch behind it — it flips once, permanently, the day Stripe
+ * keys, a returns policy and a support email are all finally in place, and
+ * every caller that reads it shows the "isn't taking orders yet" copy that
+ * assumes the shop has simply never opened. Pausing is the opposite motion:
+ * deliberate, reachable only once the shop has already gone live, and
+ * meant to be flipped back off in a few days — an owner shutting the
+ * counter without breaking their Stripe config or reverting the site to
+ * its pre-launch state. Keeping the two booleans (and their customer-facing
+ * copy — see `shopCopy.ts`'s `pauseNotice`/`pauseCheckoutMessage` versus
+ * `TERMS_PENDING`) apart is what lets a buyer, and the owner's own
+ * `/admin/settings` page, tell "we haven't opened yet" from "we're closed
+ * for a couple of days" instead of collapsing both into one generic
+ * "not open" state.
+ *
+ * A caller deciding whether an order can go through right now should check
+ * both: `isShopOpenFor(settings) && !isShopPausedFor(settings)`.
+ */
+export function isShopPausedFor(settings: StoreSettings): boolean {
+  return settings.shopPaused;
+}

@@ -9,9 +9,11 @@ import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
+import { editions, products, variants } from "@/db/schema";
 import {
   createPendingOrder,
   getOrder,
@@ -49,6 +51,17 @@ async function createPaidOrder(fulfilment: "ship" | "pickup"): Promise<string> {
   });
 
   return reservation.orderId;
+}
+
+async function truckerVariantId(): Promise<string> {
+  const db = await getDb();
+  const product = await db.query.products.findFirst({
+    where: eq(products.slug, FOAM_TRUCKER_SLUG),
+  });
+  if (!product) throw new Error("expected the seeded foam trucker product");
+  const [variant] = await db.select().from(variants).where(eq(variants.productId, product.id));
+  if (!variant) throw new Error("expected the seeded foam trucker variant");
+  return variant.id;
 }
 
 describe("ship: paid -> fulfilled with carrier + tracking", () => {
@@ -194,5 +207,84 @@ describe("refund", () => {
     const result = await markRefunded(orderId, {});
     expect(result.ok).toBe(true);
     expect((await getOrder(orderId))?.status).toBe("refunded");
+  });
+
+  describe("release", () => {
+    it("release: false (the default) leaves the edition sold and reports nothing released", async () => {
+      const orderId = await createPaidOrder("ship");
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      expect(editionNumber).toEqual(expect.any(Number));
+
+      const result = await markRefunded(orderId, {});
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.releasedEditionNumbers).toEqual([]);
+
+      const db = await getDb();
+      const [edition] = await db
+        .select({ status: editions.status, orderId: editions.orderId })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      expect(edition?.status).toBe("sold");
+      expect(edition?.orderId).toBe(orderId);
+    });
+
+    it("release: true puts the edition back to available and reports its number", async () => {
+      const orderId = await createPaidOrder("ship");
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      expect(editionNumber).toEqual(expect.any(Number));
+
+      const result = await markRefunded(orderId, { release: true });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.releasedEditionNumbers).toEqual([editionNumber]);
+
+      const db = await getDb();
+      const [edition] = await db
+        .select({
+          status: editions.status,
+          orderId: editions.orderId,
+          reservedUntil: editions.reservedUntil,
+        })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      expect(edition?.status).toBe("available");
+      expect(edition?.orderId).toBeNull();
+      expect(edition?.reservedUntil).toBeNull();
+    });
+
+    it("a failed refund (already refunded) releases nothing, even with release: true", async () => {
+      const orderId = await createPaidOrder("ship");
+      const first = await markRefunded(orderId, {});
+      expect(first.ok).toBe(true);
+
+      const second = await markRefunded(orderId, { release: true });
+      expect(second.ok).toBe(false);
+
+      const order = await getOrder(orderId);
+      const editionNumber = order?.items[0]?.editionNumber;
+      const db = await getDb();
+      const [edition] = await db
+        .select({ status: editions.status })
+        .from(editions)
+        .where(
+          and(
+            eq(editions.variantId, await truckerVariantId()),
+            eq(editions.number, editionNumber!),
+          ),
+        );
+      // Still sold — the first (non-releasing) refund is the one that stuck.
+      expect(edition?.status).toBe("sold");
+    });
   });
 });

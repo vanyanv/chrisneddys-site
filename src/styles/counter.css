@@ -4785,7 +4785,13 @@ h3 {
 }
 /* Payment is not connected yet, so the button reads as a placeholder rather
    than as something that failed. */
+/* The buy button while the shop is paused (issue #43) — the owner's own
+   note or "SHOP PAUSED" (`pauseButtonLabel`, `shopCopy.ts`). Grouped with
+   `is-dead`'s placeholder styling on purpose: both say "not a failure, just
+   not available right now" with the same dashed border, and pause is
+   exactly that, temporarily. */
 .cne-btn-primary.is-dead,
+.cne-btn-primary.is-paused,
 .cne-btn-primary:disabled {
   background: transparent;
   color: var(--a-sub);
@@ -5881,6 +5887,61 @@ h3 {
   background: var(--a-cream);
   font-family: var(--font-mono);
   font-size: 12px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* ---- shop paused (issue #43) ---------------------------------------------
+   A second, separate closed state from the pre-launch notice above — see
+   `isShopPausedFor` (`shopStatus.ts`) for why the two never share copy or
+   markup. The pill is rounded rather than square: every scarcity flag on
+   this page (`.cne-drop-flag`, `.cne-limited .tag`) is square because it's
+   a fact about the product, and this is the one status chip that's a fact
+   about the shop itself, so it gets the pill shape the rest of the system
+   reserves for exactly that distinction. Muted rather than red or green —
+   this is neither an alarm nor a sale. */
+.cne-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 6px 11px;
+  border: 2px solid var(--a-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+.cne-status-pill i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* The pause banner — square and bordered like every other card on the page
+   (chips are the one pill shape; everything else stays zero-radius), boxed
+   rather than a loose paragraph because this replaces a buy decision, not
+   just a caveat next to one. */
+.cne-pause-card {
+  margin-top: 10px;
+  padding: 12px 13px;
+  border: 2px solid var(--a-yel-deep);
+  background: var(--a-cream);
+}
+.cne-pause-head {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.cne-pause-body {
+  margin: 0;
+  font-size: 12.5px;
   line-height: 1.6;
   color: var(--a-sub);
 }

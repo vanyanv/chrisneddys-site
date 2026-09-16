@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addToBag, openBag } from "./bagStore";
 import { flyToBag } from "./flyToBag";
 import { MAX_PER_ORDER, type MerchProduct } from "@/data/merch";
+import { pauseButtonLabel } from "@/lib/shopCopy";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 
@@ -39,6 +40,18 @@ type BuyContext = {
   added: boolean;
   /** Tracked inventory at zero. Disables both buy buttons; hides the stepper. */
   soldOut: boolean;
+  /** The owner has paused the shop (`isShopPausedFor`, `shopStatus.ts`)
+   * while it remains otherwise open. Distinct from `soldOut` (this
+   * product's own inventory) and from pre-launch (`shopOpen` on the
+   * surrounding page, which never reaches these buy controls at all — a
+   * pre-launch buyer can still add to their bag, only checkout is closed).
+   * Checked after `soldOut`: a run that's genuinely gone stays "SOLD OUT"
+   * rather than the temporary, coming-back "paused" label. */
+  paused: boolean;
+  /** The disabled button's label while paused — the owner's own note
+   * ("BACK THURSDAY") or the "SHOP PAUSED" fallback; see
+   * `pauseButtonLabel` (`shopCopy.ts`). */
+  pauseLabel: string;
   /** The stepper's ceiling — the product's own `perOrderLimit` (falling back
    * to `MAX_PER_ORDER`), or less when tracked stock is lower. */
   maxQty: number;
@@ -55,12 +68,21 @@ function useBuy(): BuyContext {
 export function BuyProvider({
   product,
   soldOut = false,
+  paused = false,
+  pauseNote = null,
   maxQty,
   children,
 }: {
   product: MerchProduct;
   /** From the catalogue's live inventory — never computed client-side. */
   soldOut?: boolean;
+  /** From `isShopOpenFor(settings) && isShopPausedFor(settings)` on the
+   * product page — never computed client-side, and never true while the
+   * page is still pre-launch (see the `paused` field's own note above). */
+  paused?: boolean;
+  /** The owner's optional pause note, passed straight from `StoreSettings`.
+   * Only read while `paused` is true. */
+  pauseNote?: string | null;
   /** Omit to fall back to the product's own `perOrderLimit` (or
    * `MAX_PER_ORDER` when that's unset) — callers that also know the live
    * inventory cap (the product page) pass the smaller of the two instead. */
@@ -111,9 +133,11 @@ export function BuyProvider({
     });
   }, [product, qty]);
 
+  const pauseLabel = useMemo(() => pauseButtonLabel(pauseNote), [pauseNote]);
+
   const value = useMemo(
-    () => ({ product, qty, setQty, add, added, soldOut, maxQty: cappedQty }),
-    [product, qty, setQty, add, added, soldOut, cappedQty],
+    () => ({ product, qty, setQty, add, added, soldOut, paused, pauseLabel, maxQty: cappedQty }),
+    [product, qty, setQty, add, added, soldOut, paused, pauseLabel, cappedQty],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -121,13 +145,27 @@ export function BuyProvider({
 
 /** The desktop stepper + primary button. */
 export function BuyRow() {
-  const { product, qty, setQty, add, added, soldOut, maxQty } = useBuy();
+  const { product, qty, setQty, add, added, soldOut, paused, pauseLabel, maxQty } = useBuy();
 
   if (soldOut) {
     return (
       <div className="cne-pdp-row">
         <button type="button" className="cne-btn-primary is-soldout" disabled>
           SOLD OUT
+        </button>
+      </div>
+    );
+  }
+
+  // The pause card and the "Shop paused" pill above already said why; the
+  // button itself just has to stop working, the same square dashed shape
+  // `is-soldout` uses for the same reason — nothing here is a placeholder,
+  // the shop just isn't taking orders for a few days.
+  if (paused) {
+    return (
+      <div className="cne-pdp-row">
+        <button type="button" className="cne-btn-primary is-paused" disabled>
+          {pauseLabel}
         </button>
       </div>
     );
@@ -169,7 +207,7 @@ export function BuyRow() {
  * a media query in JS, so it is correct in the first frame and on resize.
  */
 export function StickyBuy() {
-  const { product, add, added, qty, soldOut } = useBuy();
+  const { product, add, added, qty, soldOut, paused, pauseLabel } = useBuy();
 
   return (
     <div className="cne-pdp-sticky">
@@ -177,6 +215,10 @@ export function StickyBuy() {
       {soldOut ? (
         <button type="button" className="cne-btn-primary is-soldout" disabled>
           SOLD OUT
+        </button>
+      ) : paused ? (
+        <button type="button" className="cne-btn-primary is-paused" disabled>
+          {pauseLabel}
         </button>
       ) : (
         <button type="button" className="cne-btn-primary" onClick={add}>

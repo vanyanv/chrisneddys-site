@@ -276,7 +276,10 @@ test.describe("owner accounts", () => {
       // of bug 1 above.
       await b.page.goto("/admin/settings");
       await b.page.waitForURL(/\/admin\/sign-in/, { timeout: 30_000 });
-      await expect(b.page.getByRole("heading", { name: "Owner sign-in" })).toBeVisible();
+      // issue #44 restyled the guest sign-in screen onto The Rack — the
+      // heading is now the board's "Sign in." rather than the Sheet-era
+      // "Owner sign-in".
+      await expect(b.page.getByRole("heading", { name: "Sign in." })).toBeVisible();
 
       // Context A's own session should still be good — only *other*
       // sessions are supposed to be revoked. Reproducibly fails today, bug
@@ -340,7 +343,9 @@ test.describe("owner accounts", () => {
     const password = "invitee-first-password-1";
     await page.getByLabel("New password", { exact: true }).fill(password);
     await page.getByLabel("Confirm password", { exact: true }).fill(password);
-    await page.getByRole("button", { name: "Reset password", exact: true }).click();
+    // issue #44 restyled this button onto The Rack's board copy, "Set
+    // password and sign in", in place of the plain "Reset password".
+    await page.getByRole("button", { name: "Set password and sign in", exact: true }).click();
     await page.waitForURL(/\/admin\/sign-in/, { timeout: 30_000 });
     await expect(
       page.getByText("Password updated. Sign in with your new password.", { exact: true }),

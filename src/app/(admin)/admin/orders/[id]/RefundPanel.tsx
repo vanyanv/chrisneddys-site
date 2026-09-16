@@ -9,6 +9,15 @@ import { markRefundedAction, type RefundActionState } from "./actions";
 const initial: RefundActionState = {};
 const TOAST_MS = 4000;
 
+/** "12" / "12 and 13" / "12, 13 and 14" — duplicated from `email.ts`'s own
+ * `formatNumberList` rather than shared, since this is a client component
+ * and that module is `server-only`. */
+function formatNumberList(numbers: number[]): string {
+  if (numbers.length === 1) return `${numbers[0]}`;
+  if (numbers.length === 2) return `${numbers[0]} and ${numbers[1]}`;
+  return `${numbers.slice(0, -1).join(", ")} and ${numbers[numbers.length - 1]}`;
+}
+
 /**
  * The one confirm in the store (`Refund.dc.html`) — a refund is the one
  * action here Stripe won't let anyone undo, so unlike every other order
@@ -17,14 +26,13 @@ const TOAST_MS = 4000;
  * (`RefundCard.tsx`, issue #32) with a real confirm step, per this phase's
  * brief.
  *
- * Two things the design draws that this doesn't build, because nothing
- * backs them: a reason field (nothing persists a refund reason anywhere —
- * `markRefunded` takes no such argument and `orders.notes` is a general
- * free-text field, not a structured "why"), and a "put the number back in
- * the run" toggle (a refund never releases an edition back to
- * `available` today — see `src/lib/orders.ts`'s `markRefunded`). Both are
- * called out in this phase's report rather than faked with UI that writes
- * nowhere.
+ * Carries the two things a bare "mark refunded" can't decide on its own
+ * (issue #42): a "put number N back in the run" toggle, off by default —
+ * see `markRefunded` in `src/lib/orders.ts` for why release is never
+ * inferred from the refund itself — and an optional reason, filed as an
+ * order note (`appendOrderNote`) that the customer never sees. Both are
+ * skipped entirely when the order has no numbered items to release (a
+ * plain-quantity product has no per-unit number for the toggle to name).
  *
  * The refund itself always happens in Stripe first, same as the button
  * this replaces — `markRefundedAction` only marks the order here to match
@@ -91,6 +99,14 @@ export function RefundTrigger({ order }: { order: AdminOrderDetail }) {
 
   const customer = order.name ?? order.email ?? "Guest";
 
+  // Only edition products have a number to put back — a plain-quantity item
+  // has nothing for the toggle to name, so it's simply not offered.
+  const editionNumbers = order.items
+    .map((item) => item.editionNumber)
+    .filter((n): n is number => n !== null);
+  const numberWord = editionNumbers.length === 1 ? "number" : "numbers";
+  const pronoun = editionNumbers.length === 1 ? "it" : "them";
+
   return (
     <>
       <button type="button" className="rack-btn" onClick={() => setOpen(true)}>
@@ -129,6 +145,53 @@ export function RefundTrigger({ order }: { order: AdminOrderDetail }) {
 
             <p className="rack-refund-amount rack-mono">{formatCents(order.totalCents)}</p>
 
+            <div className="adm-field rack-refund-reason">
+              <label htmlFor="refund-reason" className="adm-label">
+                Reason — {customer} never sees this
+              </label>
+              <input
+                id="refund-reason"
+                name="reason"
+                type="text"
+                form="refund-confirm-form"
+                className="adm-input"
+                placeholder="Optional, for the desk only"
+                disabled={pending}
+              />
+            </div>
+
+            {editionNumbers.length > 0 && (
+              <div className="rack-refund-release">
+                {editionNumbers.length === 1 && (
+                  <span className="rack-refund-release-badge rack-mono rack-bow" aria-hidden="true">
+                    {editionNumbers[0]}
+                  </span>
+                )}
+                <div className="rack-refund-release-copy">
+                  <label htmlFor="refund-release" className="rack-refund-release-title">
+                    Put {numberWord} {formatNumberList(editionNumbers)} back in the run
+                  </label>
+                  <p className="rack-refund-release-help">
+                    It goes back to available and the next buyer can take {pronoun}. Leave this off
+                    if {editionNumbers.length === 1 ? "it isn't" : "they aren't"} coming back.
+                  </p>
+                </div>
+                <span className="rack-refund-release-toggle">
+                  <input
+                    id="refund-release"
+                    name="release"
+                    type="checkbox"
+                    form="refund-confirm-form"
+                    className="rack-refund-release-input"
+                    disabled={pending}
+                  />
+                  <span className="rack-refund-release-track" aria-hidden="true">
+                    <span className="rack-refund-release-thumb" />
+                  </span>
+                </span>
+              </div>
+            )}
+
             <div className="rack-refund-box">
               <span className="rack-eyebrow">What happens</span>
               <p>
@@ -149,7 +212,7 @@ export function RefundTrigger({ order }: { order: AdminOrderDetail }) {
               </p>
             </div>
 
-            <form action={formAction} className="rack-refund-actions">
+            <form action={formAction} className="rack-refund-actions" id="refund-confirm-form">
               <input type="hidden" name="orderId" value={order.id} />
               <button
                 type="button"

@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Shop: the shop can be paused. A toggle in Settings stops it taking orders without unpublishing anything — every product page stays up and every link still works, only the buy button changes, and you can leave a short note ("Back Thursday") that customers see in its place. Checkout refuses while paused, so nothing slips through from a tab left open before you closed. This is a different thing from the shop not being set up yet, which still reads the way it always did ([#43](https://github.com/vanyanv/chrisneddys-site/issues/43))
+- Admin: refunding an order can put its number back in the run. Until now a refund quietly kept the number marked sold forever, so a run of fifty silently became a run of forty-nine and nothing on any screen said so. The refund panel now shows the actual number and asks — left off by default, because a refund does not always mean the hat is coming back, or coming back sellable. You can also note why you refunded, which is kept with the order and never shown to the customer; when a number does go back, the customer's refund email says so ([#42](https://github.com/vanyanv/chrisneddys-site/issues/42))
+
 ### Changed
 
+- Admin: sign-in, forgot-password and reset-password finally look like the rest of the admin. They are full pages now rather than a small box on an empty screen. Sign in warns you how many tries are left before a cool-down, instead of only speaking up once you are already locked out. Forgot-password can send the link again, says how long it lasts, and explains that it will never say whether an address has an account. Setting a new password shows how strong it is, what it still needs, and warns that it signs out every other device — which it always did, without telling you ([#44](https://github.com/vanyanv/chrisneddys-site/issues/44))
+- Admin: two warnings that used to arrive too late now arrive in time. The run size says it locks the moment the first number sells while the field can still be changed, rather than once it is already read-only. A draft lists what it still needs before it can go live, next to the button, instead of refusing after you click ([#45](https://github.com/vanyanv/chrisneddys-site/issues/45))
 - Shop: the order status page gives the answer the room. Once you look an order up, the result sits beside the form instead of below it, leads with the order number and a one-word state you can scan, names what you bought properly, and draws the three steps as one connected track rather than three loose dots ([#41](https://github.com/vanyanv/chrisneddys-site/issues/41))
 
 ### Fixed

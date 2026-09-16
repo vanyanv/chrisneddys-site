@@ -67,8 +67,13 @@ test.describe.serial("admin orders desk", () => {
     await page.goto("/admin/orders");
     await expect(page.getByRole("heading", { name: "Orders", level: 1 })).toBeVisible();
 
+    // 5, not 4: `e2e/db-warmup.mjs` also seeds a 5th, still-pending cart (a
+    // number held in an open checkout, for `admin-run.spec.ts`) that never
+    // reaches "paid" — it counts toward the "all orders" total here but not
+    // toward "to ship"/"ready for pickup", both of which key off a later
+    // status this cart never reaches.
     await expect(
-      page.getByText("4 orders · 1 to ship · 1 ready for pickup", { exact: true }),
+      page.getByText("5 orders · 1 to ship · 1 ready for pickup", { exact: true }),
     ).toBeVisible();
 
     const shipRow = rowByEmail(page, EMAILS.ship);
@@ -92,38 +97,49 @@ test.describe.serial("admin orders desk", () => {
     orderId.ready = await idFromRow(readyRow);
   });
 
+  /**
+   * Clicks a status chip and waits for the filtered URL, retrying the click
+   * if nothing navigated.
+   *
+   * The chips are plain Next `<Link>`s in a server component, so each one is
+   * a soft navigation. A click that lands while the router is still settling
+   * the PREVIOUS soft navigation is swallowed: React re-renders the nav and
+   * the anchor the event was dispatched at is gone before the router sees
+   * it, so no navigation ever starts and the URL simply stays where it was.
+   * Waiting longer cannot fix that — the click is lost, not slow — which is
+   * why this retries the click rather than raising a timeout. A real owner
+   * does exactly the same thing: click it again.
+   */
+  async function clickStatusChip(label: string, expected: RegExp, present = true) {
+    await expect(async () => {
+      await page
+        .getByRole("navigation", { name: "Filter by status" })
+        .getByRole("link", { name: label })
+        .click();
+      if (present) {
+        await expect(page).toHaveURL(expected, { timeout: 3_000 });
+      } else {
+        await expect(page).not.toHaveURL(expected, { timeout: 3_000 });
+      }
+    }).toPass({ timeout: 30_000 });
+  }
+
   test("2. status chips filter the list via ?status=", async () => {
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Paid (to fulfil)" })
-      .click();
-    await expect(page).toHaveURL(/status=paid/);
+    await clickStatusChip("Paid (to fulfil)", /status=paid/);
     await expect(rowByEmail(page, EMAILS.ship)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.shipped)).toHaveCount(0);
     await expect(rowByEmail(page, EMAILS.ready)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Ready for pickup" })
-      .click();
-    await expect(page).toHaveURL(/status=ready_for_pickup/);
+    await clickStatusChip("Ready for pickup", /status=ready_for_pickup/);
     await expect(rowByEmail(page, EMAILS.ready)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.ship)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "Fulfilled" })
-      .click();
-    await expect(page).toHaveURL(/status=fulfilled/);
+    await clickStatusChip("Fulfilled", /status=fulfilled/);
     await expect(rowByEmail(page, EMAILS.shipped)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Filter by status" })
-      .getByRole("link", { name: "All" })
-      .click();
-    await expect(page).not.toHaveURL(/status=/);
+    await clickStatusChip("All", /status=/, false);
     await expect(rowByEmail(page, EMAILS.ship)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.pickup)).toBeVisible();
     await expect(rowByEmail(page, EMAILS.shipped)).toBeVisible();
@@ -175,7 +191,7 @@ test.describe.serial("admin orders desk", () => {
     await expect(totalRow).toContainText("Total");
     await expect(totalRow).toContainText("$106.50");
 
-    await expect(page.getByRole("heading", { name: "Actions", level: 3 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Next", level: 3 })).toBeVisible();
   });
 
   test("5. mark shipped: carrier + tracking flips the pill to DONE and logs a timeline entry", async () => {
@@ -209,20 +225,33 @@ test.describe.serial("admin orders desk", () => {
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
   });
 
-  test("7. refund: first click arms, second confirms", async () => {
+  test("7. refund: opens a confirm panel; Keep the order closes it, then the confirm marks it", async () => {
     await page.goto(`/admin/orders/${orderId.shipped}`);
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
 
-    const refundBtn = page.getByRole("button", { name: "Mark refunded", exact: true });
-    await refundBtn.click();
-    await expect(
-      page.getByRole("button", { name: "Really mark refunded?", exact: true }),
-    ).toBeVisible();
+    const trigger = page.getByRole("button", { name: /^Refund \$/ });
+    await trigger.click();
 
-    await page.getByRole("button", { name: "Really mark refunded?", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Refund this order." });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("This one has no undo.")).toBeVisible();
+
+    // Keep the order: closes the panel, changes nothing.
+    await dialog.getByRole("button", { name: "Keep the order" }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
+
+    // Reopen and confirm.
+    await trigger.click();
+    await page.getByRole("dialog").getByRole("button", { name: "Mark refunded" }).click();
+
     await expect(page.getByRole("status").filter({ hasText: "Marked refunded" })).toBeVisible();
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("REFUNDED");
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveClass(/is-hidden/);
+
+    // Refunded, the trigger is gone — replaced by a plain "Refunded" note.
+    await expect(page.getByRole("button", { name: /^Refund \$/ })).toHaveCount(0);
+    await expect(page.getByText(/^Refunded ·/)).toBeVisible();
   });
 
   test("8. Packing slip opens a page with the order number and the store logo", async () => {
@@ -233,10 +262,10 @@ test.describe.serial("admin orders desk", () => {
     await expect(page).toHaveURL(/\/packing-slip\/?$/);
     await expect(page.getByText(number, { exact: true })).toBeVisible();
 
-    // Scoped to the slip sheet itself, not `getByRole("img", { name: ... })`
-    // — the admin topbar (present on every admin page, packing slip
-    // included) renders the same logo with the same alt text.
-    const logo = page.locator(".adm-slip-logo");
+    // The packing slip renders no admin topbar at all (it's a print sheet,
+    // not a screen with navigation), so there's only ever one logo on the
+    // page — but scope to the slip sheet's own class anyway for clarity.
+    const logo = page.locator(".rack-slip-logo");
     await expect(logo).toBeVisible();
     await expect(logo).toHaveAttribute("alt", /Chris N Eddy/i);
   });

@@ -13,6 +13,7 @@ import { getStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
+import { EditionMap } from "@/components/shop/EditionMap";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -127,7 +128,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         </nav>
 
         <div className="cne-pdp">
-          <ProductGallery product={product} />
+          <ProductGallery product={product} soldOut={soldOut} />
 
           <div className="cne-pdp-buy">
             <div className="cne-eyebrow">{product.eyebrow}</div>
@@ -142,15 +143,32 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               <span className="cne-price p">{formatPrice(product.price)}</span>
             </div>
 
-            {line && (
-              <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
-                <span className="cne-inv-text">{line.text}</span>
-                {line.barRatio !== null && (
-                  <div className="cne-inv-bar" aria-hidden="true">
-                    <span style={{ width: `${line.barRatio * 100}%` }} />
-                  </div>
-                )}
-              </div>
+            {/* The edition map is the centrepiece for a numbered run: every
+                cell is a real row from `editions`, coloured by its own
+                status, so "11 of 50 left" is something a buyer can check
+                against the number on their certificate rather than take on
+                faith. A tracked product with no edition rows (plain
+                quantity) falls back to the plain text/bar line instead. */}
+            {inventory?.editions ? (
+              <EditionMap editions={inventory.editions} />
+            ) : (
+              line && (
+                <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
+                  <span className="cne-inv-text">{line.text}</span>
+                  {line.barRatio !== null && (
+                    <div className="cne-inv-bar" aria-hidden="true">
+                      <span style={{ width: `${line.barRatio * 100}%` }} />
+                    </div>
+                  )}
+                </div>
+              )
+            )}
+
+            {!shopOpen && (
+              <p className="cne-shopnotice">
+                The shop isn&rsquo;t taking orders yet. Add this to your bag anyway: it stays saved
+                on this device until checkout opens.
+              </p>
             )}
 
             {/* One size fits most, so there is no variant grid at all. The

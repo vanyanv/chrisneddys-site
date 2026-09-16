@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { SIGNED_IN_BEFORE_COOKIE } from "@/lib/adminCookies";
 
 /**
  * Protects `/admin/:path*` (everything except `/admin/sign-in`): no
@@ -60,6 +61,18 @@ export async function middleware(request: NextRequest) {
   if (!GUEST_PATHS.has(pathname) && !hasSessionCookie(request)) {
     const signInUrl = new URL("/admin/sign-in", request.url);
     signInUrl.searchParams.set("next", pathname);
+    // No session cookie on a protected path means the owner's 12-hour
+    // session (`SESSION_MAX_AGE_SECONDS`, `src/lib/betterAuth.ts`) ran out
+    // and the browser dropped the cookie — OR that nobody has ever signed in
+    // on this browser. Both arrive here carrying nothing, so they are
+    // indistinguishable from the cookie alone, and only the first one was
+    // "signed out". `SIGNED_IN_BEFORE_COOKIE` is what tells them apart: it
+    // outlives the session cookie by design, so its presence means there
+    // really was a session here once. Without it we would greet a first-time
+    // visitor with an explanation of something that never happened to them.
+    if (request.cookies.has(SIGNED_IN_BEFORE_COOKIE)) {
+      signInUrl.searchParams.set("expired", "1");
+    }
     const redirectResponse = NextResponse.redirect(signInUrl, 307);
     redirectResponse.headers.set("Cache-Control", NO_STORE);
     return redirectResponse;

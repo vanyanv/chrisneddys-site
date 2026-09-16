@@ -53,11 +53,19 @@ function valuesFromSettings(settings: StoreSettings): FormValues {
 
 export function SettingsForm({
   settings,
+  shopOpen,
   connections,
   changePassword,
   owners,
 }: {
   settings: StoreSettings;
+  /** Whether the shop can currently take an order — `isShopOpenFor`
+   * (`src/lib/shopStatus.ts`), computed from Stripe keys + a published
+   * returns policy + a support email. There's no stored "shop open" flag
+   * to flip: `Settings.dc.html`'s big open/closed switch has nothing real
+   * behind it here, so this renders the same status as a read-only readout
+   * instead — see this phase's report. */
+  shopOpen: boolean;
   connections: ReactNode;
   changePassword: ReactNode;
   owners: ReactNode;
@@ -137,9 +145,11 @@ export function SettingsForm({
 
   return (
     <>
-      <div className="adm-settings-header">
-        <div className="adm-settings-header-text">
-          <h1 className="adm-h1">Settings</h1>
+      <div className="rack-page-header" style={{ padding: 0 }}>
+        <div>
+          <h1 className="rack-page-title rack-bow" style={{ fontSize: 32 }}>
+            Settings
+          </h1>
           <p className="adm-settings-lede">
             What customers see at checkout and on the returns and terms pages.
           </p>
@@ -157,6 +167,20 @@ export function SettingsForm({
           {state.error}
         </p>
       )}
+
+      <div id="settings-shop" className="rack-settings-shop-card">
+        <div>
+          <h2 className="rack-bow">The shop is {shopOpen ? "open" : "closed"}.</h2>
+          <p>
+            {shopOpen
+              ? "Stripe is connected, and a returns policy and support email are both set — checkout is live."
+              : "Checkout stays closed until Stripe is connected and a returns policy and support email are both set below."}
+          </p>
+        </div>
+        <span className={`adm-pill ${shopOpen ? "is-live" : "is-yellow"}`}>
+          {shopOpen ? "Open" : "Closed"}
+        </span>
+      </div>
 
       <form id="settings-form" ref={formRef} action={formAction} className="adm-settings-grid">
         <div className="adm-settings-section">
@@ -233,7 +257,7 @@ export function SettingsForm({
           </div>
         </div>
 
-        <div className="adm-settings-section">
+        <div id="settings-shipping" className="adm-settings-section">
           <h2 className="adm-group-label">Shipping</h2>
 
           <div className="adm-grid-2">
@@ -296,9 +320,11 @@ export function SettingsForm({
           </div>
         </div>
 
-        <div className="adm-settings-section">{connections}</div>
+        <div id="settings-connections" className="adm-settings-section">
+          {connections}
+        </div>
 
-        <div className="adm-settings-section is-full">
+        <div id="settings-policies" className="adm-settings-section is-full">
           <h2 className="adm-group-label">Policies</h2>
 
           <div className="adm-policies-grid">
@@ -353,8 +379,12 @@ export function SettingsForm({
           grid rather than as fields inside `#settings-form` — nested
           `<form>` elements aren't valid HTML. */}
       <div className="adm-settings-grid adm-settings-account-grid">
-        <div className="adm-settings-section">{changePassword}</div>
-        <div className="adm-settings-section">{owners}</div>
+        <div id="settings-signin" className="adm-settings-section">
+          {changePassword}
+        </div>
+        <div id="settings-owners" className="adm-settings-section">
+          {owners}
+        </div>
       </div>
 
       <div className={`adm-savebar adm-settings-savebar${dirty ? " is-visible" : ""}`}>

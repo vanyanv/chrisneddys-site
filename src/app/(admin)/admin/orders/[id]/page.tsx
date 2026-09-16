@@ -1,7 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireOwner } from "@/lib/auth";
+import { signOutAction } from "@/app/(admin)/admin/actions";
+import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { getOrderForAdmin, type AdminOrderDetail } from "@/lib/ordersAdmin";
 import { getStoreSettings } from "@/lib/orders";
+import { isShopOpenFor } from "@/lib/shopStatus";
 import {
   formatCents,
   formatDateTime,
@@ -10,45 +15,26 @@ import {
   stripePaymentUrl,
 } from "../format";
 import { AddressBlock, FulfilmentCard } from "./FulfilmentCard";
-import { RefundCard } from "./RefundCard";
+import { RefundTrigger } from "./RefundPanel";
+import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
 
 export const dynamic = "force-dynamic";
 
 type Params = { id: string };
 
-function CustomerColumn({
-  order,
-  pickupAddress,
-}: {
-  order: AdminOrderDetail;
-  pickupAddress: string | null;
-}) {
-  return (
-    <section>
-      <h3 className="adm-group-label">Customer</h3>
-      <p className="ord-customer-line">{order.name ?? "—"}</p>
-      <p className="ord-customer-line">
-        {order.email ? <a href={`mailto:${order.email}`}>{order.email}</a> : "—"}
-      </p>
-      <p className="ord-customer-line">{order.phone ?? "—"}</p>
+const NAV = [
+  { href: "/admin", label: "Overview" },
+  { href: "/admin/products", label: "Products" },
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/customers", label: "Customers" },
+  { href: "/admin/settings", label: "Settings" },
+];
 
-      <h3 className="adm-group-label ord-group-label-spaced">
-        {order.fulfilment === "pickup" ? "Pickup" : "Ship to"}
-      </h3>
-      {order.fulfilment === "pickup" ? (
-        <p className="adm-address ord-mono">{pickupAddress ?? "No pickup address on file."}</p>
-      ) : (
-        <AddressBlock shipTo={order.shipTo} />
-      )}
-    </section>
-  );
-}
-
-function ItemsColumn({ order }: { order: AdminOrderDetail }) {
+function ItemsCard({ order }: { order: AdminOrderDetail }) {
   return (
-    <section>
-      <h3 className="adm-group-label">Items</h3>
+    <section className="rack-order-card">
+      <h3 className="rack-eyebrow rack-order-card-head">Items</h3>
       <ul className="ord-item-list">
         {order.items.map((item) => (
           <li key={item.id} className="ord-item-row">
@@ -105,22 +91,6 @@ function ItemsColumn({ order }: { order: AdminOrderDetail }) {
   );
 }
 
-function ActionsColumn({ order }: { order: AdminOrderDetail }) {
-  return (
-    <section>
-      <h3 className="adm-group-label">Actions</h3>
-      <FulfilmentCard order={order} />
-      <RefundCard order={order} />
-      {order.notes && (
-        <div className="ord-notes">
-          <p className="ord-action-heading">Notes</p>
-          <p className="adm-notice">{order.notes}</p>
-        </div>
-      )}
-    </section>
-  );
-}
-
 type TimelineEvent = { label: string; date: Date };
 
 /** No column tracks exactly when an order became ready-for-pickup, was
@@ -141,11 +111,11 @@ function buildTimeline(order: AdminOrderDetail): TimelineEvent[] {
   return events.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-function TimelineSection({ order }: { order: AdminOrderDetail }) {
+function TimelineCard({ order }: { order: AdminOrderDetail }) {
   const events = buildTimeline(order);
   return (
-    <section className="ord-timeline-section">
-      <h3 className="adm-group-label">Timeline</h3>
+    <section className="rack-order-card ord-timeline-card">
+      <h3 className="rack-eyebrow rack-order-card-head">Timeline</h3>
       <ol className="adm-timeline">
         {events.map((event) => (
           <li key={event.label}>
@@ -155,43 +125,131 @@ function TimelineSection({ order }: { order: AdminOrderDetail }) {
           </li>
         ))}
       </ol>
+      {order.notes && (
+        <div className="ord-notes">
+          <p className="ord-action-heading">Notes</p>
+          <p className="adm-notice">{order.notes}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CustomerCard({ order }: { order: AdminOrderDetail }) {
+  return (
+    <section className="rack-order-card">
+      <h3 className="rack-eyebrow rack-order-card-head">Customer</h3>
+      <p className="ord-customer-line">{order.name ?? "—"}</p>
+      <p className="ord-customer-line">
+        {order.email ? <a href={`mailto:${order.email}`}>{order.email}</a> : "—"}
+      </p>
+      <p className="ord-customer-line">{order.phone ?? "—"}</p>
+    </section>
+  );
+}
+
+function ShipToCard({
+  order,
+  pickupAddress,
+}: {
+  order: AdminOrderDetail;
+  pickupAddress: string | null;
+}) {
+  return (
+    <section className="rack-order-card">
+      <h3 className="rack-eyebrow rack-order-card-head">
+        {order.fulfilment === "pickup" ? "Pickup" : "Ship to"}
+      </h3>
+      {order.fulfilment === "pickup" ? (
+        <p className="adm-address ord-mono">{pickupAddress ?? "No pickup address on file."}</p>
+      ) : (
+        <AddressBlock shipTo={order.shipTo} />
+      )}
     </section>
   );
 }
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<Params> }) {
+  const session = await requireOwner();
   const { id } = await params;
-  const order = await getOrderForAdmin(id);
+  const [order, settings] = await Promise.all([getOrderForAdmin(id), getStoreSettings()]);
   if (!order) notFound();
 
-  const pickupAddress =
-    order.fulfilment === "pickup" ? (await getStoreSettings()).pickupAddress : null;
-
+  const pickupAddress = order.fulfilment === "pickup" ? settings.pickupAddress : null;
   const pill = orderStatusPill(order.status, order.fulfilment);
+  const shopOpen = isShopOpenFor(settings);
+  const initials = ownerInitials(session);
 
   return (
-    <>
-      <Link href="/admin/orders" className="ord-back-link">
-        ← Orders
-      </Link>
+    <div className="rack-root">
+      <nav className="rack-topbar" aria-label="Admin sections">
+        <Link href="/admin" className="rack-brand">
+          <Image
+            src="/cne-logo.webp"
+            alt="Chris N Eddy's"
+            width={309}
+            height={89}
+            className="rack-logo"
+            priority
+          />
+          <span className="rack-wordmark-tag rack-mono">STORE</span>
+        </Link>
+        <div className="rack-tabs">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rack-tab"
+              aria-current={item.href === "/admin/orders" ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+        <div className="rack-top-right">
+          <span className={`rack-store-pill rack-mono ${shopOpen ? "" : "is-closed"}`}>
+            <i></i>Store: {shopOpen ? "Open" : "Closed"}
+          </span>
+          <details className="rack-avatar-menu">
+            <summary className="rack-avatar">{initials}</summary>
+            <div className="rack-menu">
+              <p className="rack-menu-email">{session.email}</p>
+              <form action={signOutAction}>
+                <button type="submit" className="rack-menu-signout">
+                  Sign out
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
+      </nav>
 
-      <div className="adm-order-head">
-        <div>
-          <h1 className="adm-h1">{order.number}</h1>
-          <div className="adm-order-head-meta">
+      <div style={{ padding: "18px 22px 0" }}>
+        <Link href="/admin/orders" className="ord-back-link">
+          <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
+            <path d="M10 3L5 8l5 5" />
+          </svg>
+          All orders
+        </Link>
+      </div>
+
+      <div className="rack-page-header" style={{ paddingTop: 11 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 13, flexWrap: "wrap" }}>
+          <h1 className="rack-page-title rack-bow" style={{ fontSize: 40 }}>
+            {order.number}
+          </h1>
+          <span className="adm-order-head-meta">
             <span className={`adm-pill ${pill.pillClass}`} title={statusLabel(order.status)}>
               {pill.label}
             </span>
-            <span className="ord-head-placed">
-              Placed {formatDateTime(order.createdAt)} ·{" "}
-              {order.fulfilment === "ship" ? "Ship" : "Pickup"}
-            </span>
-          </div>
+          </span>
+          <span className="ord-fulfil-tag">{order.fulfilment === "ship" ? "Ship" : "Pickup"}</span>
         </div>
-        <div className="adm-order-head-actions">
-          <Link href={`/admin/orders/${order.id}/packing-slip`} className="adm-btn">
+        <div className="rack-page-header-right">
+          <Link href={`/admin/orders/${order.id}/packing-slip`} className="rack-btn">
             Packing slip
           </Link>
+          <RefundTrigger order={order} />
           {order.stripePaymentIntentId && (
             <a
               href={stripePaymentUrl(order.stripePaymentIntentId)}
@@ -205,13 +263,21 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </div>
       </div>
 
-      <div className="adm-row-expand-grid">
-        <CustomerColumn order={order} pickupAddress={pickupAddress} />
-        <ItemsColumn order={order} />
-        <ActionsColumn order={order} />
-      </div>
+      <div className="rack-order-grid">
+        <div className="rack-order-main">
+          <ItemsCard order={order} />
+          <TimelineCard order={order} />
+        </div>
 
-      <TimelineSection order={order} />
-    </>
+        <div className="rack-order-side">
+          <div className="rack-panel rack-order-next">
+            <h3 className="rack-eyebrow rack-order-card-head">Next</h3>
+            <FulfilmentCard order={order} />
+          </div>
+          <CustomerCard order={order} />
+          <ShipToCard order={order} pickupAddress={pickupAddress} />
+        </div>
+      </div>
+    </div>
   );
 }

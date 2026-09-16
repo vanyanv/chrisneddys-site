@@ -18,14 +18,24 @@ import { firstView, type MerchProduct } from "@/data/merch";
  * rather than passing a ref means the buy controls and the gallery do not have
  * to know about each other.
  */
-export function ProductGallery({ product }: { product: MerchProduct }) {
+export function ProductGallery({
+  product,
+  soldOut = false,
+}: {
+  product: MerchProduct;
+  /** From the catalogue's live inventory — desaturates the main shot and
+   * labels it, rather than hiding the page (see the product page and issue
+   * #36 phase 6: a finished run keeps its photo, not just its listing). */
+  soldOut?: boolean;
+}) {
   const [active, setActive] = useState(0);
   const view = product.views[active] ?? firstView(product);
   const hasStrip = product.views.length > 1;
 
   return (
     <div className="cne-pdp-gal">
-      <div className="cne-pdp-main" id="cne-pdp-shot">
+      <div className={`cne-pdp-main${soldOut ? " is-soldout" : ""}`} id="cne-pdp-shot">
+        {soldOut && <span className="cne-pdp-gone">All gone</span>}
         {/* Keyed on the view so the crossfade replays when the angle changes. */}
         <ProductShot
           key={view?.id ?? "none"}

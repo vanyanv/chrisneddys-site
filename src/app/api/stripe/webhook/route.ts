@@ -14,10 +14,10 @@
  *   `releaseOrder()` returns the hold to the pool.
  * - `charge.refunded` — fires for a partial refund too (Stripe's charge
  *   object doesn't distinguish "a" refund from "the" refund in the event
- *   type). Looked up by payment intent: `markRefunded()` only when
- *   `charge.refunded === true` (the charge is now *fully* refunded); a
- *   partial refund instead appends a note via `appendOrderNote()` and
- *   leaves the order's status alone.
+ *   type). Looked up by payment intent: `markRefunded()` then a refund
+ *   confirmation email, only when `charge.refunded === true` (the charge is
+ *   now *fully* refunded); a partial refund instead appends a note via
+ *   `appendOrderNote()` and leaves the order's status alone.
  *
  * Idempotency: `recordStripeEvent(event.id, event.type)` claims the event id
  * before any of the above runs; a second delivery of the same event id
@@ -42,7 +42,7 @@ import {
   markStripeEventProcessed,
 } from "@/lib/orders";
 import type { ShipTo } from "@/db/schema";
-import { sendOrderConfirmation } from "@/lib/email";
+import { sendOrderConfirmation, sendRefundConfirmation } from "@/lib/email";
 import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -119,7 +119,11 @@ async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
   if (!order) return;
 
   if (charge.refunded) {
-    await markRefunded(order.id, {});
+    const result = await markRefunded(order.id, {});
+    if (result.ok) {
+      const refunded = await getOrder(order.id);
+      if (refunded) await sendRefundConfirmation(refunded);
+    }
     return;
   }
 

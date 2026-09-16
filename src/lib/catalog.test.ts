@@ -9,11 +9,19 @@ import { and, eq } from "drizzle-orm";
 import { editions, productImages, products, variants } from "@/db/schema";
 import {
   catalogueUpdatedAt,
+  editionCounts,
   getInventory,
   getProductBySlug,
   listPublishedProducts,
+  nextAvailableEditionNumber,
 } from "@/lib/catalog";
-import { addImage, createDraft, setStatus } from "@/lib/catalogAdmin";
+import {
+  addImage,
+  createDraft,
+  setInventory,
+  setStatus,
+  updateProductField,
+} from "@/lib/catalogAdmin";
 import { merch } from "@/data/merch";
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
@@ -87,7 +95,12 @@ describe("listPublishedProducts", () => {
 describe("getInventory", () => {
   it("reports the full, untouched edition run as available", async () => {
     const inventory = await getInventory("foam-trucker-blue");
-    expect(inventory).toEqual({ tracked: true, available: 50, editionSize: 50 });
+    expect(inventory).toEqual({
+      tracked: true,
+      available: 50,
+      editionSize: 50,
+      editions: Array.from({ length: 50 }, (_, i) => ({ number: i + 1, status: "available" })),
+    });
   });
 
   it("returns undefined for a slug that doesn't exist", async () => {
@@ -127,6 +140,8 @@ describe("listPublishedProducts ordering", () => {
     const a = await createDraft("Ordering Product A");
     const b = await createDraft("Ordering Product B");
     for (const draft of [a, b]) {
+      await updateProductField(draft.id, "priceCents", 1000);
+      await setInventory(draft.id, "quantity", 10);
       await addImage({
         productId: draft.id,
         kind: "view",
@@ -172,7 +187,100 @@ describe("getInventory after editions sell", () => {
       tracked: true,
       available: 13,
       editionSize: 50,
+      editions: [
+        ...Array.from({ length: 37 }, (_, i) => ({ number: i + 1, status: "sold" })),
+        ...Array.from({ length: 13 }, (_, i) => ({ number: i + 38, status: "available" })),
+      ],
     });
+  });
+});
+
+// Isolated from the shared foam-trucker fixture above (a fresh draft product
+// of its own) so it can put editions into `reserved` — a state none of the
+// tests sharing that fixture need — without disturbing their counts.
+describe("editions distinguish reserved from sold", () => {
+  it("getInventory reports a checked-out number as reserved, not sold or available", async () => {
+    const draft = await createDraft("Edition Map Test Cap");
+    await updateProductField(draft.id, "priceCents", 4800);
+    await setInventory(draft.id, "edition", 5);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/edmap.webp",
+      urlThumb: "https://example.com/edmap-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+    await setStatus(draft.id, "published");
+
+    const { createPendingOrder } = await import("@/lib/orders");
+    const pending = await createPendingOrder({
+      items: [{ slug: draft.slug, quantity: 1 }],
+      fulfilment: "ship",
+    });
+    if ("code" in pending) throw new Error(`expected a reservation, got ${pending.code}`);
+
+    const db = await getDb();
+    const [variant] = await db.select().from(variants).where(eq(variants.productId, draft.id));
+    if (!variant) throw new Error("expected the edition variant to exist");
+    await db
+      .update(editions)
+      .set({ status: "sold" })
+      .where(and(eq(editions.variantId, variant.id), eq(editions.number, 5)));
+
+    const inventory = await getInventory(draft.slug);
+    expect(inventory?.editions).toEqual([
+      { number: 1, status: "reserved" },
+      { number: 2, status: "available" },
+      { number: 3, status: "available" },
+      { number: 4, status: "available" },
+      { number: 5, status: "sold" },
+    ]);
+    // The reserved and sold numbers are both excluded from `available` —
+    // reserved is a hold, not a sale, but it is still not open to buy.
+    expect(inventory?.available).toBe(3);
+  });
+});
+
+describe("editionCounts", () => {
+  it("tallies available, reserved and sold separately", () => {
+    expect(
+      editionCounts([
+        { number: 1, status: "sold" },
+        { number: 2, status: "sold" },
+        { number: 3, status: "reserved" },
+        { number: 4, status: "available" },
+      ]),
+    ).toEqual({ available: 1, reserved: 1, sold: 2 });
+  });
+
+  it("returns all zeros for an empty run", () => {
+    expect(editionCounts([])).toEqual({ available: 0, reserved: 0, sold: 0 });
+  });
+});
+
+describe("nextAvailableEditionNumber", () => {
+  it("is the lowest-numbered available edition, not the lowest overall", () => {
+    expect(
+      nextAvailableEditionNumber([
+        { number: 1, status: "sold" },
+        { number: 2, status: "reserved" },
+        { number: 3, status: "available" },
+        { number: 4, status: "available" },
+      ]),
+    ).toBe(3);
+  });
+
+  it("is null once nothing is left to preview", () => {
+    expect(
+      nextAvailableEditionNumber([
+        { number: 1, status: "sold" },
+        { number: 2, status: "reserved" },
+      ]),
+    ).toBeNull();
   });
 });
 

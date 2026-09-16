@@ -11,6 +11,15 @@
  * same path — surfaces as a thrown `APIError` with `body.code ===
  * "INVALID_TOKEN"`; that's translated into a plain message and `expired:
  * true` rather than ever reaching the caller as a stack trace.
+ *
+ * On success, every existing session for the user is revoked too — for
+ * free, by Better Auth itself: `src/lib/betterAuth.ts` sets
+ * `emailAndPassword.revokeSessionsOnPasswordReset: true`, which makes the
+ * same `resetPassword` call below delete every session for the user as
+ * part of the same handler. See that file for why (whoever completes a
+ * reset arrived from an email link with no session of their own, so unlike
+ * the settings page's `revokeOtherSessions`, there's no "current" session
+ * to spare).
  */
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/betterAuth";

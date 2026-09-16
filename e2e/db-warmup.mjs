@@ -21,12 +21,15 @@
  * calls `getDb()`, which reads that var itself) — playwright.config.ts sets
  * it to `.pglite/e2e`, kept separate from the developer's own `.pglite/dev`.
  *
- * Also seeds four orders `e2e/admin-orders.spec.ts` needs — one of each
- * fulfilment/status combination the orders sheet distinguishes (paid-ship,
- * paid-pickup, fulfilled-ship, ready-pickup) — against `foam-trucker-blue`,
- * the one product `seedCatalogue` creates. Skipped when the `orders` table
- * already has rows (a `webServer.reuseExistingServer` local rerun, e.g.),
- * so this stays idempotent the same way `seedCatalogue` is.
+ * Also seeds five orders against `foam-trucker-blue` (the one product
+ * `seedCatalogue` creates): four `e2e/admin-orders.spec.ts` needs — one of
+ * each fulfilment/status combination the orders sheet distinguishes
+ * (paid-ship, paid-pickup, fulfilled-ship, ready-pickup) — plus a fifth left
+ * `pending` and never paid, so `e2e/admin-run.spec.ts` has a real number
+ * held in an open checkout to look at rather than only sold ones. Skipped
+ * when the `orders` table already has rows (a `webServer.reuseExistingServer`
+ * local rerun, e.g.), so this stays idempotent the same way `seedCatalogue`
+ * is.
  *
  * Also seeds the owner account `e2e/helpers.ts`'s `signInAsOwner()` (and
  * `e2e/admin-owner-accounts.spec.ts`) signs in with, by inserting the
@@ -169,4 +172,17 @@ async function seedOrders() {
     amounts: { subtotal: 4800, shipping: 0, tax: 220, total: 5020 },
   });
   await markReadyForPickup(ready.orderId);
+
+  // 5) left pending, never paid -> a number is "held" in an open checkout
+  //    right now, for `e2e/admin-run.spec.ts`'s run board (issue #36 phase
+  //    3, "All fifty numbers") to have a real reserved number to show
+  //    alongside the four sold ones above. Deliberately not `markPaid`'d —
+  //    this is a guest still mid-checkout, so `orders.email`/`.name` stay
+  //    null, same as a real abandoned cart looks right after Stripe
+  //    Checkout redirects the buyer away and before they ever come back.
+  const held = await createPendingOrder({
+    items: [{ slug: SLUG, quantity: 1 }],
+    fulfilment: "ship",
+  });
+  if ("code" in held) throw new Error(`seed held order failed: ${held.code}`);
 }

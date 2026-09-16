@@ -2,6 +2,7 @@
 
 import { getDb } from "@/db/client";
 import { resolveClientIp } from "@/lib/auth";
+import type { ShipTo } from "@/db/schema";
 import {
   getEditionSizes,
   getOrderByNumberAndEmail,
@@ -24,6 +25,16 @@ export type OrderLookupResult = {
   carrier: string | null;
   trackingNumber: string | null;
   items: OrderLookupItem[];
+  /** ISO timestamps, straight off the order row — `null` until that step has
+   * actually happened. The timeline on the tracking page only ever draws a
+   * step it has a real timestamp for; there is no "packed" or "delivered"
+   * event tracked anywhere in the schema, so the page doesn't claim one. */
+  paidAt: string | null;
+  fulfilledAt: string | null;
+  refundedAt: string | null;
+  /** Only meaningful (and only sent) for a `ship` order — a pickup order has
+   * nothing to address. */
+  shipTo: ShipTo | null;
 };
 
 export type OrderLookupState = {
@@ -111,6 +122,10 @@ export async function lookupOrderAction(
         editionNumber: item.editionNumber,
         editionSize: sizes.get(item.variantId) ?? null,
       })),
+      paidAt: order.paidAt?.toISOString() ?? null,
+      fulfilledAt: order.fulfilledAt?.toISOString() ?? null,
+      refundedAt: order.refundedAt?.toISOString() ?? null,
+      shipTo: order.fulfilment === "ship" ? (order.shipTo ?? null) : null,
     },
   };
 }

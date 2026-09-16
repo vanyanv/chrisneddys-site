@@ -2,34 +2,29 @@
 
 import { useActionState } from "react";
 import { lookupOrderAction, type OrderLookupResult, type OrderLookupState } from "./actions";
+import { orderTimeline } from "@/lib/orderTracking";
 
 const initialState: OrderLookupState = {};
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 12px",
-  fontSize: 14,
-  fontFamily: "inherit",
-  border: "2px solid var(--a-ink, #1a1612)",
-  background: "var(--a-paper, #fff8e7)",
-  color: "inherit",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontSize: 13,
-  fontWeight: 700,
-  marginBottom: 6,
-};
-
-function statusText(result: OrderLookupResult): string {
+/**
+ * "Order status." — the lookup form and its result, drawn with the same
+ * ruled-line input the guest check uses (`.cne-ck-*`, `src/components/contact/GuestCheck.tsx`)
+ * instead of a boxed generic `<input>`, so this is the same site as the rest
+ * of the shop rather than a bare HTML form bolted on next to it.
+ *
+ * There is no per-order URL: the order number plus the email used at
+ * checkout is the credential, submitted through a server action rather than
+ * a `GET /shop/order/CNE-1043` a stranger could guess or a search engine
+ * could index. That's a deliberate, existing choice this pass doesn't
+ * change — see `actions.ts`'s throttling and its generic "not found" for
+ * every kind of miss.
+ */
+function statusHeadline(result: OrderLookupResult): string {
   switch (result.status) {
     case "paid":
-      return "Paid — we're getting it ready.";
+      return "Paid. We're getting it ready.";
     case "fulfilled":
-      return result.carrier && result.trackingNumber
-        ? `Shipped — ${result.carrier}, tracking ${result.trackingNumber}.`
-        : "Shipped.";
+      return "On its way.";
     case "ready_for_pickup":
       return "Ready for pickup.";
     case "picked_up":
@@ -41,76 +36,142 @@ function statusText(result: OrderLookupResult): string {
   }
 }
 
+function formatWhen(iso: string): string {
+  return new Date(iso).toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export function OrderLookupForm() {
   const [state, formAction, pending] = useActionState(lookupOrderAction, initialState);
 
   return (
-    <div>
-      <form
-        action={formAction}
-        noValidate
-        style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: "42ch" }}
-      >
-        <div>
-          <label htmlFor="order-number" style={labelStyle}>
+    <div className="cne-ord">
+      <form action={formAction} noValidate className="cne-ord-form">
+        <div className="cne-ck-field">
+          <label className="cne-ck-label" htmlFor="order-number">
             Order number
           </label>
-          <input
-            id="order-number"
-            name="number"
-            type="text"
-            placeholder="CNE-1042"
-            autoComplete="off"
-            required
-            style={inputStyle}
-          />
+          <span className="cne-ck-line">
+            <input
+              id="order-number"
+              name="number"
+              type="text"
+              placeholder="CNE-1042"
+              autoComplete="off"
+              required
+              className="cne-ck-input"
+            />
+            <span className="cne-ck-underline" aria-hidden="true" />
+          </span>
         </div>
-        <div>
-          <label htmlFor="order-email" style={labelStyle}>
+
+        <div className="cne-ck-field">
+          <label className="cne-ck-label" htmlFor="order-email">
             Email used at checkout
           </label>
-          <input
-            id="order-email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            required
-            style={inputStyle}
-          />
+          <span className="cne-ck-line">
+            <input
+              id="order-email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              required
+              className="cne-ck-input"
+            />
+            <span className="cne-ck-underline" aria-hidden="true" />
+          </span>
         </div>
 
         {state.error && (
-          <p role="alert" style={{ margin: 0, fontSize: 13, color: "var(--a-red, #e63027)" }}>
+          <p className="cne-ck-err" role="alert">
             {state.error}
           </p>
         )}
 
-        <button
-          type="submit"
-          className="cne-btn-primary"
-          disabled={pending}
-          style={{ alignSelf: "flex-start", cursor: pending ? "wait" : "pointer" }}
-        >
+        <button type="submit" className="cne-btn-primary cne-ord-submit" disabled={pending}>
           {pending ? "LOOKING UP…" : "LOOK UP ORDER"}
         </button>
       </form>
 
-      {state.result && (
-        <div style={{ marginTop: 28 }}>
-          <h2 style={{ fontSize: 18, margin: "0 0 4px" }}>Order {state.result.number}</h2>
-          <p style={{ margin: "0 0 14px", fontWeight: 700 }}>{statusText(state.result)}</p>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, lineHeight: 1.7 }}>
-            {state.result.items.map((item, i) => (
-              <li key={i}>
-                {item.name}
-                {item.editionNumber != null
-                  ? ` — #${item.editionNumber}${item.editionSize ? ` of ${item.editionSize}` : ""}`
-                  : ` × ${item.quantity}`}
+      {state.result && <OrderResult result={state.result} />}
+    </div>
+  );
+}
+
+function OrderResult({ result }: { result: OrderLookupResult }) {
+  const steps = orderTimeline(result);
+
+  return (
+    <div className="cne-ord-result" role="status" aria-live="polite">
+      <div className="cne-eyebrow">Order</div>
+      <h2 className="cne-ord-number">{result.number}</h2>
+      <p className="cne-ord-headline">{statusHeadline(result)}</p>
+
+      <ul className="cne-ord-items">
+        {result.items.map((item, i) => (
+          <li key={i}>
+            <span>
+              {item.name}
+              {item.editionNumber == null && ` × ${item.quantity}`}
+            </span>
+            {item.editionNumber != null && (
+              <span className="cne-ord-numchip">
+                <span className="eyebrow">No.</span>
+                {item.editionNumber}
+                {item.editionSize ? <span className="of"> / {item.editionSize}</span> : null}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {result.status === "refunded" ? (
+        <p className="cne-ord-refunded">This order was refunded.</p>
+      ) : (
+        steps && (
+          <ol className="cne-ord-timeline">
+            {steps.map((step) => (
+              <li key={step.label} className={step.done ? "is-done" : ""}>
+                <span className="cne-ord-dot" aria-hidden="true" />
+                <span className="cne-ord-step-label">{step.label}</span>
+                <span className="cne-ord-step-detail">{step.detail}</span>
               </li>
             ))}
-          </ul>
+          </ol>
+        )
+      )}
+
+      {result.fulfilment === "ship" && result.shipTo && (
+        <div className="cne-ord-address">
+          <div className="cne-ck-label">Going to</div>
+          <address>
+            {result.shipTo.name}
+            <br />
+            {result.shipTo.line1}
+            {result.shipTo.line2 && (
+              <>
+                <br />
+                {result.shipTo.line2}
+              </>
+            )}
+            <br />
+            {result.shipTo.city}, {result.shipTo.state} {result.shipTo.postalCode}
+          </address>
         </div>
+      )}
+
+      {(result.paidAt || result.fulfilledAt || result.refundedAt) && (
+        <p className="cne-ord-meta">
+          {result.paidAt && <>Paid {formatWhen(result.paidAt)}. </>}
+          {result.fulfilledAt && <>Shipped {formatWhen(result.fulfilledAt)}. </>}
+          {result.refundedAt && <>Refunded {formatWhen(result.refundedAt)}.</>}
+        </p>
       )}
     </div>
   );

@@ -10,7 +10,7 @@
  * `revalidatePath` after a write that the storefront could see — nothing
  * here touches the cache.
  */
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
 import { getDb, type Db } from "@/db/client";
 import { imageThumbSrc } from "@/lib/productImage";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
@@ -75,12 +75,22 @@ async function nextPosition(): Promise<number> {
 
 export type CreateDraftResult = { id: string; slug: string };
 
-/** Creates a draft product with a unique slug derived from `name`, appended
- * at the end of the rack (`position` = current max + 1). */
+/**
+ * Creates a draft product with a unique slug derived from `name`, appended
+ * at the end of the rack (`position` = current max + 1).
+ *
+ * `name` may be blank — The Rack's "New product" tile creates a draft with
+ * no name at all rather than forcing a placeholder like "Untitled product"
+ * on it (issue #36's decisions comment: an unnamed draft is a first-class
+ * state, not something to paper over). A blank name still needs a slug, so
+ * `"draft"` stands in for the slug base only, never for `name` or
+ * `displayName1` — those stay genuinely empty until the owner types
+ * something, and `setStatus` refuses to publish while they are.
+ */
 export async function createDraft(name: string): Promise<CreateDraftResult> {
   const db = await getDb();
-  const trimmedName = name.trim() || "Untitled product";
-  const slug = await uniqueSlug(slugify(trimmedName));
+  const trimmedName = name.trim();
+  const slug = await uniqueSlug(slugify(trimmedName) || "draft");
   const position = await nextPosition();
 
   const [row] = await db
@@ -613,10 +623,24 @@ export type SetStatusResult = { ok: true; slug: string } | { ok: false; error: s
  * ever published; an unpublish/republish cycle keeps that original
  * timestamp rather than treating every publish as a new "first" one.
  *
- * Refuses to publish a product with no gallery photo: `firstView` (in
- * `src/data/merch.ts`) has to return something for the shop index and the
- * product page to render, and a product with zero `view` images is exactly
- * the case that used to render an empty $0 line instead.
+ * Refuses to publish a product that isn't ready — an unnamed draft (issue
+ * #36's decisions comment) is a first-class state, not a placeholder, so
+ * this is the one place that honesty is actually enforced rather than just
+ * a disabled button in the UI:
+ *
+ *  - a name (`displayName1` — the line the shop actually renders; a blank
+ *    `[SECOND COLOURWAY]`-style draft has none until the owner types one),
+ *  - a price (`priceCents` above zero — the $0 a fresh draft starts at isn't
+ *    a real price),
+ *  - a run size (the variant tracks a quantity or an edition size — plain
+ *    `untracked` means the owner hasn't decided how many exist yet), and
+ *  - a gallery photo: `firstView` (in `src/data/merch.ts`) has to return
+ *    something for the shop index and the product page to render, and a
+ *    product with zero `view` images is exactly the case that used to
+ *    render an empty $0 line instead.
+ *
+ * Each is checked in the order the panel lays the fields out, so the first
+ * error an owner sees is always the first field they'd need to fix.
  */
 export async function setStatus(
   id: string,
@@ -625,12 +649,30 @@ export async function setStatus(
   const db = await getDb();
   const existing = await db.query.products.findFirst({
     where: eq(products.id, id),
-    with: { images: { where: eq(productImages.kind, "view") } },
+    with: {
+      images: { where: eq(productImages.kind, "view") },
+      variants: true,
+    },
   });
   if (!existing) return { ok: false, error: "Product not found." };
 
-  if (status === "published" && existing.images.length === 0) {
-    return { ok: false, error: "Add at least one photo before publishing." };
+  if (status === "published") {
+    if (existing.displayName1.trim() === "") {
+      return { ok: false, error: "Give it a name before publishing." };
+    }
+    if (existing.priceCents <= 0) {
+      return { ok: false, error: "Set a price before publishing." };
+    }
+    const variant = existing.variants[0];
+    const hasRunSize = Boolean(
+      variant && (variant.editionSize !== null || variant.inventoryQuantity !== null),
+    );
+    if (!hasRunSize) {
+      return { ok: false, error: "Set a run size before publishing." };
+    }
+    if (existing.images.length === 0) {
+      return { ok: false, error: "Add at least one photo before publishing." };
+    }
   }
 
   const publishedAt =
@@ -649,15 +691,55 @@ export type InventoryMode = "untracked" | "quantity" | "edition";
 export type SetInventoryResult = { ok: true; slug: string } | { ok: false; error: string };
 
 /**
+ * Thrown when an edition run's size would change after any number in it has
+ * sold — issue #36's "Wiring The Rack" analysis, phase 3: "the count locks
+ * the moment number one sells" (the `n-run` annotation), because by then
+ * that count is printed on a certificate in somebody's hands. Once
+ * `soldCount` is above zero, `setInventory("edition", …)` refuses *any*
+ * different size — growing the run is refused exactly like shrinking it,
+ * not just a shrink below the highest sold number (the pre-phase-3 rule).
+ * `setInventory` is the only caller today; it catches this and reports
+ * `.message` through its ordinary `{ ok: false, error }` result, but the
+ * class is exported so the lock itself — not just that one call site's
+ * translation of it — is directly testable.
+ */
+export class EditionSizeLockedError extends Error {
+  constructor(public readonly soldCount: number) {
+    super(
+      `This run is locked — ${soldCount} number${soldCount === 1 ? " has" : "s have"} already ` +
+        "sold. The edition size can't change now.",
+    );
+    this.name = "EditionSizeLockedError";
+  }
+}
+
+/** Throws `EditionSizeLockedError` if `variant` already has any `sold`
+ * edition and `nextSize` isn't the size it's already at — a no-op save (the
+ * same size resubmitted) never trips the lock. A variant with nothing sold
+ * yet, or with no variant at all (a run that's never existed), is always
+ * unlocked. */
+function assertEditionSizeUnlocked(
+  variant: { editionSize: number | null; editions: { status: string }[] } | undefined,
+  nextSize: number,
+): void {
+  if (!variant || nextSize === variant.editionSize) return;
+  const soldCount = variant.editions.filter((e) => e.status === "sold").length;
+  if (soldCount > 0) throw new EditionSizeLockedError(soldCount);
+}
+
+/**
  * Sets a product's inventory mode.
  *
  * - `untracked`: clears both `inventory_quantity` and `edition_size` on the
  *   variant (creating a bare one if none exists yet).
  * - `quantity`: stores a plain count, clears `edition_size`.
  * - `edition`: creates the variant if none exists (sku from the slug,
- *   upper-cased; label "One size"), then creates editions `1..n` that don't
- *   already exist. Never deletes a `sold` or `reserved` edition — shrinking
- *   `n` below the highest sold number is refused outright.
+ *   upper-cased; label "One size"), then makes the run exactly `1..n` —
+ *   creating the numbers that don't exist yet and deleting any above `n`.
+ *   Never deletes a `sold` or `reserved` edition: changing `n` at all once
+ *   anything has sold is refused outright by `assertEditionSizeUnlocked`
+ *   (not just a shrink below the highest sold number), and a shrink past a
+ *   number held by an open checkout is refused until that hold lapses.
  */
 export async function setInventory(
   id: string,
@@ -680,16 +762,11 @@ export async function setInventory(
       return { ok: false, error: "Edition size must be a positive whole number." };
     }
 
-    if (variant) {
-      const highestSold = variant.editions
-        .filter((e) => e.status === "sold")
-        .reduce((max, e) => Math.max(max, e.number), 0);
-      if (size < highestSold) {
-        return {
-          ok: false,
-          error: `Can't reduce the edition below ${highestSold} — that number has already sold.`,
-        };
-      }
+    try {
+      assertEditionSizeUnlocked(variant, size);
+    } catch (err) {
+      if (err instanceof EditionSizeLockedError) return { ok: false, error: err.message };
+      throw err;
     }
 
     if (!variant) {
@@ -711,6 +788,31 @@ export async function setInventory(
         .set({ editionSize: size, inventoryQuantity: size, updatedAt: new Date() })
         .where(eq(variants.id, variant.id));
     }
+
+    // Shrinking has to remove the numbers that fall off the end, or the run
+    // keeps rows it no longer claims to have: take 50 down to 20 and the
+    // board reads "50 of 20 left", counting fifty surviving editions against
+    // an `editionSize` of 20. Nothing above `size` can be `sold` — the lock
+    // above already refused any change in that case — but a number can be
+    // `reserved` by a checkout that's open right now, and deleting that row
+    // would strand a buyer mid-payment holding a number the run no longer
+    // has. So refuse the shrink while such a hold is live, and say which
+    // number it is; holds lapse on their own, and the save works after.
+    if (variant.editions.some((e) => e.number > size && e.status === "reserved")) {
+      const held = variant.editions
+        .filter((e) => e.number > size && e.status === "reserved")
+        .map((e) => e.number)
+        .sort((a, b) => a - b);
+      return {
+        ok: false,
+        error:
+          `Number ${held[0]} is on hold in an open checkout right now, so the run ` +
+          `can't shrink to ${size} yet. Try again once the hold lapses.`,
+      };
+    }
+    await db
+      .delete(editions)
+      .where(and(eq(editions.variantId, variant.id), gt(editions.number, size)));
 
     const existingNumbers = new Set(variant.editions.map((e) => e.number));
     for (let number = 1; number <= size; number++) {
@@ -957,7 +1059,15 @@ function summarizeInventory(
 export type AdminProductListRow = {
   id: string;
   slug: string;
+  /** The internal working title — set once at creation, not shown on the
+   * rack card. `displayName1`/`displayName2` are what a customer (and now
+   * the rack's card/panel) actually sees. */
   name: string;
+  /** The shop's name — line 1. Empty for an unnamed draft (issue #36's
+   * decisions comment): the rack renders that honestly rather than falling
+   * back to `name` or a made-up placeholder. */
+  displayName1: string;
+  displayName2: string;
   status: "draft" | "published" | "archived";
   priceCents: number;
   position: number;
@@ -985,6 +1095,8 @@ function toAdminListRow(row: ProductListQueryRow): AdminProductListRow {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    displayName1: row.displayName1,
+    displayName2: row.displayName2,
     status: row.status,
     priceCents: row.priceCents,
     position: row.position,

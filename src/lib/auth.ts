@@ -31,6 +31,7 @@ import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { parseSetCookieHeader, toCookieOptions } from "better-auth/cookies";
 import { getDb, type Db } from "@/db/client";
+import { SIGNED_IN_BEFORE_COOKIE, SIGNED_IN_BEFORE_MAX_AGE } from "@/lib/adminCookies";
 import { account, user } from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
 import { hashPassword, verifyPassword, verifyPasswordDetailed } from "@/lib/password";
@@ -97,6 +98,24 @@ export async function applySetCookieHeader(setCookieHeader: string | null): Prom
   for (const [name, attributes] of parseSetCookieHeader(setCookieHeader)) {
     store.set(name, attributes.value, toCookieOptions(attributes));
   }
+}
+
+/**
+ * Records that this browser has signed in at least once, so a later
+ * cookieless visit to a protected path can tell an expired session apart
+ * from a first-ever visit and the sign-in page only claims "you were signed
+ * out" when that actually happened. Scoped to `/admin` and `httpOnly` —
+ * nothing outside the admin, and no client script, has any use for it.
+ */
+async function markSignedInBefore(): Promise<void> {
+  const store = await cookies();
+  store.set(SIGNED_IN_BEFORE_COOKIE, "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/admin",
+    maxAge: SIGNED_IN_BEFORE_MAX_AGE,
+  });
 }
 
 /**
@@ -191,7 +210,13 @@ export async function requireOwner(): Promise<OwnerSession> {
 
   const headerList = await headers();
   const pathname = headerList.get("x-pathname") ?? "/admin";
-  redirect(`/admin/sign-in?next=${encodeURIComponent(pathname)}`);
+  // `expired=1` here for the same reason `src/middleware.ts` sets it on its
+  // own sign-in redirect: reaching this branch means a cookie was present
+  // (middleware let the request through) but Better Auth's own session
+  // lookup came back empty — a session that expired or was revoked after
+  // the request left the browser, not a fresh visitor. Same explanation,
+  // same query param.
+  redirect(`/admin/sign-in?next=${encodeURIComponent(pathname)}&expired=1`);
 }
 
 /**
@@ -272,6 +297,7 @@ export async function signIn(
   }
 
   await applySetCookieHeader(signedIn.setCookieHeader);
+  await markSignedInBefore();
   await recordSignInAttempt(db, normalizedEmail, ip, true, now);
   await clearFailedAttempts(db, normalizedEmail);
 

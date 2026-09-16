@@ -1,0 +1,1693 @@
+/**
+ * The Rack — the redesigned admin's design system (issue #36). Every custom
+ * property and class here is prefixed `--rack-*` / `.rack-*` so it can live
+ * alongside The Sheet's `--a-*` / `.adm-*` system (`tokens.css`,
+ * `admin.css`) without colliding while both exist: Orders and Settings stay
+ * on The Sheet until their own phases land. `/admin` (Today, phase 1) and
+ * `/admin/products` (the catalogue, phase 2) both import this file — and,
+ * since the two systems share one set of hex values (DESIGN.md's palette),
+ * the catalogue's detail panel also reuses The Sheet's lower-level `.adm-*`
+ * primitives (fields, the save bar, the toast, accordions) directly rather
+ * than duplicating them under a `.rack-*` name; see the "Products" section
+ * below for exactly which ones and why.
+ *
+ * Palette values are the same hex values DESIGN.md already documents for
+ * the storefront (`counter-red`, `marquee-yellow`, `butcher-paper`, …) —
+ * The Rack reuses the brand's one palette rather than inventing a second
+ * one for the admin. Type roles: Bowlby One for display numbers and
+ * headings, Inter for body copy, JetBrains Mono for labels/meta/money —
+ * same three faces DESIGN.md already specifies, read here from the
+ * `--font-*` CSS variables `next/font` sets on `<html>`
+ * (`src/app/(admin)/layout.tsx`) rather than a second Google Fonts import.
+ *
+ * Motion tokens are the 4-step duration scale and 3 named easings from the
+ * design's `Motion.dc.html` reference sheet — taken as tokens for later
+ * phases to use, not built out as their own screen here.
+ */
+
+:root {
+  /* ---- colour ---- */
+  --rack-paper: #fff8e7;
+  --rack-cream: #fff2c9;
+  --rack-card: #fffdf6;
+  --rack-ink: #1a1612;
+  --rack-rule: #e3d8bc;
+  --rack-muted: #7a6f5e;
+  --rack-red: #e63027;
+  --rack-red-cta: #d0281c;
+  --rack-red-deep: #b41d14;
+  --rack-yellow: #f5b82e;
+  --rack-yellow-ink: #ffd633;
+  --rack-yellow-deep: #e09e0e;
+  --rack-green: #2f6b43;
+
+  /* ---- type scale (font-size only — family comes from the classes below) */
+  --rack-text-display: 40px;
+  --rack-text-stat: 30px;
+  --rack-text-body: 14px;
+  --rack-text-label: 10px;
+  --rack-text-meta: 11.5px;
+
+  /* ---- spacing ---- */
+  --rack-space-xs: 4px;
+  --rack-space-sm: 8px;
+  --rack-space-md: 13px;
+  --rack-space-lg: 15px;
+  --rack-space-xl: 22px;
+
+  /* ---- borders ---- */
+  --rack-border: 1px solid var(--rack-rule);
+  --rack-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+
+  /* ---- motion: 4-step duration scale, 3 easings by job (Motion.dc.html) */
+  --rack-dur-1: 100ms;
+  --rack-dur-2: 200ms;
+  --rack-dur-3: 300ms;
+  --rack-dur-4: 500ms;
+  --rack-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --rack-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --rack-ease-move: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Base / type roles                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-root {
+  min-height: 100vh;
+  background: var(--rack-paper);
+  color: var(--rack-ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: var(--rack-text-body);
+  line-height: 1.6;
+}
+.rack-root * {
+  box-sizing: border-box;
+}
+.rack-root :focus-visible {
+  outline: 2px solid var(--rack-yellow-deep);
+  outline-offset: 2px;
+}
+.rack-root a {
+  color: var(--rack-ink);
+}
+.rack-root a:hover {
+  color: var(--rack-red-cta);
+}
+
+.rack-mono {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.rack-bow {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+}
+.rack-eyebrow {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rack-muted);
+}
+.rack-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Shell: top bar + page header                                          */
+/* ---------------------------------------------------------------------- */
+
+.rack-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px var(--rack-space-xl);
+  border-bottom: var(--rack-border);
+  gap: var(--rack-space-lg);
+}
+/* The brand is the logo, never typed. The Rack's artboards set the wordmark
+   in Bowlby One, but DESIGN.md rules that the brand never renders as type and
+   commit 4526752 replaced the typed wordmark with this raster across the
+   admin. The shipped rule wins over the mockup. */
+.rack-logo {
+  height: 22px;
+  width: auto;
+}
+.rack-wordmark-tag {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.14em;
+  color: var(--rack-muted);
+  margin-left: var(--rack-space-sm);
+}
+.rack-brand {
+  display: flex;
+  align-items: baseline;
+  text-decoration: none;
+}
+.rack-tabs {
+  display: flex;
+  gap: var(--rack-space-xl);
+  flex-wrap: wrap;
+}
+.rack-tab {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rack-muted);
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-tab:hover {
+  color: var(--rack-ink);
+}
+.rack-tab[aria-current="page"] {
+  color: var(--rack-ink);
+  border-color: var(--rack-ink);
+}
+.rack-top-right {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-md);
+}
+.rack-store-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: var(--rack-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.rack-store-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--rack-green);
+  display: block;
+}
+.rack-store-pill.is-closed i {
+  background: var(--rack-muted);
+}
+.rack-avatar-menu {
+  position: relative;
+}
+.rack-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--rack-ink);
+  color: var(--rack-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border: none;
+}
+.rack-avatar::-webkit-details-marker {
+  display: none;
+}
+.rack-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--rack-card);
+  border: var(--rack-border);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-md);
+  min-width: 200px;
+  z-index: 20;
+}
+.rack-menu-email {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: 0 0 var(--rack-space-md);
+  word-break: break-all;
+}
+.rack-menu-signout {
+  width: 100%;
+  background: var(--rack-card);
+  border: var(--rack-border);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--rack-ink);
+}
+.rack-menu-signout:hover {
+  border-color: var(--rack-muted);
+}
+
+.rack-page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--rack-space-lg);
+  padding: var(--rack-space-xl);
+}
+.rack-page-title {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: var(--rack-text-display);
+  font-weight: 400;
+  margin: 7px 0 0;
+}
+.rack-page-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  flex-wrap: wrap;
+}
+.rack-page-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-meta);
+  letter-spacing: 0.1em;
+  color: var(--rack-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Controls                                                                */
+/* ---------------------------------------------------------------------- */
+
+.rack-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rack-space-sm);
+  background: var(--rack-yellow);
+  color: var(--rack-ink);
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--rack-yellow-deep);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-btn-primary:hover {
+  background: var(--rack-yellow-ink);
+  color: var(--rack-ink);
+}
+.rack-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--rack-card);
+  color: var(--rack-ink);
+  border: var(--rack-border);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--rack-dur-1) var(--rack-ease-move);
+  white-space: nowrap;
+}
+.rack-btn:hover {
+  border-color: var(--rack-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: stat tiles                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--rack-space-lg);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+}
+.rack-stat-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: var(--rack-space-lg) 17px;
+}
+.rack-stat-value {
+  font-size: var(--rack-text-stat);
+  margin-top: var(--rack-space-sm);
+}
+.rack-stat-meta {
+  font-size: 11px;
+  color: var(--rack-muted);
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: work queue                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-today-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+
+.rack-queue {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rack-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rack-space-lg);
+  padding: var(--rack-space-lg) 18px;
+  border-bottom: var(--rack-border);
+  flex-wrap: wrap;
+}
+.rack-queue-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  padding: 16px 18px;
+  border-bottom: var(--rack-border);
+}
+.rack-queue-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: var(--rack-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--rack-muted);
+}
+.rack-queue-icon.is-urgent {
+  border-color: var(--rack-red-cta);
+  color: var(--rack-red-cta);
+}
+.rack-queue-icon.is-warn {
+  border-color: var(--rack-yellow-deep);
+  color: var(--rack-yellow-deep);
+}
+.rack-queue-body {
+  flex: 1;
+  min-width: 0;
+}
+.rack-queue-title {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.rack-queue-meta {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-meta);
+  color: var(--rack-muted);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.rack-queue-clear {
+  margin-top: auto;
+  padding: var(--rack-space-lg) 18px;
+  border-top: var(--rack-border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--rack-green);
+}
+.rack-queue-clear span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: side column — the run + just happened                           */
+/* ---------------------------------------------------------------------- */
+
+.rack-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  min-height: 0;
+}
+.rack-panel {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: 18px;
+}
+.rack-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--rack-space-md);
+}
+
+.rack-edgrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  max-width: 356px;
+}
+.rack-edcell {
+  aspect-ratio: 1;
+  background: var(--rack-cream);
+}
+.rack-edcell.is-reserved {
+  background: var(--rack-yellow);
+}
+.rack-edcell.is-sold {
+  background: var(--rack-ink);
+}
+.rack-edlegend {
+  display: flex;
+  gap: var(--rack-space-md);
+  margin-top: var(--rack-space-sm);
+  font-size: 11.5px;
+  color: var(--rack-muted);
+  flex-wrap: wrap;
+}
+.rack-edlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rack-edlegend i {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+}
+.rack-edlegend i.is-available {
+  background: var(--rack-cream);
+  border: var(--rack-border);
+}
+.rack-edlegend i.is-reserved {
+  background: var(--rack-yellow);
+}
+.rack-edlegend i.is-sold {
+  background: var(--rack-ink);
+}
+
+.rack-activity {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 2.1;
+  color: var(--rack-muted);
+}
+.rack-activity-row {
+  display: flex;
+  gap: 11px;
+}
+.rack-activity-when {
+  width: 64px;
+  flex: none;
+}
+.rack-activity-what {
+  color: var(--rack-ink);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Motion                                                                  */
+/* ---------------------------------------------------------------------- */
+
+@keyframes rack-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rack-rise {
+  animation: rack-rise var(--rack-dur-3) var(--rack-ease-enter) both;
+}
+.rack-rise.r1 {
+  animation-delay: 40ms;
+}
+.rack-rise.r2 {
+  animation-delay: 80ms;
+}
+.rack-rise.r3 {
+  animation-delay: 120ms;
+}
+.rack-rise.r4 {
+  animation-delay: 160ms;
+}
+.rack-rise.r5 {
+  animation-delay: 200ms;
+}
+
+@keyframes rack-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.rack-sk {
+  background: var(--rack-rule);
+  animation: rack-breathe 1.4s var(--rack-ease-move) infinite;
+}
+.rack-sk.d1 {
+  animation-delay: 0.12s;
+}
+.rack-sk.d2 {
+  animation-delay: 0.24s;
+}
+.rack-sk.d3 {
+  animation-delay: 0.36s;
+}
+
+@keyframes rack-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rack-spin {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(26, 22, 18, 0.22);
+  border-top-color: var(--rack-ink);
+  border-radius: 999px;
+  animation: rack-spin 0.7s linear infinite;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rack-root *,
+  .rack-root *::before,
+  .rack-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Products: the rack's catalogue (Products.dc.html / issue #36 phase 2)  */
+/*                                                                        */
+/* Low-level primitives this page also needs — fields, buttons, the       */
+/* search box, the save bar, the toast, accordions, the segmented control */
+/* and stepper, the per-order-limit/edition helpers — are the SAME        */
+/* `.adm-*` ones `admin.css` already defines for the rest of /admin: they */
+/* read the same `--a-*` hex values DESIGN.md gives `--rack-*` here, so   */
+/* two copies of one flat-colour input would be pure duplication. This    */
+/* section only adds what's genuinely new to this screen: the card grid,  */
+/* the fixed detail panel, its run/status chrome, and the loading/empty   */
+/* states' own layout.                                                    */
+/* ---------------------------------------------------------------------- */
+
+.rack-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-md);
+  flex-wrap: wrap;
+}
+
+.rack-content {
+  display: flex;
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: flex-start;
+}
+
+.rack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--rack-space-lg);
+  flex: 1;
+  min-width: 0;
+  align-content: start;
+}
+
+.rack-card {
+  position: relative;
+  background: var(--rack-card);
+  border: 1px solid var(--rack-rule);
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: border-color var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-card:hover {
+  border-color: var(--rack-muted);
+}
+.rack-card.is-open {
+  border: 1.5px solid var(--rack-ink);
+}
+.rack-card-photo {
+  aspect-ratio: 1;
+  background: var(--rack-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.rack-card-photo img {
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+}
+.rack-card-photo .rack-eyebrow {
+  color: #6f6857;
+}
+.rack-card-body {
+  padding: var(--rack-space-md);
+}
+.rack-card-title {
+  font-size: 19px;
+  line-height: 0.95;
+  min-height: 36px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rack-card-title.is-empty {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--rack-muted);
+  line-height: 1.4;
+}
+.rack-card-price {
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: var(--rack-space-sm);
+}
+.rack-card-meta {
+  font-size: 12.5px;
+  margin-top: 4px;
+  color: var(--rack-muted);
+}
+.rack-card-meta.is-hot {
+  color: var(--rack-red-cta);
+}
+.rack-card-new {
+  border: 1.5px dashed var(--rack-rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rack-space-sm);
+  color: var(--rack-muted);
+  background: transparent;
+  min-height: 230px;
+  cursor: pointer;
+  transition: border-color var(--rack-dur-2) var(--rack-ease-move);
+  font: inherit;
+}
+.rack-card-new:hover {
+  border-color: var(--rack-muted);
+  color: var(--rack-ink);
+}
+.rack-card-new span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rack-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--rack-card);
+  border: var(--rack-border);
+}
+.rack-pill.is-live {
+  color: var(--rack-green);
+  border-color: var(--rack-green);
+}
+.rack-pill.is-warn {
+  color: var(--rack-yellow-deep);
+  border-color: var(--rack-yellow-deep);
+}
+.rack-pill.is-hot {
+  color: var(--rack-red-cta);
+  border-color: var(--rack-red-cta);
+}
+
+.rack-edbar {
+  height: 4px;
+  background: var(--rack-rule);
+  position: relative;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.rack-edbar > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--rack-ink);
+  display: block;
+}
+
+/* ---- the detail panel --------------------------------------------------- */
+
+.rack-detail {
+  width: 400px;
+  max-width: 100%;
+  flex: none;
+  padding: var(--rack-space-xl);
+  background: var(--rack-card);
+  box-shadow: var(--rack-shadow);
+  border: var(--rack-border);
+}
+.rack-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rack-detail-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  background: var(--rack-cream);
+  flex: none;
+}
+.rack-detail-thumb-empty {
+  width: 40px;
+  height: 40px;
+  background: var(--rack-cream);
+  flex: none;
+}
+.rack-detail-heading {
+  flex: 1;
+  min-width: 0;
+}
+.rack-detail-title {
+  font-size: 17px;
+  line-height: 1.1;
+}
+.rack-detail-title.is-empty {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--rack-muted);
+}
+.rack-detail-sub {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.rack-detail-sub a {
+  font-size: 11.5px;
+  text-decoration: underline;
+  color: var(--rack-muted);
+}
+
+.rack-field-pair {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--rack-space-lg);
+}
+.rack-field-pair > .adm-field {
+  flex: 1;
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.rack-hairline {
+  border-top: var(--rack-border);
+  margin-top: var(--rack-space-xl);
+  padding-top: var(--rack-space-md);
+}
+
+.rack-run-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rack-space-sm);
+  flex-wrap: wrap;
+}
+.rack-run-copy {
+  font-size: 13px;
+  color: var(--rack-muted);
+  margin: 10px 0 8px;
+}
+.rack-run-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rack-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rack-run-link:hover {
+  text-decoration: underline;
+}
+
+.rack-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rack-space-sm);
+  flex-wrap: wrap;
+}
+.rack-chips {
+  display: flex;
+  gap: var(--rack-space-sm);
+  flex-wrap: wrap;
+}
+.rack-chip {
+  border: var(--rack-border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  background: var(--rack-card);
+  color: var(--rack-ink);
+  cursor: pointer;
+  font-family: inherit;
+}
+.rack-chip.is-active {
+  background: var(--rack-ink);
+  color: var(--rack-paper);
+  border-color: var(--rack-ink);
+}
+.rack-chip:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.rack-empty-note {
+  font-size: 13px;
+  color: var(--rack-muted);
+}
+
+/* ---- archived disclosure ------------------------------------------------ */
+
+.rack-archived {
+  margin: 0 var(--rack-space-xl) var(--rack-space-xl);
+  border: var(--rack-border);
+  background: var(--rack-card);
+}
+.rack-archived summary {
+  padding: var(--rack-space-md) 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+.rack-archived summary::-webkit-details-marker {
+  display: none;
+}
+.rack-archived-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-md);
+  padding: 11px 18px;
+  border-top: var(--rack-border);
+}
+.rack-archived-row .rack-mono {
+  color: var(--rack-muted);
+  font-size: 12px;
+}
+.rack-archived-row .rack-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- first-run empty state (ProductsEmpty.dc.html) ---------------------- */
+
+.rack-empty-shell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--rack-space-xl) 40px;
+  min-height: 0;
+}
+.rack-empty-grid {
+  width: 100%;
+  max-width: 820px;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+}
+.rack-empty-art {
+  border: 1.5px dashed var(--rack-rule);
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rack-space-md);
+  color: var(--rack-muted);
+  padding: var(--rack-space-xl);
+  text-align: center;
+}
+.rack-empty-heading {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 11px;
+}
+.rack-empty-body {
+  color: var(--rack-muted);
+  margin-bottom: var(--rack-space-xl);
+  max-width: 46ch;
+}
+.rack-checklist {
+  margin-top: 30px;
+  border-top: var(--rack-border);
+}
+.rack-checklist-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 0 4px;
+}
+.rack-checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rack-space-lg);
+  padding: 16px 0;
+  border-bottom: var(--rack-border);
+}
+.rack-checklist-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: var(--rack-border);
+  background: transparent;
+  color: var(--rack-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+.rack-checklist-num.is-done {
+  border-color: var(--rack-green);
+  background: var(--rack-green);
+  color: var(--rack-paper);
+}
+.rack-checklist-body {
+  flex: 1;
+  min-width: 0;
+}
+.rack-checklist-title {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.rack-checklist-title.is-done {
+  color: var(--rack-muted);
+  text-decoration: line-through;
+}
+.rack-checklist-meta {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--rack-muted);
+  margin-top: 3px;
+}
+
+@media (max-width: 900px) {
+  .rack-content {
+    flex-direction: column;
+  }
+  .rack-detail {
+    width: 100%;
+  }
+  .rack-empty-grid {
+    grid-template-columns: 1fr;
+  }
+  .rack-empty-art {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Phone (AdminPhone.dc.html)                                             */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .rack-topbar {
+    padding: 13px var(--rack-space-lg);
+  }
+  .rack-tabs {
+    padding: 0 var(--rack-space-lg) 0;
+    gap: var(--rack-space-lg);
+    overflow-x: auto;
+  }
+  .rack-page-header {
+    padding: var(--rack-space-lg) var(--rack-space-lg) 0;
+  }
+  .rack-page-title {
+    font-size: 28px;
+  }
+  .rack-page-header-right {
+    width: 100%;
+  }
+  .rack-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: var(--rack-space-lg);
+    gap: var(--rack-space-sm);
+  }
+  .rack-stat-card {
+    padding: var(--rack-space-md);
+  }
+  .rack-stat-value {
+    font-size: 24px;
+  }
+  .rack-today-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0 var(--rack-space-lg);
+  }
+  .rack-queue {
+    border-left: none;
+    border-right: none;
+  }
+  .rack-side {
+    padding: 0 var(--rack-space-lg);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Orders: the desk and its detail page (Orders.dc.html /                 */
+/* OrderDetail.dc.html, issue #36 phase 4)                                */
+/*                                                                        */
+/* The list itself (the filter chips, search, sheet of rows, pagination)  */
+/* stays on the same `.adm-filter-chip`/`.ord-*` primitives `admin-       */
+/* orders.css` already defines — this only adds the detail page's         */
+/* two-column layout and the cards it's built from, which is genuinely    */
+/* new here. */
+/* ---------------------------------------------------------------------- */
+
+.rack-order-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+.rack-order-main,
+.rack-order-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  min-width: 0;
+}
+.rack-order-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: var(--rack-space-xl);
+}
+.rack-order-card-head {
+  margin: 0 0 var(--rack-space-lg);
+}
+.ord-timeline-card .adm-timeline {
+  max-width: none;
+}
+.rack-order-next {
+  padding: var(--rack-space-xl);
+}
+.ord-refunded-note {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--rack-muted);
+}
+
+@media (max-width: 900px) {
+  .rack-order-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .rack-order-grid {
+    padding: 0 var(--rack-space-lg) var(--rack-space-lg);
+  }
+  .rack-order-card,
+  .rack-order-next {
+    padding: var(--rack-space-lg);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* The run: "All fifty numbers" (TheRun.dc.html, issue #36 phase 3)       */
+/* ---------------------------------------------------------------------- */
+
+.run-board-hint {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: 0 0 var(--rack-space-md);
+}
+.run-board-empty {
+  font-size: 13px;
+  color: var(--rack-muted);
+}
+.run-board-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  max-width: 480px;
+}
+.run-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  border: 1px solid var(--rack-rule);
+  background: var(--rack-cream);
+  color: var(--rack-ink);
+  cursor: pointer;
+  padding: 0;
+}
+.run-cell.is-reserved {
+  background: var(--rack-yellow);
+}
+.run-cell.is-sold {
+  background: var(--rack-ink);
+  color: var(--rack-paper);
+}
+.run-cell.is-selected {
+  outline: 2px solid var(--rack-ink);
+  outline-offset: 1px;
+}
+
+.run-held-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.run-held-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: var(--rack-space-sm);
+  align-items: center;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.run-held-number {
+  font-weight: 700;
+}
+.run-held-customer {
+  color: var(--rack-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.run-held-time {
+  color: var(--rack-muted);
+  font-size: 12px;
+}
+
+.run-detail-line {
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Refund: the one confirm (Refund.dc.html, issue #36 phase 4)            */
+/* ---------------------------------------------------------------------- */
+
+.rack-refund-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 22, 18, 0.32);
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+.rack-refund-panel {
+  width: 470px;
+  max-width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--rack-card);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  animation: rack-refund-in var(--rack-dur-3) var(--rack-ease-enter) both;
+}
+@keyframes rack-refund-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rack-refund-panel {
+    animation-duration: 0.001ms;
+  }
+}
+.rack-refund-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rack-space-md);
+}
+.rack-refund-title {
+  font-size: 26px;
+  line-height: 1.05;
+  margin-top: var(--rack-space-sm);
+}
+.rack-refund-close {
+  padding: 7px;
+  flex: none;
+}
+.rack-refund-amount {
+  font-size: 24px;
+  font-weight: 700;
+}
+.rack-refund-box {
+  border: var(--rack-border);
+  background: var(--rack-paper);
+  padding: 15px 17px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.rack-refund-box .rack-eyebrow {
+  display: block;
+  margin-bottom: var(--rack-space-sm);
+}
+.rack-refund-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 13px 15px;
+  border: 1px solid var(--rack-red-cta);
+  font-size: 12.5px;
+}
+.rack-refund-warning svg {
+  color: var(--rack-red-cta);
+  margin-top: 2px;
+}
+.rack-refund-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+.rack-refund-confirm {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 14px;
+  padding: 13px;
+  background: var(--rack-red-cta);
+  color: var(--rack-cream);
+  border: 1px solid var(--rack-red-deep);
+  cursor: pointer;
+  transition: background var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-refund-confirm:hover {
+  background: var(--rack-red-deep);
+}
+.rack-refund-confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+@media (max-width: 720px) {
+  .rack-refund-panel {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Packing slip: the printed sheet (PackingSlip.dc.html)                  */
+/* ---------------------------------------------------------------------- */
+
+.rack-slip-page {
+  min-height: 100vh;
+  background: var(--rack-rule);
+  padding: var(--rack-space-xl) 0;
+}
+.rack-slip-noprint {
+  max-width: 816px;
+  margin: 0 auto 15px;
+  padding: 0 var(--rack-space-xl);
+}
+.rack-slip-sheet {
+  width: 816px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: var(--rack-ink);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  box-shadow: var(--rack-shadow);
+}
+.rack-slip-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--rack-ink);
+  padding-bottom: var(--rack-space-xl);
+}
+.rack-slip-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+.rack-slip-addr {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--rack-muted);
+  margin-top: 11px;
+}
+.rack-slip-title {
+  font-size: 26px;
+  text-align: right;
+}
+.rack-slip-number {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  margin-top: 7px;
+  font-weight: 700;
+  text-align: right;
+}
+.rack-slip-date {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rack-muted);
+  margin-top: 4px;
+  text-align: right;
+}
+.rack-slip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.rack-slip-address {
+  font-style: normal;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.rack-slip-items {
+  padding: 26px 0;
+}
+.rack-slip-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.rack-slip-item-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex: none;
+  background: var(--rack-cream);
+}
+.rack-slip-item-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+.rack-slip-item-meta {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--rack-muted);
+  margin-top: 5px;
+}
+.rack-slip-edition {
+  text-align: center;
+  border: 2px solid var(--rack-ink);
+  padding: 9px 15px;
+  flex: none;
+}
+.rack-slip-edition-num {
+  font-size: 26px;
+  line-height: 1.1;
+  margin-top: 3px;
+}
+.rack-slip-edition-num span {
+  font-size: 14px;
+  color: var(--rack-muted);
+}
+.rack-slip-qty {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  width: 52px;
+  text-align: right;
+  flex: none;
+}
+.rack-slip-callout {
+  border: 2px solid var(--rack-ink);
+  padding: var(--rack-space-xl);
+  margin-top: 4px;
+}
+.rack-slip-callout p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--rack-muted);
+  max-width: 60ch;
+  margin-top: var(--rack-space-sm);
+}
+.rack-slip-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--rack-rule);
+  padding-top: var(--rack-space-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--rack-space-lg);
+  flex-wrap: wrap;
+}
+.rack-slip-footer p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.rack-slip-order-ref {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rack-muted);
+  text-align: right;
+  margin-top: 7px;
+}
+@media print {
+  .rack-slip-page {
+    background: #fff;
+    padding: 0;
+  }
+  .rack-slip-noprint {
+    display: none;
+  }
+  .rack-slip-sheet {
+    box-shadow: none;
+    padding: 0;
+    width: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Settings (Settings.dc.html, issue #36 phase 4)                         */
+/*                                                                        */
+/* Every field, toggle, save bar, toast and account-management primitive  */
+/* here is the same `.adm-*` set `admin-settings.css` already defines —   */
+/* this only adds the outer nav-plus-content layout, which is new. */
+/* ---------------------------------------------------------------------- */
+
+.rack-settings-body {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+.rack-settings-nav {
+  position: sticky;
+  top: var(--rack-space-xl);
+  display: flex;
+  flex-direction: column;
+}
+.rack-settings-nav a {
+  font-size: 13px;
+  color: var(--rack-muted);
+  padding: 9px 12px;
+  text-decoration: none;
+}
+.rack-settings-nav a:hover {
+  color: var(--rack-ink);
+}
+.rack-settings-nav a.is-active {
+  font-weight: 600;
+  color: var(--rack-ink);
+  background: var(--rack-cream);
+}
+.rack-settings-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+}
+.rack-settings-shop-card {
+  background: var(--rack-card);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-xl);
+  flex-wrap: wrap;
+}
+.rack-settings-shop-card h2 {
+  font-size: 19px;
+}
+.rack-settings-shop-card p {
+  color: var(--rack-muted);
+  margin-top: 6px;
+}
+@media (max-width: 900px) {
+  .rack-settings-body {
+    grid-template-columns: 1fr;
+  }
+  .rack-settings-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+@media (max-width: 720px) {
+  .rack-settings-body {
+    padding: 0 var(--rack-space-lg) var(--rack-space-lg);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* When it breaks: 404, error boundary, offline (issue #36 phase 5)       */
+/*                                                                        */
+/* Shared by `admin/not-found.tsx` and `admin/error.tsx` — both are a     */
+/* full-page centred card in the same restrained, work-tool register as   */
+/* the rest of The Rack: no halftone, no marquee red. `.rack-offline` is  */
+/* its own thing below: a small fixed toast rather than a full page,      */
+/* since it has to sit on top of whatever the owner was already doing.    */
+/* ---------------------------------------------------------------------- */
+
+.rack-break-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rack-space-xl);
+}
+.rack-break-card {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+.rack-break-code {
+  margin-bottom: var(--rack-space-sm);
+}
+.rack-break-heading {
+  font-size: 32px;
+  line-height: 1.05;
+  margin-bottom: var(--rack-space-md);
+}
+.rack-break-body {
+  color: var(--rack-muted);
+  margin-bottom: var(--rack-space-xl);
+}
+.rack-break-actions {
+  display: flex;
+  gap: var(--rack-space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.rack-break-digest {
+  margin-top: var(--rack-space-xl);
+  color: var(--rack-muted);
+}
+
+/* ---- offline indicator -------------------------------------------------- */
+
+/* Mounted once, in `(admin)/layout.tsx`, so it can appear over any admin
+   route including the signed-out sign-in/forgot-password/reset-password
+   pages — those never import this stylesheet on their own, so every value
+   here carries a plain hex fallback rather than relying on `--rack-*`
+   being defined. */
+.rack-offline {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 0);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: calc(100vw - 32px);
+  background: var(--rack-ink, #1a1612);
+  color: var(--rack-paper, #fff8e7);
+  border: 1px solid var(--rack-ink, #1a1612);
+  padding: 10px 15px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 22px rgba(26, 22, 18, 0.3);
+  animation: rack-offline-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rack-offline-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--rack-red-cta, #d0281c);
+  flex: none;
+}
+@keyframes rack-offline-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rack-offline {
+    animation-duration: 0.001ms;
+  }
+}

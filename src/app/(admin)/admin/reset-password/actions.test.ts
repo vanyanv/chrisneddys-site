@@ -2,9 +2,12 @@
  * Proves `resetPasswordAction` completes a real reset (new password
  * actually signs in afterwards) and never 500s on a bad token — missing,
  * malformed/never-issued, or already consumed by a prior successful reset.
+ * Also proves the reset revokes every session the user had beforehand
+ * (issue #36) and that a failed reset revokes nothing.
  */
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
 import { getDb } from "@/db/client";
@@ -148,6 +151,98 @@ describe("resetPasswordAction", () => {
       formDataFor({ token: "irrelevant-token", password: "short1", confirmPassword: "short1" }),
     );
     expect(result).toEqual({ error: "Password must be at least 12 characters." });
+  });
+
+  it("revokes every session that existed for the user before the reset (issue #36)", async () => {
+    const auth = await getAuth();
+    const email = "reset-revokes-sessions@example.com";
+    const oldPassword = "the original owner password!!";
+    const newPassword = "a brand new post-reset password!";
+
+    await auth.api.signUpEmail({ body: { name: "Owner", email, password: oldPassword } });
+
+    // Two "devices": two independent sign-ins, two independent session
+    // cookies — same technique as `owners.test.ts`'s changePassword
+    // revocation test.
+    const deviceA = await auth.api.signInEmail({
+      body: { email, password: oldPassword },
+      asResponse: true,
+    });
+    const cookieA = deviceA.headers.get("set-cookie")!.split(";")[0]!;
+    const deviceB = await auth.api.signInEmail({
+      body: { email, password: oldPassword },
+      asResponse: true,
+    });
+    const cookieB = deviceB.headers.get("set-cookie")!.split(";")[0]!;
+
+    expect(
+      (await auth.api.getSession({ headers: new Headers({ cookie: cookieA }) }))?.user.email,
+    ).toBe(email);
+    expect(
+      (await auth.api.getSession({ headers: new Headers({ cookie: cookieB }) }))?.user.email,
+    ).toBe(email);
+
+    const token = await issueResetToken(email);
+
+    await expect(
+      resetPasswordAction(
+        undefined,
+        formDataFor({ token, password: newPassword, confirmPassword: newPassword }),
+      ),
+    ).rejects.toMatchObject({ digest: expect.stringContaining("NEXT_REDIRECT") });
+
+    // Both pre-reset sessions are gone — someone completing a reset has no
+    // session of their own to spare, so unlike `changePassword`'s
+    // `revokeOtherSessions`, there's no "current" session left standing.
+    expect(await auth.api.getSession({ headers: new Headers({ cookie: cookieA }) })).toBeNull();
+    expect(await auth.api.getSession({ headers: new Headers({ cookie: cookieB }) })).toBeNull();
+
+    // The database agrees: no session rows remain for this user.
+    const db = await getDb();
+    const userRows = await db.query.user.findMany({
+      where: (t, { eq: eqOp }) => eqOp(t.email, email),
+    });
+    expect(userRows).toHaveLength(1);
+    const remainingSessions = await db
+      .select()
+      .from(schema.session)
+      .where(eq(schema.session.userId, userRows[0]!.id));
+    expect(remainingSessions).toHaveLength(0);
+  });
+
+  it("a failed reset (invalid/expired token) revokes no sessions", async () => {
+    const auth = await getAuth();
+    const email = "reset-fails-no-revoke@example.com";
+    const password = "the standing owner password!!";
+
+    await auth.api.signUpEmail({ body: { name: "Owner", email, password } });
+
+    const device = await auth.api.signInEmail({
+      body: { email, password },
+      asResponse: true,
+    });
+    const cookie = device.headers.get("set-cookie")!.split(";")[0]!;
+    expect((await auth.api.getSession({ headers: new Headers({ cookie }) }))?.user.email).toBe(
+      email,
+    );
+
+    const result = await resetPasswordAction(
+      undefined,
+      formDataFor({
+        token: "never-issued-token-for-revoke-test",
+        password: "irrelevant new password!!",
+        confirmPassword: "irrelevant new password!!",
+      }),
+    );
+    expect(result).toEqual({
+      expired: true,
+      error: "This reset link has expired or already been used.",
+    });
+
+    // The session from before the failed attempt still authenticates.
+    expect((await auth.api.getSession({ headers: new Headers({ cookie }) }))?.user.email).toBe(
+      email,
+    );
   });
 
   it("rejects mismatched password/confirmation", async () => {

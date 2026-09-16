@@ -9,6 +9,7 @@ import {
   createPendingOrder,
   getOrder,
   markPaid,
+  markRefunded,
   setFulfilment,
   updateStoreSettings,
   type OrderWithItems,
@@ -18,6 +19,7 @@ import {
   sendOwnerInvite,
   sendPasswordReset,
   sendPickupReady,
+  sendRefundConfirmation,
   sendShippingNotice,
 } from "@/lib/email";
 
@@ -108,12 +110,19 @@ describe("sendOrderConfirmation", () => {
     const text: string = payload.text;
     expect(text).toContain(`Order ${order.number}`);
     expect(text).toContain(`#${editionNumber} of 50`);
+    expect(text).toContain(`Number ${editionNumber} is yours.`);
     expect(text).toContain("Total: $48.00");
     expect(text).toContain(
       "Pickup at 5539 W. Sunset Blvd, Los Angeles, CA 90028. Bring this email.",
     );
     expect(text).toContain("Questions? chris@chrisneddys.com");
-    expect(payload.html).toContain(`Order ${order.number}`);
+
+    const html: string = payload.html;
+    expect(html).toContain(`Order ${order.number}`);
+    expect(html).toContain(`Number ${editionNumber} is yours.`);
+    expect(html).toContain(`NUMBER ${editionNumber} OF 50`);
+    expect(html).toContain("$48.00");
+    expect(html).toContain("Pickup at 5539 W. Sunset Blvd, Los Angeles, CA 90028");
   });
 
   it("includes the returns policy when the store has one set", async () => {
@@ -197,6 +206,77 @@ describe("sendShippingNotice", () => {
     expect(payload.text).toContain("Carrier: USPS");
     expect(payload.text).toContain("Tracking number: 9400111899");
     expect(payload.text).toContain("123 Main St");
+
+    const html: string = payload.html;
+    expect(html).toContain("USPS");
+    expect(html).toContain("9400111899");
+    expect(html).toContain("123 Main St");
+  });
+});
+
+describe("sendRefundConfirmation", () => {
+  it("is gated on RESEND_API_KEY / EMAIL_FROM and never throws when they're unset", async () => {
+    const order = await paidPickupOrder();
+    const result = await sendRefundConfirmation(order);
+    expect(result).toEqual({
+      sent: false,
+      reason: "Resend isn't configured (RESEND_API_KEY / EMAIL_FROM).",
+    });
+  });
+
+  it("states the refunded amount, the order's edition number and totals, and posts to Resend", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const order = await paidPickupOrder();
+    const editionNumber = order.items[0]?.editionNumber;
+    expect(editionNumber).toEqual(expect.any(Number));
+
+    const refundResult = await markRefunded(order.id, {});
+    expect(refundResult.ok).toBe(true);
+    const refunded = await getOrder(order.id);
+    if (!refunded) throw new Error("expected the refunded order to exist");
+
+    const result = await sendRefundConfirmation(refunded);
+    expect(result).toEqual({ sent: true });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe("https://api.resend.com/emails");
+
+    const payload = JSON.parse(init.body);
+    expect(payload.to).toBe("buyer@example.com");
+    expect(payload.subject).toBe(`Refunded $48.00 for order ${order.number}`);
+
+    const text: string = payload.text;
+    expect(text).toContain(`Order ${order.number}`);
+    expect(text).toContain(`#${editionNumber} of 50`);
+    expect(text).toContain("Total: $48.00");
+    expect(text).toContain("$48.00 is on its way back to you.");
+    expect(text).toContain("Questions? chris@chrisneddys.com");
+
+    const html: string = payload.html;
+    expect(html).toContain(`Order ${order.number}`);
+    expect(html).toContain(`NUMBER ${editionNumber} OF 50`);
+    expect(html).toContain("$48.00");
+    expect(html).toContain("Refunded");
+  });
+
+  it("reports no recipient rather than sending to an empty address", async () => {
+    process.env.RESEND_API_KEY = "re_test_fake";
+    process.env.EMAIL_FROM = "orders@chrisneddys.com";
+    const fetchMock = mockResendOk();
+
+    const order = await paidPickupOrder();
+    const refundResult = await markRefunded(order.id, {});
+    expect(refundResult.ok).toBe(true);
+    const refunded = await getOrder(order.id);
+    if (!refunded) throw new Error("expected the refunded order to exist");
+
+    const result = await sendRefundConfirmation({ ...refunded, email: null });
+    expect(result).toEqual({ sent: false, reason: "No recipient email address." });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

@@ -1,0 +1,1 @@
+CREATE INDEX "orders_email_lower_idx" ON "orders" USING btree (lower(trim("email"))) WHERE "orders"."email" is not null;

@@ -1,17 +1,5 @@
-import Link from "next/link";
-import Image from "next/image";
 import { headers } from "next/headers";
 import { getOwnerSession, requireOwner } from "@/lib/auth";
-import { signOutAction } from "@/app/(admin)/admin/actions";
-import { getStoreSettings } from "@/lib/orders";
-import { isShopOpenFor } from "@/lib/shopStatus";
-import type { OwnerSession } from "@/lib/auth";
-
-const NAV = [
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/settings", label: "Settings" },
-];
 
 /** Strips the trailing slash `trailingSlash: true` adds, except for "/". */
 function normalizePathname(pathname: string): string {
@@ -28,30 +16,33 @@ function normalizePathname(pathname: string): string {
 const GUEST_PATHS = new Set(["/admin/sign-in", "/admin/forgot-password", "/admin/reset-password"]);
 
 /**
- * "CE" from a name ("Chris Eddy" -> "CE"), or the first two letters of the
- * email's local part when there's no name on file — every owner session has
- * an email, not every one has a name.
- */
-function ownerInitials(session: OwnerSession): string {
-  if (session.name) {
-    const letters = session.name
-      .trim()
-      .split(/\s+/)
-      .map((part) => part[0])
-      .filter(Boolean)
-      .slice(0, 2)
-      .join("");
-    if (letters) return letters.toUpperCase();
-  }
-  return session.email.slice(0, 2).toUpperCase();
-}
-
-/**
- * The Sheet's chrome: an ink top bar (wordmark, section tabs, store-open
- * pill, owner menu) and nothing else — no sidebar. `/admin/products` is the
- * home the tabs point at; `/admin` itself just redirects there. The
- * sign-in page shares this route tree but isn't signed in yet, so it gets
- * the bare guest shell with no top bar — just its own centred card.
+ * The auth gate for every `/admin*` route. Through issue #36 phase 3, this
+ * layout drew the Sheet's own ink top bar (`adm-topbar`/`adm-shell`, from
+ * `admin.css`) for every signed-in route except `/admin` and
+ * `/admin/products`, which had already moved onto The Rack and drew their
+ * own `rack-topbar` shell instead (`src/styles/admin-rack.css`). Phase 4
+ * moves Orders, the order detail page, the packing slip, and Settings onto
+ * the same pattern — Orders and Settings now draw their own `rack-topbar`
+ * the same way Today and Products do, and the packing slip deliberately
+ * draws none at all, since it's a print sheet, not a screen with
+ * navigation. That was every route the Sheet's shell still served, so this
+ * layout no longer renders any shell for a signed-in owner at all — only
+ * the bare guest shell for the sign-in/forgot-password/reset-password
+ * pages, which were never on The Rack and never had a top bar.
+ *
+ * `ownerInitials` used to live here too, called from the shell this layout
+ * rendered. It's moved to `./ownerDisplay.ts` now that this function has no
+ * render path left to call it from: `next build`'s route type-checking
+ * rejects any `layout.tsx` export beyond `default` and Next's own small
+ * reserved set ("... is not a valid Layout export field") — a real, latent
+ * rule this file happened to slip past while its old body both exported
+ * *and called* `ownerInitials` internally in one large render path;
+ * shrinking that body down to just the auth gate is what turns the
+ * pre-existing violation into a build failure. Every caller of
+ * `ownerInitials` (Today, Products, Orders, the order detail page,
+ * Settings) now imports it from `./ownerDisplay` instead — a one-line,
+ * behavior-preserving import-path change, including in
+ * `admin/products/page.tsx`, which this phase otherwise leaves alone.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers();
@@ -64,58 +55,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <div className="adm-shell adm-shell-guest">{children}</div>;
   }
 
-  const settings = await getStoreSettings();
-  const shopOpen = isShopOpenFor(settings);
-  const initials = ownerInitials(session);
-
-  return (
-    <div className="adm-shell">
-      <header className="adm-topbar">
-        <div className="adm-topbar-inner">
-          <Link href="/admin/products" className="adm-brand">
-            <Image
-              src="/cne-logo.webp"
-              alt="Chris N Eddy's"
-              width={309}
-              height={89}
-              className="adm-logo"
-              priority
-            />
-            <span className="adm-store-label">STORE</span>
-          </Link>
-
-          <nav className="adm-nav-tabs" aria-label="Admin sections">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="adm-nav-tab"
-                aria-current={pathname === normalizePathname(item.href) ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="adm-topbar-right">
-            <span className={`adm-pill ${shopOpen ? "is-open" : "is-closed"}`}>
-              Store: {shopOpen ? "Open" : "Closed"}
-            </span>
-            <details className="adm-menu-wrap adm-avatar-menu">
-              <summary className="adm-avatar">{initials}</summary>
-              <div className="adm-menu">
-                <p className="adm-menu-email">{session.email}</p>
-                <form action={signOutAction}>
-                  <button type="submit" className="adm-menu-signout">
-                    Sign out
-                  </button>
-                </form>
-              </div>
-            </details>
-          </div>
-        </div>
-      </header>
-      <main className="adm-main">{children}</main>
-    </div>
-  );
+  return <>{children}</>;
 }

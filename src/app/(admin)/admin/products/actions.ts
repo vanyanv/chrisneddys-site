@@ -69,6 +69,22 @@ export async function createProductPlainAction(name: string): Promise<CreateProd
   return { ok: true, id, slug };
 }
 
+export type CreateBlankProductResult = { id: string; slug: string };
+
+/**
+ * The Rack's "New product" tile/button: creates a nameless draft directly,
+ * with no name prompt first. An unnamed draft is a first-class state (issue
+ * #36's decisions comment), not a gap the UI has to talk the owner out of —
+ * the panel opens straight onto the new, empty draft so naming it is just
+ * filling in a field like any other edit.
+ */
+export async function createBlankProductAction(): Promise<CreateBlankProductResult> {
+  await requireOwner();
+  const { id, slug } = await createDraft("");
+  revalidateStorefront(slug);
+  return { id, slug };
+}
+
 export type SaveProductState = {
   ok?: boolean;
   error?: string;

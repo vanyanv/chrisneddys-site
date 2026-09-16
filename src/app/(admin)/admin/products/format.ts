@@ -22,3 +22,22 @@ export function formatDollars(cents: number): string {
 export function formatPrice(cents: number): string {
   return `$${formatDollars(cents)}`;
 }
+
+/**
+ * The rack card/panel's title: `displayName1` and `displayName2` joined with
+ * a space ("THE FOAM TRUCKER" + "— BLUE" -> "THE FOAM TRUCKER — BLUE"),
+ * trimmed, or `""` when both are blank.
+ *
+ * Deliberately returns `""` rather than a fallback — an unnamed draft
+ * (issue #36's decisions comment: `[SECOND COLOURWAY]`, first-class, not a
+ * placeholder) genuinely has no name yet, and the caller renders that
+ * honestly (a muted "No name yet" note) instead of this function inventing
+ * one. `setStatus` in `@/lib/catalogAdmin` is what refuses to publish while
+ * it's blank — this is only ever a display concern.
+ */
+export function productTitle(displayName1: string, displayName2: string): string {
+  return [displayName1, displayName2]
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" ");
+}

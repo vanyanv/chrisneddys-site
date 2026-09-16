@@ -98,6 +98,15 @@ async function buildAuth(db: Db) {
     database: drizzleAdapter(db, { provider: "pg", schema }),
     emailAndPassword: {
       enabled: true,
+      // A reset is the flow an owner uses when they think a session was
+      // stolen, so every session that existed under the old password must
+      // die along with it — otherwise whoever it is stays signed in right
+      // through the "fix". Better Auth's own `resetPassword` handler
+      // (`node_modules/better-auth/dist/api/routes/password.mjs`) does this
+      // for us when the flag is on: `deleteUserSessions(userId)` runs
+      // inside the same handler that already resolved the token to a user,
+      // right after the new password is set.
+      revokeSessionsOnPasswordReset: true,
       // A4: Better Auth calls these instead of its own built-in scrypt, so
       // there is exactly one hasher in the codebase — and `verifyPassword`
       // already accepts both the legacy 3-field hash and the current

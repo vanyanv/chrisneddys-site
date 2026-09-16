@@ -54,6 +54,12 @@ export type RunForAdmin = {
   productId: string;
   productSlug: string;
   productTitle: string;
+  /** The product's own eyebrow ("CAPSULE 01"), carried here because the run
+   * page shows it and this query already has the product row in hand.
+   * Reading it through `getProductForAdmin` instead meant a second
+   * relational read materialising every image and all fifty edition rows a
+   * second time, for one word of copy. */
+  productEyebrow: string | null;
   editionSize: number;
   /** True once anything in the run has sold — the point past which
    * `setInventory`'s `EditionSizeLockedError` refuses to change
@@ -127,6 +133,7 @@ export async function getRunForAdmin(productId: string): Promise<RunForAdmin | u
     productId: product.id,
     productSlug: product.slug,
     productTitle: [product.displayName1, product.displayName2].filter(Boolean).join(" ").trim(),
+    productEyebrow: product.eyebrow ?? null,
     editionSize: variant.editionSize,
     locked: counts.sold > 0,
     counts,

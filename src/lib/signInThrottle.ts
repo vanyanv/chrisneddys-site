@@ -14,11 +14,11 @@
 import { and, eq, gte, lt, sql, type SQL } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { signInAttempts } from "@/db/schema";
+import { LOCKOUT_WINDOW_MS, MAX_FAILED_ATTEMPTS } from "@/lib/signInPolicy";
 
 /** A channel (email or IP) is locked once it has this many failed attempts
  * inside `LOCKOUT_WINDOW_MS`. */
-export const MAX_FAILED_ATTEMPTS = 5;
-export const LOCKOUT_WINDOW_MS = 15 * 60 * 1000;
+export { MAX_FAILED_ATTEMPTS, LOCKOUT_WINDOW_MS } from "@/lib/signInPolicy";
 /** Default `kind` for owner sign-in — see the module doc comment. */
 export const SIGN_IN_KIND = "sign_in";
 /** How long `sign_in_attempts` rows are kept before `pruneSignInAttempts`

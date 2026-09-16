@@ -5,7 +5,6 @@ import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { getRunForAdmin } from "@/lib/runAdmin";
-import { getProductForAdmin } from "@/lib/catalogAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { RunBoard } from "./RunBoard";
@@ -36,11 +35,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
   const session = await requireOwner();
   const { id } = await params;
 
-  const [run, settings, product] = await Promise.all([
-    getRunForAdmin(id),
-    getStoreSettings(),
-    getProductForAdmin(id),
-  ]);
+  const [run, settings] = await Promise.all([getRunForAdmin(id), getStoreSettings()]);
   if (!run) notFound();
 
   const shopOpen = isShopOpenFor(settings);
@@ -105,7 +100,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
             The run
           </h1>
           <span className="rack-page-count rack-mono">
-            {product?.eyebrow ? `${product.eyebrow.toUpperCase()} · ` : ""}
+            {run.productEyebrow ? `${run.productEyebrow.toUpperCase()} · ` : ""}
             {run.editionSize} MADE &middot; {run.locked ? "LOCKED" : "OPEN"}
           </span>
         </div>

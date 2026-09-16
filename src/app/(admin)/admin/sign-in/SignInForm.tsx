@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
+import { signInPolicySummary } from "@/lib/signInPolicy";
 import { PasskeySignIn } from "./PasskeySignIn";
 
 const initialState: SignInState = {};
@@ -110,7 +111,7 @@ export function SignInForm({
 
       <div className="rack-hairline rack-guest-link-row">
         <Link href="/admin/forgot-password">Trouble getting in?</Link>
-        <span className="rack-eyebrow">5 tries per 15 min</span>
+        <span className="rack-eyebrow">{signInPolicySummary()}</span>
       </div>
     </form>
   );

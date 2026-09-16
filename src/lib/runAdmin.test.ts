@@ -126,6 +126,9 @@ describe("getRunForAdmin", () => {
 
     const run = await getRunForAdmin(draft.id);
     expect(run).toBeDefined();
+    // Carried off the product row this query already loads, so the run page
+    // needs no second read of the whole product just to print it.
+    expect(run).toHaveProperty("productEyebrow");
     expect(run?.counts).toEqual({ available: 3, reserved: 1, sold: 1 });
     expect(run?.locked).toBe(true);
 

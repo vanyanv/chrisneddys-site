@@ -54,11 +54,19 @@ export function OwnersCard({ owners }: { owners: OwnerRow[] }) {
     if (inviteState?.ok && inviteState.at && inviteState.at !== lastInviteAtRef.current) {
       lastInviteAtRef.current = inviteState.at;
       inviteFormRef.current?.reset();
-      router.refresh();
       // Sent-vs-not each get their own way of telling the owner: a toast
       // for "it went out", the persistent notice below (which reads
       // `inviteState` directly) for "here's the link instead".
+      //
+      // The toast goes up *before* `router.refresh()`, not after (issue
+      // #38). `refresh()` re-renders the whole of `/admin/settings` —
+      // three DB reads in `page.tsx` plus every card's own — and this
+      // confirmation needs none of it: it is reporting what the action
+      // already returned. Showing it afterwards makes "your invite went
+      // out" wait on work it does not depend on, which on a database that
+      // serializes queries is unbounded rather than merely slow.
       if (inviteState.sent) showToast("Invite sent");
+      router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteState]);
@@ -68,8 +76,9 @@ export function OwnersCard({ owners }: { owners: OwnerRow[] }) {
     if (removeState?.ok && removeState.at && removeState.at !== lastRemoveAtRef.current) {
       lastRemoveAtRef.current = removeState.at;
       setConfirmEmail(null);
-      router.refresh();
+      // Toast first, refresh second — see the invite effect above (#38).
       showToast("Owner removed");
+      router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [removeState]);

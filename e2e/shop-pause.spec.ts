@@ -37,14 +37,22 @@ const SLUG = "foam-trucker-blue";
 const PAUSE_NOTE = "Back Thursday — e2e";
 
 /**
- * Clicks Save and waits for the "Settings saved" toast — with a much longer
- * timeout than the config's already-generous default 15s. This file's own
- * saves are the slow case that pattern is built for: each one calls
- * `revalidatePath` for `/shop/`, every product page, `/returns/` and
- * `/terms/` (`saveStoreSettings`, `src/lib/settingsAdmin.ts`), and PGlite
- * only ever runs one query at a time — a second save landing while the
- * first's revalidation is still working through that queue has to wait
- * behind it. 15s was not enough for that in practice; 45s is.
+ * Clicks Save and waits for the "Settings saved" toast, with a longer
+ * timeout than the config's default 15s.
+ *
+ * An earlier version of this comment blamed the save itself queueing
+ * behind its own `revalidatePath` fan-out on PGlite's single connection.
+ * That was measured and disproven (issue #38): `updateStoreSettings` and
+ * the revalidation both finish in single-digit milliseconds every time,
+ * and the row is always written. What the toast can end up waiting on is
+ * the *implicit* re-render of `/admin/settings` that Next runs after any
+ * Server Action which revalidates anything — three DB reads in `page.tsx`
+ * plus every card's own, serialized through PGlite's one connection
+ * against whatever the rest of the suite has queued at that moment.
+ *
+ * So this timeout is a cushion for a known, tracked defect, not a
+ * measure of how long saving takes. It is deliberately not inflated
+ * further: if it trips, that is worth seeing rather than hiding.
  */
 async function save(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Save", exact: true }).click();

@@ -30,9 +30,12 @@ const GUEST_PATHS = new Set(["/admin/sign-in", "/admin/forgot-password", "/admin
 /**
  * "CE" from a name ("Chris Eddy" -> "CE"), or the first two letters of the
  * email's local part when there's no name on file — every owner session has
- * an email, not every one has a name.
+ * an email, not every one has a name. Exported so `/admin`'s own page
+ * (`admin/page.tsx`, The Rack) can build the same initials for its own
+ * avatar without duplicating this logic — see the note below on why that
+ * page owns its chrome instead of using this layout's.
  */
-function ownerInitials(session: OwnerSession): string {
+export function ownerInitials(session: OwnerSession): string {
   if (session.name) {
     const letters = session.name
       .trim()
@@ -49,9 +52,17 @@ function ownerInitials(session: OwnerSession): string {
 /**
  * The Sheet's chrome: an ink top bar (wordmark, section tabs, store-open
  * pill, owner menu) and nothing else — no sidebar. `/admin/products` is the
- * home the tabs point at; `/admin` itself just redirects there. The
- * sign-in page shares this route tree but isn't signed in yet, so it gets
- * the bare guest shell with no top bar — just its own centred card.
+ * home the tabs point at. The sign-in page shares this route tree but isn't
+ * signed in yet, so it gets the bare guest shell with no top bar — just its
+ * own centred card.
+ *
+ * `/admin` itself is `Today` (The Rack, issue #36) rather than a redirect
+ * to `/admin/products` — it's the one page this phase moves onto The
+ * Rack's visual system, which has its own top bar/tabs (`rack-topbar` in
+ * `src/styles/admin-rack.css`), not this one's `adm-topbar`. So this layout
+ * only does the auth gate for it and hands back `children` untouched;
+ * Products, Orders and Settings still get the Sheet chrome below exactly as
+ * they always have.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers();
@@ -62,6 +73,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!session) {
     return <div className="adm-shell adm-shell-guest">{children}</div>;
+  }
+
+  if (pathname === "/admin") {
+    return <>{children}</>;
   }
 
   const settings = await getStoreSettings();

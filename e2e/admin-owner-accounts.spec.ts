@@ -206,9 +206,11 @@ test.describe("owner accounts", () => {
     await page.getByLabel("Password").fill(OWNER_PASSWORD);
     await page.getByRole("button", { name: /sign in/i }).click();
 
-    // `/admin` itself redirects to `/admin/products` (src/app/(admin)/admin/page.tsx).
-    await page.waitForURL(/\/admin\/products\/?$/, { timeout: 30_000 });
-    await expect(page.getByRole("heading", { name: "Products", level: 1 })).toBeVisible();
+    // `/admin` itself is Today — The Rack's work queue
+    // (src/app/(admin)/admin/page.tsx) — rather than a redirect to
+    // /admin/products, since issue #36.
+    await page.waitForURL(/\/admin\/?$/, { timeout: 30_000 });
+    await expect(page.getByRole("heading", { name: "Today", level: 1 })).toBeVisible();
   });
 
   test("2. changing a password from settings: the new password works, the old one doesn't", async ({

@@ -1,0 +1,633 @@
+/**
+ * The Rack — the redesigned admin's design system (issue #36). Every custom
+ * property and class here is prefixed `--rack-*` / `.rack-*` so it can live
+ * alongside The Sheet's `--a-*` / `.adm-*` system (`tokens.css`,
+ * `admin.css`, `admin-sheet.css`) without colliding while both exist:
+ * Products, Orders and Settings stay on The Sheet until their own phases
+ * land, and only `/admin` (Today) imports this file.
+ *
+ * Palette values are the same hex values DESIGN.md already documents for
+ * the storefront (`counter-red`, `marquee-yellow`, `butcher-paper`, …) —
+ * The Rack reuses the brand's one palette rather than inventing a second
+ * one for the admin. Type roles: Bowlby One for display numbers and
+ * headings, Inter for body copy, JetBrains Mono for labels/meta/money —
+ * same three faces DESIGN.md already specifies, read here from the
+ * `--font-*` CSS variables `next/font` sets on `<html>`
+ * (`src/app/(admin)/layout.tsx`) rather than a second Google Fonts import.
+ *
+ * Motion tokens are the 4-step duration scale and 3 named easings from the
+ * design's `Motion.dc.html` reference sheet — taken as tokens for later
+ * phases to use, not built out as their own screen here.
+ */
+
+:root {
+  /* ---- colour ---- */
+  --rack-paper: #fff8e7;
+  --rack-cream: #fff2c9;
+  --rack-card: #fffdf6;
+  --rack-ink: #1a1612;
+  --rack-rule: #e3d8bc;
+  --rack-muted: #7a6f5e;
+  --rack-red: #e63027;
+  --rack-red-cta: #d0281c;
+  --rack-red-deep: #b41d14;
+  --rack-yellow: #f5b82e;
+  --rack-yellow-ink: #ffd633;
+  --rack-yellow-deep: #e09e0e;
+  --rack-green: #2f6b43;
+
+  /* ---- type scale (font-size only — family comes from the classes below) */
+  --rack-text-display: 40px;
+  --rack-text-stat: 30px;
+  --rack-text-body: 14px;
+  --rack-text-label: 10px;
+  --rack-text-meta: 11.5px;
+
+  /* ---- spacing ---- */
+  --rack-space-xs: 4px;
+  --rack-space-sm: 8px;
+  --rack-space-md: 13px;
+  --rack-space-lg: 15px;
+  --rack-space-xl: 22px;
+
+  /* ---- borders ---- */
+  --rack-border: 1px solid var(--rack-rule);
+  --rack-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
+
+  /* ---- motion: 4-step duration scale, 3 easings by job (Motion.dc.html) */
+  --rack-dur-1: 100ms;
+  --rack-dur-2: 200ms;
+  --rack-dur-3: 300ms;
+  --rack-dur-4: 500ms;
+  --rack-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --rack-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --rack-ease-move: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Base / type roles                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-root {
+  min-height: 100vh;
+  background: var(--rack-paper);
+  color: var(--rack-ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: var(--rack-text-body);
+  line-height: 1.6;
+}
+.rack-root * {
+  box-sizing: border-box;
+}
+.rack-root :focus-visible {
+  outline: 2px solid var(--rack-yellow-deep);
+  outline-offset: 2px;
+}
+.rack-root a {
+  color: var(--rack-ink);
+}
+.rack-root a:hover {
+  color: var(--rack-red-cta);
+}
+
+.rack-mono {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.rack-bow {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+}
+.rack-eyebrow {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rack-muted);
+}
+.rack-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Shell: top bar + page header                                          */
+/* ---------------------------------------------------------------------- */
+
+.rack-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px var(--rack-space-xl);
+  border-bottom: var(--rack-border);
+  gap: var(--rack-space-lg);
+}
+/* The brand is the logo, never typed. The Rack's artboards set the wordmark
+   in Bowlby One, but DESIGN.md rules that the brand never renders as type and
+   commit 4526752 replaced the typed wordmark with this raster across the
+   admin. The shipped rule wins over the mockup. */
+.rack-logo {
+  height: 22px;
+  width: auto;
+}
+.rack-wordmark-tag {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.14em;
+  color: var(--rack-muted);
+  margin-left: var(--rack-space-sm);
+}
+.rack-brand {
+  display: flex;
+  align-items: baseline;
+  text-decoration: none;
+}
+.rack-tabs {
+  display: flex;
+  gap: var(--rack-space-xl);
+  flex-wrap: wrap;
+}
+.rack-tab {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rack-muted);
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-tab:hover {
+  color: var(--rack-ink);
+}
+.rack-tab[aria-current="page"] {
+  color: var(--rack-ink);
+  border-color: var(--rack-ink);
+}
+.rack-top-right {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-md);
+}
+.rack-store-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: var(--rack-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.rack-store-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--rack-green);
+  display: block;
+}
+.rack-store-pill.is-closed i {
+  background: var(--rack-muted);
+}
+.rack-avatar-menu {
+  position: relative;
+}
+.rack-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--rack-ink);
+  color: var(--rack-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border: none;
+}
+.rack-avatar::-webkit-details-marker {
+  display: none;
+}
+.rack-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--rack-card);
+  border: var(--rack-border);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-md);
+  min-width: 200px;
+  z-index: 20;
+}
+.rack-menu-email {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: 0 0 var(--rack-space-md);
+  word-break: break-all;
+}
+.rack-menu-signout {
+  width: 100%;
+  background: var(--rack-card);
+  border: var(--rack-border);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--rack-ink);
+}
+.rack-menu-signout:hover {
+  border-color: var(--rack-muted);
+}
+
+.rack-page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--rack-space-lg);
+  padding: var(--rack-space-xl);
+}
+.rack-page-title {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: var(--rack-text-display);
+  font-weight: 400;
+  margin: 7px 0 0;
+}
+.rack-page-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  flex-wrap: wrap;
+}
+.rack-page-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-meta);
+  letter-spacing: 0.1em;
+  color: var(--rack-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Controls                                                                */
+/* ---------------------------------------------------------------------- */
+
+.rack-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rack-space-sm);
+  background: var(--rack-yellow);
+  color: var(--rack-ink);
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--rack-yellow-deep);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-btn-primary:hover {
+  background: var(--rack-yellow-ink);
+  color: var(--rack-ink);
+}
+.rack-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--rack-card);
+  color: var(--rack-ink);
+  border: var(--rack-border);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--rack-dur-1) var(--rack-ease-move);
+  white-space: nowrap;
+}
+.rack-btn:hover {
+  border-color: var(--rack-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: stat tiles                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--rack-space-lg);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+}
+.rack-stat-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: var(--rack-space-lg) 17px;
+}
+.rack-stat-value {
+  font-size: var(--rack-text-stat);
+  margin-top: var(--rack-space-sm);
+}
+.rack-stat-meta {
+  font-size: 11px;
+  color: var(--rack-muted);
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: work queue                                                      */
+/* ---------------------------------------------------------------------- */
+
+.rack-today-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+
+.rack-queue {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rack-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rack-space-lg);
+  padding: var(--rack-space-lg) 18px;
+  border-bottom: var(--rack-border);
+  flex-wrap: wrap;
+}
+.rack-queue-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  padding: 16px 18px;
+  border-bottom: var(--rack-border);
+}
+.rack-queue-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: var(--rack-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--rack-muted);
+}
+.rack-queue-icon.is-urgent {
+  border-color: var(--rack-red-cta);
+  color: var(--rack-red-cta);
+}
+.rack-queue-icon.is-warn {
+  border-color: var(--rack-yellow-deep);
+  color: var(--rack-yellow-deep);
+}
+.rack-queue-body {
+  flex: 1;
+  min-width: 0;
+}
+.rack-queue-title {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.rack-queue-meta {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-meta);
+  color: var(--rack-muted);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.rack-queue-clear {
+  margin-top: auto;
+  padding: var(--rack-space-lg) 18px;
+  border-top: var(--rack-border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--rack-green);
+}
+.rack-queue-clear span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Today: side column — the run + just happened                           */
+/* ---------------------------------------------------------------------- */
+
+.rack-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  min-height: 0;
+}
+.rack-panel {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: 18px;
+}
+.rack-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--rack-space-md);
+}
+
+.rack-edgrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  max-width: 356px;
+}
+.rack-edcell {
+  aspect-ratio: 1;
+  background: var(--rack-cream);
+}
+.rack-edcell.is-reserved {
+  background: var(--rack-yellow);
+}
+.rack-edcell.is-sold {
+  background: var(--rack-ink);
+}
+.rack-edlegend {
+  display: flex;
+  gap: var(--rack-space-md);
+  margin-top: var(--rack-space-sm);
+  font-size: 11.5px;
+  color: var(--rack-muted);
+  flex-wrap: wrap;
+}
+.rack-edlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rack-edlegend i {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+}
+.rack-edlegend i.is-available {
+  background: var(--rack-cream);
+  border: var(--rack-border);
+}
+.rack-edlegend i.is-reserved {
+  background: var(--rack-yellow);
+}
+.rack-edlegend i.is-sold {
+  background: var(--rack-ink);
+}
+
+.rack-activity {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 2.1;
+  color: var(--rack-muted);
+}
+.rack-activity-row {
+  display: flex;
+  gap: 11px;
+}
+.rack-activity-when {
+  width: 64px;
+  flex: none;
+}
+.rack-activity-what {
+  color: var(--rack-ink);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Motion                                                                  */
+/* ---------------------------------------------------------------------- */
+
+@keyframes rack-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rack-rise {
+  animation: rack-rise var(--rack-dur-3) var(--rack-ease-enter) both;
+}
+.rack-rise.r1 {
+  animation-delay: 40ms;
+}
+.rack-rise.r2 {
+  animation-delay: 80ms;
+}
+.rack-rise.r3 {
+  animation-delay: 120ms;
+}
+.rack-rise.r4 {
+  animation-delay: 160ms;
+}
+.rack-rise.r5 {
+  animation-delay: 200ms;
+}
+
+@keyframes rack-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.rack-sk {
+  background: var(--rack-rule);
+  animation: rack-breathe 1.4s var(--rack-ease-move) infinite;
+}
+
+@keyframes rack-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rack-spin {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(26, 22, 18, 0.22);
+  border-top-color: var(--rack-ink);
+  border-radius: 999px;
+  animation: rack-spin 0.7s linear infinite;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rack-root *,
+  .rack-root *::before,
+  .rack-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Phone (AdminPhone.dc.html)                                             */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .rack-topbar {
+    padding: 13px var(--rack-space-lg);
+  }
+  .rack-tabs {
+    padding: 0 var(--rack-space-lg) 0;
+    gap: var(--rack-space-lg);
+    overflow-x: auto;
+  }
+  .rack-page-header {
+    padding: var(--rack-space-lg) var(--rack-space-lg) 0;
+  }
+  .rack-page-title {
+    font-size: 28px;
+  }
+  .rack-page-header-right {
+    width: 100%;
+  }
+  .rack-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: var(--rack-space-lg);
+    gap: var(--rack-space-sm);
+  }
+  .rack-stat-card {
+    padding: var(--rack-space-md);
+  }
+  .rack-stat-value {
+    font-size: 24px;
+  }
+  .rack-today-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0 var(--rack-space-lg);
+  }
+  .rack-queue {
+    border-left: none;
+    border-right: none;
+  }
+  .rack-side {
+    padding: 0 var(--rack-space-lg);
+  }
+}

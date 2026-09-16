@@ -180,11 +180,24 @@ export async function getProductBySlug(slug: string): Promise<MerchProduct | und
   return cachedProductBySlug(slug);
 }
 
+export type EditionCellStatus = "available" | "reserved" | "sold";
+export type EditionCell = { number: number; status: EditionCellStatus };
+
 export type InventoryStatus = {
   /** Whether a real store is decrementing this count. False means `available` is not meaningful. */
   tracked: boolean;
   available: number;
   editionSize: number | null;
+  /**
+   * Every edition row for a tracked edition product, ordered by number —
+   * `undefined` for a plain-quantity product, an untracked product, or the
+   * static fallback (which has no real editions to report at all). This is
+   * what the product page's edition map renders: `available` alone can't
+   * tell a buyer whether the gap to `editionSize` is a number held in
+   * somebody's open checkout right now or one that's actually sold, and the
+   * map exists specifically so it never has to guess (see `editionCounts`).
+   */
+  editions?: EditionCell[];
 };
 
 async function queryInventory(slug: string): Promise<InventoryStatus | undefined> {
@@ -204,11 +217,53 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
   // lumped in. Plain-quantity products have no edition rows at all, so their
   // count comes straight from `inventory_quantity` instead (kept in sync by
   // `src/lib/orders.ts` on every reservation/payment/release).
+  const editionCells: EditionCell[] | undefined =
+    variant.editionSize !== null
+      ? [...variant.editions]
+          .sort((a, b) => a.number - b.number)
+          .map((e) => ({ number: e.number, status: e.status }))
+      : undefined;
   const available =
     variant.editionSize !== null
-      ? variant.editions.filter((e) => e.status === "available").length
+      ? (editionCells ?? []).filter((e) => e.status === "available").length
       : (variant.inventoryQuantity ?? 0);
-  return { tracked, available, editionSize: variant.editionSize };
+  return { tracked, available, editionSize: variant.editionSize, editions: editionCells };
+}
+
+/**
+ * Splits an edition run's rows into the three counts the map's legend and
+ * the admin's own inventory line both need — pulled out as its own pure
+ * function so it's testable without a database, and so the product page and
+ * anything else reading `InventoryStatus.editions` can't each tally the
+ * three states a different way.
+ */
+export function editionCounts(editions: EditionCell[]): {
+  available: number;
+  reserved: number;
+  sold: number;
+} {
+  let available = 0;
+  let reserved = 0;
+  let sold = 0;
+  for (const cell of editions) {
+    if (cell.status === "available") available++;
+    else if (cell.status === "reserved") reserved++;
+    else sold++;
+  }
+  return { available, reserved, sold };
+}
+
+/**
+ * The lowest-numbered edition still `available` — the same one
+ * `createPendingOrder` (`src/lib/orders.ts`) would claim first if a checkout
+ * started this instant, since it locks available rows in ascending number
+ * order. It is a preview, not a hold: nothing here reserves it, and another
+ * buyer's checkout can still claim it first. Returns `null` once nothing is
+ * left to preview.
+ */
+export function nextAvailableEditionNumber(editions: EditionCell[]): number | null {
+  const numbers = editions.filter((e) => e.status === "available").map((e) => e.number);
+  return numbers.length > 0 ? Math.min(...numbers) : null;
 }
 
 /**

@@ -4597,6 +4597,7 @@ h3 {
   gap: 9px;
 }
 .cne-pdp-main {
+  position: relative;
   border: 3px solid var(--a-ink);
 }
 .cne-pdp-main .cne-capshot {
@@ -4811,6 +4812,14 @@ h3 {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+/* A second ghost link (the bag's "already ordered? track it") sits under
+   the first at a lower shout, or the two compete for the same weight. */
+.cne-btn-ghost.is-sub {
+  padding-top: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: none;
 }
 
 /* What has not been settled yet, said in the place a buyer looks for it. */
@@ -5772,4 +5781,273 @@ h3 {
 }
 .cne-btn-primary.is-soldout:active {
   transform: none;
+}
+
+/* ---- edition map -----------------------------------------------------
+   The centrepiece: every numbered cell drawn, coloured by exactly the three
+   states `editions.status` carries — available, reserved (held in someone's
+   open checkout), sold. `getInventory` (src/lib/catalog.ts) only returns
+   the array for a tracked edition product, so this block never renders for
+   the static fallback catalogue or a plain-quantity product. */
+.cne-edmap {
+  margin-top: 10px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-card);
+  padding: 13px;
+}
+.cne-edmap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.cne-edmap-count {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.cne-edmap-next {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--a-red-cta);
+  border: 1.5px solid var(--a-red-cta);
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+.cne-edmap-next b {
+  font-variant-numeric: tabular-nums;
+}
+.cne-edgrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+.cne-edcell {
+  aspect-ratio: 1;
+  background: var(--a-cream);
+  border: 1px solid var(--a-line);
+}
+.cne-edcell.is-reserved {
+  background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+}
+.cne-edcell.is-sold {
+  background: var(--a-ink);
+  border-color: var(--a-ink);
+}
+.cne-edlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--a-sub);
+}
+.cne-edlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.cne-edlegend i {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border: 1px solid var(--a-line);
+}
+.cne-edlegend i.a {
+  background: var(--a-cream);
+}
+.cne-edlegend i.r {
+  background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+}
+.cne-edlegend i.s {
+  background: var(--a-ink);
+  border-color: var(--a-ink);
+}
+
+/* The product's own "not taking orders yet" notice — the same signal the
+   bag drawer already gates checkout on (`isShopOpenFor`), surfaced here too
+   so a buyer learns it before adding something to the bag, not after. */
+.cne-shopnotice {
+  margin-top: 14px;
+  padding: 11px 12px;
+  border: 2px dashed var(--a-line);
+  background: var(--a-cream);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* The sold-out run's own photo: desaturated and dimmed, with an ink "ALL
+   GONE" pill over it — a card, not an empty shelf, because the run existing
+   is the point. */
+.cne-pdp-main.is-soldout .cne-capshot {
+  filter: saturate(0.3) opacity(0.6);
+}
+.cne-pdp-gone {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--a-ink);
+  color: #fff2c9;
+  padding: 5px 9px;
+  z-index: 1;
+}
+
+/* ---- order tracking (/shop/order/) --------------------------------------
+   The form reuses the guest check's own ruled-line input pattern
+   (`.cne-ck-field`/`.cne-ck-input`/`.cne-ck-underline`) rather than a boxed
+   generic input — `--ck-rule` is scoped to `.cne-ck` there, so it's set
+   again here for the same rule colour. */
+.cne-ord {
+  max-width: 46ch;
+}
+.cne-ord-form {
+  --ck-rule: rgba(26, 22, 18, 0.16);
+  display: grid;
+  gap: 18px;
+}
+.cne-ord-submit {
+  justify-self: start;
+  width: auto;
+  padding: 13px 22px;
+}
+
+.cne-ord-result {
+  margin-top: 30px;
+  padding: 18px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-card);
+  box-shadow: 4px 4px 0 var(--a-shadow);
+}
+.cne-ord-number {
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin: 6px 0 3px;
+}
+.cne-ord-headline {
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+
+.cne-ord-items {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--a-line);
+  border-bottom: 1px solid var(--a-line);
+}
+.cne-ord-items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13.5px;
+}
+.cne-ord-numchip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  border: 1.5px solid var(--a-ink);
+  padding: 3px 7px;
+  flex: none;
+}
+.cne-ord-numchip .eyebrow {
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  font-weight: 700;
+  margin-right: 1px;
+}
+.cne-ord-numchip .of {
+  color: var(--a-sub);
+  font-weight: 500;
+}
+
+/* Two cues, not one: a filled/hollow dot and the label's own weight — a
+   step that hasn't happened is never told apart by colour alone. */
+.cne-ord-timeline {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.cne-ord-timeline li {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 10px;
+  row-gap: 2px;
+}
+.cne-ord-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  border: 2px solid var(--a-line);
+  background: var(--a-card);
+  margin-top: 2px;
+}
+.cne-ord-timeline li.is-done .cne-ord-dot {
+  border-color: var(--a-ok);
+  background: var(--a-ok);
+}
+.cne-ord-step-label {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--a-sub);
+}
+.cne-ord-timeline li.is-done .cne-ord-step-label {
+  color: var(--a-fg);
+}
+.cne-ord-step-detail {
+  grid-column: 2;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--a-sub);
+}
+
+.cne-ord-refunded {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 2px dashed var(--a-line);
+  font-weight: 600;
+  color: var(--a-sub);
+}
+
+.cne-ord-address {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--a-cream);
+  border: 1px solid var(--a-line);
+}
+.cne-ord-address address {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 5px;
+}
+
+.cne-ord-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--a-sub);
 }

@@ -228,6 +228,44 @@ export const verification = pgTable("verification", {
 });
 
 /**
+ * Better Auth's passkey plugin table (`@better-auth/passkey`, issue #51) —
+ * one row per registered WebAuthn credential. Field names mirror the
+ * plugin's own `schema` export (`node_modules/@better-auth/passkey/dist/
+ * index.mjs`) exactly, the same way `user`/`session`/`account`/
+ * `verification` above mirror Better Auth's core `getAuthTables()` — see
+ * that block's comment. `credentialID` keeps the plugin's own casing
+ * (capital ID) since the Drizzle adapter matches on this exact JS property
+ * name, not the column name.
+ */
+export const passkey = pgTable(
+  "passkey",
+  {
+    id: text("id").primaryKey(),
+    /** Owner-supplied label ("MacBook", "iPhone") — optional; the UI falls
+     * back to `getAuthenticatorName(aaguid)` (`@better-auth/passkey`) or
+     * "Passkey" when neither is set. */
+    name: text("name"),
+    publicKey: text("public_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    credentialID: text("credential_id").notNull(),
+    counter: integer("counter").notNull(),
+    deviceType: text("device_type").notNull(),
+    backedUp: boolean("backed_up").notNull(),
+    transports: text("transports"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    /** Authenticator model id (never a per-device or per-user identifier) —
+     * `null` for authenticators that report the all-zero AAGUID. */
+    aaguid: text("aaguid"),
+  },
+  (t) => [
+    index("passkey_user_id_idx").on(t.userId),
+    index("passkey_credential_id_idx").on(t.credentialID),
+  ],
+);
+
+/**
  * Every throttled attempt (success or failure), for the throttle in
  * `src/lib/signInThrottle.ts` — before verifying a password (or looking up
  * an order) it counts recent failures for both the email and the IP and

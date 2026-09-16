@@ -96,6 +96,7 @@ export function SettingsForm({
   shopOpen,
   connections,
   changePassword,
+  passkeys,
   owners,
 }: {
   settings: StoreSettings;
@@ -111,6 +112,10 @@ export function SettingsForm({
   shopOpen: boolean;
   connections: ReactNode;
   changePassword: ReactNode;
+  /** issue #51: passkeys, in the same "Sign-in & passkeys" section as
+   * `changePassword` — a distinct card, not folded into that one, since it
+   * owns its own list and its own add/remove actions. */
+  passkeys: ReactNode;
   owners: ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(saveSettingsAction, initial);
@@ -513,8 +518,9 @@ export function SettingsForm({
           grid rather than as fields inside `#settings-form` — nested
           `<form>` elements aren't valid HTML. */}
       <div className="adm-settings-grid adm-settings-account-grid">
-        <div id="settings-signin" className="adm-settings-section">
-          {changePassword}
+        <div id="settings-signin" className="adm-settings-section adm-settings-signin-group">
+          <div>{changePassword}</div>
+          <div className="adm-passkeys-block">{passkeys}</div>
         </div>
         <div id="settings-owners" className="adm-settings-section">
           {owners}

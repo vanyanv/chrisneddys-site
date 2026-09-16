@@ -78,6 +78,13 @@
       "when": 1789549945873,
       "tag": "0010_neat_eternity",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789580029614,
+      "tag": "0011_normal_jackpot",
+      "breakpoints": true
     }
   ]
 }

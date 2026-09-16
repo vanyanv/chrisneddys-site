@@ -1,9 +1,19 @@
 "use server";
 
 import { headers } from "next/headers";
+import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { requireOwner } from "@/lib/auth";
 import { getAuth } from "@/lib/betterAuth";
 import { inviteOwner, removeOwner } from "@/lib/owners";
+import {
+  finishPasskeyEnrollment,
+  listOwnerPasskeys,
+  removeOwnerPasskey,
+  startPasskeyEnrollment,
+  type FinishEnrollmentResult,
+  type OwnerPasskey,
+  type StartEnrollmentResult,
+} from "@/lib/passkeys";
 import { saveStoreSettings } from "@/lib/settingsAdmin";
 import type { StoreSettingsPatch } from "@/lib/orders";
 
@@ -250,4 +260,38 @@ export async function removeOwnerAction(
 
   if (!result.ok) return { error: result.error };
   return { ok: true, at: new Date().toISOString() };
+}
+
+// ---------------------------------------------------------------------------
+// Passkeys (issue #51) — called directly from `PasskeysCard.tsx`, not bound
+// to a `<form>`: enrollment is a two-step ceremony (a WebAuthn prompt in the
+// browser runs between the "start" and "finish" calls), which
+// `useActionState`'s single form-submit-to-result shape has no room for.
+// ---------------------------------------------------------------------------
+
+/** The signed-in owner's registered passkeys, newest first — read on every
+ * call rather than cached, so the card always shows what's actually stored. */
+export async function listPasskeysAction(): Promise<OwnerPasskey[]> {
+  await requireOwner();
+  return listOwnerPasskeys();
+}
+
+export async function startAddPasskeyAction(name?: string): Promise<StartEnrollmentResult> {
+  await requireOwner();
+  return startPasskeyEnrollment(name);
+}
+
+export async function finishAddPasskeyAction(
+  response: RegistrationResponseJSON,
+  name?: string,
+): Promise<FinishEnrollmentResult> {
+  await requireOwner();
+  return finishPasskeyEnrollment(response, name);
+}
+
+export async function removePasskeyAction(
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireOwner();
+  return removeOwnerPasskey(id);
 }

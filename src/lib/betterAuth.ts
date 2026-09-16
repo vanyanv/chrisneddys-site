@@ -45,10 +45,12 @@
 import { and, eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { passkey } from "@better-auth/passkey";
 import { getDb, type Db } from "@/db/client";
 import * as schema from "@/db/schema";
+import { brand } from "@/data/brand";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { absoluteUrl } from "@/lib/siteOrigin";
+import { absoluteUrl, getSiteOrigin } from "@/lib/siteOrigin";
 
 /**
  * What actually happened when `sendResetPassword` (below) tried to email a
@@ -132,6 +134,53 @@ export async function captureResetSend<T>(
 /** 12 hours, in seconds — see the design doc's "Sessions" section. */
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
 
+/**
+ * The WebAuthn Relying Party ID for the passkey plugin below — the domain a
+ * registered credential is scoped to. Must be the exact host (no port,
+ * no scheme) the browser sees in its address bar when the ceremony runs, or
+ * a registrable parent of it; the browser itself refuses to create or use a
+ * credential otherwise. There's no per-request origin to read here (this
+ * instance is a per-process singleton — see this file's module comment), so
+ * this reuses `getSiteOrigin()` exactly as `absoluteUrl` (above) does: the
+ * `SITE_ORIGIN` override the e2e harness and any preview needing one can set
+ * (`playwright.config.ts` points it at its own disposable server), then
+ * `VERCEL_URL` on a Vercel preview, then `brand.siteUrl` in production.
+ *
+ * A plain `pnpm dev` with none of those set falls through to
+ * `brand.siteUrl`'s real production host, which will not match
+ * `http://localhost:3000`'s origin — passkeys will not register or sign in
+ * locally unless `SITE_ORIGIN` is set to `http://localhost:<port>` in
+ * `.env.local`. Password sign-in is entirely unaffected either way.
+ *
+ * **This function must never throw**, which is why it doesn't simply read
+ * `new URL(getSiteOrigin()).hostname`. It runs inside `buildAuth` below, so
+ * anything it throws takes down the whole `auth` instance — not just
+ * passkeys, but `signInEmail`, `getSession` and `requireOwner` with it,
+ * locking every owner out of the admin. And `SITE_ORIGIN` is a hand-set
+ * environment variable: `SITE_ORIGIN=chrisneddys.com`, with the scheme left
+ * off the way every other variable in `DEPLOY.md` is a bare value, is not a
+ * hypothetical typo. `new URL()` rejects it outright, and
+ * `"www.chrisneddys.com:443"` is worse still — it parses, reading
+ * `www.chrisneddys.com:` as the scheme, and yields an empty hostname with
+ * no error at all. So a malformed origin falls back to `brand.siteUrl`'s
+ * host: passkeys registered against the wrong RP ID simply won't be offered
+ * by the browser, which is a bad passkey day, not a lockout. The password
+ * is always still there (issue #51's rule 1).
+ */
+export function passkeyRpID(): string {
+  const fallback = new URL(brand.siteUrl).hostname;
+  try {
+    return new URL(getSiteOrigin()).hostname || fallback;
+  } catch {
+    console.warn(
+      "[auth] SITE_ORIGIN is not a valid absolute origin; passkeys will use",
+      fallback,
+      "as their relying-party ID. Set SITE_ORIGIN to a full origin, scheme included (e.g. https://example.com).",
+    );
+    return fallback;
+  }
+}
+
 async function buildAuth(db: Db) {
   return betterAuth({
     secret: process.env.AUTH_SECRET,
@@ -208,6 +257,24 @@ async function buildAuth(db: Db) {
     session: {
       expiresIn: SESSION_MAX_AGE_SECONDS,
     },
+    // Issue #51: passkeys are an *addition* to email+password, never a
+    // replacement — nothing above this changes, and every endpoint this
+    // plugin adds (`/passkey/*`) is invoked the same way `signIn`/`signOut`
+    // above already invoke Better Auth's own endpoints: directly, as
+    // `auth.api.*` calls from server actions (`src/lib/passkeys.ts`), never
+    // through a mounted `/api/auth/*` route — see that file's module
+    // comment for why that works with no route handler at all.
+    plugins: [
+      passkey({
+        rpID: passkeyRpID(),
+        rpName: brand.name,
+        // Registration defaults to requiring a session (`requireSession`
+        // defaults to `true`, which this leaves alone) — issue #51's rule
+        // 2: a passkey can only ever be enrolled from inside an
+        // authenticated session, enforced by the plugin itself, not by
+        // anything bolted on here.
+      }),
+    ],
   });
 }
 

@@ -48,7 +48,11 @@ import {
  * rows. `issuedAt` is the session row's `createdAt`, in Unix seconds. */
 export type OwnerSession = { email: string; name: string | null; issuedAt: number };
 
-const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
+/** Exported so `src/lib/passkeys.ts` can return the exact same wording on
+ * every failure path a passkey sign-in can take too — a wrong password and
+ * an unrecognized (or rejected) passkey must read identically, so neither
+ * ever tells an attacker which one was tried. */
+export const GENERIC_SIGN_IN_ERROR = "That email or password isn't right.";
 
 function ownerEmailsFromEnv(): string[] {
   return parseOwnerEmails(process.env.OWNER_EMAILS);
@@ -107,8 +111,10 @@ export async function applySetCookieHeader(setCookieHeader: string | null): Prom
  * from a first-ever visit and the sign-in page only claims "you were signed
  * out" when that actually happened. Scoped to `/admin` and `httpOnly` —
  * nothing outside the admin, and no client script, has any use for it.
+ * Exported so `src/lib/passkeys.ts`'s passkey sign-in marks the same cookie
+ * a password sign-in does.
  */
-async function markSignedInBefore(): Promise<void> {
+export async function markSignedInBefore(): Promise<void> {
   const store = await cookies();
   store.set(SIGNED_IN_BEFORE_COOKIE, "1", {
     httpOnly: true,

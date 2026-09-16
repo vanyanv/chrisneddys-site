@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
+import { PasskeySignIn } from "./PasskeySignIn";
 
 const initialState: SignInState = {};
 
@@ -57,6 +58,11 @@ export function SignInForm({
 
       <input type="hidden" name="next" value={next} />
 
+      {/* issue #51: passkeys are opt-in and additive — a "Continue with a
+          passkey" primary action plus a divider, ahead of the email/password
+          fields below, which keep working exactly as they always have. */}
+      <PasskeySignIn next={next} />
+
       <div className="adm-field">
         <label className="adm-label" htmlFor="email">
           Email
@@ -77,7 +83,7 @@ export function SignInForm({
         />
       </div>
 
-      <button type="submit" className="rack-btn-primary rack-guest-submit" disabled={pending}>
+      <button type="submit" className="rack-btn rack-guest-submit" disabled={pending}>
         {pending ? (
           <>
             <span className="rack-spin" aria-hidden="true" />

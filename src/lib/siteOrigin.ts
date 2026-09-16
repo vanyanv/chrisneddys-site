@@ -16,7 +16,7 @@
  *
  * 1. `SITE_ORIGIN` — an explicit override, checked first so it always wins.
  *    This is what `playwright.config.ts`'s e2e harness sets, pointed at the
- *    Playwright test server's own `http://127.0.0.1:<port>` origin — without
+ *    Playwright test server's own `http://localhost:<port>` origin — without
  *    it, an emailed link built from `brand.siteUrl` would send the e2e
  *    suite's "invitee" flow off to the real, live chrisneddys.com instead of
  *    the disposable server under test. Any Vercel preview that needs a real

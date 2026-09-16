@@ -1904,6 +1904,26 @@
   opacity: 0.9;
 }
 
+/* issue #51: "Continue with a passkey" + its caption, and the divider that
+   separates it from the email/password fields below. */
+.rack-guest-passkey-caption {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin: var(--rack-space-sm) 0 0;
+  text-align: center;
+}
+.rack-guest-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-lg);
+  margin: var(--rack-space-xl) 0;
+}
+.rack-guest-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--rack-rule);
+}
+
 /* The "N tries left" warning (sign-in) — a step down from `.adm-error`:
    still on-brand ink text, but the yellow-cream card marks it as a caution
    rather than a hard stop, since the owner can still just try again. */

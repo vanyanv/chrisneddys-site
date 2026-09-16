@@ -31,6 +31,17 @@ function centsToPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+/** The address a "reply to this email" promise actually has to land on.
+ * `EMAIL_REPLY_TO` (read the same way `EMAIL_FROM` is, no extra gating) lets
+ * the sending address and the reply address differ — Resend's `from` has to
+ * be on a verified domain, a real inbox someone reads doesn't — and when
+ * it's unset this falls back to the store's own support address, which is
+ * already a real inbox stated in the same email's footer, so the promise
+ * holds either way. */
+function resolveReplyTo(settings: Settings): string {
+  return process.env.EMAIL_REPLY_TO || settings.supportEmail;
+}
+
 // ---------------------------------------------------------------------------
 // Shared order-shape helpers (used by both the text and HTML bodies)
 // ---------------------------------------------------------------------------
@@ -60,6 +71,35 @@ function receiptHeading(order: OrderWithItems): string {
   if (numbers.length === 1) return `Number ${numbers[0]} is yours.`;
   if (numbers.length > 1) return `Numbers ${formatNumberList(numbers)} are yours.`;
   return "Order confirmed.";
+}
+
+/** "Order CNE-1043 confirmed — number 35 of 50 is yours" for a single
+ * numbered item (with the edition size only when it's actually known),
+ * "... — numbers 35 and 36 are yours" for more than one, and the plain
+ * generic subject for an order with no numbered items at all — a
+ * quantity-only order has no number to print, so it falls back rather than
+ * printing an empty value. */
+function receiptSubject(order: OrderWithItems, sizes: Map<string, number | null>): string {
+  const generic = `Order ${order.number} confirmed — ${brand.name}`;
+  const numbers = editionNumbersOf(order);
+  if (numbers.length === 0) return generic;
+  if (numbers.length > 1) {
+    return `Order ${order.number} confirmed — numbers ${formatNumberList(numbers)} are yours`;
+  }
+  const item = order.items.find((i) => i.editionNumber === numbers[0]);
+  const size = item ? sizes.get(item.variantId) : null;
+  const of = size ? ` of ${size}` : "";
+  return `Order ${order.number} confirmed — number ${numbers[0]}${of} is yours`;
+}
+
+/** "Order CNE-1043 shipped — USPS" once a carrier is on file, falling back
+ * to the plain generic subject otherwise. No ETA is ever printed here — the
+ * schema has no delivery-estimate column (`carrier`/`trackingNumber` only,
+ * see `orders` in `src/db/schema.ts`), so there is nothing genuine to state
+ * beyond the carrier. */
+function shippingSubject(order: OrderWithItems): string {
+  if (!order.carrier) return `Order ${order.number} has shipped — ${brand.name}`;
+  return `Order ${order.number} shipped — ${order.carrier}`;
 }
 
 function firstName(order: OrderWithItems): string | null {
@@ -311,11 +351,21 @@ function htmlShell(opts: {
 // Sending
 // ---------------------------------------------------------------------------
 
+/** True once both env vars `sendEmail` is gated on are set — the same check
+ * `src/app/(admin)/admin/forgot-password/actions.ts` and `page.tsx`
+ * currently each duplicate locally, exported here so those (and anywhere
+ * else that needs to answer "is email configured?", such as the settings
+ * Connections card) can read it off one source instead. */
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+}
+
 export async function sendEmail(
   to: string,
   subject: string,
   text: string,
   html?: string,
+  replyTo?: string,
 ): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
@@ -335,7 +385,14 @@ export async function sendEmail(
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to, subject, text, html: html ?? plainHtmlBody(text) }),
+      body: JSON.stringify({
+        from,
+        to,
+        subject,
+        text,
+        html: html ?? plainHtmlBody(text),
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
@@ -391,12 +448,7 @@ export async function sendOrderConfirmation(order: OrderWithItems, db?: Db): Pro
     settings,
   });
 
-  return sendEmail(
-    order.email ?? "",
-    `Order ${order.number} confirmed — ${brand.name}`,
-    text,
-    html,
-  );
+  return sendEmail(order.email ?? "", receiptSubject(order, sizes), text, html);
 }
 
 export async function sendShippingNotice(order: OrderWithItems, db?: Db): Promise<EmailResult> {
@@ -447,12 +499,7 @@ export async function sendShippingNotice(order: OrderWithItems, db?: Db): Promis
     settings,
   });
 
-  return sendEmail(
-    order.email ?? "",
-    `Order ${order.number} has shipped — ${brand.name}`,
-    text,
-    html,
-  );
+  return sendEmail(order.email ?? "", shippingSubject(order), text, html, resolveReplyTo(settings));
 }
 
 export async function sendPickupReady(order: OrderWithItems, db?: Db): Promise<EmailResult> {
@@ -553,7 +600,13 @@ export async function sendRefundConfirmation(
     settings,
   });
 
-  return sendEmail(order.email ?? "", `Refunded ${amount} for order ${order.number}`, text, html);
+  return sendEmail(
+    order.email ?? "",
+    `Refunded ${amount} for order ${order.number}`,
+    text,
+    html,
+    resolveReplyTo(settings),
+  );
 }
 
 export async function sendPasswordReset(to: string, url: string): Promise<EmailResult> {

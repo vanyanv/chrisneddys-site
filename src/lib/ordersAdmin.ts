@@ -11,7 +11,7 @@ import "server-only";
  */
 import { and, eq, gte, inArray } from "drizzle-orm";
 import { getDb } from "@/db/client";
-import { orderItems, orders, type ShipTo } from "@/db/schema";
+import { orderItems, orders, variants, type ShipTo } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
 import * as email from "@/lib/email";
 import {
@@ -145,6 +145,14 @@ export type AdminOrderItem = {
   unitPriceCents: number;
   quantity: number;
   editionNumber: number | null;
+  /** The edition's run size, for a "Number 35 of 50" line — lives on the
+   * variant, not the order item (see `getEditionSizes` in
+   * `src/lib/orders.ts`), and projected on here the same way. `null` for a
+   * plain quantity item, or if the variant itself has none. */
+  editionSize: number | null;
+  /** The purchased variant's own label (e.g. "One size", "Medium") — real,
+   * customer-meaningful text for a packing slip, unlike the internal SKU. */
+  variantLabel: string;
 };
 
 export type AdminOrderDetail = {
@@ -177,7 +185,24 @@ export type AdminOrderDetail = {
   updatedAt: Date;
 };
 
-function toAdminDetail(order: OrderWithItems): AdminOrderDetail {
+/** Variant facts order_items doesn't itself snapshot (edition size, the
+ * variant's own label) — one query per order detail, keyed by variant id. */
+async function variantFactsFor(
+  order: OrderWithItems,
+): Promise<Map<string, { editionSize: number | null; label: string }>> {
+  const variantIds = [...new Set(order.items.map((item) => item.variantId))];
+  if (variantIds.length === 0) return new Map();
+
+  const db = await getDb();
+  const rows = await db
+    .select({ id: variants.id, editionSize: variants.editionSize, label: variants.label })
+    .from(variants)
+    .where(inArray(variants.id, variantIds));
+  return new Map(rows.map((v) => [v.id, { editionSize: v.editionSize, label: v.label }]));
+}
+
+async function toAdminDetail(order: OrderWithItems): Promise<AdminOrderDetail> {
+  const variantFacts = await variantFactsFor(order);
   return {
     id: order.id,
     number: order.number,
@@ -190,14 +215,19 @@ function toAdminDetail(order: OrderWithItems): AdminOrderDetail {
     items: order.items
       .slice()
       .sort((a, b) => (a.editionNumber ?? 0) - (b.editionNumber ?? 0))
-      .map((item) => ({
-        id: item.id,
-        productName: item.productName,
-        sku: item.sku,
-        unitPriceCents: item.unitPriceCents,
-        quantity: item.quantity,
-        editionNumber: item.editionNumber,
-      })),
+      .map((item) => {
+        const facts = variantFacts.get(item.variantId);
+        return {
+          id: item.id,
+          productName: item.productName,
+          sku: item.sku,
+          unitPriceCents: item.unitPriceCents,
+          quantity: item.quantity,
+          editionNumber: item.editionNumber,
+          editionSize: facts?.editionSize ?? null,
+          variantLabel: facts?.label ?? item.productName,
+        };
+      }),
     subtotalCents: order.subtotalCents,
     shippingCents: order.shippingCents,
     taxCents: order.taxCents,
@@ -218,7 +248,7 @@ function toAdminDetail(order: OrderWithItems): AdminOrderDetail {
 /** Full detail for one order's admin page. Undefined if the id doesn't exist. */
 export async function getOrderForAdmin(id: string): Promise<AdminOrderDetail | undefined> {
   const order = await getOrder(id);
-  return order ? toAdminDetail(order) : undefined;
+  return order ? await toAdminDetail(order) : undefined;
 }
 
 // ---------------------------------------------------------------------------

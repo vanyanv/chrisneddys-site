@@ -277,12 +277,18 @@ export async function finishPasskeySignIn(
   // key rather than a shared literal, so a flood of garbage assertions from
   // many different IPs can never look like one channel closing in on a
   // lockout together.
-  const throttleEmail = matchedEmail ?? `passkey-unknown:${ip}`;
+  //
+  // Deliberately not called `throttleEmail`: for a credential nobody owns
+  // there is no email to speak of, and the two log lines below name this
+  // field for what it actually is. Logging a synthetic key under `email`
+  // both misleads whoever is reading the line and walks an IP straight
+  // past any log pipeline rule that scrubs on the field name.
+  const throttleKey = matchedEmail ?? `passkey-unknown:${ip}`;
 
-  const throttle = await checkThrottle(db, throttleEmail, ip, now);
+  const throttle = await checkThrottle(db, throttleKey, ip, now);
   if (throttle.locked) {
     console.warn("[auth] passkey sign-in throttled", {
-      email: redactEmail(throttleEmail),
+      throttleKey: redactEmail(throttleKey),
       ip,
       emailFailures: throttle.emailFailures,
       ipFailures: throttle.ipFailures,
@@ -309,9 +315,9 @@ export async function finishPasskeySignIn(
   }
 
   if (!verified) {
-    await recordSignInAttempt(db, throttleEmail, ip, false, now);
+    await recordSignInAttempt(db, throttleKey, ip, false, now);
     console.warn("[auth] failed passkey sign-in attempt", {
-      email: redactEmail(throttleEmail),
+      throttleKey: redactEmail(throttleKey),
       ip,
     });
     return { ok: false, error: GENERIC_SIGN_IN_ERROR };

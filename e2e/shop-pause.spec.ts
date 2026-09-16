@@ -37,26 +37,26 @@ const SLUG = "foam-trucker-blue";
 const PAUSE_NOTE = "Back Thursday — e2e";
 
 /**
- * Clicks Save and waits for the "Settings saved" toast, with a longer
- * timeout than the config's default 15s.
+ * Clicks Save and waits for the "Settings saved" toast, on the config's
+ * default 15s expect timeout.
  *
- * An earlier version of this comment blamed the save itself queueing
- * behind its own `revalidatePath` fan-out on PGlite's single connection.
- * That was measured and disproven (issue #38): `updateStoreSettings` and
- * the revalidation both finish in single-digit milliseconds every time,
- * and the row is always written. What the toast can end up waiting on is
- * the *implicit* re-render of `/admin/settings` that Next runs after any
- * Server Action which revalidates anything — three DB reads in `page.tsx`
- * plus every card's own, serialized through PGlite's one connection
- * against whatever the rest of the suite has queued at that moment.
+ * This used to wait 45 seconds, as a cushion for issue #38. Two earlier
+ * explanations for that were wrong: first that the save queued behind its
+ * own `revalidatePath` fan-out on PGlite's single connection, then that
+ * nothing could be done about it at all. What the toast actually waited on
+ * was Next's *implicit* re-render of `/admin/settings` after any Server
+ * Action that revalidates something — and `saveStoreSettings` now does its
+ * revalidation inside `after()`, so that re-render never runs in the
+ * response the toast arrives in. The save itself finishes in single-digit
+ * milliseconds.
  *
- * So this timeout is a cushion for a known, tracked defect, not a
- * measure of how long saving takes. It is deliberately not inflated
- * further: if it trips, that is worth seeing rather than hiding.
+ * So there is nothing left for a cushion to cover, and a 45s ceiling would
+ * let the whole defect come back without this suite noticing. It waits the
+ * same 15s every other settings save in `admin-settings.spec.ts` waits.
  */
 async function save(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByText("Settings saved", { exact: true })).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByText("Settings saved", { exact: true })).toBeVisible();
 }
 
 test.describe.serial("shop pause (issue #43)", () => {

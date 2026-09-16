@@ -67,8 +67,13 @@ test.describe.serial("admin orders desk", () => {
     await page.goto("/admin/orders");
     await expect(page.getByRole("heading", { name: "Orders", level: 1 })).toBeVisible();
 
+    // 5, not 4: `e2e/db-warmup.mjs` also seeds a 5th, still-pending cart (a
+    // number held in an open checkout, for `admin-run.spec.ts`) that never
+    // reaches "paid" — it counts toward the "all orders" total here but not
+    // toward "to ship"/"ready for pickup", both of which key off a later
+    // status this cart never reaches.
     await expect(
-      page.getByText("4 orders · 1 to ship · 1 ready for pickup", { exact: true }),
+      page.getByText("5 orders · 1 to ship · 1 ready for pickup", { exact: true }),
     ).toBeVisible();
 
     const shipRow = rowByEmail(page, EMAILS.ship);

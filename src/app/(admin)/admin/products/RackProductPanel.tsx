@@ -587,17 +587,21 @@ function RunSection({
     );
   }
 
-  // edition — the size stays editable regardless of sales (the data layer,
-  // `setInventory` in `@/lib/catalogAdmin`, is what actually refuses to
-  // shrink it below the highest sold number; "the count locks at the first
-  // sale" is a decision for phase 3's "Starting a run" screens, not this
-  // one, so this panel doesn't invent that restriction early).
+  // edition — locked the moment anything has sold (issue #36 phase 3's
+  // decision, enforced for real by `setInventory`'s `EditionSizeLockedError`
+  // in `@/lib/catalogAdmin`; this input mirrors that here so an owner sees
+  // the field go read-only rather than typing a new size and getting a
+  // rejected save).
   const { sold, reserved, available } = product.inventory;
+  const locked = sold > 0;
 
   return (
     <div className="rack-hairline">
       <div className="rack-run-head">
         <span className="rack-eyebrow">The run &mdash; {inventoryN} made</span>
+        <a href={`/admin/products/${product.id}/run`} className="rack-run-link">
+          Open the run &rarr;
+        </a>
       </div>
       <p className="rack-run-copy">
         {sold} sold, {reserved} held in open checkouts, {available} still going.
@@ -613,9 +617,20 @@ function RunSection({
           step={1}
           className="adm-input rack-mono"
           defaultValue={String(inventoryN)}
-          onBlur={(e) => onCommitSize(e.target.value)}
+          readOnly={locked}
+          aria-readonly={locked}
+          disabled={locked}
+          onBlur={(e) => {
+            if (!locked) onCommitSize(e.target.value);
+          }}
           onKeyDown={(e) => revertOnEscape(e, String(inventoryN))}
         />
+        {locked && (
+          <p className="adm-help">
+            This locks the moment number one sells. Fifty is a promise printed on fifty
+            certificates, so the field stays read-only from here on.
+          </p>
+        )}
       </div>
       <div className="rack-edgrid" style={{ marginTop: 8 }}>
         {product.editions.map((edition) => (

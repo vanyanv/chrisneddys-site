@@ -86,7 +86,7 @@ test.describe.serial("admin products — the rack's catalogue", () => {
     expect(foamTruckerId).toBeTruthy();
   });
 
-  test("2. editing price and run size collects into the Save bar, and Discard reverts both", async () => {
+  test("2. editing price and per-order limit collects into the Save bar, and Discard reverts both", async () => {
     const card = cardBySlug(page, FOAM_TRUCKER_SLUG);
     await openCard(page, card);
 
@@ -95,9 +95,15 @@ test.describe.serial("admin products — the rack's catalogue", () => {
     await priceInput.press("Tab");
     await expect(page.getByText("1 change", { exact: true })).toBeVisible();
 
-    const sizeInput = panel(page).getByLabel("Edition size", { exact: true });
-    await sizeInput.fill("60");
-    await sizeInput.press("Tab");
+    // Not "Edition size": issue #36 phase 3 locks that field for good once
+    // anything in the run has sold, and `e2e/db-warmup.mjs` seeds this exact
+    // product with sold numbers before the server even starts — so "Limit
+    // per order" stands in as the second ordinary field here, same Save-bar/
+    // Discard mechanics, on a field that's still genuinely editable.
+    const limitInput = panel(page).getByLabel("Limit per order", { exact: true });
+    const originalLimit = await limitInput.inputValue();
+    await limitInput.fill("3");
+    await limitInput.press("Tab");
     await expect(page.getByText("2 changes", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Discard", exact: true }).click();
@@ -105,7 +111,7 @@ test.describe.serial("admin products — the rack's catalogue", () => {
     await expect(page.getByText("1 change", { exact: true })).toHaveCount(0);
     await expect(page.getByText("2 changes", { exact: true })).toHaveCount(0);
     await expect(priceInput).toHaveValue("48.00");
-    await expect(sizeInput).toHaveValue("50");
+    await expect(limitInput).toHaveValue(originalLimit);
   });
 
   // Specs 3 and 4 assert the real thing: `playwright.config.ts` pins
@@ -267,8 +273,14 @@ test.describe.serial("admin products — the rack's catalogue", () => {
     await expect(cardBySlug(page, dupSlug)).toHaveCount(0);
 
     await page.getByText(/^Archived \(\d+\)$/).click();
-    await expect(page.getByText(`/${dupSlug}`, { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Restore", exact: true }).click();
+    // Scope to the archived row for THIS slug rather than clicking the only
+    // Restore on the page: the archive is shared across spec files, and
+    // `e2e/admin-run.spec.ts` (which sorts first) parks its own scratch
+    // draft there, so an unscoped `getByRole("button", { name: "Restore" })`
+    // is a strict-mode violation the moment anything else is archived.
+    const archivedRow = page.locator(".rack-archived-row").filter({ hasText: `/${dupSlug}` });
+    await expect(archivedRow).toBeVisible();
+    await archivedRow.getByRole("button", { name: "Restore", exact: true }).click();
 
     await expect(cardBySlug(page, dupSlug)).toBeVisible();
   });

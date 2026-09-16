@@ -244,7 +244,9 @@ export function ProductEditor({
               step={1}
               className="adm-input"
               defaultValue={String(inventoryN)}
+              disabled={product.inventory.mode === "edition" && product.inventory.sold > 0}
               onBlur={(e) => {
+                if (product.inventory.mode === "edition" && product.inventory.sold > 0) return;
                 const n = Number(e.target.value);
                 const current =
                   product.inventory.mode === "edition"
@@ -257,6 +259,16 @@ export function ProductEditor({
                 else pendingApi.setValue(product.id, "inventoryN", n);
               }}
             />
+            {/* The size locks the moment number one sells — enforced for
+                real by `setInventory`'s `EditionSizeLockedError`
+                (`@/lib/catalogAdmin`); disabling the field here just keeps
+                this editor from offering a save it knows will be refused. */}
+            {product.inventory.mode === "edition" && product.inventory.sold > 0 && (
+              <p className="adm-help">
+                Locked — {product.inventory.sold} number
+                {product.inventory.sold === 1 ? "" : "s"} already sold.
+              </p>
+            )}
           </div>
         )}
 
@@ -266,6 +278,9 @@ export function ProductEditor({
               {product.inventory.available} available &middot; {product.inventory.reserved} in a
               checkout &middot; {product.inventory.sold} sold
             </p>
+            <a href={`/admin/products/${product.id}/run`} className="adm-run-link">
+              Open the run &rarr;
+            </a>
             <div className="adm-edition-legend">
               <span className="adm-edition-key is-available">Available</span>
               <span className="adm-edition-key is-reserved">In a checkout</span>

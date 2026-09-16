@@ -10,7 +10,7 @@
  * `revalidatePath` after a write that the storefront could see — nothing
  * here touches the cache.
  */
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
 import { getDb, type Db } from "@/db/client";
 import { imageThumbSrc } from "@/lib/productImage";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
@@ -691,15 +691,55 @@ export type InventoryMode = "untracked" | "quantity" | "edition";
 export type SetInventoryResult = { ok: true; slug: string } | { ok: false; error: string };
 
 /**
+ * Thrown when an edition run's size would change after any number in it has
+ * sold — issue #36's "Wiring The Rack" analysis, phase 3: "the count locks
+ * the moment number one sells" (the `n-run` annotation), because by then
+ * that count is printed on a certificate in somebody's hands. Once
+ * `soldCount` is above zero, `setInventory("edition", …)` refuses *any*
+ * different size — growing the run is refused exactly like shrinking it,
+ * not just a shrink below the highest sold number (the pre-phase-3 rule).
+ * `setInventory` is the only caller today; it catches this and reports
+ * `.message` through its ordinary `{ ok: false, error }` result, but the
+ * class is exported so the lock itself — not just that one call site's
+ * translation of it — is directly testable.
+ */
+export class EditionSizeLockedError extends Error {
+  constructor(public readonly soldCount: number) {
+    super(
+      `This run is locked — ${soldCount} number${soldCount === 1 ? " has" : "s have"} already ` +
+        "sold. The edition size can't change now.",
+    );
+    this.name = "EditionSizeLockedError";
+  }
+}
+
+/** Throws `EditionSizeLockedError` if `variant` already has any `sold`
+ * edition and `nextSize` isn't the size it's already at — a no-op save (the
+ * same size resubmitted) never trips the lock. A variant with nothing sold
+ * yet, or with no variant at all (a run that's never existed), is always
+ * unlocked. */
+function assertEditionSizeUnlocked(
+  variant: { editionSize: number | null; editions: { status: string }[] } | undefined,
+  nextSize: number,
+): void {
+  if (!variant || nextSize === variant.editionSize) return;
+  const soldCount = variant.editions.filter((e) => e.status === "sold").length;
+  if (soldCount > 0) throw new EditionSizeLockedError(soldCount);
+}
+
+/**
  * Sets a product's inventory mode.
  *
  * - `untracked`: clears both `inventory_quantity` and `edition_size` on the
  *   variant (creating a bare one if none exists yet).
  * - `quantity`: stores a plain count, clears `edition_size`.
  * - `edition`: creates the variant if none exists (sku from the slug,
- *   upper-cased; label "One size"), then creates editions `1..n` that don't
- *   already exist. Never deletes a `sold` or `reserved` edition — shrinking
- *   `n` below the highest sold number is refused outright.
+ *   upper-cased; label "One size"), then makes the run exactly `1..n` —
+ *   creating the numbers that don't exist yet and deleting any above `n`.
+ *   Never deletes a `sold` or `reserved` edition: changing `n` at all once
+ *   anything has sold is refused outright by `assertEditionSizeUnlocked`
+ *   (not just a shrink below the highest sold number), and a shrink past a
+ *   number held by an open checkout is refused until that hold lapses.
  */
 export async function setInventory(
   id: string,
@@ -722,16 +762,11 @@ export async function setInventory(
       return { ok: false, error: "Edition size must be a positive whole number." };
     }
 
-    if (variant) {
-      const highestSold = variant.editions
-        .filter((e) => e.status === "sold")
-        .reduce((max, e) => Math.max(max, e.number), 0);
-      if (size < highestSold) {
-        return {
-          ok: false,
-          error: `Can't reduce the edition below ${highestSold} — that number has already sold.`,
-        };
-      }
+    try {
+      assertEditionSizeUnlocked(variant, size);
+    } catch (err) {
+      if (err instanceof EditionSizeLockedError) return { ok: false, error: err.message };
+      throw err;
     }
 
     if (!variant) {
@@ -753,6 +788,31 @@ export async function setInventory(
         .set({ editionSize: size, inventoryQuantity: size, updatedAt: new Date() })
         .where(eq(variants.id, variant.id));
     }
+
+    // Shrinking has to remove the numbers that fall off the end, or the run
+    // keeps rows it no longer claims to have: take 50 down to 20 and the
+    // board reads "50 of 20 left", counting fifty surviving editions against
+    // an `editionSize` of 20. Nothing above `size` can be `sold` — the lock
+    // above already refused any change in that case — but a number can be
+    // `reserved` by a checkout that's open right now, and deleting that row
+    // would strand a buyer mid-payment holding a number the run no longer
+    // has. So refuse the shrink while such a hold is live, and say which
+    // number it is; holds lapse on their own, and the save works after.
+    if (variant.editions.some((e) => e.number > size && e.status === "reserved")) {
+      const held = variant.editions
+        .filter((e) => e.number > size && e.status === "reserved")
+        .map((e) => e.number)
+        .sort((a, b) => a - b);
+      return {
+        ok: false,
+        error:
+          `Number ${held[0]} is on hold in an open checkout right now, so the run ` +
+          `can't shrink to ${size} yet. Try again once the hold lapses.`,
+      };
+    }
+    await db
+      .delete(editions)
+      .where(and(eq(editions.variantId, variant.id), gt(editions.number, size)));
 
     const existingNumbers = new Set(variant.editions.map((e) => e.number));
     for (let number = 1; number <= size; number++) {

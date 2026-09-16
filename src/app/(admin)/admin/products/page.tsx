@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
-import { ownerInitials } from "@/app/(admin)/admin/layout";
+import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { listArchivedProductsForAdmin, listProductsForAdmin } from "@/lib/catalogAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { getSetupChecklist } from "@/lib/setupChecklist";

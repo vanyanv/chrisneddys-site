@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
-import { ownerInitials } from "@/app/(admin)/admin/layout";
+import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import {

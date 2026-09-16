@@ -1085,3 +1085,423 @@
     padding: 0 var(--rack-space-lg);
   }
 }
+
+/* ---------------------------------------------------------------------- */
+/* Orders: the desk and its detail page (Orders.dc.html /                 */
+/* OrderDetail.dc.html, issue #36 phase 4)                                */
+/*                                                                        */
+/* The list itself (the filter chips, search, sheet of rows, pagination)  */
+/* stays on the same `.adm-filter-chip`/`.ord-*` primitives `admin-       */
+/* orders.css` already defines — this only adds the detail page's         */
+/* two-column layout and the cards it's built from, which is genuinely    */
+/* new here. */
+/* ---------------------------------------------------------------------- */
+
+.rack-order-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+.rack-order-main,
+.rack-order-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  min-width: 0;
+}
+.rack-order-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: var(--rack-space-xl);
+}
+.rack-order-card-head {
+  margin: 0 0 var(--rack-space-lg);
+}
+.ord-timeline-card .adm-timeline {
+  max-width: none;
+}
+.rack-order-next {
+  padding: var(--rack-space-xl);
+}
+.ord-refunded-note {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--rack-muted);
+}
+
+@media (max-width: 900px) {
+  .rack-order-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .rack-order-grid {
+    padding: 0 var(--rack-space-lg) var(--rack-space-lg);
+  }
+  .rack-order-card,
+  .rack-order-next {
+    padding: var(--rack-space-lg);
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Refund: the one confirm (Refund.dc.html, issue #36 phase 4)            */
+/* ---------------------------------------------------------------------- */
+
+.rack-refund-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 22, 18, 0.32);
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+.rack-refund-panel {
+  width: 470px;
+  max-width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--rack-card);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  animation: rack-refund-in var(--rack-dur-3) var(--rack-ease-enter) both;
+}
+@keyframes rack-refund-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rack-refund-panel {
+    animation-duration: 0.001ms;
+  }
+}
+.rack-refund-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rack-space-md);
+}
+.rack-refund-title {
+  font-size: 26px;
+  line-height: 1.05;
+  margin-top: var(--rack-space-sm);
+}
+.rack-refund-close {
+  padding: 7px;
+  flex: none;
+}
+.rack-refund-amount {
+  font-size: 24px;
+  font-weight: 700;
+}
+.rack-refund-box {
+  border: var(--rack-border);
+  background: var(--rack-paper);
+  padding: 15px 17px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.rack-refund-box .rack-eyebrow {
+  display: block;
+  margin-bottom: var(--rack-space-sm);
+}
+.rack-refund-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 13px 15px;
+  border: 1px solid var(--rack-red-cta);
+  font-size: 12.5px;
+}
+.rack-refund-warning svg {
+  color: var(--rack-red-cta);
+  margin-top: 2px;
+}
+.rack-refund-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+.rack-refund-confirm {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 14px;
+  padding: 13px;
+  background: var(--rack-red-cta);
+  color: var(--rack-cream);
+  border: 1px solid var(--rack-red-deep);
+  cursor: pointer;
+  transition: background var(--rack-dur-1) var(--rack-ease-move);
+}
+.rack-refund-confirm:hover {
+  background: var(--rack-red-deep);
+}
+.rack-refund-confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+@media (max-width: 720px) {
+  .rack-refund-panel {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Packing slip: the printed sheet (PackingSlip.dc.html)                  */
+/* ---------------------------------------------------------------------- */
+
+.rack-slip-page {
+  min-height: 100vh;
+  background: var(--rack-rule);
+  padding: var(--rack-space-xl) 0;
+}
+.rack-slip-noprint {
+  max-width: 816px;
+  margin: 0 auto 15px;
+  padding: 0 var(--rack-space-xl);
+}
+.rack-slip-sheet {
+  width: 816px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: var(--rack-ink);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  box-shadow: var(--rack-shadow);
+}
+.rack-slip-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--rack-ink);
+  padding-bottom: var(--rack-space-xl);
+}
+.rack-slip-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+.rack-slip-addr {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--rack-muted);
+  margin-top: 11px;
+}
+.rack-slip-title {
+  font-size: 26px;
+  text-align: right;
+}
+.rack-slip-number {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  margin-top: 7px;
+  font-weight: 700;
+  text-align: right;
+}
+.rack-slip-date {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rack-muted);
+  margin-top: 4px;
+  text-align: right;
+}
+.rack-slip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.rack-slip-address {
+  font-style: normal;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.rack-slip-items {
+  padding: 26px 0;
+}
+.rack-slip-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.rack-slip-item-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex: none;
+  background: var(--rack-cream);
+}
+.rack-slip-item-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+.rack-slip-item-meta {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--rack-muted);
+  margin-top: 5px;
+}
+.rack-slip-edition {
+  text-align: center;
+  border: 2px solid var(--rack-ink);
+  padding: 9px 15px;
+  flex: none;
+}
+.rack-slip-edition-num {
+  font-size: 26px;
+  line-height: 1.1;
+  margin-top: 3px;
+}
+.rack-slip-edition-num span {
+  font-size: 14px;
+  color: var(--rack-muted);
+}
+.rack-slip-qty {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  width: 52px;
+  text-align: right;
+  flex: none;
+}
+.rack-slip-callout {
+  border: 2px solid var(--rack-ink);
+  padding: var(--rack-space-xl);
+  margin-top: 4px;
+}
+.rack-slip-callout p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--rack-muted);
+  max-width: 60ch;
+  margin-top: var(--rack-space-sm);
+}
+.rack-slip-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--rack-rule);
+  padding-top: var(--rack-space-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--rack-space-lg);
+  flex-wrap: wrap;
+}
+.rack-slip-footer p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.rack-slip-order-ref {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rack-muted);
+  text-align: right;
+  margin-top: 7px;
+}
+@media print {
+  .rack-slip-page {
+    background: #fff;
+    padding: 0;
+  }
+  .rack-slip-noprint {
+    display: none;
+  }
+  .rack-slip-sheet {
+    box-shadow: none;
+    padding: 0;
+    width: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Settings (Settings.dc.html, issue #36 phase 4)                         */
+/*                                                                        */
+/* Every field, toggle, save bar, toast and account-management primitive  */
+/* here is the same `.adm-*` set `admin-settings.css` already defines —   */
+/* this only adds the outer nav-plus-content layout, which is new. */
+/* ---------------------------------------------------------------------- */
+
+.rack-settings-body {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: var(--rack-space-xl);
+  padding: 0 var(--rack-space-xl) var(--rack-space-xl);
+  align-items: start;
+}
+.rack-settings-nav {
+  position: sticky;
+  top: var(--rack-space-xl);
+  display: flex;
+  flex-direction: column;
+}
+.rack-settings-nav a {
+  font-size: 13px;
+  color: var(--rack-muted);
+  padding: 9px 12px;
+  text-decoration: none;
+}
+.rack-settings-nav a:hover {
+  color: var(--rack-ink);
+}
+.rack-settings-nav a.is-active {
+  font-weight: 600;
+  color: var(--rack-ink);
+  background: var(--rack-cream);
+}
+.rack-settings-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+}
+.rack-settings-shop-card {
+  background: var(--rack-card);
+  box-shadow: var(--rack-shadow);
+  padding: var(--rack-space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--rack-space-xl);
+  flex-wrap: wrap;
+}
+.rack-settings-shop-card h2 {
+  font-size: 19px;
+}
+.rack-settings-shop-card p {
+  color: var(--rack-muted);
+  margin-top: 6px;
+}
+@media (max-width: 900px) {
+  .rack-settings-body {
+    grid-template-columns: 1fr;
+  }
+  .rack-settings-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+@media (max-width: 720px) {
+  .rack-settings-body {
+    padding: 0 var(--rack-space-lg) var(--rack-space-lg);
+  }
+}

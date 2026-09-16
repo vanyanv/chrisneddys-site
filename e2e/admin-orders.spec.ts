@@ -175,7 +175,7 @@ test.describe.serial("admin orders desk", () => {
     await expect(totalRow).toContainText("Total");
     await expect(totalRow).toContainText("$106.50");
 
-    await expect(page.getByRole("heading", { name: "Actions", level: 3 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Next", level: 3 })).toBeVisible();
   });
 
   test("5. mark shipped: carrier + tracking flips the pill to DONE and logs a timeline entry", async () => {
@@ -209,20 +209,33 @@ test.describe.serial("admin orders desk", () => {
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
   });
 
-  test("7. refund: first click arms, second confirms", async () => {
+  test("7. refund: opens a confirm panel; Keep the order closes it, then the confirm marks it", async () => {
     await page.goto(`/admin/orders/${orderId.shipped}`);
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
 
-    const refundBtn = page.getByRole("button", { name: "Mark refunded", exact: true });
-    await refundBtn.click();
-    await expect(
-      page.getByRole("button", { name: "Really mark refunded?", exact: true }),
-    ).toBeVisible();
+    const trigger = page.getByRole("button", { name: /^Refund \$/ });
+    await trigger.click();
 
-    await page.getByRole("button", { name: "Really mark refunded?", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Refund this order." });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("This one has no undo.")).toBeVisible();
+
+    // Keep the order: closes the panel, changes nothing.
+    await dialog.getByRole("button", { name: "Keep the order" }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("DONE");
+
+    // Reopen and confirm.
+    await trigger.click();
+    await page.getByRole("dialog").getByRole("button", { name: "Mark refunded" }).click();
+
     await expect(page.getByRole("status").filter({ hasText: "Marked refunded" })).toBeVisible();
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveText("REFUNDED");
     await expect(page.locator(".adm-order-head-meta .adm-pill")).toHaveClass(/is-hidden/);
+
+    // Refunded, the trigger is gone — replaced by a plain "Refunded" note.
+    await expect(page.getByRole("button", { name: /^Refund \$/ })).toHaveCount(0);
+    await expect(page.getByText(/^Refunded ·/)).toBeVisible();
   });
 
   test("8. Packing slip opens a page with the order number and the store logo", async () => {
@@ -233,10 +246,10 @@ test.describe.serial("admin orders desk", () => {
     await expect(page).toHaveURL(/\/packing-slip\/?$/);
     await expect(page.getByText(number, { exact: true })).toBeVisible();
 
-    // Scoped to the slip sheet itself, not `getByRole("img", { name: ... })`
-    // — the admin topbar (present on every admin page, packing slip
-    // included) renders the same logo with the same alt text.
-    const logo = page.locator(".adm-slip-logo");
+    // The packing slip renders no admin topbar at all (it's a print sheet,
+    // not a screen with navigation), so there's only ever one logo on the
+    // page — but scope to the slip sheet's own class anyway for clarity.
+    const logo = page.locator(".rack-slip-logo");
     await expect(logo).toBeVisible();
     await expect(logo).toHaveAttribute("alt", /Chris N Eddy/i);
   });

@@ -67,7 +67,7 @@ export function OrdersTable({ rows }: { rows: OrdersTableRow[] }) {
             <span>Placed</span>
             <span>Customer</span>
             <span>Items</span>
-            <span>Fulfilment</span>
+            <span>Method</span>
             <span>Total</span>
             <span>Status</span>
           </div>

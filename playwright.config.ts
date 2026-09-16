@@ -112,8 +112,25 @@ export default defineConfig({
       // forgot-password test (4) exercises: `isEmailConfigured()` in
       // `src/app/(admin)/admin/forgot-password/page.tsx` and `actions.ts`
       // both key off this exact pair.
-      STRIPE_SECRET_KEY: "",
-      STRIPE_WEBHOOK_SECRET: "",
+      //
+      // STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET are non-empty placeholders,
+      // not real credentials — `getStripe()` (`src/lib/stripe.ts`) is never
+      // actually called anywhere in this suite (no spec drives `/api/checkout`
+      // all the way through, since that really would need a live Stripe
+      // account), so no request is ever made with them and Stripe stays as
+      // disabled here as ever. What they DO need to be is *present*:
+      // `hasPaymentKeys()` (`src/lib/shopStatus.ts`) — and therefore
+      // `isShopOpenFor()` — checks only that both env vars are set, and it
+      // gates the paused-shop UI issue #43 added (`e2e/shop-pause.spec.ts`):
+      // `paused` on the product/shop pages is `isShopOpenFor(settings) &&
+      // isShopPausedFor(settings)`, so with these blank the pause banner and
+      // disabled buy button could never render at all, paused or not. Every
+      // other spec still sees a closed shop exactly as before: `returnsPolicy`
+      // (the other half of `isShopOpenFor`) stays unset for everyone except
+      // `shop-pause.spec.ts`, which sets and then restores it through the
+      // Settings form.
+      STRIPE_SECRET_KEY: "sk_test_e2e_disabled_placeholder",
+      STRIPE_WEBHOOK_SECRET: "whsec_e2e_disabled_placeholder",
       BLOB_READ_WRITE_TOKEN: "",
       RESEND_API_KEY: "",
       EMAIL_FROM: "",

@@ -15,11 +15,13 @@
  */
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { like } from "drizzle-orm";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { checkThrottle, MAX_FAILED_ATTEMPTS, SIGN_IN_KIND } from "@/lib/signInThrottle";
+import { RESET_LINK_EXPIRY_SECONDS } from "@/lib/signInPolicy";
 
 // `requestPasswordResetAction` now throttles through `resolveClientIp`
 // (`@/lib/auth`), which carries `import "server-only"` and reads the
@@ -97,6 +99,37 @@ describe("requestPasswordResetAction", () => {
       sent: true,
       message: "If that address belongs to an owner, a reset link is on its way.",
     });
+  });
+
+  it("issues a link that really expires in 30 minutes, not Better Auth's default hour (#44)", async () => {
+    process.env.RESEND_API_KEY = "re_test_key";
+    process.env.EMAIL_FROM = "owner@chrisneddys.com";
+
+    // Behavioural rather than a read of the option we just set:
+    // `resetPasswordTokenExpiresIn` appears nowhere in better-auth's type
+    // declarations — only in `dist/api/routes/password.mjs`, as
+    // `options.emailAndPassword.resetPasswordTokenExpiresIn || 3600 * 1`.
+    // A misspelled key would therefore typecheck and silently fall back to
+    // an hour, so the only honest check is what the stored token says.
+    const db = (await getDb()) as unknown as PgliteDatabase<typeof schema>;
+    const before = Date.now();
+    await requestPasswordResetAction(undefined, formDataFor(KNOWN_EMAIL));
+    const after = Date.now();
+
+    const rows = await db
+      .select()
+      .from(schema.verification)
+      .where(like(schema.verification.identifier, "reset-password:%"));
+    expect(rows.length).toBeGreaterThan(0);
+
+    const latest = rows.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+    if (!latest) throw new Error("no reset-password verification row was written");
+    const lifetimeMs = latest.expiresAt.getTime() - before;
+    // Generous either side of 30 minutes, but nowhere near 60 — the whole
+    // point is telling those two apart.
+    expect(lifetimeMs).toBeGreaterThan(RESET_LINK_EXPIRY_SECONDS * 1000 - 5_000);
+    expect(lifetimeMs).toBeLessThanOrEqual(RESET_LINK_EXPIRY_SECONDS * 1000 + (after - before));
+    expect(latest.expiresAt.getTime() - before).toBeLessThan(45 * 60 * 1000);
   });
 
   it("says plainly that emailing isn't set up when RESEND_API_KEY/EMAIL_FROM are unset — for a known email too, not just an unknown one", async () => {

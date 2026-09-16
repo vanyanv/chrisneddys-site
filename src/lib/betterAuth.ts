@@ -51,6 +51,7 @@ import * as schema from "@/db/schema";
 import { brand } from "@/data/brand";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { absoluteUrl, getSiteOrigin } from "@/lib/siteOrigin";
+import { RESET_LINK_EXPIRY_SECONDS } from "@/lib/signInPolicy";
 
 /**
  * What actually happened when `sendResetPassword` (below) tried to email a
@@ -187,6 +188,11 @@ async function buildAuth(db: Db) {
     database: drizzleAdapter(db, { provider: "pg", schema }),
     emailAndPassword: {
       enabled: true,
+      // #44 draws a 30-minute reset link. Better Auth defaults this to
+      // 3600s, so leaving it unset meant the forgot-password panel's
+      // sentence was the only thing claiming a lifetime, with nothing
+      // holding the config to it. Both now read the same constant.
+      resetPasswordTokenExpiresIn: RESET_LINK_EXPIRY_SECONDS,
       // A reset is the flow an owner uses when they think a session was
       // stolen, so every session that existed under the old password must
       // die along with it — otherwise whoever it is stays signed in right

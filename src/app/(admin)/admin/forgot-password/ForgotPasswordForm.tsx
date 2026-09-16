@@ -3,15 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useActionState } from "react";
+import { RESET_LINK_EXPIRY_MINUTES } from "@/lib/signInPolicy";
 import { requestPasswordResetAction, type ForgotPasswordState } from "./actions";
 
 const initialState: ForgotPasswordState = {};
-
-/** Matches Better Auth's `resetPasswordTokenExpiresIn` default (3600
- * seconds — see `src/lib/betterAuth.ts`, which doesn't override it). Kept
- * as one constant so this copy and that config can't quietly drift apart
- * again the way the drawn board's "30 minutes" already had. */
-const RESET_LINK_EXPIRY_MINUTES = 60;
 
 function CheckIcon() {
   return (

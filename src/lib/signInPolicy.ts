@@ -25,3 +25,20 @@ export const LOCKOUT_WINDOW_MS = 15 * 60 * 1000;
 export function signInPolicySummary(): string {
   return `${MAX_FAILED_ATTEMPTS} tries per ${LOCKOUT_WINDOW_MS / 60_000} min`;
 }
+
+/**
+ * How long a password-reset link stays valid, in seconds.
+ *
+ * #44 draws 30 minutes. This shipped at 60 first, because Better Auth's
+ * `resetPasswordTokenExpiresIn` defaults to 3600s and the copy was changed
+ * to match the code rather than the other way round — which made the
+ * drawing wrong instead of the build. Passing this into `betterAuth.ts`
+ * and rendering the same number on the forgot-password panel means the
+ * link's real lifetime and the sentence describing it cannot disagree:
+ * the previous constant lived in the client component alone, so the
+ * config was still free to drift out from under it.
+ */
+export const RESET_LINK_EXPIRY_SECONDS = 30 * 60;
+
+/** The same window in whole minutes, for copy that says "30 minutes". */
+export const RESET_LINK_EXPIRY_MINUTES = RESET_LINK_EXPIRY_SECONDS / 60;

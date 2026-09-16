@@ -4701,6 +4701,14 @@ h3 {
   color: var(--a-sub);
   margin: 18px 0 8px;
 }
+/* The size chip and the per-order limit chip sit side by side rather than
+   stacked — each one states a single fact, so neither needs the other's
+   room. */
+.cne-pdp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .cne-chip {
   display: inline-block;
   font-family: var(--font-mono);
@@ -4713,7 +4721,8 @@ h3 {
   padding: 8px 11px;
   line-height: 1;
 }
-/* One size means there is nothing to choose — so it states, it does not offer. */
+/* One size means there is nothing to choose — so it states, it does not offer.
+   The limit chip states the same way: a fact, not a control. */
 .cne-chip.is-static {
   cursor: default;
 }
@@ -4803,6 +4812,42 @@ h3 {
 .cne-btn-primary:disabled:active {
   transform: none;
 }
+/* The sold-out escape (issue #50): a working link where the primary button
+   just went dead, in the design system's own secondary-button geometry
+   (Counter Cream fill, ink text, identical shape to the primary) rather
+   than the ghost link below, which is for a lower-shout aside, not a
+   redirect off a dead end. */
+.cne-btn-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--a-fg);
+  background: var(--a-cream);
+  border: 3px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-shadow);
+  padding: 15px 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.cne-btn-secondary:active {
+  transform: translate(4px, 4px);
+  box-shadow: 1px 1px 0 var(--a-shadow);
+}
+.cne-pdp-sticky .cne-btn-secondary {
+  margin-top: 0;
+  padding: 14px 12px;
+  font-size: 12px;
+  box-shadow: 3px 3px 0 var(--a-shadow);
+}
+
 .cne-btn-ghost {
   display: block;
   width: 100%;
@@ -5523,6 +5568,10 @@ h3 {
     font-size: 27px;
   }
   .cne-btn-primary {
+    font-size: 13.5px;
+    padding: 16px;
+  }
+  .cne-btn-secondary {
     font-size: 13.5px;
     padding: 16px;
   }

@@ -1,12 +1,22 @@
 import "@/styles/admin-rack.css";
 import "@/styles/admin-customers.css";
 import "@/styles/admin-orders.css";
+import { SkeletonHoldBack } from "@/components/admin/SkeletonHoldBack";
 
 /**
  * `/admin/customers/[email]`'s loading skeleton — shown while `page.tsx`'s
  * `requireOwner()` and `getCustomerForAdmin`/`getStoreSettings` reads are in
  * flight. Mirrors that page's own header, stat row and orders card, same
  * as `admin/orders/[id]/loading.tsx` does for the order detail page.
+ *
+ * The top bar, tab strip, "Everyone who's bought" back-link and the
+ * customer header (avatar, name, contact line, "Email" button) render
+ * immediately, so a slow connection still gets a stable frame instead of a
+ * blank viewport for 200ms (issue #46 follow-up). Like
+ * `admin/orders/[id]/loading.tsx`, this header has no single fact worth
+ * pulling out on its own — it's a name and a contact line, not a count —
+ * so it stays whole, the top bar's own avatar/store-pill tradeoff. Only the
+ * stat row and the orders list below sit behind `<SkeletonHoldBack>`.
  */
 function skDelay(i: number): string {
   const step = i % 4;
@@ -36,8 +46,10 @@ export default function CustomerDetailLoading() {
           </span>
         </div>
         <div className="rack-top-right">
-          <span className="rack-sk" style={{ height: 22, width: 96 }} />
-          <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          <SkeletonHoldBack>
+            <span className="rack-sk" style={{ height: 22, width: 96 }} />
+            <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          </SkeletonHoldBack>
         </div>
       </nav>
 
@@ -61,30 +73,32 @@ export default function CustomerDetailLoading() {
         </div>
       </div>
 
-      <div className="rack-stats">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="rack-stat-card">
-            <span className={skDelay(i)} style={{ height: 10, width: 60, display: "block" }} />
-            <span
-              className={skDelay(i + 1)}
-              style={{ height: 28, width: 50, display: "block", marginTop: 8 }}
-            />
-          </div>
-        ))}
-      </div>
-
-      <div style={{ padding: "0 22px 22px" }}>
-        <section className="rack-order-card">
-          <h3 className="rack-eyebrow rack-order-card-head">Orders</h3>
-          {[0, 1, 2].map((i) => (
-            <div key={i} style={{ display: "flex", gap: 13, padding: "12px 0" }}>
-              <span className={skDelay(i)} style={{ height: 12, width: 60 }} />
-              <span className={skDelay(i + 1)} style={{ height: 12, width: "40%" }} />
-              <span className={skDelay(i + 2)} style={{ height: 12, width: 44 }} />
+      <SkeletonHoldBack>
+        <div className="rack-stats">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="rack-stat-card">
+              <span className={skDelay(i)} style={{ height: 10, width: 60, display: "block" }} />
+              <span
+                className={skDelay(i + 1)}
+                style={{ height: 28, width: 50, display: "block", marginTop: 8 }}
+              />
             </div>
           ))}
-        </section>
-      </div>
+        </div>
+
+        <div style={{ padding: "0 22px 22px" }}>
+          <section className="rack-order-card">
+            <h3 className="rack-eyebrow rack-order-card-head">Orders</h3>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ display: "flex", gap: 13, padding: "12px 0" }}>
+                <span className={skDelay(i)} style={{ height: 12, width: 60 }} />
+                <span className={skDelay(i + 1)} style={{ height: 12, width: "40%" }} />
+                <span className={skDelay(i + 2)} style={{ height: 12, width: 44 }} />
+              </div>
+            ))}
+          </section>
+        </div>
+      </SkeletonHoldBack>
     </div>
   );
 }

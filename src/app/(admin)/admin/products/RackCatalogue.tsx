@@ -519,7 +519,18 @@ export function RackCatalogue({
           disabled={pendingApi.saving}
           onClick={() => void pendingApi.save()}
         >
-          {pendingApi.saving ? "Saving…" : "Save"}
+          {pendingApi.saving ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              {/* Motion.dc.html's 100-400ms tier ("inline spinner... sits
+                  inside the control you pressed"). `.rack-spin` (issue #46)
+                  shipped in admin-rack.css with no component rendering it —
+                  a save that lingers past the instant toast now says so. */}
+              <span className="rack-spin" aria-hidden="true" />
+              Saving…
+            </span>
+          ) : (
+            "Save"
+          )}
         </button>
       </div>
 

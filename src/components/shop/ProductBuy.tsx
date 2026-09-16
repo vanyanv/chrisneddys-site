@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { addToBag, openBag } from "./bagStore";
 import { flyToBag } from "./flyToBag";
 import { MAX_PER_ORDER, type MerchProduct } from "@/data/merch";
@@ -149,11 +150,19 @@ export function BuyRow() {
 
   if (soldOut) {
     return (
-      <div className="cne-pdp-row">
-        <button type="button" className="cne-btn-primary is-soldout" disabled>
-          SOLD OUT
-        </button>
-      </div>
+      <>
+        <div className="cne-pdp-row">
+          <button type="button" className="cne-btn-primary is-soldout" disabled>
+            SOLD OUT
+          </button>
+        </div>
+        {/* The one working link on a page whose own button is dead
+            (ShopStates.dc.html's "run finished" state, issue #50): the run
+            is genuinely gone, but the shop is not. */}
+        <Link href="/shop/" className="cne-btn-secondary">
+          See what else is in the shop
+        </Link>
+      </>
     );
   }
 
@@ -209,14 +218,23 @@ export function BuyRow() {
 export function StickyBuy() {
   const { product, add, added, qty, soldOut, paused, pauseLabel } = useBuy();
 
+  // Sold out replaces the whole bar rather than sitting a dead button next
+  // to a price for a run that isn't selling at it any more — the same
+  // footer swap ShopStates.dc.html draws for "run finished".
+  if (soldOut) {
+    return (
+      <div className="cne-pdp-sticky">
+        <Link href="/shop/" className="cne-btn-secondary">
+          See what else is in the shop
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="cne-pdp-sticky">
       <span className="cne-price p">{formatPrice(product.price * qty)}</span>
-      {soldOut ? (
-        <button type="button" className="cne-btn-primary is-soldout" disabled>
-          SOLD OUT
-        </button>
-      ) : paused ? (
+      {paused ? (
         <button type="button" className="cne-btn-primary is-paused" disabled>
           {pauseLabel}
         </button>

@@ -1,5 +1,6 @@
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
+import { SkeletonHoldBack } from "@/components/admin/SkeletonHoldBack";
 
 /**
  * `/admin/orders/[id]`'s loading skeleton (issue #36 phase 5, "Motion &
@@ -7,6 +8,16 @@ import "@/styles/admin-orders.css";
  * `getOrderForAdmin`/`getStoreSettings` reads are in flight. Mirrors that
  * page's own three-card main column and three-card side column rather than
  * a generic skeleton, same as the rest of The Rack's loading states.
+ *
+ * The top bar, tab strip, "All orders" back-link and the order header
+ * (number, status pill, action buttons) render immediately, so a slow
+ * connection still gets a stable frame instead of a blank viewport for
+ * 200ms (issue #46 follow-up). Unlike the list pages' header, this one has
+ * no single "count line" worth a nested hold — it's an order number and a
+ * pair of action buttons, not a fact separable from the rest — so it stays
+ * whole, the same tradeoff the top bar's own avatar/store-pill make. Only
+ * the items/timeline/customer/shipping cards below sit behind
+ * `<SkeletonHoldBack>`.
  */
 function skDelay(i: number): string {
   const step = i % 4;
@@ -36,8 +47,10 @@ export default function OrderDetailLoading() {
           </span>
         </div>
         <div className="rack-top-right">
-          <span className="rack-sk" style={{ height: 22, width: 96 }} />
-          <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          <SkeletonHoldBack>
+            <span className="rack-sk" style={{ height: 22, width: 96 }} />
+            <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          </SkeletonHoldBack>
         </div>
       </nav>
 
@@ -56,60 +69,62 @@ export default function OrderDetailLoading() {
         </div>
       </div>
 
-      <div className="rack-order-grid">
-        <div className="rack-order-main">
-          <section className="rack-order-card">
-            <h3 className="rack-eyebrow rack-order-card-head">Items</h3>
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                className="ord-item-row"
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}
-              >
-                <span className={skDelay(i)} style={{ width: 36, height: 36, flex: "none" }} />
-                <span style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span className={skDelay(i)} style={{ height: 12, width: "60%" }} />
-                  <span className={skDelay(i + 1)} style={{ height: 10, width: "35%" }} />
-                </span>
-                <span className={skDelay(i + 2)} style={{ height: 12, width: 44 }} />
-              </div>
-            ))}
-          </section>
-          <section className="rack-order-card">
-            <h3 className="rack-eyebrow rack-order-card-head">Timeline</h3>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ display: "flex", gap: 10, padding: "8px 0" }}>
-                <span className={skDelay(i)} style={{ width: 8, height: 8, borderRadius: 999 }} />
-                <span className={skDelay(i)} style={{ height: 11, width: "30%" }} />
-                <span className={skDelay(i + 1)} style={{ height: 11, width: "25%" }} />
-              </div>
-            ))}
-          </section>
-        </div>
-
-        <div className="rack-order-side">
-          <div className="rack-panel rack-order-next">
-            <h3 className="rack-eyebrow rack-order-card-head">Next</h3>
-            <span className="rack-sk" style={{ height: 34, width: "100%", display: "block" }} />
+      <SkeletonHoldBack>
+        <div className="rack-order-grid">
+          <div className="rack-order-main">
+            <section className="rack-order-card">
+              <h3 className="rack-eyebrow rack-order-card-head">Items</h3>
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className="ord-item-row"
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}
+                >
+                  <span className={skDelay(i)} style={{ width: 36, height: 36, flex: "none" }} />
+                  <span style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <span className={skDelay(i)} style={{ height: 12, width: "60%" }} />
+                    <span className={skDelay(i + 1)} style={{ height: 10, width: "35%" }} />
+                  </span>
+                  <span className={skDelay(i + 2)} style={{ height: 12, width: 44 }} />
+                </div>
+              ))}
+            </section>
+            <section className="rack-order-card">
+              <h3 className="rack-eyebrow rack-order-card-head">Timeline</h3>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ display: "flex", gap: 10, padding: "8px 0" }}>
+                  <span className={skDelay(i)} style={{ width: 8, height: 8, borderRadius: 999 }} />
+                  <span className={skDelay(i)} style={{ height: 11, width: "30%" }} />
+                  <span className={skDelay(i + 1)} style={{ height: 11, width: "25%" }} />
+                </div>
+              ))}
+            </section>
           </div>
-          <section className="rack-order-card">
-            <h3 className="rack-eyebrow rack-order-card-head">Customer</h3>
-            <span className="rack-sk" style={{ height: 11, width: "60%", display: "block" }} />
-            <span
-              className="rack-sk d1"
-              style={{ height: 11, width: "75%", display: "block", marginTop: 8 }}
-            />
-          </section>
-          <section className="rack-order-card">
-            <h3 className="rack-eyebrow rack-order-card-head">Ship to</h3>
-            <span className="rack-sk d2" style={{ height: 11, width: "80%", display: "block" }} />
-            <span
-              className="rack-sk d3"
-              style={{ height: 11, width: "55%", display: "block", marginTop: 8 }}
-            />
-          </section>
+
+          <div className="rack-order-side">
+            <div className="rack-panel rack-order-next">
+              <h3 className="rack-eyebrow rack-order-card-head">Next</h3>
+              <span className="rack-sk" style={{ height: 34, width: "100%", display: "block" }} />
+            </div>
+            <section className="rack-order-card">
+              <h3 className="rack-eyebrow rack-order-card-head">Customer</h3>
+              <span className="rack-sk" style={{ height: 11, width: "60%", display: "block" }} />
+              <span
+                className="rack-sk d1"
+                style={{ height: 11, width: "75%", display: "block", marginTop: 8 }}
+              />
+            </section>
+            <section className="rack-order-card">
+              <h3 className="rack-eyebrow rack-order-card-head">Ship to</h3>
+              <span className="rack-sk d2" style={{ height: 11, width: "80%", display: "block" }} />
+              <span
+                className="rack-sk d3"
+                style={{ height: 11, width: "55%", display: "block", marginTop: 8 }}
+              />
+            </section>
+          </div>
         </div>
-      </div>
+      </SkeletonHoldBack>
     </div>
   );
 }

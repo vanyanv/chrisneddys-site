@@ -216,7 +216,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             <div className="cne-pdp-lab">
               <span>Size — one size fits most</span>
             </div>
-            <span className="cne-chip is-static">ONE SIZE FITS MOST</span>
+            <div className="cne-pdp-chips">
+              <span className="cne-chip is-static">ONE SIZE FITS MOST</span>
+              {/* States the real per-order cap enforced on the stepper below
+                  (`perOrderLimit`, falling back to `MAX_PER_ORDER`) rather
+                  than leaving it undiscoverable until someone hits it. */}
+              <span className="cne-chip is-static">LIMIT {perOrderLimit}</span>
+            </div>
 
             <BuyRow />
 

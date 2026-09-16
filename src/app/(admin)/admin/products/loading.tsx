@@ -1,4 +1,5 @@
 import "@/styles/admin-rack.css";
+import { SkeletonHoldBack } from "@/components/admin/SkeletonHoldBack";
 
 /**
  * `/admin/products`'s loading skeleton (`ProductsLoading.dc.html`, issue #36
@@ -9,6 +10,13 @@ import "@/styles/admin-rack.css";
  * skeletons them instead, on the same honesty rule the rest of The Rack
  * follows (real data or a skeleton, never a guess) — everything else
  * (cards, the detail panel, the edition grid) follows the mockup as drawn.
+ *
+ * The top bar, tab strip, "Products" title and "New product" button render
+ * immediately — none of them wait on the catalogue read, so holding them
+ * back traded a skeleton flash for a blank-screen one on a slow connection
+ * (issue #46 follow-up). Only the product count (data) and the card
+ * grid/detail panel below (the actual catalogue) sit behind
+ * `<SkeletonHoldBack>`.
  */
 /** Cycles through the skeleton's 4-step stagger (`""`, `d1`, `d2`, `d3`) so a
  * row of skeleton pieces breathes slightly out of phase with its neighbours,
@@ -41,8 +49,10 @@ export default function ProductsLoading() {
           </span>
         </div>
         <div className="rack-top-right">
-          <span className="rack-sk" style={{ height: 22, width: 96 }} />
-          <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          <SkeletonHoldBack>
+            <span className="rack-sk" style={{ height: 22, width: 96 }} />
+            <span className="rack-sk" style={{ width: 28, height: 28, borderRadius: 999 }} />
+          </SkeletonHoldBack>
         </div>
       </nav>
 
@@ -51,7 +61,9 @@ export default function ProductsLoading() {
           <h1 className="rack-page-title rack-bow">Products</h1>
         </div>
         <div className="rack-page-header-right">
-          <span className="rack-sk" style={{ height: 11, width: 130, display: "block" }} />
+          <SkeletonHoldBack>
+            <span className="rack-sk" style={{ height: 11, width: 130, display: "block" }} />
+          </SkeletonHoldBack>
           <button type="button" className="rack-btn-primary" style={{ opacity: 0.55 }} disabled>
             <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
               <path d="M8 3v10M3 8h10" />
@@ -61,44 +73,46 @@ export default function ProductsLoading() {
         </div>
       </div>
 
-      <div className="rack-content">
-        <div className="rack-grid">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="rack-card" style={{ cursor: "default" }}>
-              <div className={skDelay(i)} style={{ aspectRatio: 1 }} />
-              <div className="rack-card-body">
-                <div className={skDelay(i)} style={{ height: 14, width: "82%" }} />
-                <div className={skDelay(i)} style={{ height: 14, width: "54%", marginTop: 7 }} />
-                <div className={skDelay(i)} style={{ height: 11, width: "38%", marginTop: 12 }} />
-                <div className={skDelay(i)} style={{ height: 4, width: "100%", marginTop: 9 }} />
+      <SkeletonHoldBack>
+        <div className="rack-content">
+          <div className="rack-grid">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rack-card" style={{ cursor: "default" }}>
+                <div className={skDelay(i)} style={{ aspectRatio: 1 }} />
+                <div className="rack-card-body">
+                  <div className={skDelay(i)} style={{ height: 14, width: "82%" }} />
+                  <div className={skDelay(i)} style={{ height: 14, width: "54%", marginTop: 7 }} />
+                  <div className={skDelay(i)} style={{ height: 11, width: "38%", marginTop: 12 }} />
+                  <div className={skDelay(i)} style={{ height: 4, width: "100%", marginTop: 9 }} />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        <aside className="rack-detail">
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span className="rack-sk" style={{ width: 40, height: 40, flex: "none" }} />
-            <div style={{ flex: 1 }}>
-              <div className="rack-sk" style={{ height: 15, width: "88%" }} />
-              <div className="rack-sk d1" style={{ height: 11, width: "56%", marginTop: 7 }} />
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 15 }}>
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className={skDelay(i)} style={{ width: 56, height: 56 }} />
             ))}
           </div>
-          <div className="rack-hairline">
-            <div className="rack-sk d2" style={{ height: 10, width: 120 }} />
-            <div className="rack-edgrid" style={{ marginTop: 13 }}>
-              {Array.from({ length: 50 }, (_, i) => (
-                <span key={i} className={skDelay(i)} style={{ aspectRatio: 1 }} />
+
+          <aside className="rack-detail">
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span className="rack-sk" style={{ width: 40, height: 40, flex: "none" }} />
+              <div style={{ flex: 1 }}>
+                <div className="rack-sk" style={{ height: 15, width: "88%" }} />
+                <div className="rack-sk d1" style={{ height: 11, width: "56%", marginTop: 7 }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 15 }}>
+              {[0, 1, 2, 3].map((i) => (
+                <span key={i} className={skDelay(i)} style={{ width: 56, height: 56 }} />
               ))}
             </div>
-          </div>
-        </aside>
-      </div>
+            <div className="rack-hairline">
+              <div className="rack-sk d2" style={{ height: 10, width: 120 }} />
+              <div className="rack-edgrid" style={{ marginTop: 13 }}>
+                {Array.from({ length: 50 }, (_, i) => (
+                  <span key={i} className={skDelay(i)} style={{ aspectRatio: 1 }} />
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </SkeletonHoldBack>
     </div>
   );
 }

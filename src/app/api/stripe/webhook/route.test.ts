@@ -19,8 +19,10 @@ vi.mock("@/lib/stripe", () => ({
 }));
 
 const sendOrderConfirmationMock = vi.hoisted(() => vi.fn());
+const sendRefundConfirmationMock = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/email", () => ({
   sendOrderConfirmation: sendOrderConfirmationMock,
+  sendRefundConfirmation: sendRefundConfirmationMock,
 }));
 
 const migrationsFolder = fileURLToPath(new URL("../../../../../drizzle", import.meta.url));
@@ -37,6 +39,8 @@ beforeEach(() => {
   constructEventMock.mockReset();
   sendOrderConfirmationMock.mockReset();
   sendOrderConfirmationMock.mockResolvedValue({ sent: false, reason: "not configured in tests" });
+  sendRefundConfirmationMock.mockReset();
+  sendRefundConfirmationMock.mockResolvedValue({ sent: false, reason: "not configured in tests" });
 });
 
 async function post(rawBody: string): Promise<Response> {
@@ -226,6 +230,9 @@ describe("POST /api/stripe/webhook", () => {
     const order = await getOrder(orderId);
     expect(order?.status).toBe("refunded");
     expect(order?.refundedAt).not.toBeNull();
+
+    expect(sendRefundConfirmationMock).toHaveBeenCalledTimes(1);
+    expect(sendRefundConfirmationMock.mock.calls[0]?.[0]?.id).toBe(orderId);
   });
 
   it("leaves the order's status alone and appends a note on a partial refund", async () => {
@@ -245,5 +252,6 @@ describe("POST /api/stripe/webhook", () => {
     expect(order?.status).toBe("paid");
     expect(order?.refundedAt).toBeNull();
     expect(order?.notes).toBe("Partial refund of $12.00 in Stripe");
+    expect(sendRefundConfirmationMock).not.toHaveBeenCalled();
   });
 });

@@ -267,15 +267,20 @@ export async function getOrdersDashboardCounts(): Promise<OrdersDashboardCounts>
  * config, a thrown error mid-send — is swallowed here and never blocks (or
  * rolls back) the status change that already committed.
  */
-async function notifyBestEffort(kind: "shipped" | "pickup_ready", orderId: string): Promise<void> {
+async function notifyBestEffort(
+  kind: "shipped" | "pickup_ready" | "refunded",
+  orderId: string,
+): Promise<void> {
   try {
     const order = await getOrder(orderId);
     if (!order) return;
 
     if (kind === "shipped") {
       await email.sendShippingNotice(order);
-    } else {
+    } else if (kind === "pickup_ready") {
       await email.sendPickupReady(order);
+    } else {
+      await email.sendRefundConfirmation(order);
     }
   } catch {
     // Best-effort only — see the doc comment above.
@@ -324,5 +329,9 @@ export async function markPickedUp(orderId: string): Promise<OrderMutationResult
  * order so the desk matches reality. */
 export async function markRefunded(orderId: string): Promise<OrderMutationResult> {
   await requireOwner();
-  return transitionRefunded(orderId, {});
+  const result = await transitionRefunded(orderId, {});
+  if (!result.ok) return result;
+
+  await notifyBestEffort("refunded", orderId);
+  return { ok: true };
 }

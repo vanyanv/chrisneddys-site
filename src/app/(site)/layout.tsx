@@ -15,7 +15,7 @@ import { Analytics } from "@/components/shared/Analytics";
 import { TrackEvents } from "@/components/shared/TrackEvents";
 import { PrefetchNav } from "@/components/counter/PrefetchNav";
 import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
-import { getStoreSettings } from "@/lib/orders";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { shippingReturnsNote } from "@/lib/shopCopy";
 import { TERMS_PENDING } from "@/data/merch";
 
@@ -122,7 +122,7 @@ export const revalidate = 60;
  * `shippingNote` is the "Shipping & returns" line (or the closed-shop
  * placeholder) for the same reason.
  *
- * `getStoreSettings()` is only called once the Stripe keys are present. Not
+ * `getPublicStoreSettings()` is only called once the Stripe keys are present. Not
  * just an optimisation: `isShopOpenFor` itself needs the settings row (it
  * reads `returnsPolicy` and `supportEmail` off it), so there is no way to
  * know whether the shop is open without fetching it once the keys exist —
@@ -137,7 +137,7 @@ export const revalidate = 60;
  * the shop pages already do for the catalogue itself.
  */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const settings = hasPaymentKeys() ? await getStoreSettings() : null;
+  const settings = hasPaymentKeys() ? await getPublicStoreSettings() : null;
   const shopOpen = settings ? isShopOpenFor(settings) : false;
   const pickupEnabled = settings?.pickupEnabled ?? false;
   const shippingNote =

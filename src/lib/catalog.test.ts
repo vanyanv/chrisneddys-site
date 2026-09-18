@@ -12,6 +12,7 @@ import {
   editionCounts,
   getInventory,
   getProductBySlug,
+  listInventory,
   listPublishedProducts,
   nextAvailableEditionNumber,
 } from "@/lib/catalog";
@@ -338,5 +339,52 @@ describe("hasDatabase", () => {
   it("is false under NODE_ENV=production with neither DATABASE_URL nor PGLITE_DATA_DIR set", () => {
     env.NODE_ENV = "production";
     expect(hasDatabase()).toBe(false);
+  });
+});
+
+// The shop index reads inventory through `listInventory` and the product page
+// reads it through `getInventory`. They are two different queries over the
+// same rows, so the thing worth testing is that they cannot disagree about a
+// product — that is what would put "13 of 50 left" on one page and something
+// else on the other.
+describe("listInventory", () => {
+  it("reports the same counts as getInventory, without the edition rows", async () => {
+    const [listed] = await listInventory(["foam-trucker-blue"]);
+    const single = await getInventory("foam-trucker-blue");
+    if (!single) throw new Error("expected the seeded product to have inventory");
+
+    expect(listed).toEqual({
+      tracked: single.tracked,
+      available: single.available,
+      editionSize: single.editionSize,
+    });
+    // Not merely absent from the comparison above — genuinely not fetched.
+    expect(listed).not.toHaveProperty("editions");
+    expect(single.editions).toBeDefined();
+  });
+
+  it("keeps one entry per slug asked for, in that order, undefined where there is no product", async () => {
+    expect(await listInventory(["no-such-cap", "foam-trucker-blue", "also-not-real"])).toEqual([
+      undefined,
+      expect.objectContaining({ tracked: true, editionSize: 50 }),
+      undefined,
+    ]);
+  });
+
+  it("makes no query at all for an empty page", async () => {
+    expect(await listInventory([])).toEqual([]);
+  });
+
+  it("agrees with getInventory on a plain-quantity product, which has no editions", async () => {
+    const draft = await createDraft("Batched Quantity Cap");
+    await updateProductField(draft.id, "priceCents", 2400);
+    await setInventory(draft.id, "quantity", 7);
+    await setStatus(draft.id, "published");
+
+    const [listed] = await listInventory([draft.slug]);
+    const single = await getInventory(draft.slug);
+    expect(listed).toEqual({ tracked: true, available: 7, editionSize: null });
+    expect(single?.available).toBe(7);
+    expect(single?.editions).toBeUndefined();
   });
 });

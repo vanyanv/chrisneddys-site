@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/legal.css";
 import { brand } from "@/data/brand";
-import { getStoreSettings } from "@/lib/orders";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
@@ -38,7 +38,7 @@ function paragraphsOf(text: string): string[] {
  * rather than inventing a policy nobody has agreed to.
  */
 export default async function ReturnsPage() {
-  const settings = await getStoreSettings();
+  const settings = await getPublicStoreSettings();
   const policy = settings.returnsPolicy?.trim();
   const contactEmail = settings.supportEmail || brand.email;
 

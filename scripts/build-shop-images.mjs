@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 /**
- * Converts raw Foam Trucker photography into the two web cuts /shop expects:
- * a 720px-wide `.webp` (quality ~82) and a 200px-wide `-thumb.webp`, for every
- * `.png`/`.jpg`/`.jpeg` in the input directory.
+ * Converts raw Foam Trucker photography into the three web cuts /shop expects:
+ * a 720px-wide `.webp` (quality ~82), a 400px-wide `-mid.webp` and a 200px-wide
+ * `-thumb.webp`, for every `.png`/`.jpg`/`.jpeg` in the input directory.
+ *
+ * The middle cut exists because the gallery's thumbnail strip draws tiles about
+ * 50-175px wide. On a 2x or 3x screen — which is nearly every phone and most
+ * laptops — that needs 240-500 source pixels, so with only 200 and 720 to pick
+ * from the browser took the 720 for all eight tiles and downloaded the whole
+ * gallery at full size. Measured on the Foam Trucker page: 136 KB of images at
+ * 1x against 688 KB at 2x. A 400px cut lands in that gap, so every tile is
+ * served a file at least as large as it draws and no larger.
  *
  * Source files are expected at `assets/shop/foam-trucker-blue/` — see the
  * README there for the eight expected gallery photos plus the certificate and
@@ -60,7 +68,7 @@ const CROP = {
   certificate: { left: 515, top: 139, width: 1366, height: 2118 },
 };
 
-const WIDTHS = { full: 720, thumb: 200 };
+const WIDTHS = { full: 720, mid: 400, thumb: 200 };
 const QUALITY = 82;
 
 function flag(name) {
@@ -102,19 +110,24 @@ async function main() {
     const src = join(resolvedIn, file);
     const crop = CROP[name];
 
-    const full = join(resolvedOut, `${name}.webp`);
-    const thumb = join(resolvedOut, `${name}-thumb.webp`);
+    const cuts = [
+      [`${name}.webp`, WIDTHS.full],
+      [`${name}-mid.webp`, WIDTHS.mid],
+      [`${name}-thumb.webp`, WIDTHS.thumb],
+    ];
 
-    // A fresh `sharp(src)` per resize: `.extract()`/`.resize()` mutate the
-    // pipeline, and the same instance can't be reused for two different
-    // output sizes.
-    const forFull = crop ? sharp(src).extract(crop) : sharp(src);
-    const forThumb = crop ? sharp(src).extract(crop) : sharp(src);
+    for (const [outName, width] of cuts) {
+      // A fresh `sharp(src)` per resize: `.extract()`/`.resize()` mutate the
+      // pipeline, and the same instance can't be reused for two different
+      // output sizes.
+      const pipeline = crop ? sharp(src).extract(crop) : sharp(src);
+      await pipeline
+        .resize({ width })
+        .webp({ quality: QUALITY })
+        .toFile(join(resolvedOut, outName));
+    }
 
-    await forFull.resize({ width: WIDTHS.full }).webp({ quality: QUALITY }).toFile(full);
-    await forThumb.resize({ width: WIDTHS.thumb }).webp({ quality: QUALITY }).toFile(thumb);
-
-    console.log(`${file} -> ${name}.webp, ${name}-thumb.webp${crop ? " (cropped)" : ""}`);
+    console.log(`${file} -> ${cuts.map(([n]) => n).join(", ")}${crop ? " (cropped)" : ""}`);
   }
 }
 

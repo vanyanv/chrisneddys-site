@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import "@/styles/shop-product.css";
+import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { MAX_PER_ORDER, TERMS_PENDING } from "@/data/merch";
 import {
@@ -141,7 +143,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         maxQty={maxQty}
       >
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
-          <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
+          <Link prefetch={false} href="/shop/">
+            SHOP
+          </Link>{" "}
+          <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
         </nav>
 
@@ -234,11 +239,17 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             {note ? (
               <p className="cne-pending">
-                {note.line} See <Link href="/returns/">returns</Link>
+                {note.line} See{" "}
+                <Link prefetch={false} href="/returns/">
+                  returns
+                </Link>
                 {note.hasTerms && (
                   <>
                     {" "}
-                    and <Link href="/terms/">terms</Link>
+                    and{" "}
+                    <Link prefetch={false} href="/terms/">
+                      terms
+                    </Link>
                   </>
                 )}
                 .
@@ -307,11 +318,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const cert = product.authenticity.certificate;
                     const certFull = cert.url ?? `${product.photoDir}/${cert.src}.webp`;
                     const certThumb = cert.thumbUrl ?? `${product.photoDir}/${cert.src}-thumb.webp`;
+                    // Same three cuts as the gallery (see `ProductShot`): the
+                    // 400px file only exists for in-repo photography, so an
+                    // uploaded image keeps the original pair.
+                    const certSrcSet =
+                      cert.url || cert.thumbUrl
+                        ? `${certThumb} 200w, ${certFull} 720w`
+                        : `${certThumb} 200w, ${product.photoDir}/${cert.src}-mid.webp 400w, ${certFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-cert"
                         src={certFull}
-                        srcSet={`${certThumb} 200w, ${certFull} 720w`}
+                        srcSet={certSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={cert.width}
                         height={cert.height}
@@ -327,11 +345,15 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const stickerFull = sticker.url ?? `${product.photoDir}/${sticker.src}.webp`;
                     const stickerThumb =
                       sticker.thumbUrl ?? `${product.photoDir}/${sticker.src}-thumb.webp`;
+                    const stickerSrcSet =
+                      sticker.url || sticker.thumbUrl
+                        ? `${stickerThumb} 200w, ${stickerFull} 720w`
+                        : `${stickerThumb} 200w, ${product.photoDir}/${sticker.src}-mid.webp 400w, ${stickerFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-sticker"
                         src={stickerFull}
-                        srcSet={`${stickerThumb} 200w, ${stickerFull} 720w`}
+                        srcSet={stickerSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={sticker.width}
                         height={sticker.height}
@@ -353,9 +375,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <h2>Come eat.</h2>
           <p>
             The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
-            of cheese, every topping free. <Link href="/menu/">See the menu</Link> or{" "}
-            <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
-            <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
+            of cheese, every topping free.{" "}
+            <Link prefetch={false} href="/menu/">
+              See the menu
+            </Link>{" "}
+            or{" "}
+            <Link prefetch={false} href="/order/">
+              order for pickup
+            </Link>
+            . Questions about the drop go to{" "}
+            <Link prefetch={false} href="/contact/">
+              the contact page
+            </Link>
+            , or call {brand.phone}.
           </p>
         </section>
 

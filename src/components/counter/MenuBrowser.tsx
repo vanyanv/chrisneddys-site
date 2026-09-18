@@ -79,7 +79,7 @@ export function MenuBrowser() {
 
           <p className="cne-menu-foot">
             Live prices from our{" "}
-            <Link href="/order/" style={{ color: "inherit" }}>
+            <Link prefetch={false} href="/order/" style={{ color: "inherit" }}>
               Hollywood ordering page
             </Link>
             . Delivery apps price higher.

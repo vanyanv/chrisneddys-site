@@ -59,6 +59,7 @@ export default function NotFound() {
           The page you’re looking for has left the building. Here’s where to go instead.
         </p>
         <Link
+          prefetch={false}
           href="/"
           style={{
             display: "inline-block",

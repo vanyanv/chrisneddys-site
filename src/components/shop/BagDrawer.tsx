@@ -299,10 +299,15 @@ export function BagDrawer({
               </p>
             </>
           )}
-          <Link href="/shop/" className="cne-btn-ghost" onClick={dismiss}>
+          <Link prefetch={false} href="/shop/" className="cne-btn-ghost" onClick={dismiss}>
             Keep shopping
           </Link>
-          <Link href="/shop/order/" className="cne-btn-ghost is-sub" onClick={dismiss}>
+          <Link
+            prefetch={false}
+            href="/shop/order/"
+            className="cne-btn-ghost is-sub"
+            onClick={dismiss}
+          >
             Already ordered? Track it
           </Link>
         </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/legal.css";
 import { brand } from "@/data/brand";
 import { getPublicStoreSettings } from "@/lib/orders";
 import { JsonLdScript } from "@/components/shared/JsonLd";

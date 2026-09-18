@@ -1,11 +1,10 @@
 /**
- * One conversion event, reported to both analytics tools.
+ * One conversion event, reported to GA4.
  *
- * GA4 is where these are turned into key events and joined to campaigns;
- * Plausible already counts outbound clicks on its own, so the named events sent
- * here are what let a Plausible goal separate "tapped ORDER in the dock" from
- * "tapped ORDER in the hero" — a distinction its outbound-link extension
- * cannot make, because both go to the same URL.
+ * GA4 is where these are turned into key events and joined to campaigns. The
+ * `surface` each event carries is what separates "tapped ORDER in the dock"
+ * from "tapped ORDER in the hero" — a distinction GA4's own outbound-click
+ * measurement cannot make, because both go to the same URL.
  *
  * Every event here is an *intent* signal except `contact_submit` and
  * `notify_signup`. For the menu, the sale happens on Otter, on a domain this
@@ -27,10 +26,7 @@ export type TrackItem = {
   quantity: number;
 };
 
-/**
- * GA4 takes nested arrays; Plausible takes flat scalars only. A value that is
- * neither a scalar nor an `items` array has nowhere sensible to go.
- */
+/** GA4 takes nested arrays, so an `items` list rides alongside the scalars. */
 type ParamValue = Primitive | TrackItem[];
 
 export type TrackEvent =
@@ -64,14 +60,13 @@ export type TrackEvent =
 declare global {
   interface Window {
     gtag?: (command: string, ...args: unknown[]) => void;
-    plausible?: (event: string, opts?: { props?: Record<string, Primitive> }) => void;
   }
 }
 
 /**
  * Fire and forget. Never throws, and never blocks a navigation: the anchor's
  * default action is left alone, so a click that leaves the page still leaves it
- * even if both tags are blocked, slow or absent.
+ * even if the tag is blocked, slow or absent.
  */
 export function track(event: TrackEvent, params: Record<string, ParamValue> = {}): void {
   if (typeof window === "undefined") return;
@@ -90,18 +85,5 @@ export function track(event: TrackEvent, params: Record<string, ParamValue> = {}
     window.gtag?.("event", event, { ...props, transport_type: "beacon" });
   } catch {
     /* analytics must never break the page */
-  }
-
-  try {
-    // Plausible's custom properties are flat strings and numbers — an array
-    // would be dropped or stringified into a useless dimension, so the items
-    // list is left out and only the scalars go over.
-    const flat: Record<string, Primitive> = {};
-    for (const [k, v] of Object.entries(props)) {
-      if (!Array.isArray(v)) flat[k] = v;
-    }
-    window.plausible?.(event, Object.keys(flat).length ? { props: flat } : undefined);
-  } catch {
-    /* as above */
   }
 }

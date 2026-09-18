@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@/styles/check-form.css";
+import "@/styles/shop-order.css";
 import { pageMetadata } from "@/lib/seo";
 import { OrderLookupForm } from "./OrderLookupForm";
 

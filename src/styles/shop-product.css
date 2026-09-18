@@ -1,0 +1,762 @@
+/**
+ * /shop/[product]/ — the product page.
+ *
+ * The gallery, the buy column, the details and authenticity blocks, the
+ * edition map, and what the page looks like when a drop is sold out or the
+ * shop is paused. Ported from the checkout prototype: phone values are the
+ * base and `@media (min-width: 901px)` carries the desktop ones, same as the
+ * rest of the site.
+ */
+
+.cne-pdp-crumb {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  padding: 14px 15px 0;
+}
+
+.cne-pdp-crumb a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cne-pdp-crumb a:hover {
+  color: var(--a-red-cta);
+}
+
+.cne-pdp {
+  display: grid;
+  gap: 18px;
+  padding: 14px 15px 4px;
+}
+
+.cne-pdp-gal {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cne-pdp-main {
+  position: relative;
+  border: 3px solid var(--a-ink);
+}
+
+.cne-pdp-main .cne-capshot {
+  aspect-ratio: 4 / 3;
+  --cne-mark: 22px;
+}
+
+.cne-pdp-main .cne-capshot.is-photo {
+  aspect-ratio: 720 / 411;
+}
+
+.cne-pdp-thumbs {
+  display: grid;
+  /* Four across on a phone wraps eight tabs into two even rows. */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.cne-pdp-t {
+  border: 2.5px solid var(--a-line);
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.cne-pdp-t[aria-selected="true"] {
+  border-color: var(--a-ink);
+}
+
+.cne-pdp-t .cne-capshot {
+  aspect-ratio: 1 / 1;
+  --cne-mark: 9px;
+}
+
+.cne-pdp-t .cne-cap {
+  width: 78%;
+}
+
+.cne-pdp-t .cne-cap .mark small {
+  display: none;
+}
+
+.cne-pdp-buy h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  line-height: 0.96;
+  margin: 5px 0 0;
+  font-weight: 400;
+}
+
+.cne-pdp-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0 2px;
+  flex-wrap: wrap;
+}
+
+.cne-pdp-price .p {
+  font-size: 26px;
+}
+
+.cne-pdp-price .s {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--a-sub);
+  font-weight: 500;
+}
+
+/* The scarcity flag takes the space a size grid would have used. */
+.cne-limited {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-cream);
+}
+
+.cne-limited .tag {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  background: var(--a-red-cta);
+  color: #fff2c9;
+  border: 2px solid var(--a-ink);
+  padding: 5px 7px;
+  line-height: 1;
+  flex: none;
+  transform: rotate(-2deg);
+}
+
+.cne-limited .txt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.cne-pdp-lab {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--a-sub);
+  margin: 18px 0 8px;
+}
+
+/* The size chip and the per-order limit chip sit side by side rather than
+   stacked — each one states a single fact, so neither needs the other's
+   room. */
+.cne-pdp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cne-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 2px solid var(--a-ink);
+  background: var(--a-ink);
+  color: #fff2c9;
+  padding: 8px 11px;
+  line-height: 1;
+}
+
+/* One size means there is nothing to choose — so it states, it does not offer.
+   The limit chip states the same way: a fact, not a control. */
+.cne-chip.is-static {
+  cursor: default;
+}
+
+.cne-pdp-row {
+  display: flex;
+  gap: 9px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.cne-qty {
+  display: flex;
+  border: 3px solid var(--a-ink);
+  flex: none;
+}
+
+.cne-qty button {
+  width: 38px;
+  background: transparent;
+  border: none;
+  color: var(--a-fg);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cne-qty button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cne-qty > span {
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  border-left: 2px solid var(--a-line);
+  border-right: 2px solid var(--a-line);
+  font-variant-numeric: tabular-nums;
+}
+
+.cne-qty > span b {
+  font-weight: 800;
+  display: block;
+}
+
+/* The sold-out escape (issue #50): a working link where the primary button
+   just went dead, in the design system's own secondary-button geometry
+   (Counter Cream fill, ink text, identical shape to the primary) rather
+   than the ghost link below, which is for a lower-shout aside, not a
+   redirect off a dead end. */
+.cne-btn-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--a-fg);
+  background: var(--a-cream);
+  border: 3px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-shadow);
+  padding: 15px 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+
+.cne-btn-secondary:active {
+  transform: translate(4px, 4px);
+  box-shadow: 1px 1px 0 var(--a-shadow);
+}
+
+.cne-pdp-sticky .cne-btn-secondary {
+  margin-top: 0;
+  padding: 14px 12px;
+  font-size: 12px;
+  box-shadow: 3px 3px 0 var(--a-shadow);
+}
+
+/* What has not been settled yet, said in the place a buyer looks for it. */
+.cne-pending {
+  margin: 16px 0 0;
+  padding: 11px 12px;
+  border: 2px dashed var(--a-line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* The price and the button must never scroll away on a phone. */
+.cne-pdp-sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 15px;
+  margin-top: 18px;
+  background: var(--a-bg);
+  border-top: 3px solid var(--a-ink);
+}
+
+.cne-pdp-sticky .p {
+  font-size: 19px;
+  flex: none;
+}
+
+.cne-pdp-sticky .cne-btn-primary {
+  padding: 14px 12px;
+  font-size: 12px;
+  box-shadow: 3px 3px 0 var(--a-shadow);
+}
+
+.cne-pdp-more {
+  padding-top: 26px;
+}
+
+.cne-pdp-more p {
+  max-width: 62ch;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+.cne-pdp-more a {
+  text-decoration: underline;
+  color: inherit;
+}
+
+/* ---- product page: details / fit / limited / why ------------------------ */
+.cne-pdp-details {
+  border-top: 2.5px solid var(--a-line);
+}
+
+.cne-detail-list {
+  display: grid;
+  gap: 9px;
+  max-width: 62ch;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cne-detail-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--a-fg);
+}
+
+.cne-detail-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  background: var(--a-red-cta);
+  border: 1.5px solid var(--a-ink);
+}
+
+.cne-detail-block {
+  max-width: 62ch;
+  margin-top: 20px;
+}
+
+.cne-detail-block p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* ---- product page: authenticity ------------------------------------------
+   Two images when the scans exist — the certificate and the brim sticker —
+   next to the copy and the fact list. Until then `.cne-auth-imgs` simply
+   doesn't render, and the section is the paragraph and the facts alone. */
+.cne-pdp-auth {
+  border-top: 2.5px solid var(--a-line);
+}
+
+.cne-auth {
+  display: grid;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.cne-auth-copy p {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+.cne-auth-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 16px;
+  margin: 18px 0 0;
+  max-width: 62ch;
+}
+
+.cne-auth-facts div {
+  border-top: 2px solid var(--a-line);
+  padding-top: 8px;
+}
+
+.cne-auth-facts dt {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--a-sub);
+  margin-bottom: 4px;
+}
+
+.cne-auth-facts dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cne-auth-imgs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.cne-auth-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-shadow);
+  background: var(--a-card);
+  object-fit: cover;
+}
+
+/* ---- shop motion --------------------------------------------------------
+   Everything decorative sits behind the reduced-motion guard; the flow works
+   identically without a single one of them. */
+@media (prefers-reduced-motion: no-preference) {
+  .cne-qty > span b {
+    animation: cne-qty-nudge 0.26s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+
+  .cne-capshot.is-swap {
+    animation: cne-shot-in 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+}
+
+@keyframes cne-qty-nudge {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cne-shot-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- desktop ------------------------------------------------------------ */
+@media (min-width: 901px) {
+  .cne-pdp-crumb {
+    padding: 20px 30px 0;
+  }
+
+  .cne-pdp {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    gap: 34px;
+    padding: 18px 30px 8px;
+  }
+
+  .cne-pdp-gal {
+    gap: 10px;
+  }
+
+  .cne-pdp-main .cne-capshot {
+    aspect-ratio: 4 / 3;
+  }
+
+  .cne-pdp-main .cne-capshot.is-photo {
+    aspect-ratio: 720 / 411;
+  }
+
+  .cne-pdp-main .cne-cap {
+    width: 66%;
+    max-width: 430px;
+  }
+
+  .cne-pdp-thumbs {
+    /* All eight tabs in one row once there's room. */
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+  }
+
+  .cne-pdp-buy h1 {
+    font-size: 31px;
+  }
+
+  .cne-pdp-price .p {
+    font-size: 27px;
+  }
+
+  .cne-btn-secondary {
+    font-size: 13.5px;
+    padding: 16px;
+  }
+
+  /* The sticky bar is a phone answer to a phone problem. On a desktop the buy
+       row is still on screen, so a second one would just be a second one. */
+  .cne-pdp-sticky {
+    display: none;
+  }
+
+  .cne-limited .txt {
+    font-size: 10.5px;
+  }
+
+  .cne-pending {
+    font-size: 10.5px;
+  }
+
+  .cne-pdp-more {
+    padding-top: 34px;
+  }
+
+  .cne-pdp-details,
+  .cne-pdp-auth {
+    padding-top: 34px;
+  }
+
+  .cne-auth {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+    align-items: start;
+    gap: 34px;
+  }
+
+  .cne-auth-imgs {
+    max-width: 360px;
+  }
+}
+
+/* The buy button once tracked stock hits zero — dashed like the "payment not
+   connected" state it sits next to in the stylesheet, but ink-bordered and
+   solid-cream rather than transparent: nothing here is a placeholder, the
+   run is actually gone. */
+.cne-btn-primary.is-soldout {
+  background: var(--a-cream);
+  color: var(--a-fg);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cne-btn-primary.is-soldout:active {
+  transform: none;
+}
+
+/* ---- edition map -----------------------------------------------------
+   The centrepiece: every numbered cell drawn, coloured by exactly the three
+   states `editions.status` carries — available, reserved (held in someone's
+   open checkout), sold. `getInventory` (src/lib/catalog.ts) only returns
+   the array for a tracked edition product, so this block never renders for
+   the static fallback catalogue or a plain-quantity product. */
+.cne-edmap {
+  margin-top: 10px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-card);
+  padding: 13px;
+}
+
+.cne-edmap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.cne-edmap-count {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.cne-edmap-next {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--a-red-cta);
+  border: 1.5px solid var(--a-red-cta);
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.cne-edmap-next b {
+  font-variant-numeric: tabular-nums;
+}
+
+.cne-edgrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+
+.cne-edcell {
+  aspect-ratio: 1;
+  background: var(--a-cream);
+  border: 1px solid var(--a-line);
+}
+
+.cne-edcell.is-reserved {
+  background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+}
+
+.cne-edcell.is-sold {
+  background: var(--a-ink);
+  border-color: var(--a-ink);
+}
+
+.cne-edlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--a-sub);
+}
+
+.cne-edlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cne-edlegend i {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border: 1px solid var(--a-line);
+}
+
+.cne-edlegend i.a {
+  background: var(--a-cream);
+}
+
+.cne-edlegend i.r {
+  background: var(--a-yel);
+  border-color: var(--a-yel-deep);
+}
+
+.cne-edlegend i.s {
+  background: var(--a-ink);
+  border-color: var(--a-ink);
+}
+
+/* The product's own "not taking orders yet" notice — the same signal the
+   bag drawer already gates checkout on (`isShopOpenFor`), surfaced here too
+   so a buyer learns it before adding something to the bag, not after. */
+.cne-shopnotice {
+  margin-top: 14px;
+  padding: 11px 12px;
+  border: 2px dashed var(--a-line);
+  background: var(--a-cream);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* ---- shop paused (issue #43) ---------------------------------------------
+   A second, separate closed state from the pre-launch notice above — see
+   `isShopPausedFor` (`shopStatus.ts`) for why the two never share copy or
+   markup. The pill is rounded rather than square: every scarcity flag on
+   this page (`.cne-drop-flag`, `.cne-limited .tag`) is square because it's
+   a fact about the product, and this is the one status chip that's a fact
+   about the shop itself, so it gets the pill shape the rest of the system
+   reserves for exactly that distinction. Muted rather than red or green —
+   this is neither an alarm nor a sale. */
+.cne-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 6px 11px;
+  border: 2px solid var(--a-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+
+.cne-status-pill i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* The pause banner — square and bordered like every other card on the page
+   (chips are the one pill shape; everything else stays zero-radius), boxed
+   rather than a loose paragraph because this replaces a buy decision, not
+   just a caveat next to one. */
+.cne-pause-card {
+  margin-top: 10px;
+  padding: 12px 13px;
+  border: 2px solid var(--a-yel-deep);
+  background: var(--a-cream);
+}
+
+.cne-pause-head {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cne-pause-body {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--a-sub);
+}
+
+/* The sold-out run's own photo: desaturated and dimmed, with an ink "ALL
+   GONE" pill over it — a card, not an empty shelf, because the run existing
+   is the point. */
+.cne-pdp-main.is-soldout .cne-capshot {
+  filter: saturate(0.3) opacity(0.6);
+}
+
+.cne-pdp-gone {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--a-ink);
+  color: #fff2c9;
+  padding: 5px 9px;
+  z-index: 1;
+}

@@ -49,7 +49,12 @@ export function SiteFooter() {
     <footer className="cne-foot" data-surface="footer">
       <div className="cne-foot-top">
         <div className="cne-foot-brand">
-          <Link href="/" aria-label={`${brand.name} — Home`} className="cne-foot-mark">
+          <Link
+            prefetch={false}
+            href="/"
+            aria-label={`${brand.name} — Home`}
+            className="cne-foot-mark"
+          >
             <Image
               src="/cne-logo.webp"
               alt={brand.name}
@@ -71,7 +76,9 @@ export function SiteFooter() {
             <ul>
               {EAT.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link prefetch={false} href={item.href}>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,7 +91,9 @@ export function SiteFooter() {
             <ul>
               {COUNTER_LINKS.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link prefetch={false} href={item.href}>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -139,9 +148,15 @@ export function SiteFooter() {
         <span>
           © {new Date().getFullYear()} {brand.name}
         </span>
-        <Link href="/privacy/">Privacy</Link>
-        <Link href="/returns/">Returns</Link>
-        <Link href="/terms/">Terms</Link>
+        <Link prefetch={false} href="/privacy/">
+          Privacy
+        </Link>
+        <Link prefetch={false} href="/returns/">
+          Returns
+        </Link>
+        <Link prefetch={false} href="/terms/">
+          Terms
+        </Link>
       </div>
     </footer>
   );

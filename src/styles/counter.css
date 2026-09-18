@@ -6,6 +6,12 @@
  * A real site has one DOM, so those pairs are merged here: the base rules are
  * the phone values and `@media (min-width: 901px)` carries the desktop ones.
  * Values are ported verbatim — this file is the reference for pixel parity.
+ *
+ * Sitewide only. What one page draws sits beside this file and is loaded by
+ * that page: `about.css`, `contact.css`, `check-form.css`, `legal.css`,
+ * `shop-index.css`, `shop-product.css`, `shop-inventory.css` and
+ * `shop-order.css`. Every storefront page inlines this stylesheet, so a rule
+ * that only one route can match belongs in one of those instead.
  */
 
 @import "./tokens.css";
@@ -2523,6 +2529,27 @@ body {
   }
 }
 
+/* The home page's map split. `.cne-split` is also the class /about's two-Ways
+   block uses — a different component that happens to share the name — and
+   until the story page's CSS moved into `about.css` these three values
+   reached this split from there. They are stated here now so the home page
+   does not depend on a page it has nothing to do with. */
+.cne-split {
+  position: relative;
+}
+@media (max-width: 900px) {
+  .cne-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 3px solid var(--a-ink);
+  }
+}
+@media (min-width: 901px) {
+  .cne-split {
+    min-height: 560px;
+  }
+}
+
 /* ---- locations ---------------------------------------------------------- */
 .cne-mapwrap {
   position: relative;
@@ -3032,1247 +3059,13 @@ h3 {
 }
 
 /* =========================================================================
-   /about — the two Ways.
-
-   The page opens split down the middle, one founder either side, because the
-   argument they never settled is the reason the menu has two Ways on it. Every
-   class not in this block is the system's own; this is the only CSS the story
-   page adds, and it reuses the hero's halftone rather than inventing a texture.
-   ========================================================================= */
-.cne-story .cne-sec p {
-  margin: 0 0 13px;
-}
-
-/* ---- the split ---------------------------------------------------------- */
-.cne-split {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  border-bottom: 3px solid var(--a-ink);
-}
-.cne-side {
-  position: relative;
-  overflow: hidden;
-  border: 0;
-  margin: 0;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  padding: 26px 15px 22px;
-  min-height: 292px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  transition:
-    filter 0.45s ease,
-    opacity 0.45s ease;
-}
-.cne-side + .cne-side {
-  border-top: 3px solid var(--a-ink);
-}
-.cne-side.is-chris {
-  background: var(--sp-a-bg);
-  color: var(--sp-a-fg);
-}
-.cne-side.is-eddy {
-  background: var(--sp-b-bg);
-  color: var(--sp-b-fg);
-}
-/* The half you didn't pick steps back rather than leaving. */
-.cne-side.is-off {
-  filter: saturate(0.5);
-  opacity: 0.55;
-}
-.cne-side.is-chris::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
-  background-size: 19px 19px;
-  opacity: 0.1;
-}
-.cne-side > * {
-  position: relative;
-  z-index: 2;
-}
-
-.cne-side-who {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.78;
-  margin-bottom: 10px;
-}
-.cne-side .cne-side-h {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(34px, 12vw, 52px);
-  line-height: 0.9;
-  margin: 0 0 16px;
-  text-shadow: 4px 4px 0 var(--a-ink);
-}
-.cne-side.is-chris .cne-side-h {
-  color: var(--sp-a-accent);
-}
-.cne-side.is-eddy .cne-side-h {
-  color: var(--sp-b-fg);
-}
-
-.cne-taps {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 16px;
-}
-.cne-taps span {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.cne-taps span::before {
-  content: "";
-  width: 9px;
-  height: 9px;
-  flex: none;
-  border: 2px solid currentColor;
-}
-.cne-side-q {
-  font-size: 13.5px;
-  line-height: 1.45;
-  font-weight: 600;
-  max-width: 32ch;
-  border-top: 2px solid currentColor;
-  padding-top: 13px;
-  margin: 0;
-}
-.cne-side-pick {
-  margin-top: 14px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  opacity: 0.62;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.cne-side[aria-pressed="true"] .cne-side-pick {
-  opacity: 1;
-}
-.cne-side[aria-pressed="true"] .cne-side-pick::before {
-  content: "\2713 ";
-}
-
-/* The halves arrive from opposite edges. `.cne-rv` is borrowed only to get
-   `is-in` from RevealRoot — the container itself must not fade or the two
-   animations fight over the same transform. */
-.js .cne-split.cne-rv,
-.js .cne-split.cne-rv.is-in {
-  opacity: 1;
-  transform: none;
-}
-.js .cne-side.is-chris,
-.js .cne-side.is-eddy {
-  transform: translateY(16px);
-  opacity: 0;
-}
-.js .cne-split.is-in .cne-side {
-  transform: none;
-  opacity: 1;
-  transition:
-    transform 0.75s cubic-bezier(0.2, 0.8, 0.25, 1),
-    opacity 0.6s ease,
-    filter 0.45s ease;
-}
-.js .cne-split.is-in .cne-side.is-off {
-  opacity: 0.55;
-}
-
-/* The seam is a desktop object: on a phone the halves stack, so there is none. */
-.cne-seam {
-  display: none;
-}
-
-.cne-evenbar {
-  background: var(--a-ink);
-  border-bottom: 3px solid var(--a-ink);
-  display: flex;
-  justify-content: center;
-  padding: 9px 15px;
-}
-.cne-evenbar button {
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--a-yel);
-  padding: 4px 6px;
-}
-.cne-evenbar button:hover {
-  color: #fff;
-}
-
-/* ---- the seam: the phone call ------------------------------------------- */
-.cne-band {
-  background: var(--a-nav);
-  color: #fff2c9;
-  padding: 30px 15px 32px;
-  border-bottom: 3px solid var(--a-ink);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.cne-band > * {
-  position: relative;
-  z-index: 2;
-}
-.cne-band .cne-eyebrow {
-  color: var(--a-yel);
-}
-.cne-band-big {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(19px, 5.6vw, 26px);
-  line-height: 1.16;
-  max-width: 22ch;
-  margin: 8px auto 0;
-  color: #fff2c9;
-}
-.cne-band-big em {
-  font-style: normal;
-  color: var(--a-yel);
-}
-.cne-hair {
-  height: 3px;
-  background: var(--a-yel);
-  max-width: 260px;
-  margin: 20px auto 0;
-  transform: scaleX(0);
-  transform-origin: center;
-}
-.js .cne-hair.cne-rv {
-  opacity: 1;
-}
-.js .cne-hair.cne-rv.is-in {
-  transform: scaleX(1);
-  transition: transform 0.85s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-.cne-band-after {
-  margin: 18px auto 0;
-  max-width: 46ch;
-  font-size: 13px;
-  line-height: 1.6;
-  color: rgba(255, 242, 201, 0.78);
-}
-
-/* ---- what they agreed on, and what they didn't -------------------------- */
-.cne-twocol {
-  display: grid;
-  grid-template-columns: 1fr;
-}
-.cne-twocol > div + div {
-  border-top: 1.5px solid var(--a-line);
-}
-.cne-facts {
-  margin-top: 14px;
-  display: flex;
-  flex-direction: column;
-}
-.cne-facts div {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  flex-wrap: wrap;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.05em;
-  border-top: 1.5px solid var(--a-line);
-  padding: 8px 0;
-  color: var(--a-sub);
-}
-.cne-facts b {
-  color: var(--a-red-cta);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-/* ---- closing ------------------------------------------------------------ */
-.cne-close {
-  text-align: center;
-  padding-bottom: 26px;
-}
-.cne-close h2 {
-  display: inline-block;
-}
-.cne-close h2::after {
-  left: 50%;
-  transform: translateX(-50%);
-}
-.cne-close .cne-cta {
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-}
-/* Beats `.cne-story .cne-sec p`, which resets the margin and would otherwise
-   take the `auto` that centres this line under a centred heading. */
-.cne-story .cne-close p.cne-close-p {
-  max-width: 44ch;
-  margin: 14px auto 0;
-}
-
-/* The two Ways keep their own colours all the way to the buttons. */
-.cne-big.is-chris {
-  background: var(--a-red-cta);
-  color: #fff2c9;
-  flex: 1;
-}
-.cne-big.is-eddy {
-  background: var(--a-yel);
-  color: #1a1612;
-  flex: 1;
-}
-
-@media (min-width: 901px) {
-  .cne-story .cne-sec p {
-    font-size: 16px;
-    margin-bottom: 14px;
-  }
-
-  /* The two halves are one grid, so the seam between them can be re-weighted
-     in a single transition when someone takes a side. */
-  .cne-split {
-    grid-template-columns: var(--sp-l, 1fr) var(--sp-r, 1fr);
-    border-bottom: 4px solid var(--a-ink);
-    min-height: 560px;
-    transition: grid-template-columns 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
-  }
-  .cne-side {
-    padding: 56px 44px 48px;
-    min-height: 0;
-  }
-  .cne-side + .cne-side {
-    border-top: 0;
-  }
-  .cne-side-who {
-    font-size: 12px;
-    letter-spacing: 0.24em;
-    margin-bottom: 16px;
-  }
-  .cne-side .cne-side-h {
-    font-size: clamp(40px, 4.6vw, 68px);
-    margin-bottom: 24px;
-    text-shadow: 6px 6px 0 var(--a-ink);
-  }
-  .cne-taps {
-    gap: 8px;
-    margin-bottom: 24px;
-  }
-  .cne-taps span {
-    font-size: 14px;
-    gap: 11px;
-  }
-  .cne-taps span::before {
-    width: 12px;
-    height: 12px;
-  }
-  .cne-side-q {
-    font-size: 19px;
-    padding-top: 18px;
-    border-top-width: 3px;
-  }
-  .cne-side-pick {
-    font-size: 12px;
-    margin-top: 22px;
-  }
-
-  /* Off the page rather than up it, once there is room either side.
-     These come before the `is-in` rule below on purpose: same specificity,
-     so source order is what decides, and the halves must end at `none`. */
-  .js .cne-side.is-chris {
-    transform: translateX(-100%);
-    opacity: 1;
-  }
-  .js .cne-side.is-eddy {
-    transform: translateX(100%);
-    opacity: 1;
-  }
-  .js .cne-split.is-in .cne-side {
-    transform: none;
-    opacity: 1;
-  }
-  .js .cne-split.is-in .cne-side.is-off {
-    opacity: 0.55;
-  }
-
-  .cne-seam {
-    display: flex;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: var(--sp-seam, 50%);
-    width: 4px;
-    background: var(--a-ink);
-    transform: translateX(-50%);
-    z-index: 4;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    transition: left 0.55s cubic-bezier(0.6, 0.05, 0.2, 1);
-  }
-  .cne-seam span {
-    writing-mode: vertical-rl;
-    background: var(--a-ink);
-    color: #fff2c9;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    padding: 22px 5px;
-    white-space: nowrap;
-  }
-
-  .cne-evenbar {
-    padding: 12px 44px;
-    border-bottom-width: 4px;
-  }
-  .cne-evenbar button {
-    font-size: 11px;
-  }
-
-  .cne-band {
-    padding: 72px 44px;
-    border-bottom-width: 4px;
-  }
-  .cne-band-big {
-    font-size: clamp(28px, 3.4vw, 44px);
-    line-height: 1.12;
-    margin-top: 18px;
-  }
-  .cne-hair {
-    max-width: 520px;
-    margin-top: 32px;
-    height: 4px;
-  }
-  .cne-band-after {
-    font-size: 16px;
-    margin-top: 26px;
-    max-width: 52ch;
-  }
-
-  .cne-twocol {
-    grid-template-columns: 1fr 1fr;
-  }
-  .cne-twocol > div + div {
-    border-top: 0;
-    border-left: 4px solid var(--a-ink);
-  }
-  .cne-facts {
-    margin-top: 22px;
-  }
-  .cne-facts div {
-    font-size: 13px;
-    padding: 11px 0;
-    border-top-width: 2px;
-  }
-
-  .cne-close {
-    padding-bottom: 60px;
-  }
-  /* Wide enough that "CHRIS'S WAY →" stays on one line at the desktop button
-     size, which is bigger here than anywhere else on the site. */
-  .cne-close .cne-cta {
-    max-width: 540px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js .cne-side {
-    transform: none !important;
-    opacity: 1 !important;
-  }
-  .js .cne-side.is-off {
-    opacity: 0.55 !important;
-  }
-  .cne-hair {
-    transform: scaleX(1) !important;
-  }
-  .cne-split,
-  .cne-seam {
-    transition: none !important;
-  }
-}
-
-/* =========================================================================
-   /contact — the guest check
+   THE BAG — the one part of the shop that is sitewide.
    =========================================================================
-   The form is drawn as a diner check because that is the paper this business
-   already runs on: a number, a time, ruled lines, a dashed subtotal, and a
-   torn edge. Everything below is the two skins' own tokens; the only new
-   values are the two rules, which need an alpha the palette does not carry.
-   ------------------------------------------------------------------------ */
-
-/* ---- hero (mirrors the /locations hero, one step quieter) --------------- */
-.cne-ct-hero {
-  position: relative;
-  overflow: hidden;
-  background: var(--a-red);
-  color: #fff2c9;
-  border-bottom: 3px solid var(--a-ink);
-  padding: 30px 15px 34px;
-}
-.cne-ct-hero-in {
-  position: relative;
-  z-index: 2;
-  max-width: 1280px;
-  margin: 0 auto;
-}
-.cne-ct-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--a-yel-ink);
-  margin: 0 0 6px;
-}
-.cne-ct-hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(34px, 11vw, 56px);
-  line-height: 0.94;
-  margin: 0 0 12px;
-  color: #fff2c9;
-  text-shadow: 4px 4px 0 var(--a-ink);
-  text-wrap: balance;
-}
-.cne-ct-lede {
-  margin: 0;
-  max-width: 46ch;
-  font-size: 14px;
-  line-height: 1.55;
-  color: #fff2c9;
-}
-
-/* ---- page grid --------------------------------------------------------- */
-.cne-ct-wrap {
-  display: grid;
-  gap: 22px;
-  padding: 22px 15px 8px;
-  max-width: 1280px;
-  margin: 0 auto;
-  align-items: start;
-}
-.cne-ct-rail {
-  display: grid;
-  gap: 14px;
-}
-
-/* ---- the check itself --------------------------------------------------- */
-.cne-ck {
-  --ck-rule: rgba(26, 22, 18, 0.16);
-  position: relative;
-  background: var(--a-card);
-  color: var(--a-fg);
-  border: 3px solid var(--a-ink);
-  box-shadow: 6px 6px 0 var(--a-shadow);
-  padding: 0 18px 22px;
-  transition:
-    transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
-    opacity 0.35s ease;
-}
-
-/* The torn top edge. A repeating gradient rather than a border image, so it
-   picks up the ink colour of whichever skin is running. */
-.cne-ct-wrap .cne-ck-perf {
-  height: 11px;
-  margin: 0 -3px;
-  background-image: repeating-linear-gradient(90deg, var(--a-ink) 0 8px, transparent 8px 16px);
-  background-size: 16px 3px;
-  background-position: 0 100%;
-  background-repeat: repeat-x;
-}
-
-.cne-ck-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0 11px;
-  border-bottom: 2px dashed var(--ck-rule);
-}
-.cne-ck-title {
-  font-family: var(--font-display);
-  font-size: 17px;
-  line-height: 1;
-  margin: 0;
-  text-transform: uppercase;
-}
-.cne-ck-meta {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.cne-ck-body {
-  display: grid;
-  gap: 18px;
-  padding-top: 20px;
-}
-
-/* ---- one ruled line ----------------------------------------------------- */
-.cne-ck-field {
-  position: relative;
-  display: grid;
-  gap: 5px;
-}
-.cne-ck-label {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  transition: color 0.2s;
-  padding: 0;
-}
-.cne-ck-field:focus-within .cne-ck-label {
-  color: var(--a-red-cta);
-}
-.cne-ck-opt {
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  opacity: 0.8;
-}
-
-.cne-ck-input {
-  font-family: var(--font-body);
-  /* 16px is the threshold below which iOS Safari zooms the viewport on focus
-     and never zooms back out. Everything else on the check can be smaller. */
-  font-size: 16px;
-  color: var(--a-fg);
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid var(--ck-rule);
-  border-radius: 0;
-  padding: 8px 2px;
-  width: 100%;
-  appearance: none;
-}
-.cne-ck-input::placeholder {
-  color: var(--a-sub);
-  opacity: 0.75;
-}
-.cne-ck-input:focus {
-  outline: none;
-  border-bottom-color: transparent;
-}
-.cne-ck-area {
-  resize: vertical;
-  min-height: 112px;
-  line-height: 1.6;
-  display: block;
-}
-
-/* The input and its underline share a box of their own, so the underline sits
-   on the input's bottom edge rather than the field's — otherwise an error
-   message or the character counter pushes the field's bottom down and the rule
-   goes with it, landing under the message instead of under the input. */
-.cne-ck-line {
-  position: relative;
-  display: block;
-}
-
-/* Wipes in from the left on focus; sits under the 2px rule it replaces. */
-.cne-ck-underline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: var(--a-red-cta);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
-  pointer-events: none;
-}
-.cne-ck-field:focus-within .cne-ck-underline {
-  transform: scaleX(1);
-}
-.cne-ck-field.is-bad .cne-ck-underline {
-  transform: scaleX(1);
-  background: var(--a-red);
-}
-.cne-ck-err {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--a-red-cta);
-  font-weight: 600;
-}
-
-.cne-ck-count {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  color: var(--a-sub);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  transition: color 0.2s;
-}
-.cne-ck-count.is-warn {
-  color: var(--a-red-cta);
-}
-
-/* ---- topic stamps ------------------------------------------------------- */
-.cne-ck-fs {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-}
-.cne-ck-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 3px;
-}
-.cne-ck-chip {
-  position: relative;
-  display: inline-flex;
-}
-.cne-ck-chip input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-.cne-ck-chip span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  padding: 8px 12px;
-  border: 2px solid var(--ck-rule);
-  border-radius: 999px;
-  color: var(--a-sub);
-  cursor: pointer;
-  transition:
-    transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-color 0.18s,
-    color 0.18s,
-    background 0.18s;
-}
-.cne-ck-chip input:focus-visible + span {
-  outline: 3px solid var(--a-ink);
-  outline-offset: 3px;
-}
-.cne-ck-chip input:checked + span {
-  background: var(--a-red-cta);
-  border-color: var(--a-red-cta);
-  color: #fff2c9;
-  box-shadow: 3px 3px 0 var(--a-shadow);
-  animation: cne-ck-stamp 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.cne-ck-chip input:checked + span::before {
-  content: "✓";
-  font-size: 11px;
-}
-@keyframes cne-ck-stamp {
-  0% {
-    transform: scale(1.16) rotate(-3.5deg);
-  }
-  60% {
-    transform: scale(0.97) rotate(1.2deg);
-  }
-  100% {
-    transform: none;
-  }
-}
-
-/* ---- honeypot: gone from sight, from AT, and from the tab order --------- */
-.cne-ck-pot {
-  position: absolute !important;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ---- send --------------------------------------------------------------- */
-.cne-ck-fail {
-  margin: 0;
-  padding: 12px 14px;
-  border: 2px solid var(--a-red-cta);
-  background: rgba(230, 48, 39, 0.08);
-  font-size: 13px;
-  line-height: 1.55;
-}
-.cne-ck-fail a {
-  color: inherit;
-  font-weight: 700;
-}
-
-.cne-ck-total {
-  border-top: 2px dashed var(--ck-rule);
-  padding-top: 18px;
-}
-.cne-ck-send {
-  font-family: var(--font-display);
-  font-size: 15px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: var(--a-red-cta);
-  color: #fff2c9;
-  border: 3px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-shadow);
-  padding: 13px 22px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  line-height: 1;
-  transition:
-    transform 0.12s,
-    box-shadow 0.12s,
-    background 0.18s;
-}
-.cne-ck-send:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--a-shadow);
-}
-.cne-ck-send:disabled {
-  cursor: progress;
-  opacity: 0.85;
-}
-.cne-ck-arrow {
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.cne-ck-send:hover:not(:disabled) {
-  background: var(--a-red);
-}
-.cne-ck-send:hover:not(:disabled) .cne-ck-arrow {
-  transform: translateX(4px);
-}
-
-.cne-ck-spin {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 242, 201, 0.35);
-  border-top-color: #fff2c9;
-  animation: cne-ck-spin 0.7s linear infinite;
-}
-@keyframes cne-ck-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.cne-ck.is-sending {
-  opacity: 0.92;
-}
-
-/* ---- the receipt -------------------------------------------------------- */
-.cne-ck-receipt {
-  text-align: center;
-  padding-bottom: 26px;
-  animation: cne-ck-land 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-.cne-ck-receipt:focus {
-  outline: none;
-}
-@keyframes cne-ck-land {
-  0% {
-    opacity: 0;
-    transform: translateY(22px) rotate(1.8deg) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-.cne-ck-mark {
-  width: 54px;
-  height: 54px;
-  margin: 22px auto 0;
-  border: 3px solid #1f7a43;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: #1f7a43;
-  font-size: 26px;
-  font-weight: 700;
-  animation: cne-ck-pop 0.45s 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-@keyframes cne-ck-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0) rotate(-32deg);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-.cne-ck-up {
-  font-family: var(--font-display);
-  font-size: clamp(26px, 8vw, 34px);
-  text-transform: uppercase;
-  margin: 18px 0 8px;
-  line-height: 1;
-  color: var(--a-red-cta);
-  text-shadow: 3px 3px 0 var(--a-shadow);
-}
-.cne-ck-lede {
-  margin: 0 auto;
-  max-width: 40ch;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-.cne-ck-lede strong {
-  color: var(--a-fg);
-  word-break: break-word;
-}
-
-.cne-ck-sum {
-  text-align: left;
-  margin: 22px 0 0;
-  padding-top: 15px;
-  border-top: 2px dashed var(--ck-rule);
-  display: grid;
-  gap: 8px;
-}
-.cne-ck-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-.cne-ck-row dt {
-  flex: 0 0 auto;
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-}
-.cne-ck-dots {
-  flex: 1 1 auto;
-  height: 1px;
-  margin-bottom: 3px;
-  background-image: radial-gradient(circle, var(--ck-rule) 1px, transparent 1px);
-  background-size: 5px 1px;
-  background-repeat: repeat-x;
-}
-.cne-ck-row dd {
-  flex: 0 1 auto;
-  min-width: 0;
-  margin: 0;
-  font-weight: 700;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.cne-ck-again {
-  margin-top: 20px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  background: transparent;
-  color: var(--a-sub);
-  border: 2px solid var(--ck-rule);
-  border-radius: 999px;
-  padding: 8px 15px;
-  cursor: pointer;
-  transition:
-    color 0.18s,
-    border-color 0.18s;
-}
-.cne-ck-again:hover {
-  color: var(--a-fg);
-  border-color: var(--a-fg);
-}
-
-/* ---- rail: locations ---------------------------------------------------- */
-.cne-ct-card,
-.cne-ct-faq {
-  border: 3px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-shadow);
-  padding: 17px;
-}
-.cne-ct-card {
-  background: var(--a-card);
-}
-
-.cne-ct-cardh {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  margin: 0 0 11px;
-}
-
-.cne-ct-locs {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-}
-.cne-ct-loc {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--a-line);
-}
-.cne-ct-loc:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-.cne-ct-loc a {
-  display: grid;
-  gap: 1px;
-  text-decoration: none;
-  color: inherit;
-  min-width: 0;
-}
-.cne-ct-loc a:hover .cne-ct-locn {
-  text-decoration: underline;
-}
-.cne-ct-locn {
-  font-weight: 700;
-  font-size: 13.5px;
-}
-.cne-ct-loca {
-  font-size: 12px;
-  color: var(--a-sub);
-}
-.cne-ct-tag {
-  flex: 0 0 auto;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 4px 8px;
-  border: 2px solid currentColor;
-  border-radius: 999px;
-  color: var(--a-sub);
-  white-space: nowrap;
-}
-.cne-ct-tag.is-open {
-  color: #1f7a43;
-}
-
-/* ---- rail: the questions the form should never have to receive ---------- */
-.cne-ct-faq {
-  background: var(--a-yel);
-  color: #1a1612;
-}
-.cne-ct-faq .cne-ct-cardh {
-  color: rgba(26, 22, 18, 0.62);
-}
-.cne-ct-faq details {
-  border-top: 2px solid rgba(26, 22, 18, 0.18);
-}
-.cne-ct-faq details:first-of-type {
-  border-top: 0;
-}
-.cne-ct-faq summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  list-style: none;
-  cursor: pointer;
-  padding: 11px 0;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1.4;
-  transition: opacity 0.18s;
-}
-.cne-ct-faq summary::-webkit-details-marker {
-  display: none;
-}
-.cne-ct-faq summary::after {
-  content: "+";
-  font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1;
-  flex: 0 0 auto;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.cne-ct-faq details[open] summary::after {
-  transform: rotate(135deg);
-}
-.cne-ct-faq summary:hover {
-  opacity: 0.68;
-}
-.cne-ct-faq details p {
-  margin: 0 0 12px;
-  padding-right: 24px;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: rgba(26, 22, 18, 0.74);
-  animation: cne-ck-unfold 0.3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-@keyframes cne-ck-unfold {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
-  .cne-ct-hero {
-    padding: 56px 44px 62px;
-  }
-  .cne-ct-eyebrow {
-    font-size: 13px;
-    letter-spacing: 0.24em;
-    margin-bottom: 10px;
-  }
-  .cne-ct-hero h1 {
-    font-size: clamp(64px, 8vw, 104px);
-    text-shadow: 6px 6px 0 var(--a-ink);
-  }
-  .cne-ct-lede {
-    font-size: 17px;
-  }
-
-  .cne-ct-wrap {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    gap: 34px;
-    padding: 52px 44px 18px;
-  }
-  .cne-ct-rail {
-    gap: 18px;
-  }
-
-  .cne-ck {
-    padding: 0 30px 28px;
-    box-shadow: 8px 8px 0 var(--a-shadow);
-  }
-  .cne-ck-head {
-    padding: 15px 0 13px;
-  }
-  .cne-ck-title {
-    font-size: 22px;
-  }
-  .cne-ck-meta {
-    font-size: 10px;
-  }
-  .cne-ck-body {
-    gap: 21px;
-    padding-top: 24px;
-  }
-  .cne-ck-label {
-    font-size: 10px;
-  }
-  .cne-ck-chip span {
-    font-size: 11px;
-    padding: 8px 13px;
-  }
-  .cne-ck-send {
-    font-size: 16px;
-    padding: 14px 26px;
-    box-shadow: 5px 5px 0 var(--a-shadow);
-  }
-  .cne-ck-send:active:not(:disabled) {
-    transform: translate(5px, 5px);
-  }
-  .cne-ck-up {
-    font-size: 42px;
-  }
-  .cne-ck-lede {
-    font-size: 14px;
-  }
-
-  .cne-ct-card,
-  .cne-ct-faq {
-    padding: 20px;
-    box-shadow: 5px 5px 0 var(--a-shadow);
-  }
-  .cne-ct-cardh {
-    font-size: 10px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cne-ck,
-  .cne-ck-receipt,
-  .cne-ck-mark,
-  .cne-ck-spin,
-  .cne-ck-underline,
-  .cne-ck-chip span,
-  .cne-ct-faq summary::after,
-  .cne-ct-faq details p {
-    animation: none !important;
-    transition: none !important;
-  }
-  .cne-ck-underline {
-    transition: none !important;
-  }
-}
-
-/* =========================================================================
-   THE SHOP — /shop, the product page, and the bag.
-   ========================================================================= *
-   Ported from the checkout prototype. Phone values are the base and
-   `@media (min-width: 901px)` carries the desktop ones, same as the rest of
-   this file.
-
-   The bag is the only part of this that appears outside /shop: the header
-   button and the drawer are mounted sitewide, because a bag that vanishes when
-   you wander off to the menu is a bag nobody trusts.
+   The header button and the drawer are mounted on every page, because a bag
+   that vanishes when you wander off to the menu is a bag nobody trusts, so
+   the shot it draws its line items with and the buttons it uses live here
+   too. Everything else the shop needs is per-route: `shop-index.css`,
+   `shop-product.css`, `shop-inventory.css` and `shop-order.css`.
    ========================================================================= */
 
 /* ---- the product shot ----------------------------------------------------
@@ -4289,18 +3082,21 @@ h3 {
   aspect-ratio: 4 / 3;
   --cne-mark: 15px;
 }
+
 /* 720x411 is the Otter cut, and the frame is cut to match it: a product shot
    letterboxed inside a 4:3 box is a small hat in a large empty room. */
 .cne-capshot.is-photo {
   background: var(--a-card);
   aspect-ratio: 720 / 411;
 }
+
 .cne-capshot.is-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
+
 /* Matched to scripts/merch-og-card.html: same dot size, tile and opacity, so
    the product image and the social card are one picture in two places. */
 .cne-capshot-dots {
@@ -4325,6 +3121,7 @@ h3 {
      surface on the site carries, and the same one the social card draws. */
   filter: drop-shadow(10px 12px 0 rgba(26, 22, 18, 0.35));
 }
+
 .cne-cap .crown {
   position: absolute;
   left: 8%;
@@ -4336,6 +3133,7 @@ h3 {
   border-radius: 50% 50% 12% 12% / 62% 62% 18% 18%;
   overflow: hidden;
 }
+
 /* The centre seam. Light rather than dark, because the crown is near-black. */
 .cne-cap .crown::after {
   content: "";
@@ -4347,6 +3145,7 @@ h3 {
   background: rgba(255, 255, 255, 0.14);
   transform: translateX(-50%);
 }
+
 .cne-cap .brim {
   position: absolute;
   left: 0;
@@ -4358,6 +3157,7 @@ h3 {
   border-radius: 50% / 100% 100% 34% 34%;
   transform: rotate(-2deg);
 }
+
 .cne-cap .btn {
   position: absolute;
   left: 50%;
@@ -4370,6 +3170,7 @@ h3 {
   transform: translateX(-50%);
   z-index: 3;
 }
+
 .cne-cap .mark {
   position: absolute;
   left: 0;
@@ -4382,6 +3183,7 @@ h3 {
   color: var(--cne-cap-m);
   line-height: 1;
 }
+
 .cne-cap .mark small {
   display: block;
   font-family: var(--font-mono);
@@ -4391,6 +3193,7 @@ h3 {
   margin-top: 5px;
   opacity: 0.9;
 }
+
 /* Says out loud that this is a drawing. One string, in merch.ts, deleted the
    day a photograph exists. */
 .cne-capshot-tag {
@@ -4416,358 +3219,12 @@ h3 {
   color: var(--a-sub);
   margin: 0 0 18px;
 }
-.cne-drops {
-  display: grid;
-  gap: 16px;
-}
-.cne-drop {
-  position: relative;
-  display: grid;
-  background: var(--a-card);
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 5px 5px 0 var(--a-shadow);
-  color: inherit;
-  text-decoration: none;
-  transition:
-    transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1),
-    box-shadow 0.2s,
-    border-color 0.2s;
-}
-.cne-drop:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 9px 9px 0 var(--a-red);
-  border-color: var(--a-red);
-}
-.cne-drop:hover .cne-cap {
-  transform: rotate(-4deg) scale(1.05);
-}
-.cne-drop:active {
-  transform: translate(0, 0);
-  box-shadow: 2px 2px 0 var(--a-shadow);
-}
-.cne-drop-art {
-  --cne-mark: 20px;
-  border-bottom: 2.5px solid var(--a-ink);
-}
-.cne-drop-art .cne-capshot {
-  aspect-ratio: 4 / 3;
-}
-.cne-drop-art .cne-capshot.is-photo {
-  aspect-ratio: 720 / 411;
-}
-.cne-drop-b {
-  padding: 17px 17px 19px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cne-drop-b h2 {
-  font-family: var(--font-display);
-  font-size: 21px;
-  line-height: 1.05;
-  margin: 0;
-  padding: 0;
-}
-/* The index card is a link, not a section — no yellow rule underneath it. */
-.cne-drop-b h2::after {
-  content: none;
-}
-.cne-drop-price {
-  font-family: var(--font-mono);
-  font-size: 19px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-.cne-drop-b p {
-  margin: 2px 0 0;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--a-sub);
-  max-width: 44ch;
-}
-.cne-drop-go {
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--a-red-cta);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-.cne-drop-go span {
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
-}
-.cne-drop:hover .cne-drop-go span {
-  transform: translateX(5px);
-}
-.cne-drop-flag {
-  position: absolute;
-  right: -7px;
-  top: 12px;
-  z-index: 6;
-  font-family: var(--font-display);
-  font-size: 9.5px;
-  letter-spacing: 0.05em;
-  background: var(--a-red-cta);
-  color: #fff2c9;
-  border: 2px solid var(--a-ink);
-  padding: 6px 8px;
-  line-height: 1;
-  transform: rotate(3deg);
-}
-.cne-drop-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 16px 0 0;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  line-height: 1.6;
-}
-.cne-drop-note span {
-  flex: none;
-  width: 26px;
-  height: 2px;
-  background: var(--a-line);
-}
 
-.cne-shop-facts {
-  display: grid;
-  gap: 0;
-  border: 2.5px solid var(--a-ink);
-  background: var(--a-card);
-  margin-top: 4px;
-}
-.cne-shop-facts > div {
-  padding: 13px 15px 15px;
-  border-bottom: 2px solid var(--a-line);
-}
-.cne-shop-facts > div:last-child {
-  border-bottom: none;
-}
-.cne-shop-facts b {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-.cne-shop-facts span {
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--a-sub);
-}
-.cne-shop-facts a {
-  text-decoration: underline;
-  color: inherit;
-}
-
-/* ---- product page ------------------------------------------------------- */
-.cne-pdp-crumb {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  padding: 14px 15px 0;
-}
-.cne-pdp-crumb a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.cne-pdp-crumb a:hover {
-  color: var(--a-red-cta);
-}
-
-.cne-pdp {
-  display: grid;
-  gap: 18px;
-  padding: 14px 15px 4px;
-}
-.cne-pdp-gal {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.cne-pdp-main {
-  position: relative;
-  border: 3px solid var(--a-ink);
-}
-.cne-pdp-main .cne-capshot {
-  aspect-ratio: 4 / 3;
-  --cne-mark: 22px;
-}
-.cne-pdp-main .cne-capshot.is-photo {
-  aspect-ratio: 720 / 411;
-}
-.cne-pdp-thumbs {
-  display: grid;
-  /* Four across on a phone wraps eight tabs into two even rows. */
-  grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
-}
-.cne-pdp-t {
-  border: 2.5px solid var(--a-line);
-  background: none;
-  padding: 0;
-  cursor: pointer;
-}
-.cne-pdp-t[aria-selected="true"] {
-  border-color: var(--a-ink);
-}
-.cne-pdp-t .cne-capshot {
-  aspect-ratio: 1 / 1;
-  --cne-mark: 9px;
-}
-.cne-pdp-t .cne-cap {
-  width: 78%;
-}
-.cne-pdp-t .cne-cap .mark small {
-  display: none;
-}
-
-.cne-pdp-buy h1 {
-  font-family: var(--font-display);
-  font-size: 25px;
-  line-height: 0.96;
-  margin: 5px 0 0;
-  font-weight: 400;
-}
-.cne-pdp-price {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 12px 0 2px;
-  flex-wrap: wrap;
-}
 .cne-price {
   font-family: var(--font-mono);
   font-weight: 800;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-}
-.cne-pdp-price .p {
-  font-size: 26px;
-}
-.cne-pdp-price .s {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--a-sub);
-  font-weight: 500;
-}
-
-/* The scarcity flag takes the space a size grid would have used. */
-.cne-limited {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-  padding: 10px 12px;
-  border: 2.5px solid var(--a-ink);
-  background: var(--a-cream);
-}
-.cne-limited .tag {
-  font-family: var(--font-display);
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
-  background: var(--a-red-cta);
-  color: #fff2c9;
-  border: 2px solid var(--a-ink);
-  padding: 5px 7px;
-  line-height: 1;
-  flex: none;
-  transform: rotate(-2deg);
-}
-.cne-limited .txt {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.5;
-  font-weight: 700;
-}
-
-.cne-pdp-lab {
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--a-sub);
-  margin: 18px 0 8px;
-}
-/* The size chip and the per-order limit chip sit side by side rather than
-   stacked — each one states a single fact, so neither needs the other's
-   room. */
-.cne-pdp-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.cne-chip {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  border: 2px solid var(--a-ink);
-  background: var(--a-ink);
-  color: #fff2c9;
-  padding: 8px 11px;
-  line-height: 1;
-}
-/* One size means there is nothing to choose — so it states, it does not offer.
-   The limit chip states the same way: a fact, not a control. */
-.cne-chip.is-static {
-  cursor: default;
-}
-
-.cne-pdp-row {
-  display: flex;
-  gap: 9px;
-  align-items: stretch;
-  margin-top: 18px;
-}
-.cne-qty {
-  display: flex;
-  border: 3px solid var(--a-ink);
-  flex: none;
-}
-.cne-qty button {
-  width: 38px;
-  background: transparent;
-  border: none;
-  color: var(--a-fg);
-  font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  line-height: 1;
-}
-.cne-qty button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-.cne-qty > span {
-  width: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 800;
-  border-left: 2px solid var(--a-line);
-  border-right: 2px solid var(--a-line);
-  font-variant-numeric: tabular-nums;
-}
-.cne-qty > span b {
-  font-weight: 800;
-  display: block;
 }
 
 .cne-btn-primary {
@@ -4788,10 +3245,12 @@ h3 {
     box-shadow 0.12s,
     background 0.2s;
 }
+
 .cne-btn-primary:active {
   transform: translate(4px, 4px);
   box-shadow: 1px 1px 0 var(--a-shadow);
 }
+
 /* Payment is not connected yet, so the button reads as a placeholder rather
    than as something that failed. */
 /* The buy button while the shop is paused (issue #43) — the owner's own
@@ -4809,43 +3268,9 @@ h3 {
   cursor: not-allowed;
   font-size: 11.5px;
 }
+
 .cne-btn-primary:disabled:active {
   transform: none;
-}
-/* The sold-out escape (issue #50): a working link where the primary button
-   just went dead, in the design system's own secondary-button geometry
-   (Counter Cream fill, ink text, identical shape to the primary) rather
-   than the ghost link below, which is for a lower-shout aside, not a
-   redirect off a dead end. */
-.cne-btn-secondary {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-  text-align: center;
-  text-decoration: none;
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  color: var(--a-fg);
-  background: var(--a-cream);
-  border: 3px solid var(--a-ink);
-  box-shadow: 5px 5px 0 var(--a-shadow);
-  padding: 15px 12px;
-  cursor: pointer;
-  line-height: 1;
-  transition:
-    transform 0.12s,
-    box-shadow 0.12s;
-}
-.cne-btn-secondary:active {
-  transform: translate(4px, 4px);
-  box-shadow: 1px 1px 0 var(--a-shadow);
-}
-.cne-pdp-sticky .cne-btn-secondary {
-  margin-top: 0;
-  padding: 14px 12px;
-  font-size: 12px;
-  box-shadow: 3px 3px 0 var(--a-shadow);
 }
 
 .cne-btn-ghost {
@@ -4864,6 +3289,7 @@ h3 {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
 /* A second ghost link (the bag's "already ordered? track it") sits under
    the first at a lower shout, or the two compete for the same weight. */
 .cne-btn-ghost.is-sub {
@@ -4871,154 +3297,6 @@ h3 {
   font-size: 9.5px;
   letter-spacing: 0.06em;
   text-transform: none;
-}
-
-/* What has not been settled yet, said in the place a buyer looks for it. */
-.cne-pending {
-  margin: 16px 0 0;
-  padding: 11px 12px;
-  border: 2px dashed var(--a-line);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-
-/* The price and the button must never scroll away on a phone. */
-.cne-pdp-sticky {
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 11px 15px;
-  margin-top: 18px;
-  background: var(--a-bg);
-  border-top: 3px solid var(--a-ink);
-}
-.cne-pdp-sticky .p {
-  font-size: 19px;
-  flex: none;
-}
-.cne-pdp-sticky .cne-btn-primary {
-  padding: 14px 12px;
-  font-size: 12px;
-  box-shadow: 3px 3px 0 var(--a-shadow);
-}
-
-.cne-pdp-more {
-  padding-top: 26px;
-}
-.cne-pdp-more p {
-  max-width: 62ch;
-  margin: 10px 0 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-.cne-pdp-more a {
-  text-decoration: underline;
-  color: inherit;
-}
-
-/* ---- product page: details / fit / limited / why ------------------------ */
-.cne-pdp-details {
-  border-top: 2.5px solid var(--a-line);
-}
-.cne-detail-list {
-  display: grid;
-  gap: 9px;
-  max-width: 62ch;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.cne-detail-list li {
-  position: relative;
-  padding-left: 18px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--a-fg);
-}
-.cne-detail-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 6px;
-  width: 7px;
-  height: 7px;
-  background: var(--a-red-cta);
-  border: 1.5px solid var(--a-ink);
-}
-.cne-detail-block {
-  max-width: 62ch;
-  margin-top: 20px;
-}
-.cne-detail-block p {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-
-/* ---- product page: authenticity ------------------------------------------
-   Two images when the scans exist — the certificate and the brim sticker —
-   next to the copy and the fact list. Until then `.cne-auth-imgs` simply
-   doesn't render, and the section is the paragraph and the facts alone. */
-.cne-pdp-auth {
-  border-top: 2.5px solid var(--a-line);
-}
-.cne-auth {
-  display: grid;
-  gap: 20px;
-  margin-top: 4px;
-}
-.cne-auth-copy p {
-  max-width: 62ch;
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-.cne-auth-facts {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px 16px;
-  margin: 18px 0 0;
-  max-width: 62ch;
-}
-.cne-auth-facts div {
-  border-top: 2px solid var(--a-line);
-  padding-top: 8px;
-}
-.cne-auth-facts dt {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--a-sub);
-  margin-bottom: 4px;
-}
-.cne-auth-facts dd {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.4;
-}
-.cne-auth-imgs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.cne-auth-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-shadow);
-  background: var(--a-card);
-  object-fit: cover;
 }
 
 /* ---- the bag button, in the site header --------------------------------- */
@@ -5033,6 +3311,7 @@ h3 {
      already right-aligns itself with `margin-left: auto` there instead. */
   margin-left: auto;
 }
+
 .cne-bagbtn {
   display: inline-flex;
   align-items: center;
@@ -5054,18 +3333,22 @@ h3 {
     transform 0.09s,
     box-shadow 0.09s;
 }
+
 .cne-bagbtn:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 #1a1612;
 }
+
 .cne-bagbtn svg {
   width: 12px;
   height: 12px;
   flex: none;
 }
+
 .cne-bagbtn-t {
   display: none;
 }
+
 .cne-bagbtn-c {
   background: #1a1612;
   color: var(--a-yel);
@@ -5077,6 +3360,7 @@ h3 {
   overflow: hidden;
   display: block;
 }
+
 .cne-bagbtn-c span {
   display: block;
   height: 14px;
@@ -5094,13 +3378,16 @@ h3 {
   .cne-nav {
     gap: 4px;
   }
+
   .cne-orderbtn {
     padding: 8px 6px;
   }
+
   .cne-bagbtn {
     gap: 0;
     padding: 4px;
   }
+
   .cne-bagbtn-c {
     position: absolute;
     top: -6px;
@@ -5125,9 +3412,11 @@ h3 {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 .cne-bag-scrim.is-in {
   opacity: 1;
 }
+
 .cne-drawer {
   position: fixed;
   top: auto;
@@ -5144,9 +3433,11 @@ h3 {
   transform: translateY(101%);
   transition: transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
+
 .cne-drawer.is-in {
   transform: none;
 }
+
 .cne-dr-head {
   display: flex;
   align-items: center;
@@ -5156,6 +3447,7 @@ h3 {
   border-bottom: 3px solid var(--a-ink);
   background: var(--a-cream);
 }
+
 .cne-dr-head h2 {
   font-family: var(--font-display);
   font-size: 18px;
@@ -5163,6 +3455,7 @@ h3 {
   font-weight: 400;
   line-height: 1;
 }
+
 .cne-dr-x {
   background: none;
   border: none;
@@ -5174,6 +3467,7 @@ h3 {
   line-height: 1;
   padding: 6px 8px;
 }
+
 .cne-dr-body {
   flex: 1;
   overflow: auto;
@@ -5186,6 +3480,7 @@ h3 {
   margin: 0;
   padding: 0;
 }
+
 .cne-li {
   display: flex;
   gap: 12px;
@@ -5193,18 +3488,22 @@ h3 {
   border-bottom: 1.5px solid var(--a-line);
   overflow: hidden;
 }
+
 .cne-li-art {
   width: 72px;
   flex: none;
   border: 2.5px solid var(--a-ink);
 }
+
 .cne-li-art .cne-capshot {
   aspect-ratio: 1 / 1;
   --cne-mark: 8px;
 }
+
 .cne-li-art .cne-cap {
   width: 80%;
 }
+
 .cne-li-b {
   flex: 1;
   min-width: 0;
@@ -5212,17 +3511,20 @@ h3 {
   flex-direction: column;
   gap: 5px;
 }
+
 .cne-li-b .n {
   font-family: var(--font-display);
   font-size: 13px;
   line-height: 1.1;
 }
+
 .cne-li-b .v {
   font-family: var(--font-mono);
   font-size: 9.5px;
   color: var(--a-sub);
   letter-spacing: 0.06em;
 }
+
 .cne-li-ft {
   display: flex;
   align-items: center;
@@ -5230,13 +3532,16 @@ h3 {
   gap: 10px;
   margin-top: auto;
 }
+
 .cne-li-ft .cne-price {
   font-size: 14px;
 }
+
 .cne-qty-sm {
   display: flex;
   border: 2px solid var(--a-ink);
 }
+
 .cne-qty-sm button {
   width: 26px;
   height: 26px;
@@ -5249,10 +3554,12 @@ h3 {
   cursor: pointer;
   line-height: 1;
 }
+
 .cne-qty-sm button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
+
 .cne-qty-sm span {
   width: 26px;
   display: flex;
@@ -5264,6 +3571,7 @@ h3 {
   border-left: 1.5px solid var(--a-line);
   border-right: 1.5px solid var(--a-line);
 }
+
 .cne-li-rm {
   align-self: flex-start;
   background: none;
@@ -5277,6 +3585,7 @@ h3 {
   cursor: pointer;
   padding: 4px 0;
 }
+
 .cne-li-rm:hover {
   color: var(--a-red);
 }
@@ -5286,12 +3595,14 @@ h3 {
   padding: 14px 17px 16px;
   background: var(--a-cream);
 }
+
 .cne-tot {
   display: flex;
   flex-direction: column;
   gap: 5px;
   margin-bottom: 12px;
 }
+
 .cne-tot div {
   display: flex;
   justify-content: space-between;
@@ -5299,25 +3610,31 @@ h3 {
   font-family: var(--font-mono);
   font-size: 11px;
 }
+
 .cne-tot div span:last-child {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
+
 .cne-tot .sub span:last-child {
   font-size: 14px;
 }
+
 .cne-tot .muted {
   color: var(--a-sub);
 }
+
 .cne-tot .grand {
   border-top: 2px solid var(--a-ink);
   padding-top: 9px;
   margin-top: 4px;
   font-size: 13px;
 }
+
 .cne-tot .grand span:last-child {
   font-size: 19px;
 }
+
 .cne-dr-note.is-terms {
   margin: 10px 0 13px;
   text-align: left;
@@ -5325,6 +3642,7 @@ h3 {
   padding: 10px 11px;
   border: 2px dashed var(--a-line);
 }
+
 .cne-dr-note {
   margin: 9px 0 0;
   font-family: var(--font-mono);
@@ -5349,6 +3667,7 @@ h3 {
   justify-content: center;
   overflow: hidden;
 }
+
 .cne-flyer .cne-cap {
   width: 78%;
   max-width: none;
@@ -5361,26 +3680,25 @@ h3 {
   .cne-bagbtn.is-new {
     animation: cne-bag-in 0.56s cubic-bezier(0.18, 1.5, 0.4, 1) both;
   }
+
   .cne-bagbtn.is-bump {
     animation: cne-bag-bump 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
   }
+
   .cne-bagbtn-c span {
     animation: cne-bag-roll 0.32s cubic-bezier(0.25, 0.9, 0.3, 1) both;
   }
-  .cne-qty > span b {
-    animation: cne-qty-nudge 0.26s cubic-bezier(0.3, 1.4, 0.5, 1);
-  }
+
   .cne-drawer.is-in .cne-li {
     animation: cne-li-in 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both;
     animation-delay: calc(var(--cne-li-i, 0) * 70ms + 110ms);
   }
+
   .cne-li.is-out {
     animation: cne-li-out 0.28s cubic-bezier(0.4, 0, 0.7, 0.2) both;
   }
-  .cne-capshot.is-swap {
-    animation: cne-shot-in 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both;
-  }
 }
+
 @keyframes cne-bag-in {
   0% {
     transform: scale(0.2) rotate(-22deg);
@@ -5395,6 +3713,7 @@ h3 {
     opacity: 1;
   }
 }
+
 @keyframes cne-bag-bump {
   0% {
     transform: scale(1);
@@ -5406,6 +3725,7 @@ h3 {
     transform: scale(1);
   }
 }
+
 @keyframes cne-bag-roll {
   from {
     transform: translateY(14px);
@@ -5414,17 +3734,7 @@ h3 {
     transform: translateY(0);
   }
 }
-@keyframes cne-qty-nudge {
-  0% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.35);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
+
 @keyframes cne-li-in {
   from {
     opacity: 0;
@@ -5435,6 +3745,7 @@ h3 {
     transform: none;
   }
 }
+
 @keyframes cne-li-out {
   to {
     opacity: 0;
@@ -5443,23 +3754,11 @@ h3 {
     filter: blur(2px);
   }
 }
-@keyframes cne-shot-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .cne-drawer,
   .cne-bag-scrim,
-  .cne-cap,
-  .cne-drop,
-  .cne-drop-go span {
+  .cne-cap {
     transition: none !important;
   }
 }
@@ -5470,136 +3769,10 @@ h3 {
     font-size: 15px;
     margin-bottom: 22px;
   }
-  .cne-drops {
-    gap: 20px;
-  }
-  .cne-drop {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    box-shadow: 6px 6px 0 var(--a-shadow);
-  }
-  .cne-drop-art {
-    border-bottom: none;
-    border-right: 2.5px solid var(--a-ink);
-  }
-  .cne-drop-art {
-    --cne-mark: 30px;
-  }
-  .cne-drop-art .cne-capshot {
-    aspect-ratio: auto;
-    height: 100%;
-    min-height: 270px;
-  }
-  /* A real photo carries its own aspect ratio inline (`ProductShot` sets it
-     from the view's width/height) — a square shot stretched to `height: 100%`
-     would be squeezed to match the text column instead. Let the image's own
-     ratio decide the card's height instead; a taller card is the correct
-     result for a square photo, not a bug. The drawing above still fills the
-     card evenly, since it carries no photo and keeps the height:100% rule. */
-  .cne-drop-art .cne-capshot.is-photo {
-    height: auto;
-    min-height: 0;
-  }
-  .cne-drop-art .cne-cap {
-    width: 58%;
-    max-width: 340px;
-  }
-  .cne-drop-b {
-    padding: 26px 28px;
-    justify-content: center;
-    gap: 7px;
-  }
-  .cne-drop-b h2 {
-    font-size: 25px;
-  }
-  .cne-drop-price {
-    font-size: 22px;
-  }
-  .cne-drop-b p {
-    font-size: 13px;
-  }
-  .cne-drop-flag {
-    font-size: 10.5px;
-    padding: 7px 9px;
-    top: 16px;
-    right: -8px;
-  }
 
-  .cne-shop-facts {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .cne-shop-facts > div {
-    border-bottom: none;
-    border-right: 2px solid var(--a-line);
-  }
-  .cne-shop-facts > div:last-child {
-    border-right: none;
-  }
-
-  .cne-pdp-crumb {
-    padding: 20px 30px 0;
-  }
-  .cne-pdp {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-    gap: 34px;
-    padding: 18px 30px 8px;
-  }
-  .cne-pdp-gal {
-    gap: 10px;
-  }
-  .cne-pdp-main .cne-capshot {
-    aspect-ratio: 4 / 3;
-  }
-  .cne-pdp-main .cne-capshot.is-photo {
-    aspect-ratio: 720 / 411;
-  }
-  .cne-pdp-main .cne-cap {
-    width: 66%;
-    max-width: 430px;
-  }
-  .cne-pdp-thumbs {
-    /* All eight tabs in one row once there's room. */
-    grid-template-columns: repeat(8, 1fr);
-    gap: 10px;
-  }
-  .cne-pdp-buy h1 {
-    font-size: 31px;
-  }
-  .cne-pdp-price .p {
-    font-size: 27px;
-  }
   .cne-btn-primary {
     font-size: 13.5px;
     padding: 16px;
-  }
-  .cne-btn-secondary {
-    font-size: 13.5px;
-    padding: 16px;
-  }
-  /* The sticky bar is a phone answer to a phone problem. On a desktop the buy
-     row is still on screen, so a second one would just be a second one. */
-  .cne-pdp-sticky {
-    display: none;
-  }
-  .cne-limited .txt {
-    font-size: 10.5px;
-  }
-  .cne-pending {
-    font-size: 10.5px;
-  }
-  .cne-pdp-more {
-    padding-top: 34px;
-  }
-  .cne-pdp-details,
-  .cne-pdp-auth {
-    padding-top: 34px;
-  }
-  .cne-auth {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
-    align-items: start;
-    gap: 34px;
-  }
-  .cne-auth-imgs {
-    max-width: 360px;
   }
 
   .cne-bagbtn {
@@ -5607,12 +3780,13 @@ h3 {
     padding: 8px 11px;
     box-shadow: 2px 2px 0 #1a1612;
   }
+
   .cne-bagbtn-t {
     display: inline;
   }
 
   /* Above the phone breakpoint the drawer comes in from the right, which is
-     where a bag has lived since carts had corners. */
+       where a bag has lived since carts had corners. */
   .cne-drawer {
     top: 0;
     left: auto;
@@ -5624,614 +3798,24 @@ h3 {
     transform: translateX(101%);
     transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
   }
+
   .cne-drawer.is-in {
     transform: none;
   }
+
   .cne-dr-head {
     padding: 15px 18px;
   }
+
   .cne-dr-head h2 {
     font-size: 19px;
   }
+
   .cne-dr-body {
     padding: 16px 18px;
   }
+
   .cne-dr-foot {
     padding: 15px 18px 18px;
   }
-}
-
-/* ---- legal pages ---------------------------------------------------------
-   /privacy/ and anything else that is mostly prose. One measured column on the
-   paper ground rather than the red hero the marketing pages open with: a policy
-   is read, not scanned, and the display face at hero size above two thousand
-   words reads as a promotion of the thing it is disclosing.
-
-   The column is capped at 68ch. Body copy is 15px here rather than the site's
-   14px for the same reason — this is the one page on the site somebody reads
-   top to bottom. */
-.cne-lg {
-  max-width: 68ch;
-  margin: 0 auto;
-  padding: 34px 18px 64px;
-}
-.cne-lg-head {
-  border-bottom: 3px solid var(--a-ink);
-  padding-bottom: 18px;
-  margin-bottom: 26px;
-}
-.cne-lg-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--a-red);
-  margin: 0 0 8px;
-}
-.cne-lg-head h1 {
-  font-family: var(--font-display);
-  font-size: clamp(32px, 9vw, 46px);
-  line-height: 0.96;
-  margin: 0 0 10px;
-  color: var(--a-ink);
-  text-wrap: balance;
-}
-.cne-lg-date {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--a-sub);
-}
-
-/* The summary, boxed on cream so the one paragraph that answers the question
-   for most people is not the one they have to find. */
-.cne-lg-tldr {
-  background: var(--a-cream);
-  border: 3px solid var(--a-ink);
-  box-shadow: 4px 4px 0 var(--a-shadow);
-  padding: 18px 20px;
-  margin-bottom: 34px;
-}
-.cne-lg-tldr h2 {
-  font-family: var(--font-display);
-  font-size: 19px;
-  margin: 0 0 8px;
-  color: var(--a-ink);
-}
-.cne-lg-tldr p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.62;
-}
-
-.cne-lg-sec {
-  margin-bottom: 32px;
-}
-.cne-lg-sec h2 {
-  font-family: var(--font-display);
-  font-size: 21px;
-  line-height: 1.1;
-  margin: 0 0 12px;
-  color: var(--a-ink);
-  /* Clears the sticky header when a heading is jumped to from the table of
-     contents a longer policy would grow, and from any anchor shared into it. */
-  scroll-margin-top: var(--cne-stuck);
-}
-.cne-lg-sec p,
-.cne-lg-sec li {
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--a-ink);
-}
-.cne-lg-sec p {
-  margin: 0 0 12px;
-}
-.cne-lg-sec ul {
-  margin: 0 0 12px;
-  padding-left: 20px;
-}
-.cne-lg-sec li {
-  margin-bottom: 7px;
-}
-.cne-lg-sec strong {
-  font-weight: 700;
-}
-.cne-lg-sec a {
-  color: var(--a-red-cta);
-  text-underline-offset: 2px;
-}
-.cne-lg-sec code {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  background: var(--a-cream);
-  border: 1px solid var(--a-line);
-  border-radius: 3px;
-  padding: 1px 5px;
-}
-
-/* The one paragraph on the page making a claim about the code rather than about
-   policy, so it is marked as a statement of fact rather than of intent. */
-.cne-lg-note {
-  border-left: 4px solid var(--a-yel);
-  background: var(--a-card);
-  padding: 12px 14px;
-  margin: 0 0 12px;
-}
-
-.cne-lg-contact {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1.9;
-}
-
-@media (min-width: 768px) {
-  .cne-lg {
-    padding: 52px 24px 80px;
-  }
-  .cne-lg-tldr {
-    padding: 22px 26px;
-  }
-  .cne-lg-sec h2 {
-    font-size: 24px;
-  }
-}
-
-/* ---- live inventory ------------------------------------------------------
-   Only rendered when `catalog.ts`'s `getInventory` reports a real, tracked
-   count — the fallback catalogue never reaches this markup at all. Mono to
-   match every other numeric readout on the shop (the price, the qty
-   stepper), and the bar fills in the one brand yellow that is a fill colour
-   rather than text (see `--a-yel`'s note above). */
-.cne-inv {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.cne-inv-text {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--a-fg);
-}
-.cne-inv-bar {
-  width: 100%;
-  max-width: 220px;
-  height: 6px;
-  border: 2px solid var(--a-ink);
-  background: var(--a-cream);
-  overflow: hidden;
-}
-.cne-inv-bar > span {
-  display: block;
-  height: 100%;
-  background: var(--a-yel);
-}
-.cne-inv.is-soldout .cne-inv-text {
-  color: var(--a-red-cta);
-}
-
-/* Smaller cut for the shop index card, under the price rather than the buy
-   row — same information, less room. */
-.cne-inv.is-sm .cne-inv-text {
-  font-size: 9.5px;
-}
-.cne-inv.is-sm .cne-inv-bar {
-  max-width: 160px;
-  height: 5px;
-}
-
-/* The buy button once tracked stock hits zero — dashed like the "payment not
-   connected" state it sits next to in the stylesheet, but ink-bordered and
-   solid-cream rather than transparent: nothing here is a placeholder, the
-   run is actually gone. */
-.cne-btn-primary.is-soldout {
-  background: var(--a-cream);
-  color: var(--a-fg);
-  border-style: dashed;
-  box-shadow: none;
-  cursor: not-allowed;
-}
-.cne-btn-primary.is-soldout:active {
-  transform: none;
-}
-
-/* ---- edition map -----------------------------------------------------
-   The centrepiece: every numbered cell drawn, coloured by exactly the three
-   states `editions.status` carries — available, reserved (held in someone's
-   open checkout), sold. `getInventory` (src/lib/catalog.ts) only returns
-   the array for a tracked edition product, so this block never renders for
-   the static fallback catalogue or a plain-quantity product. */
-.cne-edmap {
-  margin-top: 10px;
-  border: 2.5px solid var(--a-ink);
-  background: var(--a-card);
-  padding: 13px;
-}
-.cne-edmap-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.cne-edmap-count {
-  font-family: var(--font-body);
-  font-size: 14.5px;
-  font-weight: 600;
-}
-.cne-edmap-next {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--a-red-cta);
-  border: 1.5px solid var(--a-red-cta);
-  padding: 3px 7px;
-  white-space: nowrap;
-}
-.cne-edmap-next b {
-  font-variant-numeric: tabular-nums;
-}
-.cne-edgrid {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 2px;
-}
-.cne-edcell {
-  aspect-ratio: 1;
-  background: var(--a-cream);
-  border: 1px solid var(--a-line);
-}
-.cne-edcell.is-reserved {
-  background: var(--a-yel);
-  border-color: var(--a-yel-deep);
-}
-.cne-edcell.is-sold {
-  background: var(--a-ink);
-  border-color: var(--a-ink);
-}
-.cne-edlegend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 9px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--a-sub);
-}
-.cne-edlegend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.cne-edlegend i {
-  width: 9px;
-  height: 9px;
-  display: inline-block;
-  border: 1px solid var(--a-line);
-}
-.cne-edlegend i.a {
-  background: var(--a-cream);
-}
-.cne-edlegend i.r {
-  background: var(--a-yel);
-  border-color: var(--a-yel-deep);
-}
-.cne-edlegend i.s {
-  background: var(--a-ink);
-  border-color: var(--a-ink);
-}
-
-/* The product's own "not taking orders yet" notice — the same signal the
-   bag drawer already gates checkout on (`isShopOpenFor`), surfaced here too
-   so a buyer learns it before adding something to the bag, not after. */
-.cne-shopnotice {
-  margin-top: 14px;
-  padding: 11px 12px;
-  border: 2px dashed var(--a-line);
-  background: var(--a-cream);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-
-/* ---- shop paused (issue #43) ---------------------------------------------
-   A second, separate closed state from the pre-launch notice above — see
-   `isShopPausedFor` (`shopStatus.ts`) for why the two never share copy or
-   markup. The pill is rounded rather than square: every scarcity flag on
-   this page (`.cne-drop-flag`, `.cne-limited .tag`) is square because it's
-   a fact about the product, and this is the one status chip that's a fact
-   about the shop itself, so it gets the pill shape the rest of the system
-   reserves for exactly that distinction. Muted rather than red or green —
-   this is neither an alarm nor a sale. */
-.cne-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  padding: 6px 11px;
-  border: 2px solid var(--a-line);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-}
-.cne-status-pill i {
-  width: 7px;
-  height: 7px;
-  flex: none;
-  display: block;
-  border-radius: 999px;
-  background: currentColor;
-}
-
-/* The pause banner — square and bordered like every other card on the page
-   (chips are the one pill shape; everything else stays zero-radius), boxed
-   rather than a loose paragraph because this replaces a buy decision, not
-   just a caveat next to one. */
-.cne-pause-card {
-  margin-top: 10px;
-  padding: 12px 13px;
-  border: 2px solid var(--a-yel-deep);
-  background: var(--a-cream);
-}
-.cne-pause-head {
-  margin: 0 0 4px;
-  font-size: 14px;
-  font-weight: 700;
-}
-.cne-pause-body {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--a-sub);
-}
-
-/* The sold-out run's own photo: desaturated and dimmed, with an ink "ALL
-   GONE" pill over it — a card, not an empty shelf, because the run existing
-   is the point. */
-.cne-pdp-main.is-soldout .cne-capshot {
-  filter: saturate(0.3) opacity(0.6);
-}
-.cne-pdp-gone {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: var(--a-ink);
-  color: #fff2c9;
-  padding: 5px 9px;
-  z-index: 1;
-}
-
-/* ---- order tracking (/shop/order/) --------------------------------------
-   The form reuses the guest check's own ruled-line input pattern
-   (`.cne-ck-field`/`.cne-ck-input`/`.cne-ck-underline`) rather than a boxed
-   generic input — `--ck-rule` is scoped to `.cne-ck` there, so it's set
-   again here for the same rule colour. */
-/* Order status (/shop/order).
-   One column until there is an answer, two once there is: the form is the
-   whole point of the page while you are still asking, and secondary the
-   moment it has been answered — so the result takes the wider column and
-   the form steps back beside it rather than sitting above it at full size
-   with the answer pushed below the fold. */
-.cne-ord {
-  max-width: 46ch;
-}
-.cne-ord.has-result {
-  max-width: none;
-  display: grid;
-  gap: 28px;
-  align-items: start;
-}
-@media (min-width: 900px) {
-  .cne-ord.has-result {
-    grid-template-columns: minmax(260px, 20rem) minmax(0, 34rem);
-    gap: 40px;
-  }
-}
-.cne-ord-form {
-  --ck-rule: rgba(26, 22, 18, 0.16);
-  display: grid;
-  gap: 18px;
-}
-.cne-ord-submit {
-  justify-self: start;
-  width: auto;
-  padding: 13px 22px;
-}
-
-.cne-ord-result {
-  padding: 20px;
-  border: 2.5px solid var(--a-ink);
-  background: var(--a-card);
-  box-shadow: 6px 6px 0 var(--a-shadow);
-}
-/* Only the stacked layout needs the gap; in two columns the grid owns it. */
-.cne-ord:not(.has-result) .cne-ord-result,
-.cne-ord.has-result .cne-ord-result {
-  margin-top: 0;
-}
-
-.cne-ord-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-.cne-ord-number {
-  font-family: var(--font-display);
-  font-size: clamp(26px, 5vw, 34px);
-  line-height: 1;
-  margin: 6px 0 0;
-}
-.cne-ord-badge {
-  flex: none;
-  padding: 5px 10px;
-  border: 2px solid var(--a-ink);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.cne-ord-badge.is-paid {
-  background: var(--a-yel);
-}
-.cne-ord-badge.is-ready,
-.cne-ord-badge.is-done {
-  background: var(--a-ink);
-  color: var(--a-card);
-}
-/* A refund is the one state that is not progress — it reads differently on
-   purpose rather than as another shade of "going fine". */
-.cne-ord-badge.is-refunded {
-  background: transparent;
-  border-style: dashed;
-  color: var(--a-sub);
-}
-
-.cne-ord-headline {
-  margin: 10px 0 18px;
-  font-weight: 700;
-  font-size: 15px;
-}
-
-.cne-ord-items {
-  display: grid;
-  gap: 10px;
-  margin: 0 0 18px;
-  padding: 14px 0;
-  border-top: 1px solid var(--a-line);
-  border-bottom: 1px solid var(--a-line);
-}
-.cne-ord-items li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13.5px;
-}
-/* What they bought is the first thing they are looking for, so it is set
-   like a name rather than like a table cell. */
-.cne-ord-item-name {
-  font-weight: 700;
-  font-size: 14.5px;
-  line-height: 1.3;
-}
-.cne-ord-numchip {
-  flex: none;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 3px;
-  padding: 5px 9px;
-  border: 2px solid var(--a-ink);
-  background: var(--a-cream);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 700;
-}
-.cne-ord-numchip .eyebrow {
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-}
-.cne-ord-numchip .of {
-  font-size: 11px;
-  color: var(--a-sub);
-}
-
-/* The timeline is a track, not three loose dots: a rule runs behind the
-   dots so the steps read as one journey, and the done part of it is inked
-   while the rest stays faint. */
-.cne-ord-timeline {
-  position: relative;
-  display: grid;
-  gap: 16px;
-  margin: 0 0 18px;
-  padding: 0 0 0 26px;
-  list-style: none;
-}
-.cne-ord-timeline::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
-  background: var(--a-line);
-}
-.cne-ord-timeline li {
-  position: relative;
-  display: grid;
-  gap: 1px;
-}
-.cne-ord-dot {
-  position: absolute;
-  left: -26px;
-  top: 3px;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--a-line);
-  border-radius: 50%;
-  background: var(--a-card);
-}
-.cne-ord-timeline li.is-done .cne-ord-dot {
-  background: var(--a-ink);
-  border-color: var(--a-ink);
-}
-.cne-ord-step-label {
-  font-weight: 700;
-  font-size: 13.5px;
-  color: var(--a-sub);
-}
-.cne-ord-timeline li.is-done .cne-ord-step-label {
-  color: var(--a-ink);
-}
-.cne-ord-step-detail {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--a-sub);
-}
-
-.cne-ord-refunded {
-  margin: 0 0 16px;
-  padding: 10px 12px;
-  border: 2px dashed var(--a-line);
-  font-weight: 600;
-  color: var(--a-sub);
-}
-
-.cne-ord-address {
-  margin-bottom: 12px;
-  padding: 12px;
-  background: var(--a-cream);
-  border: 1px solid var(--a-line);
-}
-.cne-ord-address address {
-  font-style: normal;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.7;
-  margin-top: 5px;
-}
-
-.cne-ord-meta {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--a-sub);
 }

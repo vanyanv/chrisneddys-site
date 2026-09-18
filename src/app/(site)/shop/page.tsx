@@ -14,21 +14,10 @@ import { ShopIndexTracking } from "@/components/shop/ShopIndexTracking";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { shopListLd } from "@/lib/merchLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
-import { customerFacingProductName } from "@/lib/productName";
+import { productMetadataName } from "@/lib/productSeo";
 import type { MerchProduct } from "@/data/merch";
 
 const LEDE = `Merch from ${brand.name}, the smash-burger location on Sunset in Hollywood.`;
-
-/** The name a customer sees, whether the product came from the seed data
- * (which sets `name`) or The Rack (which never does — see
- * `customerFacingProductName`'s comment). */
-function shopProductName(product: MerchProduct): string {
-  return customerFacingProductName({
-    displayName1: product.displayName[0],
-    displayName2: product.displayName[1],
-    name: product.name,
-  });
-}
 
 /**
  * The shop index's title and description, read from the published catalogue
@@ -45,7 +34,12 @@ function shopIndexMetadata(products: MerchProduct[]): { title: string; descripti
   }
   if (products.length === 1) {
     const p = products[0]!;
-    const name = shopProductName(p);
+    // Not the all-caps display pair the product page's own Bowlby heading
+    // uses — see `productMetadataName`'s comment on why metadata wants the
+    // other order. The parenthetical (the drop's own colour/capsule note) is
+    // dropped the same way a product's own title does: it costs characters
+    // this line doesn't have to spend.
+    const name = productMetadataName(p).replace(/\s*\(.*\)\s*$/, "");
     return {
       title: `Shop — ${name}`,
       description: `${LEDE} ${name}, ${formatPrice(p.price)}. One drop, while it lasts.`,
@@ -61,7 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const products = await listPublishedProducts();
   const { title, description } = shopIndexMetadata(products);
   const keywords = Array.from(
-    new Set([brand.name, "merch", ...products.map((p) => shopProductName(p))]),
+    new Set([brand.name, "merch", ...products.map((p) => productMetadataName(p))]),
   );
   return pageMetadata({ title, description, path: "/shop/", keywords });
 }

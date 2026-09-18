@@ -11,6 +11,7 @@ import { listPublishedProducts } from "@/lib/catalog";
 import {
   addImage,
   applyProductChanges,
+  backfillDraftSeo,
   createDraft,
   duplicateProduct,
   EditionSizeLockedError,
@@ -25,6 +26,7 @@ import {
   updateProduct,
   updateProductField,
 } from "@/lib/catalogAdmin";
+import { draftStoredSeo } from "@/lib/productSeo";
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
 
@@ -76,6 +78,10 @@ describe("updateProduct", () => {
       why: null,
       authenticityCopy: null,
       authenticityFacts: [],
+      metaTitle: null,
+      metaKeywords: null,
+      socialImageUrl: null,
+      socialImageAlt: null,
     });
     expect(result.ok).toBe(false);
   });
@@ -100,6 +106,10 @@ describe("updateProduct", () => {
       why: null,
       authenticityCopy: null,
       authenticityFacts: [{ label: "A", value: "B" }],
+      metaTitle: null,
+      metaKeywords: null,
+      socialImageUrl: null,
+      socialImageAlt: null,
     });
     expect(result).toEqual({ ok: true, oldSlug: draft.slug, newSlug: "renamed-product" });
 
@@ -130,6 +140,10 @@ describe("updateProduct", () => {
       why: null,
       authenticityCopy: null,
       authenticityFacts: [],
+      metaTitle: null,
+      metaKeywords: null,
+      socialImageUrl: null,
+      socialImageAlt: null,
     });
     expect(result.ok).toBe(false);
   });
@@ -584,6 +598,10 @@ describe("duplicateProduct", () => {
       why: "why copy",
       authenticityCopy: "authenticity copy",
       authenticityFacts: [{ label: "Capsule", value: "CNE-99" }],
+      metaTitle: "Dup Source Title",
+      metaKeywords: "dup, source, product",
+      socialImageUrl: "/shop/dup-source.png",
+      socialImageAlt: "The Duplicate Source Product in its packaging",
     });
 
     await addImage({
@@ -631,6 +649,10 @@ describe("duplicateProduct", () => {
     expect(dup?.priceCents).toBe(4200);
     expect(dup?.details).toEqual(["detail one", "detail two"]);
     expect(dup?.authenticityFacts).toEqual([{ label: "Capsule", value: "CNE-99" }]);
+    expect(dup?.metaTitle).toBe("Dup Source Title");
+    expect(dup?.metaKeywords).toBe("dup, source, product");
+    expect(dup?.socialImageUrl).toBe("/shop/dup-source.png");
+    expect(dup?.socialImageAlt).toBe("The Duplicate Source Product in its packaging");
     expect(dup?.views).toHaveLength(2);
     expect(dup?.views.map((v) => v.urlFull).sort()).toEqual(
       ["https://example.com/dup-1.webp", "https://example.com/dup-2.webp"].sort(),
@@ -702,6 +724,161 @@ describe("updateProductField", () => {
   it("returns an error for a missing product", async () => {
     const result = await updateProductField(crypto.randomUUID(), "name", "Nope");
     expect(result).toEqual({ ok: false, error: "Product not found." });
+  });
+
+  it("accepts a meta title, rejects an over-length one, and stores an empty one as null", async () => {
+    const draft = await createDraft("Meta Title Field Product");
+
+    const accepted = await updateProductField(draft.id, "metaTitle", "A short, punchy title");
+    expect(accepted).toEqual({ ok: true, previous: null });
+
+    const tooLong = await updateProductField(draft.id, "metaTitle", "x".repeat(61));
+    expect(tooLong).toEqual({
+      ok: false,
+      error: "Meta title must be 60 characters or fewer.",
+    });
+
+    const cleared = await updateProductField(draft.id, "metaTitle", "");
+    expect(cleared).toEqual({ ok: true, previous: "A short, punchy title" });
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.metaTitle).toBeNull();
+  });
+
+  it("accepts meta keywords, rejects an over-length list, and stores an empty one as null", async () => {
+    const draft = await createDraft("Meta Keywords Field Product");
+
+    const accepted = await updateProductField(draft.id, "metaKeywords", "hats, trucker, cap");
+    expect(accepted).toEqual({ ok: true, previous: null });
+
+    const tooLong = await updateProductField(draft.id, "metaKeywords", "x".repeat(161));
+    expect(tooLong).toEqual({
+      ok: false,
+      error: "Meta keywords must be 160 characters or fewer.",
+    });
+
+    const cleared = await updateProductField(draft.id, "metaKeywords", "");
+    expect(cleared).toEqual({ ok: true, previous: "hats, trucker, cap" });
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.metaKeywords).toBeNull();
+  });
+
+  it("accepts a root-relative or https social image URL, rejects anything else, and stores an empty one as null", async () => {
+    const draft = await createDraft("Social Image URL Field Product");
+
+    const accepted = await updateProductField(draft.id, "socialImageUrl", "/shop/example.png");
+    expect(accepted).toEqual({ ok: true, previous: null });
+
+    const acceptedHttps = await updateProductField(
+      draft.id,
+      "socialImageUrl",
+      "https://example.com/share.png",
+    );
+    expect(acceptedHttps).toEqual({ ok: true, previous: "/shop/example.png" });
+
+    const relative = await updateProductField(draft.id, "socialImageUrl", "shop/example.png");
+    expect(relative).toEqual({
+      ok: false,
+      error: `Social image URL must start with "/" or be an https:// URL.`,
+    });
+
+    const scripted = await updateProductField(draft.id, "socialImageUrl", "javascript:alert(1)");
+    expect(scripted).toEqual({
+      ok: false,
+      error: `Social image URL must start with "/" or be an https:// URL.`,
+    });
+
+    const cleared = await updateProductField(draft.id, "socialImageUrl", "");
+    expect(cleared).toEqual({ ok: true, previous: "https://example.com/share.png" });
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.socialImageUrl).toBeNull();
+  });
+
+  it("accepts social image alt text, rejects one too short or too long, and stores an empty one as null", async () => {
+    const draft = await createDraft("Social Image Alt Field Product");
+
+    const accepted = await updateProductField(
+      draft.id,
+      "socialImageAlt",
+      "The Foam Trucker in royal blue",
+    );
+    expect(accepted).toEqual({ ok: true, previous: null });
+
+    const tooShort = await updateProductField(draft.id, "socialImageAlt", "short");
+    expect(tooShort).toEqual({
+      ok: false,
+      error: "Alt text must be between 8 and 125 characters.",
+    });
+
+    const tooLong = await updateProductField(draft.id, "socialImageAlt", "x".repeat(126));
+    expect(tooLong).toEqual({
+      ok: false,
+      error: "Alt text must be between 8 and 125 characters.",
+    });
+
+    const cleared = await updateProductField(draft.id, "socialImageAlt", "");
+    expect(cleared).toEqual({ ok: true, previous: "The Foam Trucker in royal blue" });
+
+    const admin = await getProductForAdmin(draft.id);
+    expect(admin?.socialImageAlt).toBeNull();
+  });
+});
+
+describe("backfillDraftSeo", () => {
+  it("fills all four columns from the product once it has a name and none of them has been written", async () => {
+    const draft = await createDraft("Backfill Fresh Product");
+    const before = await getProductForAdmin(draft.id);
+    expect(before?.metaTitle).toBeNull();
+    expect(before?.metaDescription).toBe("");
+    expect(before?.metaKeywords).toBeNull();
+    expect(before?.socialImageAlt).toBeNull();
+
+    await backfillDraftSeo(draft.id);
+
+    const after = await getProductForAdmin(draft.id);
+    const expected = draftStoredSeo({
+      slug: after!.slug,
+      name: after!.name,
+      displayName1: after!.displayName1,
+      displayName2: after!.displayName2,
+      price: after!.priceCents / 100,
+      eyebrow: after!.eyebrow,
+      description: after!.description,
+      limitedNote: after!.limitedNote,
+    });
+    expect(after?.metaTitle).toBe(expected.metaTitle);
+    expect(after?.metaDescription).toBe(expected.metaDescription);
+    expect(after?.metaKeywords).toBe(expected.metaKeywords);
+    expect(after?.socialImageAlt).toBe(expected.socialImageAlt);
+  });
+
+  it("is a no-op once any of the four columns already has a value, so it never overwrites an owner's words", async () => {
+    const draft = await createDraft("Backfill Written Product");
+    const written = await updateProductField(draft.id, "metaTitle", "The owner's own title");
+    expect(written.ok).toBe(true);
+
+    await backfillDraftSeo(draft.id);
+
+    const after = await getProductForAdmin(draft.id);
+    expect(after?.metaTitle).toBe("The owner's own title");
+    // The other three columns stay untouched too — the whole backfill is
+    // skipped, not just the column that already had something in it.
+    expect(after?.metaDescription).toBe("");
+    expect(after?.metaKeywords).toBeNull();
+    expect(after?.socialImageAlt).toBeNull();
+  });
+
+  it("is a no-op for a nameless draft, since there's nothing to derive copy from", async () => {
+    const draft = await createDraft("");
+    await backfillDraftSeo(draft.id);
+
+    const after = await getProductForAdmin(draft.id);
+    expect(after?.metaTitle).toBeNull();
+    expect(after?.metaDescription).toBe("");
+    expect(after?.metaKeywords).toBeNull();
+    expect(after?.socialImageAlt).toBeNull();
   });
 });
 

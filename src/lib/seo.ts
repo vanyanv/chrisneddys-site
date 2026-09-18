@@ -72,11 +72,14 @@ export function pageMetadata(opts: {
   description: string;
   path: string;
   image?: OgImage;
+  /** Optional — most pages have nothing worth listing beyond the title and description. */
+  keywords?: string[];
 }): Metadata {
   const full = `${opts.title} · ${brand.name}`;
   return {
     title: opts.title,
     description: opts.description,
+    ...(opts.keywords && opts.keywords.length ? { keywords: opts.keywords } : {}),
     alternates: { canonical: opts.path },
     openGraph: openGraphFor({
       title: full,

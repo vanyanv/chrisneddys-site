@@ -52,14 +52,23 @@ export type TrackEvent =
   | "notify_signup"
   /** The opening-list signup could not be sent. */
   | "notify_error"
+  /** Saw the shop index — the list of products, not any one of them. */
+  | "view_item_list"
+  /** Tapped a product card on the shop index. */
+  | "select_item"
   /** Landed on a product page in the shop. */
   | "view_item"
   /** Put something in the bag. */
   | "add_to_cart"
+  /** Took something out of the bag — dropped a line, or the minus button
+   * took its quantity to zero. */
+  | "remove_from_cart"
   /** Opened the bag. */
   | "view_cart"
   /** Tapped CHECKOUT in the bag and a Stripe Checkout Session was requested. */
-  | "begin_checkout";
+  | "begin_checkout"
+  /** A paid order loaded on /shop/thanks/. */
+  | "purchase";
 
 declare global {
   interface Window {

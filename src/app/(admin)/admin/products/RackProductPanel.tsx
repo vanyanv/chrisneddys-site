@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { AdminProduct, InventoryMode } from "@/lib/catalogAdmin";
 import { imageThumbSrc } from "@/lib/productImage";
 import { joinRequirements, missingPublishRequirements } from "@/lib/publishRequirements";
-import { setInventoryPlainAction } from "./actions";
+import { generateProductSeoAction, setInventoryPlainAction } from "./actions";
 import { PhotosEditor } from "./PhotosEditor";
 import { RowMenu, type RowMenuAction } from "./RowMenu";
 import { productTitle, relativeTime } from "./format";
@@ -82,6 +82,11 @@ export function RackProductPanel({
   useEffect(() => setProduct(initialProduct), [initialProduct]);
   const [modeBusy, setModeBusy] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
+  const [seoBusy, setSeoBusy] = useState(false);
+  // Bumped after "Write with AI" writes new values, so the accordion's
+  // uncontrolled `defaultValue` inputs remount and pick them up — the same
+  // trick `pendingApi.resetToken` already plays on this same key.
+  const [seoNonce, setSeoNonce] = useState(0);
 
   function patch(p: Partial<AdminProduct>) {
     setProduct((prev) => ({ ...prev, ...p }));
@@ -178,6 +183,34 @@ export function RackProductPanel({
     setStatusBusy(false);
   }
 
+  /** "Write with AI" — rewrites all four search-engine fields and pushes the
+   * result straight into the accordion. Clears any unsaved edits to those
+   * four fields first, so a stale pending value can't outrank what the
+   * button just wrote once the fields remount. */
+  async function generateSeo() {
+    setSeoBusy(true);
+    try {
+      const result = await generateProductSeoAction(product.id);
+      if (!result.ok) {
+        pendingApi.showToast(result.error, { tone: "error" });
+        return;
+      }
+      pendingApi.clearValue(product.id, "metaTitle");
+      pendingApi.clearValue(product.id, "metaDescription");
+      pendingApi.clearValue(product.id, "metaKeywords");
+      pendingApi.clearValue(product.id, "socialImageAlt");
+      patch(result.fields);
+      setSeoNonce((n) => n + 1);
+      pendingApi.showToast(
+        result.source === "ai"
+          ? "Written for you — edit anything you don't like."
+          : "Filled in from the product. Set OPENAI_API_KEY to have these written properly.",
+      );
+    } finally {
+      setSeoBusy(false);
+    }
+  }
+
   const facts = (pendingApi.getValue(product.id, "authenticityFacts") ??
     product.authenticityFacts) as { label: string; value: string }[];
 
@@ -193,6 +226,18 @@ export function RackProductPanel({
   const slugValue = String(pendingApi.getValue(product.id, "slug") ?? product.slug);
   const metaValue = String(
     pendingApi.getValue(product.id, "metaDescription") ?? product.metaDescription,
+  );
+  const metaTitleValue = String(
+    pendingApi.getValue(product.id, "metaTitle") ?? product.metaTitle ?? "",
+  );
+  const metaKeywordsValue = String(
+    pendingApi.getValue(product.id, "metaKeywords") ?? product.metaKeywords ?? "",
+  );
+  const socialImageUrlValue = String(
+    pendingApi.getValue(product.id, "socialImageUrl") ?? product.socialImageUrl ?? "",
+  );
+  const socialImageAltValue = String(
+    pendingApi.getValue(product.id, "socialImageAlt") ?? product.socialImageAlt ?? "",
   );
   const authCopyValue = String(
     pendingApi.getValue(product.id, "authenticityCopy") ?? product.authenticityCopy ?? "",
@@ -514,7 +559,21 @@ export function RackProductPanel({
                 <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" />
               </svg>
             </summary>
-            <div className="adm-accordion-body" key={`seo-${pendingApi.resetToken}`}>
+            <div className="adm-accordion-body" key={`seo-${pendingApi.resetToken}-${seoNonce}`}>
+              <div className="adm-field">
+                <button
+                  type="button"
+                  className="adm-btn"
+                  disabled={seoBusy}
+                  onClick={() => void generateSeo()}
+                >
+                  Write with AI
+                </button>
+                <p className="adm-help">
+                  Fills in the four fields below from this product&rsquo;s name, price and
+                  description. Safe to run again &mdash; it replaces whatever is here now.
+                </p>
+              </div>
               <div className="adm-field">
                 <label htmlFor={`slug-${product.id}`} className="adm-label">
                   Slug
@@ -538,6 +597,32 @@ export function RackProductPanel({
                 )}
               </div>
               <div className="adm-field">
+                <label htmlFor={`meta-title-${product.id}`} className="adm-label">
+                  Page title
+                </label>
+                <input
+                  id={`meta-title-${product.id}`}
+                  className="adm-input"
+                  maxLength={60}
+                  defaultValue={metaTitleValue}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim();
+                    const original = product.metaTitle ?? "";
+                    if (raw === original) pendingApi.clearValue(product.id, "metaTitle");
+                    else pendingApi.setValue(product.id, "metaTitle", raw || null);
+                  }}
+                />
+                <p className="adm-help">
+                  {metaTitleValue.length}/60 &middot; Leave it empty and the name and price fill it
+                  in.
+                </p>
+                {pendingApi.getError(product.id, "metaTitle") && (
+                  <p className="adm-error" role="alert">
+                    {pendingApi.getError(product.id, "metaTitle")}
+                  </p>
+                )}
+              </div>
+              <div className="adm-field">
                 <label htmlFor={`meta-${product.id}`} className="adm-label">
                   Meta description
                 </label>
@@ -554,6 +639,84 @@ export function RackProductPanel({
                   }}
                 />
                 <p className="adm-help">{metaValue.length}/155</p>
+              </div>
+              <div className="adm-field">
+                <label htmlFor={`meta-keywords-${product.id}`} className="adm-label">
+                  Keywords
+                </label>
+                <input
+                  id={`meta-keywords-${product.id}`}
+                  className="adm-input"
+                  maxLength={160}
+                  defaultValue={metaKeywordsValue}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim();
+                    const original = product.metaKeywords ?? "";
+                    if (raw === original) pendingApi.clearValue(product.id, "metaKeywords");
+                    else pendingApi.setValue(product.id, "metaKeywords", raw || null);
+                  }}
+                />
+                <p className="adm-help">
+                  Comma-separated. Search engines don&rsquo;t rank on these, so a short honest list
+                  beats a long one. Leave it empty and it&rsquo;s worked out from the product.
+                </p>
+                {pendingApi.getError(product.id, "metaKeywords") && (
+                  <p className="adm-error" role="alert">
+                    {pendingApi.getError(product.id, "metaKeywords")}
+                  </p>
+                )}
+              </div>
+              <div className="adm-field">
+                <label htmlFor={`social-url-${product.id}`} className="adm-label">
+                  Share picture
+                </label>
+                <input
+                  id={`social-url-${product.id}`}
+                  className="adm-input"
+                  defaultValue={socialImageUrlValue}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim();
+                    const original = product.socialImageUrl ?? "";
+                    if (raw === original) pendingApi.clearValue(product.id, "socialImageUrl");
+                    else pendingApi.setValue(product.id, "socialImageUrl", raw || null);
+                  }}
+                />
+                <p className="adm-help">
+                  Leave this empty and the card is drawn from the product automatically. If you set
+                  it, it needs to start with &ldquo;/&rdquo; or be a full https:// address.
+                </p>
+                {pendingApi.getError(product.id, "socialImageUrl") && (
+                  <p className="adm-error" role="alert">
+                    {pendingApi.getError(product.id, "socialImageUrl")}
+                  </p>
+                )}
+              </div>
+              <div className="adm-field">
+                <label htmlFor={`social-alt-${product.id}`} className="adm-label">
+                  Share picture alt text
+                </label>
+                <textarea
+                  id={`social-alt-${product.id}`}
+                  className="adm-textarea"
+                  rows={2}
+                  maxLength={125}
+                  defaultValue={socialImageAltValue}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim();
+                    const original = product.socialImageAlt ?? "";
+                    if (raw === original) pendingApi.clearValue(product.id, "socialImageAlt");
+                    else pendingApi.setValue(product.id, "socialImageAlt", raw || null);
+                  }}
+                />
+                <p className="adm-help">
+                  {socialImageAltValue.length}/125 &middot; Leave it empty and it&rsquo;s worked out
+                  from the product.
+                </p>
+                {pendingApi.getError(product.id, "socialImageAlt") && (
+                  <p className="adm-error" role="alert">
+                    {pendingApi.getError(product.id, "socialImageAlt")}
+                  </p>
+                )}
               </div>
             </div>
           </details>

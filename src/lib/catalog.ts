@@ -98,6 +98,10 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
     why: row.why ?? undefined,
     authenticityCopy: row.authenticityCopy ?? undefined,
     authenticityFacts: (row.authenticityFacts as AuthenticityFact[] | null) ?? undefined,
+    metaTitle: row.metaTitle ?? undefined,
+    metaKeywords: row.metaKeywords ?? undefined,
+    socialImageUrl: row.socialImageUrl ?? undefined,
+    socialImageAlt: row.socialImageAlt ?? undefined,
     authenticity:
       certificate && sticker
         ? {

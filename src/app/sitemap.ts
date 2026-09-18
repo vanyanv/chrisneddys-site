@@ -4,6 +4,7 @@ import { allLocationSlugs } from "@/lib/locationSlug";
 import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
 import { PRIVACY_UPDATED } from "@/data/privacy";
 import { catalogueUpdatedAt, listPublishedProducts } from "@/lib/catalog";
+import { productSocialImage } from "@/lib/productSeo";
 
 export const dynamic = "force-static";
 
@@ -87,7 +88,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       path: `/shop/${p.slug}/`,
       priority: 0.8,
       updated: merchUpdated,
-      images: [`${brand.siteUrl}/shop/${p.slug}.png`],
+      // The owner's own share image where one is set, otherwise the card
+      // generated per product — never the hand-made `/shop/<slug>.png`,
+      // which only exists for the seeded product.
+      images: [productSocialImage(p)],
     })),
     { path: "/locations/", priority: 0.8, updated: LOCATIONS_UPDATED },
     ...allLocationSlugs().map((slug) => ({

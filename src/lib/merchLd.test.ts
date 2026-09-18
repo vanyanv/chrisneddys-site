@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { productLd, shopListLd, socialCard, productImage } from "@/lib/merchLd";
+import { productLd, shopListLd, productImage } from "@/lib/merchLd";
 import { merch } from "@/data/merch";
 import { brand } from "@/data/brand";
 import { ID } from "@/lib/seo";
+import { productSocialImage } from "@/lib/productSeo";
 
 // A real product from the catalogue, not an invented fixture.
 const trucker = merch.find((p) => p.slug === "foam-trucker-blue");
@@ -20,10 +21,31 @@ describe("productLd", () => {
   });
 
   it("carries the required name, description and manufacturer fields", () => {
+    // The receipt-grade `name`, not the display lines: those are written in
+    // caps for the page's Bowlby heading — see `productMetadataName`.
     expect(ld.name).toBe(trucker.name);
+    // The product's own sentence, not the search snippet: a schema
+    // `description` has no snippet budget to fit.
     expect(ld.description).toBe(trucker.description);
     expect(ld.manufacturer).toEqual({ "@id": ID.org });
     expect(ld.brand).toEqual({ "@type": "Brand", name: brand.name });
+  });
+
+  it("names the product from its display lines when `name` is blank, the way a Rack-created product is", () => {
+    const blankName = {
+      ...trucker,
+      name: "",
+      displayName: ["THE FOAM", "TRUCKER"] as [string, string],
+    };
+    const ld = productLd(blankName);
+    expect(ld.name).toBe("THE FOAM TRUCKER");
+  });
+
+  it("falls back to a derived description when both the description and the snippet column are empty", () => {
+    const blankDescription = { ...trucker, description: "", metaDescription: "" };
+    const ld = productLd(blankDescription);
+    expect(ld.description.length).toBeGreaterThan(0);
+    expect(ld.description).toContain(trucker.name);
   });
 
   it("nests an Offer with a matching @id, price and no availability while the shop is closed", () => {
@@ -91,21 +113,19 @@ describe("shopListLd", () => {
   });
 });
 
-describe("socialCard / productImage", () => {
-  it("builds an absolute social card url from the slug", () => {
-    expect(socialCard("foam-trucker-blue")).toBe(`${brand.siteUrl}/shop/foam-trucker-blue.png`);
-  });
-
-  it("leads with the real catalogue product's first view photo, then the social card", () => {
+describe("productImage", () => {
+  it("leads with the real catalogue product's first view photo, then the owner's own share card", () => {
     const firstPhoto = trucker.views[0]?.photo;
     if (!firstPhoto) throw new Error("expected foam-trucker-blue's first view to have a photo");
+    // The seed product has its own `socialImageUrl`, so the card is that file,
+    // same as `productSocialImage` returns for it directly.
     expect(productImage(trucker)).toEqual([
       `${brand.siteUrl}${trucker.photoDir}/${firstPhoto.src}.webp`,
-      socialCard(trucker.slug),
+      productSocialImage(trucker),
     ]);
   });
 
-  it("leads with the first view's own photo when one exists, then the social card", () => {
+  it("leads with the first view's own photo when one exists, then the generated card when there is no owner image", () => {
     const withViewPhoto = {
       slug: "with-view-photo",
       photoDir: "/shop/with-view-photo",
@@ -120,7 +140,7 @@ describe("socialCard / productImage", () => {
     };
     expect(productImage(withViewPhoto)).toEqual([
       `${brand.siteUrl}/shop/with-view-photo/front.webp`,
-      socialCard("with-view-photo"),
+      `${brand.siteUrl}/shop/with-view-photo/social-card/`,
     ]);
   });
 
@@ -128,10 +148,15 @@ describe("socialCard / productImage", () => {
     const legacy = { slug: "legacy", photo: "abc123" };
     const images = productImage(legacy);
     expect(images[0]).toBe(`${brand.siteUrl}/menu/${legacy.photo}.webp`);
-    expect(images[1]).toBe(socialCard(legacy.slug));
+    expect(images[1]).toBe(`${brand.siteUrl}/shop/legacy/social-card/`);
   });
 
-  it("falls back to only the social card when there is no photo at all", () => {
-    expect(productImage({ slug: "no-photo" })).toEqual([socialCard("no-photo")]);
+  it("falls back to only the share card when there is no photo at all, using the owner's image when one is set", () => {
+    expect(productImage({ slug: "no-photo" })).toEqual([
+      `${brand.siteUrl}/shop/no-photo/social-card/`,
+    ]);
+    expect(
+      productImage({ slug: "no-photo", socialImageUrl: "/shop/no-photo/hand-made.png" }),
+    ).toEqual([`${brand.siteUrl}/shop/no-photo/hand-made.png`]);
   });
 });

@@ -19,8 +19,9 @@ import { EditionMap } from "@/components/shop/EditionMap";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { productLd, socialCard } from "@/lib/merchLd";
+import { productLd } from "@/lib/merchLd";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+import { resolveProductSeo } from "@/lib/productSeo";
 
 type Params = { product: string };
 
@@ -39,25 +40,21 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const product = await getProductBySlug(slug);
   if (!product) return {};
 
-  // Title case, from the product's real name rather than the all-caps display
-  // pair — a SERP title in block capitals reads as shouting. The parenthetical
-  // is what the page says in its own "limited run" line, so the title spends
-  // its 60 characters on the name and the price.
-  const title = `${product.name.replace(/\s*\(.*\)\s*$/, "")} — ${formatPrice(product.price)}`;
-  const description = product.metaDescription;
+  const seo = resolveProductSeo(product);
   const path = `/shop/${product.slug}/`;
 
   // Not the shared burger card — a product page shared into a group chat
   // should show the product.
   return pageMetadata({
-    title,
-    description,
+    title: seo.title,
+    description: seo.description,
     path,
+    keywords: seo.keywords,
     image: {
-      url: socialCard(product.slug),
+      url: seo.imageUrl,
       width: 1200,
       height: 630,
-      alt: `${product.name} — ${formatPrice(product.price)}`,
+      alt: seo.imageAlt,
     },
   });
 }

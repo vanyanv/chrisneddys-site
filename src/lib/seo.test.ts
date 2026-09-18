@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { breadcrumbLd, openGraphFor, twitterFor, ID } from "@/lib/seo";
+import { breadcrumbLd, openGraphFor, twitterFor, pageMetadata, ID } from "@/lib/seo";
 import { brand } from "@/data/brand";
 
 describe("breadcrumbLd", () => {
@@ -41,6 +41,28 @@ describe("openGraphFor / twitterFor", () => {
     expect(tw.card).toBe("summary_large_image");
     expect(tw.title).toBe("T");
     expect(tw.images).toEqual(["/og.jpg"]);
+  });
+});
+
+describe("pageMetadata", () => {
+  it("carries no keywords field when none are given", () => {
+    const meta = pageMetadata({ title: "T", description: "D", path: "/shop/" });
+    expect(meta.keywords).toBeUndefined();
+  });
+
+  it("carries keywords through to Metadata.keywords when given", () => {
+    const meta = pageMetadata({
+      title: "T",
+      description: "D",
+      path: "/shop/",
+      keywords: ["merch", "Chris N Eddy's"],
+    });
+    expect(meta.keywords).toEqual(["merch", "Chris N Eddy's"]);
+  });
+
+  it("drops an empty keywords array rather than setting an empty field", () => {
+    const meta = pageMetadata({ title: "T", description: "D", path: "/shop/", keywords: [] });
+    expect(meta.keywords).toBeUndefined();
   });
 });
 

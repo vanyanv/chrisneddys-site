@@ -4,8 +4,8 @@ import "@/styles/shop-index.css";
 import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
-import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
-import { getStoreSettings } from "@/lib/orders";
+import { inventoryLine, listInventory, listPublishedProducts } from "@/lib/catalog";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
@@ -38,9 +38,11 @@ export const revalidate = 60;
  * window, and not one of the four had been decided.
  */
 export default async function ShopPage() {
-  const merch = await listPublishedProducts();
-  const inventories = await Promise.all(merch.map((product) => getInventory(product.slug)));
-  const settings = await getStoreSettings();
+  // The settings read depends on nothing else here, so it goes out with the
+  // product list rather than after it; the inventory read is the only one
+  // that genuinely has to wait, since it needs the slugs. Two hops, not three.
+  const [merch, settings] = await Promise.all([listPublishedProducts(), getPublicStoreSettings()]);
+  const inventories = await listInventory(merch.map((product) => product.slug));
   const note = shippingReturnsNote(settings);
   // Same "only true once the shop has actually opened" rule the product
   // page follows (issue #43) — pre-launch has its own, unrelated "still

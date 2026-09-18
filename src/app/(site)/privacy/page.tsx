@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "@/styles/legal.css";
 import { brand } from "@/data/brand";
-import { getStoreSettings } from "@/lib/orders";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { PRIVACY_UPDATED } from "@/data/privacy";
@@ -47,7 +47,7 @@ export const revalidate = 60;
  * If any of those change, this page is part of the change.
  */
 export default async function PrivacyPage() {
-  const settings = await getStoreSettings();
+  const settings = await getPublicStoreSettings();
   const contactEmail = settings.supportEmail || brand.email;
 
   const policyLd = {

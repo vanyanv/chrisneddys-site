@@ -7,7 +7,7 @@ import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { editions, products, variants } from "@/db/schema";
-import { getInventory } from "@/lib/catalog";
+import { getInventory, listInventory } from "@/lib/catalog";
 import {
   addImage,
   createDraft,
@@ -23,6 +23,7 @@ import {
   quoteCart,
   releaseExpiredReservations,
   releaseOrder,
+  reviveStoreSettings,
   updateStoreSettings,
 } from "@/lib/orders";
 
@@ -560,5 +561,219 @@ describe("plain-quantity product", () => {
       fulfilment: "ship",
     });
     expect(second).toEqual({ code: "insufficient_stock", slug: draft.slug });
+  });
+});
+
+// `getPublicStoreSettings` serves the storefront's settings out of
+// `unstable_cache`, which stores what it holds as JSON — so `updatedAt`
+// comes back out of it as a string, not the `Date` the row type promises.
+// `/returns/` and `/terms/` stamp their "last updated" line by calling
+// `updatedAt.toISOString()`, and a string has no such method: without the
+// revival below, both pages throw on every cached render.
+describe("reviveStoreSettings", () => {
+  it("restores updatedAt as a Date after the round trip through JSON the cache does", async () => {
+    const fresh = await getStoreSettings();
+    expect(fresh.updatedAt).toBeInstanceOf(Date);
+
+    const throughCache = JSON.parse(JSON.stringify(fresh));
+    expect(typeof throughCache.updatedAt).toBe("string");
+
+    const revived = reviveStoreSettings(throughCache);
+    expect(revived.updatedAt).toBeInstanceOf(Date);
+    expect(revived.updatedAt.toISOString()).toBe(fresh.updatedAt.toISOString());
+    // Every other field survives untouched.
+    expect(revived.storeName).toBe(fresh.storeName);
+    expect(revived.supportEmail).toBe(fresh.supportEmail);
+  });
+
+  it("leaves an already-revived row alone, so revival is safe to repeat", () => {
+    const row = { updatedAt: new Date("2026-01-02T03:04:05.000Z") } as never;
+    expect(reviveStoreSettings(row).updatedAt.toISOString()).toBe("2026-01-02T03:04:05.000Z");
+  });
+});
+
+// `releaseExpiredReservations` is the one piece of this file that runs in
+// front of a shopper who is waiting, so it releases every lapsed hold in one
+// transaction rather than one transaction each. These cover the part that
+// makes that safe: a burst of expired holds across more than one product has
+// to come out exactly as the per-order path left it.
+//
+// Every product here is created by the test that uses it, rather than shared
+// with the fixtures above — a sweep is global by definition, so these would
+// otherwise be reading counts that the tests before them had already moved.
+async function publishedEditionProduct(name: string, editionSize: number) {
+  const draft = await createDraft(name);
+  await updateProductField(draft.id, "priceCents", 3600);
+  await setInventory(draft.id, "edition", editionSize);
+  await addImage({
+    productId: draft.id,
+    kind: "view",
+    viewId: crypto.randomUUID(),
+    label: "FRONT",
+    alt: `${name} front view`,
+    urlFull: "https://example.com/sweep.webp",
+    urlThumb: "https://example.com/sweep-thumb.webp",
+    width: 720,
+    height: 720,
+  });
+  await setStatus(draft.id, "published");
+  return draft;
+}
+
+describe("releaseExpiredReservations releasing a burst", () => {
+  it("frees every lapsed hold across several products, and leaves the mirrors right", async () => {
+    const capA = await publishedEditionProduct("Burst Sweep Cap A", 8);
+    const capB = await publishedEditionProduct("Burst Sweep Cap B", 6);
+
+    // Four holds that all lapsed — the shape a drop leaves behind half an
+    // hour after it sells through.
+    for (let i = 0; i < 3; i++) {
+      const held = await createPendingOrder({
+        items: [{ slug: capA.slug, quantity: 1 }],
+        fulfilment: "ship",
+        holdMinutes: -60,
+      });
+      if ("code" in held) throw new Error(`expected a reservation, got ${held.code}`);
+    }
+    const otherHeld = await createPendingOrder({
+      items: [{ slug: capB.slug, quantity: 2 }],
+      fulfilment: "ship",
+      holdMinutes: -60,
+    });
+    if ("code" in otherHeld) throw new Error(`expected a reservation, got ${otherHeld.code}`);
+
+    expect((await getInventory(capA.slug))?.available).toBe(5);
+    expect((await getInventory(capB.slug))?.available).toBe(4);
+
+    expect(await releaseExpiredReservations(new Date())).toBe(4);
+
+    // Both products whole again, and `inventory_quantity` — the mirror the
+    // shop index reads — resynced for each variant the sweep touched.
+    expect((await getInventory(capA.slug))?.available).toBe(8);
+    expect((await getInventory(capB.slug))?.available).toBe(6);
+    const [listedA, listedB] = await listInventory([capA.slug, capB.slug]);
+    expect(listedA?.available).toBe(8);
+    expect(listedB?.available).toBe(6);
+  });
+
+  it("leaves a hold that has not lapsed alone", async () => {
+    const cap = await publishedEditionProduct("Live Hold Cap", 5);
+    const live = await createPendingOrder({
+      items: [{ slug: cap.slug, quantity: 1 }],
+      fulfilment: "ship",
+      holdMinutes: 30,
+    });
+    if ("code" in live) throw new Error(`expected a reservation, got ${live.code}`);
+
+    expect(await releaseExpiredReservations(new Date())).toBe(0);
+    expect((await getOrder(live.orderId))?.status).toBe("pending");
+
+    // And the number it is holding is still held.
+    const inventory = await getInventory(cap.slug);
+    const held = live.reservations[0]?.editionNumbers[0];
+    expect(inventory?.editions?.find((e) => e.number === held)?.status).toBe("reserved");
+  });
+
+  it('keeps a note already on the order instead of overwriting it with "expired"', async () => {
+    const cap = await publishedEditionProduct("Annotated Sweep Cap", 5);
+    const annotated = await createPendingOrder({
+      items: [{ slug: cap.slug, quantity: 1 }],
+      fulfilment: "ship",
+      holdMinutes: -60,
+    });
+    if ("code" in annotated) throw new Error(`expected a reservation, got ${annotated.code}`);
+
+    const db = await getDb();
+    await db
+      .update(schema.orders)
+      .set({ notes: "customer rang about this one" })
+      .where(eq(schema.orders.id, annotated.orderId));
+
+    await releaseExpiredReservations(new Date());
+
+    const order = await getOrder(annotated.orderId);
+    expect(order?.status).toBe("cancelled");
+    expect(order?.notes).toBe("customer rang about this one");
+  });
+
+  it('writes "expired" as the note when the order had none', async () => {
+    const cap = await publishedEditionProduct("Bare Sweep Cap", 5);
+    const bare = await createPendingOrder({
+      items: [{ slug: cap.slug, quantity: 1 }],
+      fulfilment: "ship",
+      holdMinutes: -60,
+    });
+    if ("code" in bare) throw new Error(`expected a reservation, got ${bare.code}`);
+
+    await releaseExpiredReservations(new Date());
+    expect((await getOrder(bare.orderId))?.notes).toBe("expired");
+  });
+
+  it("does nothing, and reports nothing, when there is no lapsed hold at all", async () => {
+    expect(await releaseExpiredReservations(new Date())).toBe(0);
+  });
+});
+
+// The batch works from a list of ids rather than re-reading each order, so
+// what protects the money is the status filter on each statement. These two
+// cover that: the first is the ordinary case, the second is the half-state
+// the filter exists for.
+describe("releaseExpiredReservations and orders that are not purely pending", () => {
+  it("never selects an order that has been paid, because payment clears its expiry", async () => {
+    const cap = await publishedEditionProduct("Paid Mid Sweep Cap", 5);
+    const held = await createPendingOrder({
+      items: [{ slug: cap.slug, quantity: 1 }],
+      fulfilment: "ship",
+      holdMinutes: -60,
+    });
+    if ("code" in held) throw new Error(`expected a reservation, got ${held.code}`);
+
+    // The webhook wins the race: the hold had lapsed on paper, but payment
+    // landed first.
+    await markPaid({
+      orderId: held.orderId,
+      paymentIntentId: `pi_test_sweep_${held.number}`,
+      email: "buyer@example.com",
+      name: "Test Buyer",
+      amounts: { subtotal: 3600, shipping: 600, tax: 0, total: 4200 },
+    });
+
+    expect(await releaseExpiredReservations(new Date())).toBe(0);
+
+    const order = await getOrder(held.orderId);
+    expect(order?.status).toBe("paid");
+    expect(order?.notes).not.toBe("expired");
+
+    // The number stays sold to them — never handed back to the next buyer.
+    const inventory = await getInventory(cap.slug);
+    expect(inventory?.available).toBe(4);
+    expect(inventory?.editions?.filter((e) => e.status === "sold")).toHaveLength(1);
+  });
+
+  it("leaves a sold number sold even while its order still reads pending and lapsed", async () => {
+    const cap = await publishedEditionProduct("Half Settled Cap", 5);
+    const held = await createPendingOrder({
+      items: [{ slug: cap.slug, quantity: 1 }],
+      fulfilment: "ship",
+      holdMinutes: -60,
+    });
+    if ("code" in held) throw new Error(`expected a reservation, got ${held.code}`);
+
+    // The state the `reserved` filter exists for: the number has settled as
+    // sold while the order row has not caught up — what a sweep interleaved
+    // with `markPaid` can see, and what a crash between the two would leave.
+    const db = await getDb();
+    await db
+      .update(schema.editions)
+      .set({ status: "sold" })
+      .where(eq(schema.editions.orderId, held.orderId));
+
+    await releaseExpiredReservations(new Date());
+
+    // Handing this number back would sell it twice.
+    const inventory = await getInventory(cap.slug);
+    expect(inventory?.editions?.filter((e) => e.status === "sold")).toHaveLength(1);
+    expect(inventory?.editions?.filter((e) => e.status === "available")).toHaveLength(4);
+    expect(inventory?.available).toBe(4);
   });
 });

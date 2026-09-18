@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "@/styles/legal.css";
 import { brand } from "@/data/brand";
 import { getStoreSettings } from "@/lib/orders";
 import { JsonLdScript } from "@/components/shared/JsonLd";

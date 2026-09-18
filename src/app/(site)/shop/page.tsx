@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "@/styles/shop-index.css";
+import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
 import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import "@/styles/shop-product.css";
+import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { MAX_PER_ORDER, TERMS_PENDING } from "@/data/merch";
 import {

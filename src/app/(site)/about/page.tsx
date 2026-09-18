@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/about.css";
 import { TwoWays } from "@/components/about/TwoWays";
 import { StorySeam } from "@/components/about/StorySeam";
 import { StoryColumns } from "@/components/about/StoryColumns";

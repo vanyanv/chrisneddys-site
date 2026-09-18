@@ -1,0 +1,117 @@
+/**
+ * One ruled line — the check's input pattern.
+ *
+ * Split out of the guest check because two pages draw the same field: the
+ * contact form (`contact.css`) and the order lookup (`shop-order.css`). A
+ * label, an input with a 2px rule under it, and a red underline that wipes in
+ * from the left on focus.
+ *
+ * `--ck-rule` is the rule's colour and is *not* set here: each page scopes it
+ * to its own container, so a check on paper and a check on cream can share
+ * these rules and still draw the line in the right ink.
+ */
+
+/* ---- one ruled line ----------------------------------------------------- */
+.cne-ck-field {
+  position: relative;
+  display: grid;
+  gap: 5px;
+}
+
+.cne-ck-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.cne-ck-field:focus-within .cne-ck-label {
+  color: var(--a-red-cta);
+}
+
+.cne-ck-input {
+  font-family: var(--font-body);
+  /* 16px is the threshold below which iOS Safari zooms the viewport on focus
+     and never zooms back out. Everything else on the check can be smaller. */
+  font-size: 16px;
+  color: var(--a-fg);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--ck-rule);
+  border-radius: 0;
+  padding: 8px 2px;
+  width: 100%;
+  appearance: none;
+}
+
+.cne-ck-input::placeholder {
+  color: var(--a-sub);
+  opacity: 0.75;
+}
+
+.cne-ck-input:focus {
+  outline: none;
+  border-bottom-color: transparent;
+}
+
+/* The input and its underline share a box of their own, so the underline sits
+   on the input's bottom edge rather than the field's — otherwise an error
+   message or the character counter pushes the field's bottom down and the rule
+   goes with it, landing under the message instead of under the input. */
+.cne-ck-line {
+  position: relative;
+  display: block;
+}
+
+/* Wipes in from the left on focus; sits under the 2px rule it replaces. */
+.cne-ck-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--a-red-cta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  pointer-events: none;
+}
+
+.cne-ck-field:focus-within .cne-ck-underline {
+  transform: scaleX(1);
+}
+
+.cne-ck-field.is-bad .cne-ck-underline {
+  transform: scaleX(1);
+  background: var(--a-red);
+}
+
+.cne-ck-err {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--a-red-cta);
+  font-weight: 600;
+}
+
+/* ---- desktop ------------------------------------------------------------ */
+@media (min-width: 901px) {
+  .cne-ck-label {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-ck-underline {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cne-ck-underline {
+    transition: none !important;
+  }
+}

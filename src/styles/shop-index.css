@@ -1,0 +1,271 @@
+/**
+ * /shop/ — the drop grid.
+ *
+ * The index's own cards and nothing else. The product shot inside a card
+ * (`.cne-capshot`, `.cne-cap`) is the system's, in `counter.css`, because the
+ * bag draws the same shot on every page; the rules here are only what a card
+ * does to it.
+ */
+
+.cne-drops {
+  display: grid;
+  gap: 16px;
+}
+
+.cne-drop {
+  position: relative;
+  display: grid;
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-shadow);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.cne-drop:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 9px 9px 0 var(--a-red);
+  border-color: var(--a-red);
+}
+
+.cne-drop:hover .cne-cap {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+.cne-drop:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--a-shadow);
+}
+
+.cne-drop-art {
+  --cne-mark: 20px;
+  border-bottom: 2.5px solid var(--a-ink);
+}
+
+.cne-drop-art .cne-capshot {
+  aspect-ratio: 4 / 3;
+}
+
+.cne-drop-art .cne-capshot.is-photo {
+  aspect-ratio: 720 / 411;
+}
+
+.cne-drop-b {
+  padding: 17px 17px 19px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cne-drop-b h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.05;
+  margin: 0;
+  padding: 0;
+}
+
+/* The index card is a link, not a section — no yellow rule underneath it. */
+.cne-drop-b h2::after {
+  content: none;
+}
+
+.cne-drop-price {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cne-drop-b p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--a-sub);
+  max-width: 44ch;
+}
+
+.cne-drop-go {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--a-red-cta);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cne-drop-go span {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.cne-drop:hover .cne-drop-go span {
+  transform: translateX(5px);
+}
+
+.cne-drop-flag {
+  position: absolute;
+  right: -7px;
+  top: 12px;
+  z-index: 6;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  background: var(--a-red-cta);
+  color: #fff2c9;
+  border: 2px solid var(--a-ink);
+  padding: 6px 8px;
+  line-height: 1;
+  transform: rotate(3deg);
+}
+
+.cne-drop-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  line-height: 1.6;
+}
+
+.cne-drop-note span {
+  flex: none;
+  width: 26px;
+  height: 2px;
+  background: var(--a-line);
+}
+
+.cne-shop-facts {
+  display: grid;
+  gap: 0;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-card);
+  margin-top: 4px;
+}
+
+.cne-shop-facts > div {
+  padding: 13px 15px 15px;
+  border-bottom: 2px solid var(--a-line);
+}
+
+.cne-shop-facts > div:last-child {
+  border-bottom: none;
+}
+
+.cne-shop-facts b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.cne-shop-facts span {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--a-sub);
+}
+
+.cne-shop-facts a {
+  text-decoration: underline;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-drop,
+  .cne-drop-go span {
+    transition: none !important;
+  }
+}
+
+/* ---- desktop ------------------------------------------------------------ */
+@media (min-width: 901px) {
+  .cne-drops {
+    gap: 20px;
+  }
+
+  .cne-drop {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    box-shadow: 6px 6px 0 var(--a-shadow);
+  }
+
+  .cne-drop-art {
+    border-bottom: none;
+    border-right: 2.5px solid var(--a-ink);
+  }
+
+  .cne-drop-art {
+    --cne-mark: 30px;
+  }
+
+  .cne-drop-art .cne-capshot {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 270px;
+  }
+
+  /* A real photo carries its own aspect ratio inline (`ProductShot` sets it
+       from the view's width/height) — a square shot stretched to `height: 100%`
+       would be squeezed to match the text column instead. Let the image's own
+       ratio decide the card's height instead; a taller card is the correct
+       result for a square photo, not a bug. The drawing above still fills the
+       card evenly, since it carries no photo and keeps the height:100% rule. */
+  .cne-drop-art .cne-capshot.is-photo {
+    height: auto;
+    min-height: 0;
+  }
+
+  .cne-drop-art .cne-cap {
+    width: 58%;
+    max-width: 340px;
+  }
+
+  .cne-drop-b {
+    padding: 26px 28px;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .cne-drop-b h2 {
+    font-size: 25px;
+  }
+
+  .cne-drop-price {
+    font-size: 22px;
+  }
+
+  .cne-drop-b p {
+    font-size: 13px;
+  }
+
+  .cne-drop-flag {
+    font-size: 10.5px;
+    padding: 7px 9px;
+    top: 16px;
+    right: -8px;
+  }
+
+  .cne-shop-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cne-shop-facts > div {
+    border-bottom: none;
+    border-right: 2px solid var(--a-line);
+  }
+
+  .cne-shop-facts > div:last-child {
+    border-right: none;
+  }
+}

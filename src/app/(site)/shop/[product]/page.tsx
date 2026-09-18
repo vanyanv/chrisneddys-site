@@ -11,7 +11,7 @@ import {
   inventoryLine,
   listPublishedProducts,
 } from "@/lib/catalog";
-import { getStoreSettings } from "@/lib/orders";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, pauseNotice, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
@@ -77,15 +77,21 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  */
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { product: slug } = await params;
-  const product = await getProductBySlug(slug);
+  // All three reads key off the slug alone, so none of them has to wait on
+  // another — one hop for the page instead of three. A slug that turns out
+  // not to exist pays for two reads it doesn't use, which is a 404 nobody is
+  // waiting on, not the path that matters.
+  const [product, inventory, settings] = await Promise.all([
+    getProductBySlug(slug),
+    getInventory(slug),
+    getPublicStoreSettings(),
+  ]);
   if (!product) notFound();
 
-  const inventory = await getInventory(slug);
   const line = inventoryLine(inventory, product.eyebrow);
   const soldOut = line?.soldOut ?? false;
   const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
   const maxQty = inventory?.tracked ? Math.min(perOrderLimit, inventory.available) : perOrderLimit;
-  const settings = await getStoreSettings();
   const note = shippingReturnsNote(settings);
   const flag = editionFlag(inventory?.editionSize ?? null);
   const shopOpen = isShopOpenFor(settings);
@@ -134,7 +140,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         maxQty={maxQty}
       >
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
-          <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
+          <Link prefetch={false} href="/shop/">
+            SHOP
+          </Link>{" "}
+          <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
         </nav>
 
@@ -227,11 +236,17 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             {note ? (
               <p className="cne-pending">
-                {note.line} See <Link href="/returns/">returns</Link>
+                {note.line} See{" "}
+                <Link prefetch={false} href="/returns/">
+                  returns
+                </Link>
                 {note.hasTerms && (
                   <>
                     {" "}
-                    and <Link href="/terms/">terms</Link>
+                    and{" "}
+                    <Link prefetch={false} href="/terms/">
+                      terms
+                    </Link>
                   </>
                 )}
                 .
@@ -300,11 +315,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const cert = product.authenticity.certificate;
                     const certFull = cert.url ?? `${product.photoDir}/${cert.src}.webp`;
                     const certThumb = cert.thumbUrl ?? `${product.photoDir}/${cert.src}-thumb.webp`;
+                    // Same three cuts as the gallery (see `ProductShot`): the
+                    // 400px file only exists for in-repo photography, so an
+                    // uploaded image keeps the original pair.
+                    const certSrcSet =
+                      cert.url || cert.thumbUrl
+                        ? `${certThumb} 200w, ${certFull} 720w`
+                        : `${certThumb} 200w, ${product.photoDir}/${cert.src}-mid.webp 400w, ${certFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-cert"
                         src={certFull}
-                        srcSet={`${certThumb} 200w, ${certFull} 720w`}
+                        srcSet={certSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={cert.width}
                         height={cert.height}
@@ -320,11 +342,15 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const stickerFull = sticker.url ?? `${product.photoDir}/${sticker.src}.webp`;
                     const stickerThumb =
                       sticker.thumbUrl ?? `${product.photoDir}/${sticker.src}-thumb.webp`;
+                    const stickerSrcSet =
+                      sticker.url || sticker.thumbUrl
+                        ? `${stickerThumb} 200w, ${stickerFull} 720w`
+                        : `${stickerThumb} 200w, ${product.photoDir}/${sticker.src}-mid.webp 400w, ${stickerFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-sticker"
                         src={stickerFull}
-                        srcSet={`${stickerThumb} 200w, ${stickerFull} 720w`}
+                        srcSet={stickerSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={sticker.width}
                         height={sticker.height}
@@ -346,9 +372,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <h2>Come eat.</h2>
           <p>
             The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
-            of cheese, every topping free. <Link href="/menu/">See the menu</Link> or{" "}
-            <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
-            <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
+            of cheese, every topping free.{" "}
+            <Link prefetch={false} href="/menu/">
+              See the menu
+            </Link>{" "}
+            or{" "}
+            <Link prefetch={false} href="/order/">
+              order for pickup
+            </Link>
+            . Questions about the drop go to{" "}
+            <Link prefetch={false} href="/contact/">
+              the contact page
+            </Link>
+            , or call {brand.phone}.
           </p>
         </section>
 

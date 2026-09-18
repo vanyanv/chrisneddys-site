@@ -19,10 +19,10 @@
  * rendering mode). Phase 2's admin can call `revalidateTag("catalogue")`
  * after a write and every cached read here picks it up immediately.
  */
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { getDb, hasDatabase } from "@/db/client";
-import { products, type AuthenticityFact } from "@/db/schema";
+import { editions, products, variants, type AuthenticityFact } from "@/db/schema";
 import { merch, MERCH_UPDATED, type MerchProduct, type MerchView } from "@/data/merch";
 
 const CACHE_TAGS = ["catalogue"];
@@ -171,6 +171,10 @@ const cachedInventory = unstable_cache(queryInventory, ["catalogue-inventory"], 
   tags: CACHE_TAGS,
   revalidate: REVALIDATE_SECONDS,
 });
+const cachedInventoryList = unstable_cache(queryInventoryList, ["catalogue-inventory-list"], {
+  tags: CACHE_TAGS,
+  revalidate: REVALIDATE_SECONDS,
+});
 
 export async function listPublishedProducts(): Promise<MerchProduct[]> {
   if (shouldUseFallback()) return merch;
@@ -208,7 +212,9 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
   const db = await getDb();
   const product = await db.query.products.findFirst({
     where: eq(products.slug, slug),
-    with: { variants: { with: { editions: true } } },
+    // Ordered, so this and `queryInventoryList` below can never pick a
+    // different variant for the same product and report two different counts.
+    with: { variants: { orderBy: [asc(variants.position)], with: { editions: true } } },
   });
   if (!product) return undefined;
 
@@ -232,6 +238,60 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
       ? (editionCells ?? []).filter((e) => e.status === "available").length
       : (variant.inventoryQuantity ?? 0);
   return { tracked, available, editionSize: variant.editionSize, editions: editionCells };
+}
+
+/**
+ * The shop index's inventory read: every slug in one query, counts only.
+ *
+ * `queryInventory` above loads every edition row a product has — fifty of
+ * them for a fifty-piece run — because the product page draws a map with one
+ * cell per row. The index draws no map. It shows "N of 50 left", so all it
+ * ever needed was the two numbers, and asking for the rows to count them
+ * meant carrying the whole run across the wire per product, once per render.
+ * Here the count is a `count(*)` the database answers off
+ * `editions_variant_status_idx`, and one query covers every product on the
+ * page rather than one query each.
+ *
+ * Deliberately not reading `variants.inventory_quantity` for edition
+ * products even though `syncVariantAvailableMirror` keeps it equal to this
+ * count: `queryInventory` counts the rows themselves, and the two reads have
+ * to agree about the same product or the index and the product page will say
+ * different things about it.
+ */
+async function queryInventoryList(slugs: string[]): Promise<(InventoryStatus | undefined)[]> {
+  if (slugs.length === 0) return [];
+  const db = await getDb();
+  const rows = await db
+    .select({
+      slug: products.slug,
+      inventoryQuantity: variants.inventoryQuantity,
+      editionSize: variants.editionSize,
+      availableEditions: sql<number>`(
+        select count(*)::int from ${editions}
+        where ${editions.variantId} = ${variants.id} and ${editions.status} = 'available'
+      )`,
+    })
+    .from(products)
+    .leftJoin(variants, eq(variants.productId, products.id))
+    .where(inArray(products.slug, slugs))
+    .orderBy(asc(products.slug), asc(variants.position));
+
+  const bySlug = new Map<string, InventoryStatus>();
+  for (const row of rows) {
+    // First row per slug wins — the ordering above makes that the same
+    // variant `queryInventory` picks.
+    if (bySlug.has(row.slug)) continue;
+    if (row.editionSize === null && row.inventoryQuantity === null) {
+      bySlug.set(row.slug, { tracked: false, available: 0, editionSize: null });
+      continue;
+    }
+    bySlug.set(row.slug, {
+      tracked: row.inventoryQuantity !== null,
+      available: row.editionSize !== null ? row.availableEditions : (row.inventoryQuantity ?? 0),
+      editionSize: row.editionSize,
+    });
+  }
+  return slugs.map((slug) => bySlug.get(slug));
 }
 
 /**
@@ -282,6 +342,27 @@ export async function getInventory(slug: string): Promise<InventoryStatus | unde
   }
   if (isTestEnv()) return queryInventory(slug);
   return cachedInventory(slug);
+}
+
+/**
+ * `getInventory` for a whole page of products at once, in one query and
+ * without the edition rows — what the shop index needs. Returns one entry
+ * per slug given, in that order, `undefined` where there is no such product.
+ *
+ * The `editions` array is deliberately absent from every entry: only the
+ * product page's edition map reads it, and it is the expensive part. Use
+ * `getInventory` for that page.
+ */
+export async function listInventory(slugs: string[]): Promise<(InventoryStatus | undefined)[]> {
+  if (shouldUseFallback()) {
+    return slugs.map((slug) =>
+      merch.some((p) => p.slug === slug)
+        ? { tracked: false, available: 0, editionSize: null }
+        : undefined,
+    );
+  }
+  if (isTestEnv()) return queryInventoryList(slugs);
+  return cachedInventoryList(slugs);
 }
 
 /**

@@ -19,10 +19,10 @@ export function StoryClose(): ReactElement {
         do.
       </p>
       <div className="cne-cta">
-        <Link className="cne-big is-chris" href={`/menu/?way=${chris.id}`}>
+        <Link prefetch={false} className="cne-big is-chris" href={`/menu/?way=${chris.id}`}>
           {chris.name.toUpperCase()} &rarr;
         </Link>
-        <Link className="cne-big is-eddy" href={`/menu/?way=${eddy.id}`}>
+        <Link prefetch={false} className="cne-big is-eddy" href={`/menu/?way=${eddy.id}`}>
           {eddy.name.toUpperCase()} &rarr;
         </Link>
       </div>

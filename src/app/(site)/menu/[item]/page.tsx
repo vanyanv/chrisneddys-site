@@ -95,7 +95,7 @@ export default async function MenuItemPage({ params }: Params) {
 
       <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">
-          <Link href="/menu/" style={{ color: "inherit" }}>
+          <Link prefetch={false} href="/menu/" style={{ color: "inherit" }}>
             Menu
           </Link>{" "}
           / {item.name}
@@ -209,7 +209,7 @@ export default async function MenuItemPage({ params }: Params) {
             >
               DIRECTIONS
             </a>
-            <Link className="cne-mini is-plain" href="/menu/">
+            <Link prefetch={false} className="cne-mini is-plain" href="/menu/">
               THE FULL MENU
             </Link>
           </div>

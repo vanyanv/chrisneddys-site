@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { getEditionSizes, getOrderBySessionId, getStoreSettings } from "@/lib/orders";
+import { getEditionSizes, getOrderBySessionId, getPublicStoreSettings } from "@/lib/orders";
 import { formatPrice } from "@/lib/otter";
 import { canShowFullOrderDetails } from "@/lib/orderVisibility";
 import { ClearBagOnce } from "@/components/shop/ClearBagOnce";
@@ -58,9 +58,12 @@ export default async function ThanksPage({
         <h1>Thanks.</h1>
         <p className="cne-shop-lede">
           We couldn&rsquo;t find that checkout session. If you just paid, check{" "}
-          <Link href="/shop/order/">order status</Link> with your order number and email.
+          <Link prefetch={false} href="/shop/order/">
+            order status
+          </Link>{" "}
+          with your order number and email.
         </p>
-        <Link href="/shop/" className="cne-btn-ghost">
+        <Link prefetch={false} href="/shop/" className="cne-btn-ghost">
           Back to the shop
         </Link>
       </Shell>
@@ -96,7 +99,8 @@ export default async function ThanksPage({
         <h1>Still confirming.</h1>
         <p className="cne-shop-lede">
           {order ? `Your order is ${order.number}. ` : "This is taking longer than it should. "}
-          Payment can take a minute to confirm. Check <Link href="/shop/order/">
+          Payment can take a minute to confirm. Check{" "}
+          <Link prefetch={false} href="/shop/order/">
             order status
           </Link>{" "}
           in a bit, or reach us at <a href={`mailto:${brand.email}`}>{brand.email}</a>.
@@ -111,7 +115,11 @@ export default async function ThanksPage({
         <h1>Payment not completed.</h1>
         <p className="cne-shop-lede">
           This checkout session was cancelled or expired before payment went through, so nothing was
-          charged. <Link href="/shop/">Back to the shop</Link> to try again.
+          charged.{" "}
+          <Link prefetch={false} href="/shop/">
+            Back to the shop
+          </Link>{" "}
+          to try again.
         </p>
       </Shell>
     );
@@ -128,7 +136,10 @@ export default async function ThanksPage({
         <h1>Thanks — order {order.number}</h1>
         <p className="cne-shop-lede">
           Check your confirmation email for the details, or{" "}
-          <Link href="/shop/order/">look up your order</Link> with your order number and email.
+          <Link prefetch={false} href="/shop/order/">
+            look up your order
+          </Link>{" "}
+          with your order number and email.
         </p>
       </Shell>
     );
@@ -136,7 +147,7 @@ export default async function ThanksPage({
 
   const [sizes, settings] = await Promise.all([
     getEditionSizes(order.items.map((i) => i.variantId)),
-    getStoreSettings(),
+    getPublicStoreSettings(),
   ]);
 
   const single = order.items.length === 1 ? order.items[0] : undefined;
@@ -196,10 +207,13 @@ export default async function ThanksPage({
       <p className="cne-shop-lede">
         Questions about your order?{" "}
         <a href={`mailto:${settings.supportEmail}`}>{settings.supportEmail}</a>, or{" "}
-        <Link href="/shop/order/">look it up</Link> any time.
+        <Link prefetch={false} href="/shop/order/">
+          look it up
+        </Link>{" "}
+        any time.
       </p>
 
-      <Link href="/shop/" className="cne-btn-ghost">
+      <Link prefetch={false} href="/shop/" className="cne-btn-ghost">
         Back to the shop
       </Link>
     </Shell>

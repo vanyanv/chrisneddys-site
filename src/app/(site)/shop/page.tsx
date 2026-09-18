@@ -4,8 +4,8 @@ import "@/styles/shop-index.css";
 import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
-import { getInventory, inventoryLine, listPublishedProducts } from "@/lib/catalog";
-import { getStoreSettings } from "@/lib/orders";
+import { inventoryLine, listInventory, listPublishedProducts } from "@/lib/catalog";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
@@ -78,10 +78,12 @@ export const revalidate = 60;
  * window, and not one of the four had been decided.
  */
 export default async function ShopPage() {
-  const merch = await listPublishedProducts();
+  // The settings read depends on nothing else here, so it goes out with the
+  // product list rather than after it; the inventory read is the only one
+  // that genuinely has to wait, since it needs the slugs. Two hops, not three.
+  const [merch, settings] = await Promise.all([listPublishedProducts(), getPublicStoreSettings()]);
   const { description } = shopIndexMetadata(merch);
-  const inventories = await Promise.all(merch.map((product) => getInventory(product.slug)));
-  const settings = await getStoreSettings();
+  const inventories = await listInventory(merch.map((product) => product.slug));
   const note = shippingReturnsNote(settings);
   // Same "only true once the shop has actually opened" rule the product
   // page follows (issue #43) — pre-launch has its own, unrelated "still
@@ -122,6 +124,7 @@ export default async function ShopPage() {
 
             return (
               <Link
+                prefetch={false}
                 key={product.slug}
                 href={`/shop/${product.slug}/`}
                 className="cne-drop"
@@ -187,11 +190,17 @@ export default async function ShopPage() {
           <>
             <h2>Shipping &amp; returns.</h2>
             <p className="cne-shop-lede">
-              {note.line} See <Link href="/returns/">returns</Link>
+              {note.line} See{" "}
+              <Link prefetch={false} href="/returns/">
+                returns
+              </Link>
               {note.hasTerms && (
                 <>
                   {" "}
-                  and <Link href="/terms/">terms</Link>
+                  and{" "}
+                  <Link prefetch={false} href="/terms/">
+                    terms
+                  </Link>
                 </>
               )}
               .
@@ -201,7 +210,10 @@ export default async function ShopPage() {
           <>
             <h2>Still being sorted.</h2>
             <p className="cne-shop-lede">
-              {TERMS_PENDING} Want to know when it opens? <Link href="/contact/">Get in touch</Link>{" "}
+              {TERMS_PENDING} Want to know when it opens?{" "}
+              <Link prefetch={false} href="/contact/">
+                Get in touch
+              </Link>{" "}
               or call {brand.phone}.
             </p>
           </>

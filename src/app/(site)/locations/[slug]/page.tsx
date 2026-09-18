@@ -55,7 +55,7 @@ export default async function LocationPage({ params }: Params) {
       {loc.isOpen && <JsonLdScript data={restaurantLd(loc)} />}
       <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">
-          <Link href="/locations/" style={{ color: "inherit" }}>
+          <Link prefetch={false} href="/locations/" style={{ color: "inherit" }}>
             Locations
           </Link>{" "}
           / {hood}

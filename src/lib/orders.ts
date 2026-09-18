@@ -16,7 +16,8 @@
  * `getDb()`) so tests can pass a PGlite instance instead of talking to Neon.
  */
 import { and, asc, desc, eq, gt, inArray, lt, sql } from "drizzle-orm";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { cache } from "react";
 import { getDb, type Db } from "@/db/client";
 import {
   editions,
@@ -103,6 +104,56 @@ export async function getStoreSettings(db?: Db): Promise<StoreSettings> {
   if (!row) throw new Error("store_settings default row missing and could not be created");
   return row;
 }
+
+/** Matches the `revalidate = 60` the storefront pages that read these
+ * settings already declare, and `src/lib/catalog.ts`'s own window. */
+const REVALIDATE_SECONDS = 60;
+
+/** Tag for the cached storefront settings read below. Every write to
+ * `store_settings` has to clear it — see `saveStoreSettings`. */
+export const STORE_SETTINGS_TAG = "store-settings";
+
+const cachedStoreSettings = unstable_cache(() => getStoreSettings(), ["store-settings"], {
+  tags: [STORE_SETTINGS_TAG],
+  revalidate: REVALIDATE_SECONDS,
+});
+
+/**
+ * `unstable_cache` stores what it caches as JSON, so a `timestamp` column
+ * comes back out of it as an ISO string rather than the `Date` the row type
+ * promises. `/returns/` and `/terms/` both call `updatedAt.toISOString()` to
+ * stamp their "last updated" line, and a string has no such method — this is
+ * what a cached settings read has to put back before handing the row on.
+ */
+export function reviveStoreSettings(row: StoreSettings): StoreSettings {
+  return { ...row, updatedAt: new Date(row.updatedAt) };
+}
+
+/**
+ * The storefront's read of `store_settings` — the store name, the shipping
+ * and returns copy, and whether the shop is open.
+ *
+ * `getStoreSettings` above goes to the database every single time it is
+ * called, which is right for checkout, the Stripe webhook and `/admin` (all
+ * of which must never act on a stale row) but wrong for rendering a page:
+ * `src/app/(site)/layout.tsx` calls it on *every* storefront page and the
+ * page underneath then calls it again, so a page whose product data was
+ * entirely cached still made two database round trips before it could
+ * render. This is that same read, cached for a minute the way
+ * `src/lib/catalog.ts` caches the catalogue, and wrapped in React's `cache`
+ * so the layout and the page share one call within a single render instead
+ * of two.
+ *
+ * Owners never wait the minute out: `saveStoreSettings` clears
+ * `STORE_SETTINGS_TAG` on every save, so a change is live on the storefront
+ * as soon as it is saved. Anything that must read the row as it stands right
+ * now — checkout's open/paused gate, the admin's own screens — keeps calling
+ * `getStoreSettings` directly.
+ */
+export const getPublicStoreSettings = cache(async (): Promise<StoreSettings> => {
+  if (isTestEnv()) return getStoreSettings();
+  return reviveStoreSettings(await cachedStoreSettings());
+});
 
 export type StoreSettingsPatch = Partial<{
   storeName: string;
@@ -913,20 +964,82 @@ export async function releaseOrder(
   });
 }
 
-/** Releases every pending order whose hold has expired. Call opportunistically
- * before a new reservation, or from a cron. Returns how many were released. */
+/**
+ * Releases every pending order whose hold has expired. Call opportunistically
+ * before a new reservation, or from a cron. Returns how many were released.
+ *
+ * This runs on the buy button, in front of a shopper, because it has to:
+ * `createPendingOrder` claims editions by `status = 'available'`, so a lapsed
+ * hold whose numbers are still marked `reserved` reads as sold-out stock
+ * until something puts them back. (Plain-quantity products don't need it —
+ * `reservedQuantity` already discounts holds whose `expires_at` has passed
+ * in SQL — but edition products do, because `editions.status` is a
+ * materialized state rather than a derived one.)
+ *
+ * What it must not do is bill one shopper for everyone else's cleanup. It
+ * used to run `releaseOrder` in a loop, one transaction each, so the cost of
+ * clicking Buy scaled with however many holds happened to have lapsed — and
+ * they lapse in bursts, thirty minutes after a drop, which is exactly when
+ * the next person is clicking. It is now a single transaction whose
+ * statement count is bounded by the number of variants touched instead: two
+ * statements plus a mirror resync per variant, whether one hold expired or
+ * two hundred.
+ *
+ * Two guards make a batch safe where the loop relied on re-reading each
+ * order: only editions still `reserved` go back (one the webhook has already
+ * sold is never handed to somebody else), and only orders still `pending`
+ * are cancelled (a payment that lands mid-sweep is not overwritten). Neither
+ * takes a lock on `orders` before the one on `editions`: `markPaid` locks
+ * editions first and updates the order last, and taking them the other way
+ * round here is how the two would deadlock.
+ */
 export async function releaseExpiredReservations(now: Date = new Date(), db?: Db): Promise<number> {
   const database = await resolveDb(db);
-  const expired = await database
-    .select({ id: orders.id })
-    .from(orders)
-    .where(and(eq(orders.status, "pending"), lt(orders.expiresAt, now)));
 
-  let count = 0;
-  for (const row of expired) {
-    if (await releaseOrder({ orderId: row.id }, "expired", database)) count++;
-  }
-  return count;
+  return database.transaction(async (tx) => {
+    const expired = await tx
+      .select({ id: orders.id })
+      .from(orders)
+      .where(and(eq(orders.status, "pending"), lt(orders.expiresAt, now)));
+    if (expired.length === 0) return 0;
+
+    const ids = expired.map((row) => row.id);
+
+    // Every held number goes back in one statement. `order_id` is
+    // deliberately left set, exactly as `releaseOrder` leaves it and for the
+    // same reason: `markPaid`'s `wasReleased` branch uses it to reclaim these
+    // precise numbers if this order's payment lands after its hold lapsed.
+    const freed = await tx
+      .update(editions)
+      .set({ status: "available", reservedUntil: null })
+      .where(and(inArray(editions.orderId, ids), eq(editions.status, "reserved")))
+      .returning({ variantId: editions.variantId });
+
+    // Bounded by how many variants were actually touched — at most the size
+    // of the catalogue — rather than by how many orders expired.
+    for (const variantId of new Set(freed.map((row) => row.variantId))) {
+      await syncVariantAvailableMirror(tx, variantId);
+    }
+
+    // `coalesce` is `releaseOrder`'s `order.notes ?? reason` in SQL: a note
+    // someone already wrote on the order survives, and only an unset one
+    // becomes "expired".
+    const released = await tx
+      .update(orders)
+      .set({
+        status: "cancelled",
+        notes: sql`coalesce(${orders.notes}, 'expired')`,
+        expiresAt: null,
+        updatedAt: new Date(),
+      })
+      .where(and(inArray(orders.id, ids), eq(orders.status, "pending")))
+      .returning({ id: orders.id });
+
+    // What the statement actually changed, not what was selected a moment
+    // ago: an order the Stripe webhook paid in between is excluded by the
+    // `pending` check above and must not be counted as released.
+    return released.length;
+  });
 }
 
 // ---------------------------------------------------------------------------

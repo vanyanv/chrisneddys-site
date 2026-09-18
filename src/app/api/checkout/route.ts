@@ -201,7 +201,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (parsed instanceof NextResponse) return parsed;
   const { items, fulfilment } = parsed;
 
-  const settings = await getStoreSettings();
+  // The sweep has to finish before anything below claims stock, but it reads
+  // nothing the settings read produces, so the two go out together rather
+  // than one after the other. It runs even on a request the gates below turn
+  // away, which is harmless: freeing lapsed holds is maintenance that wants
+  // doing either way, and it writes nothing when nothing has expired.
+  const [settings] = await Promise.all([getStoreSettings(), releaseExpiredReservations()]);
   if (!isShopOpenFor(settings)) {
     return NextResponse.json({ error: "The shop isn't open yet." }, { status: 503 });
   }
@@ -218,9 +223,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (fulfilment === "pickup" && !settings.pickupEnabled) {
     return badRequest("Pickup isn't available right now.");
   }
-
-  // Free anything that timed out before this cart competes for the same stock.
-  await releaseExpiredReservations();
 
   const quote = await quoteCart(items, fulfilment);
   if ("code" in quote) return quoteErrorResponse(quote);

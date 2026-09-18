@@ -135,7 +135,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         maxQty={maxQty}
       >
         <nav className="cne-pdp-crumb" aria-label="Breadcrumb">
-          <Link href="/shop/">SHOP</Link> <span aria-hidden="true">/</span>{" "}
+          <Link prefetch={false} href="/shop/">
+            SHOP
+          </Link>{" "}
+          <span aria-hidden="true">/</span>{" "}
           <span aria-current="page">{product.displayName.join(" ")}</span>
         </nav>
 
@@ -228,11 +231,17 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             {note ? (
               <p className="cne-pending">
-                {note.line} See <Link href="/returns/">returns</Link>
+                {note.line} See{" "}
+                <Link prefetch={false} href="/returns/">
+                  returns
+                </Link>
                 {note.hasTerms && (
                   <>
                     {" "}
-                    and <Link href="/terms/">terms</Link>
+                    and{" "}
+                    <Link prefetch={false} href="/terms/">
+                      terms
+                    </Link>
                   </>
                 )}
                 .
@@ -358,9 +367,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <h2>Come eat.</h2>
           <p>
             The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
-            of cheese, every topping free. <Link href="/menu/">See the menu</Link> or{" "}
-            <Link href="/order/">order for pickup</Link>. Questions about the drop go to{" "}
-            <Link href="/contact/">the contact page</Link>, or call {brand.phone}.
+            of cheese, every topping free.{" "}
+            <Link prefetch={false} href="/menu/">
+              See the menu
+            </Link>{" "}
+            or{" "}
+            <Link prefetch={false} href="/order/">
+              order for pickup
+            </Link>
+            . Questions about the drop go to{" "}
+            <Link prefetch={false} href="/contact/">
+              the contact page
+            </Link>
+            , or call {brand.phone}.
           </p>
         </section>
 

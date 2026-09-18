@@ -110,9 +110,12 @@ export default async function PrivacyPage() {
         <section className="cne-lg-sec" aria-labelledby="p-order">
           <h2 id="p-order">What placing an order collects</h2>
           <p>
-            When you buy something from the <Link href="/shop/">shop</Link>, Stripe Checkout
-            collects your <strong>name</strong>, <strong>email address</strong>, your{" "}
-            <strong>shipping address</strong> if you have it shipped, and a{" "}
+            When you buy something from the{" "}
+            <Link prefetch={false} href="/shop/">
+              shop
+            </Link>
+            , Stripe Checkout collects your <strong>name</strong>, <strong>email address</strong>,
+            your <strong>shipping address</strong> if you have it shipped, and a{" "}
             <strong>phone number</strong> — Stripe requires it to check out, and we only use it for
             questions about your order. It hands that back to us along with{" "}
             <strong>what you bought</strong> and, for a numbered item like the Foam Trucker,{" "}
@@ -223,9 +226,11 @@ export default async function PrivacyPage() {
             <strong>Instagram</strong>, <strong>Yelp</strong> and <strong>Tripadvisor</strong>{" "}
             elsewhere. Anything you type once you are there — an address, a card number, a tip — you
             are giving to them, not to us. We never see it. Checking out through the{" "}
-            <Link href="/shop/">shop</Link> is different: that payment page is Stripe&rsquo;s,
-            described above, and it is the one place off this site we do ask you to visit to
-            complete a purchase.
+            <Link prefetch={false} href="/shop/">
+              shop
+            </Link>{" "}
+            is different: that payment page is Stripe&rsquo;s, described above, and it is the one
+            place off this site we do ask you to visit to complete a purchase.
           </p>
         </section>
 

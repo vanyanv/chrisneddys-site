@@ -47,7 +47,7 @@ export function SiteHeader() {
   return (
     <header className={`cne-header${lifted ? " is-lifted" : ""}`}>
       <div className="cne-nav">
-        <Link href="/" aria-label={`${brand.name} — Home`} className="cne-logo">
+        <Link prefetch={false} href="/" aria-label={`${brand.name} — Home`} className="cne-logo">
           <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} priority />
         </Link>
         <div className="cne-nav-right">
@@ -70,9 +70,31 @@ export function SiteHeader() {
         </div>
       </div>
 
+      {/* `prefetch={false}` here and on every other storefront link. Next's
+          default prefetches a link's whole route payload the moment the link
+          enters the viewport, and these six are in the viewport on every page,
+          so landing anywhere pulled ~29 KB apiece for five pages the visitor
+          had not asked for — 143 KB before they had done anything, during the
+          window the hero image is competing for. Reading a page to the bottom
+          cost more again as the footer, the location cards and the menu's
+          thirty item links scrolled past: 344 KB on the home page, 518 KB on
+          the menu.
+
+          It is a trade, and it was made deliberately. Prefetching bought a
+          click-to-paint of 93ms on any connection; fetching on the click
+          instead costs a median 224ms on 4G and 511ms on a fast-3G phone.
+          So this spends about a tenth of a second on 4G, on the taps a
+          visitor actually makes, to stop spending a third to half a megabyte
+          on every page whether they tap or not. If that ever reads as slow,
+          the narrowest way back is to drop `prefetch={false}` from these six
+          tabs alone: it restores instant primary navigation for 143 KB a
+          session, and leaves the footer, the location cards and the menu's
+          item links — the ones that scale with how far the page is read —
+          still off. */}
       <nav className="cne-tabs" aria-label="Primary">
         {TABS.map((t) => (
           <Link
+            prefetch={false}
             key={t.href}
             href={t.href}
             className="cne-tab"

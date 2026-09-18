@@ -41,7 +41,7 @@ export default function MenuPage() {
         <ul className="cne-menu-named">
           {featuredItems.map((i) => (
             <li key={i.id}>
-              <Link href={`/menu/${i.id}/`}>
+              <Link prefetch={false} href={`/menu/${i.id}/`}>
                 <span className="n">{i.name}</span>
                 <span className="p">{formatPrice(i.price)} &rsaquo;</span>
               </Link>

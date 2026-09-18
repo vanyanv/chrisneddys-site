@@ -52,7 +52,7 @@ export function Hero() {
             >
               ORDER ONLINE →
             </a>
-            <Link className="cne-big is-secondary" href="/menu/">
+            <Link prefetch={false} className="cne-big is-secondary" href="/menu/">
               <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
             </Link>
           </div>

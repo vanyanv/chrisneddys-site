@@ -93,7 +93,11 @@ export default function OrderPage() {
         <p className="cne-lede">
           Online ordering runs through our Otter storefront at the Hollywood location, 5539 W.
           Sunset Blvd. Prices there are the pickup prices you see on{" "}
-          <Link href="/menu/" style={{ textDecoration: "underline", color: "inherit" }}>
+          <Link
+            prefetch={false}
+            href="/menu/"
+            style={{ textDecoration: "underline", color: "inherit" }}
+          >
             our menu
           </Link>{" "}
           — sliders from {formatPrice(SLIDER_PRICE)}, combos from {formatPrice(COMBO_FROM_PRICE)},
@@ -136,7 +140,11 @@ export default function OrderPage() {
                 // details link still runs either way.
                 <>
                   {!loc.isOpen && <div className="cne-loc-note">Opening date to be announced.</div>}
-                  <Link href={`/locations/${slugFor(loc)}/`} className="cne-loc-note cne-loc-more">
+                  <Link
+                    prefetch={false}
+                    href={`/locations/${slugFor(loc)}/`}
+                    className="cne-loc-note cne-loc-more"
+                  >
                     {loc.neighbourhood} hours &amp; directions &rarr;
                   </Link>
                 </>
@@ -172,7 +180,11 @@ export default function OrderPage() {
         <p className="cne-lede">
           Office lunches and events run through {cateringPlatform.name}. For anything it does not
           cover — a private event, a press or partnership question — the{" "}
-          <Link href="/contact/" style={{ textDecoration: "underline", color: "inherit" }}>
+          <Link
+            prefetch={false}
+            href="/contact/"
+            style={{ textDecoration: "underline", color: "inherit" }}
+          >
             contact page
           </Link>{" "}
           reaches a real person.

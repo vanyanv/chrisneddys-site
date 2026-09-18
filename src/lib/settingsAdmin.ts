@@ -22,6 +22,7 @@ import { listPublishedProducts } from "@/lib/catalog";
 import {
   getStoreSettings,
   updateStoreSettings,
+  STORE_SETTINGS_TAG,
   type StoreSettings,
   type StoreSettingsPatch,
   type UpdateStoreSettingsResult,
@@ -83,6 +84,7 @@ export async function saveStoreSettings(
   if (!isTestEnv()) {
     after(async () => {
       revalidateTag("catalogue");
+      revalidateTag(STORE_SETTINGS_TAG);
       revalidatePath("/shop/");
       revalidatePath("/returns/");
       revalidatePath("/terms/");

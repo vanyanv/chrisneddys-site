@@ -23,6 +23,7 @@ import {
   quoteCart,
   releaseExpiredReservations,
   releaseOrder,
+  reviveStoreSettings,
   updateStoreSettings,
 } from "@/lib/orders";
 
@@ -560,5 +561,33 @@ describe("plain-quantity product", () => {
       fulfilment: "ship",
     });
     expect(second).toEqual({ code: "insufficient_stock", slug: draft.slug });
+  });
+});
+
+// `getPublicStoreSettings` serves the storefront's settings out of
+// `unstable_cache`, which stores what it holds as JSON — so `updatedAt`
+// comes back out of it as a string, not the `Date` the row type promises.
+// `/returns/` and `/terms/` stamp their "last updated" line by calling
+// `updatedAt.toISOString()`, and a string has no such method: without the
+// revival below, both pages throw on every cached render.
+describe("reviveStoreSettings", () => {
+  it("restores updatedAt as a Date after the round trip through JSON the cache does", async () => {
+    const fresh = await getStoreSettings();
+    expect(fresh.updatedAt).toBeInstanceOf(Date);
+
+    const throughCache = JSON.parse(JSON.stringify(fresh));
+    expect(typeof throughCache.updatedAt).toBe("string");
+
+    const revived = reviveStoreSettings(throughCache);
+    expect(revived.updatedAt).toBeInstanceOf(Date);
+    expect(revived.updatedAt.toISOString()).toBe(fresh.updatedAt.toISOString());
+    // Every other field survives untouched.
+    expect(revived.storeName).toBe(fresh.storeName);
+    expect(revived.supportEmail).toBe(fresh.supportEmail);
+  });
+
+  it("leaves an already-revived row alone, so revival is safe to repeat", () => {
+    const row = { updatedAt: new Date("2026-01-02T03:04:05.000Z") } as never;
+    expect(reviveStoreSettings(row).updatedAt.toISOString()).toBe("2026-01-02T03:04:05.000Z");
   });
 });

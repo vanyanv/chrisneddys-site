@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { getEditionSizes, getOrderBySessionId, getStoreSettings } from "@/lib/orders";
+import { getEditionSizes, getOrderBySessionId, getPublicStoreSettings } from "@/lib/orders";
 import { formatPrice } from "@/lib/otter";
 import { canShowFullOrderDetails } from "@/lib/orderVisibility";
 import { ClearBagOnce } from "@/components/shop/ClearBagOnce";
@@ -135,7 +135,7 @@ export default async function ThanksPage({
 
   const [sizes, settings] = await Promise.all([
     getEditionSizes(order.items.map((i) => i.variantId)),
-    getStoreSettings(),
+    getPublicStoreSettings(),
   ]);
 
   const single = order.items.length === 1 ? order.items[0] : undefined;

@@ -9,7 +9,7 @@ import {
   inventoryLine,
   listPublishedProducts,
 } from "@/lib/catalog";
-import { getStoreSettings } from "@/lib/orders";
+import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, pauseNotice, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
@@ -78,15 +78,21 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  */
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { product: slug } = await params;
-  const product = await getProductBySlug(slug);
+  // All three reads key off the slug alone, so none of them has to wait on
+  // another — one hop for the page instead of three. A slug that turns out
+  // not to exist pays for two reads it doesn't use, which is a 404 nobody is
+  // waiting on, not the path that matters.
+  const [product, inventory, settings] = await Promise.all([
+    getProductBySlug(slug),
+    getInventory(slug),
+    getPublicStoreSettings(),
+  ]);
   if (!product) notFound();
 
-  const inventory = await getInventory(slug);
   const line = inventoryLine(inventory, product.eyebrow);
   const soldOut = line?.soldOut ?? false;
   const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
   const maxQty = inventory?.tracked ? Math.min(perOrderLimit, inventory.available) : perOrderLimit;
-  const settings = await getStoreSettings();
   const note = shippingReturnsNote(settings);
   const flag = editionFlag(inventory?.editionSize ?? null);
   const shopOpen = isShopOpenFor(settings);

@@ -16,7 +16,8 @@
  * `getDb()`) so tests can pass a PGlite instance instead of talking to Neon.
  */
 import { and, asc, desc, eq, gt, inArray, lt, sql } from "drizzle-orm";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { cache } from "react";
 import { getDb, type Db } from "@/db/client";
 import {
   editions,
@@ -103,6 +104,56 @@ export async function getStoreSettings(db?: Db): Promise<StoreSettings> {
   if (!row) throw new Error("store_settings default row missing and could not be created");
   return row;
 }
+
+/** Matches the `revalidate = 60` the storefront pages that read these
+ * settings already declare, and `src/lib/catalog.ts`'s own window. */
+const REVALIDATE_SECONDS = 60;
+
+/** Tag for the cached storefront settings read below. Every write to
+ * `store_settings` has to clear it — see `saveStoreSettings`. */
+export const STORE_SETTINGS_TAG = "store-settings";
+
+const cachedStoreSettings = unstable_cache(() => getStoreSettings(), ["store-settings"], {
+  tags: [STORE_SETTINGS_TAG],
+  revalidate: REVALIDATE_SECONDS,
+});
+
+/**
+ * `unstable_cache` stores what it caches as JSON, so a `timestamp` column
+ * comes back out of it as an ISO string rather than the `Date` the row type
+ * promises. `/returns/` and `/terms/` both call `updatedAt.toISOString()` to
+ * stamp their "last updated" line, and a string has no such method — this is
+ * what a cached settings read has to put back before handing the row on.
+ */
+export function reviveStoreSettings(row: StoreSettings): StoreSettings {
+  return { ...row, updatedAt: new Date(row.updatedAt) };
+}
+
+/**
+ * The storefront's read of `store_settings` — the store name, the shipping
+ * and returns copy, and whether the shop is open.
+ *
+ * `getStoreSettings` above goes to the database every single time it is
+ * called, which is right for checkout, the Stripe webhook and `/admin` (all
+ * of which must never act on a stale row) but wrong for rendering a page:
+ * `src/app/(site)/layout.tsx` calls it on *every* storefront page and the
+ * page underneath then calls it again, so a page whose product data was
+ * entirely cached still made two database round trips before it could
+ * render. This is that same read, cached for a minute the way
+ * `src/lib/catalog.ts` caches the catalogue, and wrapped in React's `cache`
+ * so the layout and the page share one call within a single render instead
+ * of two.
+ *
+ * Owners never wait the minute out: `saveStoreSettings` clears
+ * `STORE_SETTINGS_TAG` on every save, so a change is live on the storefront
+ * as soon as it is saved. Anything that must read the row as it stands right
+ * now — checkout's open/paused gate, the admin's own screens — keeps calling
+ * `getStoreSettings` directly.
+ */
+export const getPublicStoreSettings = cache(async (): Promise<StoreSettings> => {
+  if (isTestEnv()) return getStoreSettings();
+  return reviveStoreSettings(await cachedStoreSettings());
+});
 
 export type StoreSettingsPatch = Partial<{
   storeName: string;

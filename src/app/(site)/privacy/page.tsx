@@ -38,8 +38,8 @@ export const revalidate = 60;
  *   Better Auth (`src/lib/betterAuth.ts`) — which sets the one first-party
  *   session cookie this site issues. There is no customer account or
  *   password.
- * - The analytics are `Analytics.tsx` (GA4) and the Plausible tag in
- *   `layout.tsx`; the event list is the `TrackEvent` union in `lib/track.ts`.
+ * - The analytics are `Analytics.tsx` (GA4) and nothing else; the event list
+ *   is the `TrackEvent` union in `lib/track.ts`.
  * - Before checkout, the only thing written to the browser is `cne.bag.v1`
  *   (`src/components/shop/bagStore.ts`), in `localStorage`.
  *
@@ -81,7 +81,7 @@ export default async function PrivacyPage() {
           <p>
             Placing an order gives us your name, email, shipping address and what you bought; your
             card details go straight to Stripe and never reach our servers. Two contact forms send
-            us what you type into them. Two analytics tools count pages and taps. A hat in the shop
+            us what you type into them. One analytics tool counts pages and taps. A hat in the shop
             bag stays in your own browser until you check out. There is no customer account, and we
             don&rsquo;t sell any of it.
           </p>
@@ -164,7 +164,7 @@ export default async function PrivacyPage() {
         <section className="cne-lg-sec" aria-labelledby="p-auto">
           <h2 id="p-auto">What gets measured automatically</h2>
           <p>
-            We use two analytics tools to understand which pages people read and which buttons they
+            We use one analytics tool to understand which pages people read and which buttons they
             press — how many, not who.
           </p>
           <ul>
@@ -173,13 +173,9 @@ export default async function PrivacyPage() {
               visit, roughly where in the world you are, and the kind of device and browser you
               used.
             </li>
-            <li>
-              <strong>Plausible Analytics</strong>, which is cookieless and does not build a profile
-              across sites.
-            </li>
           </ul>
           <p>
-            Alongside page views, both receive a named event when you do one of a fixed set of
+            Alongside page views, it receives a named event when you do one of a fixed set of
             things: tap an order, delivery, phone or directions link; open an item on the menu; view
             a product, add one to the bag, or open the bag; send the contact form; or join an
             opening list. An event carries what was tapped and which part of the page it was tapped

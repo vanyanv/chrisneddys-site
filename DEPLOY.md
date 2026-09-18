@@ -52,11 +52,11 @@ base-uri 'self';
 object-src 'none';
 frame-ancestors 'none';
 form-action 'self';
-script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io;
+script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
 style-src 'self' 'unsafe-inline';
 img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com;
 font-src 'self';
-connect-src 'self' https://api.web3forms.com https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com;
+connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com;
 upgrade-insecure-requests
 ```
 
@@ -65,11 +65,11 @@ Written as one line, no newlines, in whichever config the host reads.
 Every origin in it was read off a built `out/`, not assumed:
 
 - **`script-src`** — `googletagmanager.com` is gtag.js, appended by the snippet in
-  `Analytics.tsx`; `plausible.io` is the outbound-links script in `layout.tsx`.
+  `Analytics.tsx`. It is the only third-party script origin the site needs.
 - **`connect-src`** — `api.web3forms.com` is where both forms POST. The
   `google-analytics.com` wildcards cover GA4's regional collection endpoints
   (`region1.`, `region2.`, …), which are not optional and are not on the bare
-  hostname. `plausible.io` also takes the event beacons, not just the script.
+  hostname.
 - **`font-src 'self'`** — `next/font` downloads Google's fonts at build time and
   serves them from `/_next/static/media/`. There are 14 `.woff2` files in `out/`
   and no request to `fonts.gstatic.com`, so the font origins are deliberately
@@ -575,15 +575,10 @@ being counted.
 
 Ordered so that nothing is measured after the fact.
 
-- [ ] Confirm the Plausible property name matches `data-domain="chrisneddys.com"`
-      exactly. If it is registered as `www.chrisneddys.com`, every pageview is
-      discarded silently.
 - [ ] Walk the site on a phone with `?ga_debug=1` and confirm the six events land
       in GA4 DebugView: `order_click`, `delivery_click`, `call_click`,
       `directions_click`, `menu_item_open`, `contact_submit`.
 - [ ] In GA4, mark `order_click`, `delivery_click` and `call_click` as key events.
-      In Plausible, create goals with the same names — custom events do not appear
-      until a goal exists.
 - [ ] `pnpm check:links`, and open the two bot-blocked delivery URLs by hand.
 - [ ] Run the four `curl` checks in **S3 + CloudFront → Verify**: apex → www,
       `/menu` → `/menu/`, `/index.html` → `/`, and an unknown path → `404`.

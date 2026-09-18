@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
-import Script from "next/script";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
 import { SiteHeader } from "@/components/counter/SiteHeader";
@@ -171,12 +170,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             no DOM at all until it is opened. */}
         <BagDrawer shopOpen={shopOpen} pickupEnabled={pickupEnabled} shippingNote={shippingNote} />
         <OrderDock />
-        <Script
-          defer
-          data-domain="chrisneddys.com"
-          src="https://plausible.io/js/script.outbound-links.js"
-          strategy="lazyOnload"
-        />
       </body>
     </html>
   );

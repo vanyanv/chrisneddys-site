@@ -25,9 +25,11 @@
  * site without the flag becoming a way to send hits from anywhere — or, worse,
  * a way to have production traffic filtered out as developer traffic.
  *
- * This sits alongside Plausible rather than replacing it — Plausible already
- * tracks outbound clicks, which is how "did someone actually go through to
- * Otter" gets measured.
+ * This is now the site's only analytics tag. Outbound clicks — "did someone
+ * actually go through to Otter" — are measured two ways: GA4's own enhanced
+ * measurement of outbound links, and the named `order_click`/`delivery_click`
+ * events `TrackEvents.tsx` sends, which additionally say which surface the
+ * click came from.
  */
 import { shouldTrack } from "@/lib/analytics";
 

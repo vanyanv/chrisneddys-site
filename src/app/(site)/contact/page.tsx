@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@/styles/check-form.css";
+import "@/styles/contact.css";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { sharedFaq } from "@/data/faq";

@@ -1,0 +1,53 @@
+/**
+ * The live inventory meter — /shop/ and /shop/[product]/.
+ *
+ * Two pages draw the same "3 left of 40" readout, so it is its own file rather
+ * than a copy in each. Only rendered when `catalog.ts`'s `getInventory`
+ * reports a real, tracked count — the fallback catalogue never reaches this
+ * markup at all.
+ */
+
+.cne-inv {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cne-inv-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--a-fg);
+}
+
+.cne-inv-bar {
+  width: 100%;
+  max-width: 220px;
+  height: 6px;
+  border: 2px solid var(--a-ink);
+  background: var(--a-cream);
+  overflow: hidden;
+}
+
+.cne-inv-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--a-yel);
+}
+
+.cne-inv.is-soldout .cne-inv-text {
+  color: var(--a-red-cta);
+}
+
+/* Smaller cut for the shop index card, under the price rather than the buy
+   row — same information, less room. */
+.cne-inv.is-sm .cne-inv-text {
+  font-size: 9.5px;
+}
+
+.cne-inv.is-sm .cne-inv-bar {
+  max-width: 160px;
+  height: 5px;
+}

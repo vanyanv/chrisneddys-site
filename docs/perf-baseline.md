@@ -8,12 +8,18 @@ Commit measured: `320e4fc` (merge of PR #52), clean tree, no app code changed.
 ## How these were measured
 
 - `pnpm build` then `pnpm start` (production Next.js server) on `localhost:3100`.
-- Lighthouse 12, performance category only, headless Chromium 1194.
+- Lighthouse **12.8.2**, performance category only, driving headless
+  **Chromium 141.0.7390.37** (the Playwright `chromium-1194` build at
+  `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`).
 - Four pages: `/`, `/menu/`, `/locations/`, `/shop/foam-trucker-blue/`.
-- Two profiles per page: Lighthouse **mobile** default (simulated Slow 4G,
-  Moto G Power class CPU throttling) and the **desktop** preset.
+- Two profiles per page: Lighthouse **mobile** default and the **desktop**
+  preset. The mobile profile simulates 150 ms RTT at 1638 kbps with a 4x CPU
+  slowdown, on a 412 x 823 viewport at a 1.75x device pixel ratio.
 - Three runs per page per profile, 24 runs total. The figures below are the
   **median** of the three.
+- Host CPU benchmark index at the time of the run: 2547. A materially
+  different index on a later run means the CPU-bound numbers are not directly
+  comparable.
 
 Caveat worth keeping in mind: this is a local server with no CDN and no real
 network in front of it, so treat the absolute numbers as a yardstick for
@@ -129,9 +135,10 @@ other page — and 688 KB of that is images. Nine gallery images download at ful
 720 px width even though eight of them render as 120 px thumbnails.
 
 The cause is a gap in the `srcSet`: each gallery image offers only a 200 w thumb
-and the 720 w original. A 120 px thumbnail on a phone with a 2.6x screen needs
-about 315 px, the 200 w file is too small, so the browser falls back to the
-720 w original every time. Lighthouse puts the saving at 595 KB. Next.js image
+and the 720 w original. At the mobile profile's 1.75x device pixel ratio a
+120 px thumbnail needs about 210 px, the 200 w file is just short of that, so
+the browser falls back to the 720 w original every time. Real phones commonly
+run at 2x or 3x, where the gap is wider still. Lighthouse puts the saving at 595 KB. Next.js image
 optimisation is off (`images: { unoptimized: true }` in `next.config.mjs`), so
 nothing fills that gap automatically.
 
@@ -173,12 +180,22 @@ larger than the page's own scripts, images and document combined.
 
 ## Reproducing this
 
-```
+```shell
 pnpm install && pnpm build
 PORT=3100 pnpm start
-CHROME_PATH=/path/to/chrome npx lighthouse http://localhost:3100/menu/ \
+
+# Pinned deliberately: an unpinned `npx lighthouse` will drift to a newer
+# version whose scoring curve is not comparable with the numbers above.
+npx --yes lighthouse@12.8.2 http://localhost:3100/menu/ \
   --only-categories=performance --output=json --output-path=out.json \
   --chrome-flags="--headless=new --no-sandbox"
 ```
+
+Lighthouse finds Chromium through `CHROME_PATH`; point it at the same binary
+named above, or at any Chromium of a comparable major version, and say which
+one you used when you record new numbers. Lighthouse is deliberately not a
+`devDependency` — it is a measurement tool run by hand, not part of
+`pnpm install`, `pnpm test` or the build, and pinning it at the call site
+keeps it out of everyone's install.
 
 Add `--preset=desktop` for the desktop profile. Take the median of three runs.

@@ -301,11 +301,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const cert = product.authenticity.certificate;
                     const certFull = cert.url ?? `${product.photoDir}/${cert.src}.webp`;
                     const certThumb = cert.thumbUrl ?? `${product.photoDir}/${cert.src}-thumb.webp`;
+                    // Same three cuts as the gallery (see `ProductShot`): the
+                    // 400px file only exists for in-repo photography, so an
+                    // uploaded image keeps the original pair.
+                    const certSrcSet =
+                      cert.url || cert.thumbUrl
+                        ? `${certThumb} 200w, ${certFull} 720w`
+                        : `${certThumb} 200w, ${product.photoDir}/${cert.src}-mid.webp 400w, ${certFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-cert"
                         src={certFull}
-                        srcSet={`${certThumb} 200w, ${certFull} 720w`}
+                        srcSet={certSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={cert.width}
                         height={cert.height}
@@ -321,11 +328,15 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                     const stickerFull = sticker.url ?? `${product.photoDir}/${sticker.src}.webp`;
                     const stickerThumb =
                       sticker.thumbUrl ?? `${product.photoDir}/${sticker.src}-thumb.webp`;
+                    const stickerSrcSet =
+                      sticker.url || sticker.thumbUrl
+                        ? `${stickerThumb} 200w, ${stickerFull} 720w`
+                        : `${stickerThumb} 200w, ${product.photoDir}/${sticker.src}-mid.webp 400w, ${stickerFull} 720w`;
                     return (
                       <img
                         className="cne-auth-img is-sticker"
                         src={stickerFull}
-                        srcSet={`${stickerThumb} 200w, ${stickerFull} 720w`}
+                        srcSet={stickerSrcSet}
                         sizes="(min-width: 901px) 280px, 45vw"
                         width={sticker.width}
                         height={sticker.height}

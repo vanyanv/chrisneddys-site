@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { TrackEvents } from "@/components/shared/TrackEvents";
+import { PrefetchNav } from "@/components/counter/PrefetchNav";
 import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
 import { getStoreSettings } from "@/lib/orders";
 import { shippingReturnsNote } from "@/lib/shopCopy";
@@ -170,6 +171,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             no DOM at all until it is opened. */}
         <BagDrawer shopOpen={shopOpen} pickupEnabled={pickupEnabled} shippingNote={shippingNote} />
         <OrderDock />
+        {/* Warms the six header routes once this page has loaded and the
+            browser is idle. Renders nothing. */}
+        <PrefetchNav />
       </body>
     </html>
   );

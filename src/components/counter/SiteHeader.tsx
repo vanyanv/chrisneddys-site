@@ -10,7 +10,12 @@ import { orderUrl } from "@/lib/otter";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 import { BagButton } from "@/components/shop/BagButton";
 
-const TABS = [
+/**
+ * The six primary destinations. Exported because `PrefetchNav` warms exactly
+ * this set once the page is idle — one list, so the thing that is prefetched
+ * and the thing that is shown cannot drift apart.
+ */
+export const TABS = [
   { href: "/", label: "HOME" },
   { href: "/menu/", label: "MENU" },
   { href: "/locations/", label: "LOCATIONS" },

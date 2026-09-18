@@ -64,13 +64,13 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
           fries, cheese fries, loaded fries, shakes, and the Secret Menu.
         </p>
         <div className="cne-loc-btns" style={{ maxWidth: 420, flexWrap: "wrap" }}>
-          <Link className="cne-mini is-red" href="/menu/">
+          <Link prefetch={false} className="cne-mini is-red" href="/menu/">
             SEE THE MENU
           </Link>
-          <Link className="cne-mini is-plain" href="/order/">
+          <Link prefetch={false} className="cne-mini is-plain" href="/order/">
             ORDER ONLINE
           </Link>
-          <Link className="cne-mini is-plain" href="/locations/">
+          <Link prefetch={false} className="cne-mini is-plain" href="/locations/">
             ALL LOCATIONS
           </Link>
         </div>
@@ -81,6 +81,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         <h2>Our other locations.</h2>
         {others.map((o) => (
           <Link
+            prefetch={false}
             key={o.id}
             href={`/locations/${slugFor(o)}/`}
             className={`cne-loc ${o.isOpen ? "is-live" : "is-soon"}`}

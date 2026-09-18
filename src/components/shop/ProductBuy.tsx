@@ -159,7 +159,7 @@ export function BuyRow() {
         {/* The one working link on a page whose own button is dead
             (ShopStates.dc.html's "run finished" state, issue #50): the run
             is genuinely gone, but the shop is not. */}
-        <Link href="/shop/" className="cne-btn-secondary">
+        <Link prefetch={false} href="/shop/" className="cne-btn-secondary">
           See what else is in the shop
         </Link>
       </>
@@ -224,7 +224,7 @@ export function StickyBuy() {
   if (soldOut) {
     return (
       <div className="cne-pdp-sticky">
-        <Link href="/shop/" className="cne-btn-secondary">
+        <Link prefetch={false} href="/shop/" className="cne-btn-secondary">
           See what else is in the shop
         </Link>
       </div>

@@ -80,7 +80,12 @@ export default async function ShopPage() {
             const flag = editionFlag(inventories[i]?.editionSize ?? null);
 
             return (
-              <Link key={product.slug} href={`/shop/${product.slug}/`} className="cne-drop">
+              <Link
+                prefetch={false}
+                key={product.slug}
+                href={`/shop/${product.slug}/`}
+                className="cne-drop"
+              >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
                 <div className="cne-drop-art">
                   <ProductShot
@@ -141,11 +146,17 @@ export default async function ShopPage() {
           <>
             <h2>Shipping &amp; returns.</h2>
             <p className="cne-shop-lede">
-              {note.line} See <Link href="/returns/">returns</Link>
+              {note.line} See{" "}
+              <Link prefetch={false} href="/returns/">
+                returns
+              </Link>
               {note.hasTerms && (
                 <>
                   {" "}
-                  and <Link href="/terms/">terms</Link>
+                  and{" "}
+                  <Link prefetch={false} href="/terms/">
+                    terms
+                  </Link>
                 </>
               )}
               .
@@ -155,7 +166,10 @@ export default async function ShopPage() {
           <>
             <h2>Still being sorted.</h2>
             <p className="cne-shop-lede">
-              {TERMS_PENDING} Want to know when it opens? <Link href="/contact/">Get in touch</Link>{" "}
+              {TERMS_PENDING} Want to know when it opens?{" "}
+              <Link prefetch={false} href="/contact/">
+                Get in touch
+              </Link>{" "}
               or call {brand.phone}.
             </p>
           </>

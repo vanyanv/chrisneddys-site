@@ -31,7 +31,10 @@ export function ProductShot({
 }: {
   product: MerchProduct;
   view: MerchView | undefined;
-  /** Passed straight to the <img>; the two cuts are 200px and 720px. */
+  /**
+   * Passed straight to the <img>. The cuts are 200px and 720px, plus a 400px
+   * one offered to the thumbnail strip — see `srcSet` below.
+   */
   sizes: string;
   /** The product page's main shot is the largest paint on that route. */
   priority?: boolean;
@@ -52,6 +55,22 @@ export function ProductShot({
     const base = `${product.photoDir ?? ""}/${src}`;
     const fullSrc = url ?? `${base}.webp`;
     const thumbSrc = thumbUrl ?? `${base}-thumb.webp`;
+    // The 400px cut sits between the thumbnail and the full shot, and only the
+    // thumbnail strip offers it. A tile there is drawn 50-175px wide, which on
+    // a 2x or 3x screen — nearly every phone, and most laptops — needs more
+    // than 200 source pixels, so with only 200 and 720 to choose from the
+    // browser took the 720 for all eight tiles and pulled the entire gallery
+    // down at full size. The main shot deliberately keeps the original pair:
+    // it is drawn 284-778px wide, where 720 is the right file at any density,
+    // and leaving its candidates alone means the photograph a customer
+    // actually studies is the same file it has always been.
+    //
+    // Only photography built by `scripts/build-shop-images.mjs` has the middle
+    // cut; an image uploaded through /admin is two cuts and nothing else.
+    const midded = thumb && !url && !thumbUrl;
+    const srcSet = midded
+      ? `${thumbSrc} 200w, ${base}-mid.webp 400w, ${fullSrc} 720w`
+      : `${thumbSrc} 200w, ${fullSrc} 720w`;
 
     return (
       <div
@@ -60,7 +79,7 @@ export function ProductShot({
       >
         <img
           src={fullSrc}
-          srcSet={`${thumbSrc} 200w, ${fullSrc} 720w`}
+          srcSet={srcSet}
           sizes={sizes}
           alt={view.caption}
           width={width}

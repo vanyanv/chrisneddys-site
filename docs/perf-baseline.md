@@ -20,12 +20,23 @@ Commit measured: `320e4fc` (merge of PR #52), clean tree, no app code changed.
 - Host CPU benchmark index at the time of the run: 2547. A materially
   different index on a later run means the CPU-bound numbers are not directly
   comparable.
+- **Cross-checked in a real browser.** Every page was also driven through
+  Playwright against the same Chromium with the throttling actually applied
+  over CDP (`Network.emulateNetworkConditions` at 150 ms / 1638 kbps,
+  `Emulation.setCPUThrottlingRate` at 4), recording `largest-contentful-paint`
+  entries from a `PerformanceObserver`. Three runs per page.
 
-Caveat worth keeping in mind: this is a local server with no CDN and no real
-network in front of it, so treat the absolute numbers as a yardstick for
-comparison rather than as what a shopper in Los Angeles sees. The mobile
-profile's throttling is simulated, which is why every page shows the same
-~457 ms time to first byte even though the server itself answered in 10–30 ms.
+Two caveats, both load-bearing:
+
+1. This is a local server with no CDN and no real network in front of it, so
+   treat the absolute numbers as a yardstick for comparison rather than as what
+   a shopper in Los Angeles sees. The simulated profile is why every page shows
+   the same ~457 ms time to first byte though the server answered in 10–30 ms.
+2. Lighthouse's mobile profile **simulates** rather than applies its throttling,
+   and on this site it overstates LCP by roughly 2x. The real-browser numbers
+   are the ones to reason about. See "LCP: what Lighthouse modelled, and what a
+   real browser does" below — this distinction already produced one wrong
+   conclusion, recorded there.
 
 ## Page scores and metrics
 
@@ -49,22 +60,62 @@ profile's throttling is simulated, which is why every page shows the same
 
 Desktop is healthy everywhere. All of the headroom is on mobile.
 
-## LCP breakdown (mobile, per page)
+## LCP: what Lighthouse modelled, and what a real browser does
 
-Lighthouse splits LCP into four phases. On every page the overwhelming
-majority sits in **render delay** — the resource is already in the browser and
-nothing is drawing it.
+**Read this section before acting on the LCP numbers above.** Lighthouse's
+mobile profile does not actually throttle the page; it records an unthrottled
+trace and then _models_ what a slow connection would have done (Lantern
+simulation). On this site that model is roughly 2x pessimistic about LCP, and
+it attributes the difference to a phase that does not exist in a real browser.
 
-| Page                       | LCP element                 | TTFB   | Load delay | Load time | **Render delay**  |
-| -------------------------- | --------------------------- | ------ | ---------- | --------- | ----------------- |
-| `/`                        | `<img>` hero-still-760.webp | 459 ms | 106 ms     | 279 ms    | **2562 ms (75%)** |
-| `/menu/`                   | `<span class="d">` (text)   | 457 ms | 0 ms       | 0 ms      | **2928 ms (86%)** |
-| `/locations/`              | `<img>` map-base.svg        | 457 ms | 362 ms     | 387 ms    | **2137 ms (64%)** |
-| `/shop/foam-trucker-blue/` | `<h1>` (text)               | 458 ms | 0 ms       | 0 ms      | **3011 ms (87%)** |
+Lighthouse's phase split says the overwhelming majority of LCP is **render
+delay** — the resource is in the browser and nothing is drawing it:
 
-Note the Speed Index / LCP gap: the page is visually settled at ~1.2 s but LCP
-does not fire until ~3.4 s. That gap is the signature of the reveal animation
-described below.
+| Page                       | LCP element                 | TTFB   | Load delay | Load time | Render delay  |
+| -------------------------- | --------------------------- | ------ | ---------- | --------- | ------------- |
+| `/`                        | `<img>` hero-still-760.webp | 459 ms | 106 ms     | 279 ms    | 2562 ms (75%) |
+| `/menu/`                   | `<span class="d">` (text)   | 457 ms | 0 ms       | 0 ms      | 2928 ms (86%) |
+| `/locations/`              | `<img>` map-base.svg        | 457 ms | 362 ms     | 387 ms    | 2137 ms (64%) |
+| `/shop/foam-trucker-blue/` | `<h1>` (text)               | 458 ms | 0 ms       | 0 ms      | 3011 ms (87%) |
+
+Driving the same build through headless Chromium with the **same conditions
+applied for real** — 150 ms RTT, 1638 kbps and a 4x CPU slowdown set over CDP,
+on the same 412 x 823 viewport at 1.75x — gives a different and much better
+picture. Median of three runs, and the three runs agreed to within 12 ms:
+
+| Page                       | FCP    | LCP         | `load` event | LCP element               |
+| -------------------------- | ------ | ----------- | ------------ | ------------------------- |
+| `/`                        | 564 ms | **1704 ms** | 2596 ms      | `hero-still-760.webp`     |
+| `/menu/`                   | 540 ms | **540 ms**  | 2276 ms      | `<span class="d">` (text) |
+| `/locations/`              | 476 ms | **1256 ms** | 2205 ms      | `map-base.svg`            |
+| `/shop/foam-trucker-blue/` | 532 ms | **1780 ms** | **5298 ms**  | `shop/.../front.webp`     |
+
+There is no long render-delay phase. Every page fires a single LCP entry, with
+no late candidate replacing an earlier one. Where LCP is later than FCP it is
+because an **image** is still arriving: `/menu/`, the one page with no
+above-the-fold image, reports LCP at 540 ms, identical to its FCP.
+
+So treat the simulated LCP column as a pessimistic index that is useful for
+comparing one run against another, and the table immediately above as what a
+shopper on a slow connection actually waits for. The one number that tells the
+real story is `/shop/foam-trucker-blue/`'s `load` event at 5.3 s against
+2.2–2.6 s everywhere else.
+
+### The scroll-reveal is not the problem — it is already handled
+
+An earlier draft of this document named the scroll-reveal animation as the
+biggest cost, on the strength of that render-delay column. That was wrong, and
+it is recorded here so nobody re-opens it.
+
+`.js .cne-rv { opacity: 0 }` (`src/styles/counter.css:1415`) does hide the
+revealed sections, and `RevealRoot` (`src/components/counter/Reveal.tsx`) only
+adds `is-in` after hydration. But `src/app/(site)/layout.tsx` already ships an
+inline `REVEAL_ABOVE_FOLD` script directly after `<main>`, added in `3f18ace`,
+which reveals everything in the initial viewport while the HTML is still
+parsing. Measured: on `/menu/` both above-the-fold `.cne-rv` sections are at
+`opacity: 1` and LCP fires at 540 ms. On `/`, `/locations/` and
+`/shop/foam-trucker-blue/` there are no `.cne-rv` elements above the fold at
+all, so the reveal cannot gate their LCP under any circumstances.
 
 ## Bundle sizes
 
@@ -112,46 +163,52 @@ Bytes actually transferred, mobile, by resource type:
 
 ## The three worst offenders
 
-### 1. The scroll-reveal animation holds back LCP by about 2–3 seconds on every page
+Ranked on the real-browser measurements above, not on the simulated scores.
 
-`src/app/(site)/layout.tsx:152` runs an inline script that puts a `js` class on
-`<html>` straight away. `src/styles/counter.css:1415` then sets
-`.js .cne-rv { opacity: 0 }`, so every section marked `cne-rv` — which is most
-of the page — is invisible from the very first frame. Those sections only
-become visible once React has hydrated and `RevealRoot`
-(`src/components/counter/Reveal.tsx`) runs its effect and adds `is-in`.
-
-The practical effect is that LCP is pinned to "hydration finished", not to
-"content arrived". That is why render delay is 64–87% of LCP on all four
-pages, why LCP is the same ~3.4 s whether the element is an image or a plain
-`<h1>`, and why Speed Index (1.2 s) and LCP (3.4 s) are so far apart. Anyone on
-a slow phone stares at hidden sections for roughly two extra seconds after the
-content has already been delivered.
-
-### 2. The shop product page ships 688 KB of images, mostly at the wrong size
+### 1. The shop product page ships 688 KB of images, mostly at the wrong size
 
 `/shop/foam-trucker-blue/` transfers 1218 KB on mobile — roughly double every
-other page — and 688 KB of that is images. Nine gallery images download at full
-720 px width even though eight of them render as 120 px thumbnails.
+other page — and 688 KB of that is images. It is the only page whose `load`
+event lands at 5.3 s instead of 2.2–2.6 s, and the gap is almost exactly the
+image weight. Nine gallery images download at full 720 px width even though
+eight of them render as 120 px thumbnails.
 
 The cause is a gap in the `srcSet`: each gallery image offers only a 200 w thumb
 and the 720 w original. At the mobile profile's 1.75x device pixel ratio a
 120 px thumbnail needs about 210 px, the 200 w file is just short of that, so
 the browser falls back to the 720 w original every time. Real phones commonly
-run at 2x or 3x, where the gap is wider still. Lighthouse puts the saving at 595 KB. Next.js image
-optimisation is off (`images: { unoptimized: true }` in `next.config.mjs`), so
-nothing fills that gap automatically.
+run at 2x or 3x, where the gap is wider still. Lighthouse puts the saving at
+595 KB. Next.js image optimisation is off (`images: { unoptimized: true }` in
+`next.config.mjs`), so nothing fills that gap automatically.
+
+A single intermediate width in each `srcSet` would take most of those 595 KB
+off the page, and it is the one change on this list with a clearly measurable
+payoff.
+
+### 2. Images are what LCP waits for on every page that has one
+
+`/` reports LCP at 1704 ms and `/locations/` at 1256 ms, and in both cases the
+LCP element is an image still in flight — `hero-still-760.webp` (57 KB
+transferred) and `map-base.svg` (31 KB transferred, 93 KB on disk). `/menu/`,
+which has no above-the-fold image, reports 540 ms. The delta between those is
+the whole of the available LCP win on the storefront.
+
+`map-base.svg` is the softer target of the two: 93 KB of SVG on disk for a
+decorative locator map, served uncompressed by byte count and decoded on the
+main thread.
 
 ### 3. Every page ships ~116 KB of inline CSS and ~145–205 KB of route prefetch that nothing asked for
 
-Two separate costs that together dominate what is left.
+Two separate costs. Neither shows up in LCP; both show up in bytes and in the
+`load` event, and both scale with every page a visitor opens.
 
 `experimental.inlineCss: true` in `next.config.mjs` inlines the stylesheet into
 the HTML document. All four pages carry an identical 116,085 bytes of inline
 `<style>`, which is why each HTML document is 279–320 KB raw (54–60 KB
 compressed). Because it lives in the document it is re-sent on every page view
 and can never be cached, and Lighthouse reckons about 12 KB of it is unused on
-any given page.
+any given page. The trade is deliberate — inlining removes a render-blocking
+request — but it is being paid on every navigation rather than once.
 
 Separately, Next.js `<Link>` prefetch pulls the React payload for five or six
 other routes as soon as the page settles — 28–31 KB each, 143–203 KB per page —
@@ -199,3 +256,24 @@ one you used when you record new numbers. Lighthouse is deliberately not a
 keeps it out of everyone's install.
 
 Add `--preset=desktop` for the desktop profile. Take the median of three runs.
+
+For the real-browser figures, drive the same build with Playwright instead,
+applying the throttling over CDP rather than letting Lighthouse model it:
+
+```js
+const cdp = await ctx.newCDPSession(page);
+await cdp.send("Network.enable");
+await cdp.send("Network.emulateNetworkConditions", {
+  offline: false,
+  latency: 150,
+  downloadThroughput: (1638.4 * 1024) / 8,
+  uploadThroughput: (675 * 1024) / 8,
+});
+await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+```
+
+with the context at `viewport: { width: 412, height: 823 }`,
+`deviceScaleFactor: 1.75`, `isMobile: true`, and an init script registering a
+`PerformanceObserver` on `largest-contentful-paint`. The repo's own
+`@playwright/test` expects a newer Chromium than the one pinned above, so pass
+`executablePath` explicitly rather than running `playwright install`.

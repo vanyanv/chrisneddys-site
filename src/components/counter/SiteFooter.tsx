@@ -20,6 +20,7 @@ const EAT = [
   { href: "/shop/", label: "Shop" },
   { href: "/about/", label: "Our story" },
   { href: "/contact/", label: "Contact" },
+  { href: "/careers/", label: "Careers" },
 ];
 
 const COUNTER_LINKS = [

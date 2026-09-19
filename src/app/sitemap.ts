@@ -28,6 +28,8 @@ const SITE_UPDATED = "2026-09-09";
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
+/** When /careers was added. */
+const CAREERS_ADDED = "2026-09-19";
 
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(menu) as MenuCategoryKey[])
@@ -101,6 +103,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { path: "/about/", priority: 0.5, updated: SITE_UPDATED },
     { path: "/contact/", priority: 0.5, updated: SITE_UPDATED },
+    // A page for people, not customers — never the answer to a search someone
+    // orders from, so it sits with /about/ and /contact/ rather than up with
+    // the menu or the shop.
+    { path: "/careers/", priority: 0.4, updated: CAREERS_ADDED },
     // Listed, but at the floor: it is a page that has to be findable and is
     // never the answer to a search. Its own `lastmod` comes from the policy
     // itself, so a crawler is told the terms moved only when they did.

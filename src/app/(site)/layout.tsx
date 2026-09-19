@@ -146,6 +146,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
+        {/* First focusable element on every page, so a keyboard or
+            screen-reader user can jump past the header and tab strip
+            instead of tabbing through them before reaching content. */}
+        <a href="#main" className="cne-skip-link">
+          Skip to content
+        </a>
         {/* Set before first paint so scroll-reveal sections start hidden and
             animate in. Without it they would flash visible, then hide. */}
         <script

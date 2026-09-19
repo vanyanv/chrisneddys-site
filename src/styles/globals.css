@@ -308,6 +308,26 @@ body {
   border: 0;
 }
 
+/* Off-screen until focused, then a plain, high-contrast bar above everything
+   else — so a keyboard or screen-reader user can jump straight past the
+   header and tab strip instead of tabbing through them on every page. */
+.cne-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 1000;
+  background: var(--color-cne-ink);
+  color: var(--color-cne-cream);
+  padding: 12px 20px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cne-skip-link:focus {
+  top: 0;
+}
+
 /* ---- Locations map -------------------------------------------------------
    Real OpenStreetMap geometry, drawn in brand colours. See src/data/laGeo.ts.
    Everything here is presentational; the geometry itself is in the SVG.

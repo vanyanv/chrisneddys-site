@@ -121,6 +121,15 @@ export default function ContactPage() {
               </details>
             ))}
           </div>
+
+          <div className="cne-ct-card cne-rv">
+            <h2 className="cne-ct-cardh">Accessibility</h2>
+            <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+              If anything on this site is hard to use with a screen reader, keyboard, or other
+              assistive technology, tell us through the form above or at{" "}
+              <a href={`mailto:${brand.email}`}>{brand.email}</a> and we&rsquo;ll fix it.
+            </p>
+          </div>
         </aside>
       </div>
     </>

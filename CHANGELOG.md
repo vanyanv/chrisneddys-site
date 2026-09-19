@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Site: a mistyped or dead link no longer dead-ends. Next only ran the site's branded "not on the menu" 404 for links inside the site itself — a URL that matched no route at all (an old bookmark, a typo, a broken external link) fell through to the framework's own bare, unstyled 404 with no header and no way back. There's now a proper one for that case too ([#70](https://github.com/vanyanv/chrisneddys-site/issues/70))
+- Site: you can now skip past the header straight to the page content with a keyboard, instead of tabbing through the full nav on every single page. The contact page also names how to report an accessibility problem ([#71](https://github.com/vanyanv/chrisneddys-site/issues/71))
+
 ### Added
 
 - Site: a careers page. `/careers/` pitches the business and links straight to the Indeed company page for open roles, pay and how to apply, instead of copying listings here where they'd go stale. Linked from the site footer ([#68](https://github.com/vanyanv/chrisneddys-site/issues/68))

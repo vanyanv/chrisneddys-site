@@ -85,6 +85,13 @@
       "when": 1789580029614,
       "tag": "0011_normal_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789773802376,
+      "tag": "0012_lively_rhodey",
+      "breakpoints": true
     }
   ]
 }

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import "@/styles/check-form.css";
 import "@/styles/shop-order.css";
-import { pageMetadata } from "@/lib/seo";
 import { OrderLookupForm } from "./OrderLookupForm";
 
-const title = "Order status";
-const description =
-  "Look up a Chris N Eddy's merch order by order number and the email used at checkout.";
-
-export const metadata: Metadata = pageMetadata({ title, description, path: "/shop/order/" });
+// A lookup form has nothing unique to index — every visitor sees the same
+// empty form, and the only real content (an order) sits behind the order
+// number and email, exactly like `shop/thanks/` (issue #64).
+export const metadata: Metadata = {
+  title: "Order status",
+  robots: { index: false, follow: false },
+};
 
 /** A lookup form has nothing worth prerendering or caching per visitor —
  * every real answer comes back through the server action, never the initial

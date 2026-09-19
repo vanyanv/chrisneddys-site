@@ -17,6 +17,7 @@ import {
   missingPublishRequirements,
   PUBLISH_REQUIREMENT_MESSAGES,
 } from "@/lib/publishRequirements";
+import { draftStoredSeo } from "@/lib/productSeo";
 import { editions, productImages, products, variants, type AuthenticityFact } from "@/db/schema";
 
 /** `db ?? getDb()` — lets a function join a caller's transaction (pass `tx`)
@@ -112,6 +113,10 @@ export async function createDraft(name: string): Promise<CreateDraftResult> {
       oneSize: true,
       status: "draft",
       position,
+      metaTitle: null,
+      metaKeywords: null,
+      socialImageUrl: null,
+      socialImageAlt: null,
     })
     .returning({ id: products.id, slug: products.slug });
 
@@ -137,6 +142,10 @@ export type ProductPatch = {
   why: string | null;
   authenticityCopy: string | null;
   authenticityFacts: AuthenticityFact[];
+  metaTitle: string | null;
+  metaKeywords: string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
 };
 
 export type UpdateProductResult =
@@ -186,11 +195,64 @@ export async function updateProduct(id: string, patch: ProductPatch): Promise<Up
       why: patch.why,
       authenticityCopy: patch.authenticityCopy,
       authenticityFacts: patch.authenticityFacts.length > 0 ? patch.authenticityFacts : null,
+      metaTitle: patch.metaTitle,
+      metaKeywords: patch.metaKeywords,
+      socialImageUrl: patch.socialImageUrl,
+      socialImageAlt: patch.socialImageAlt,
       updatedAt: new Date(),
     })
     .where(eq(products.id, id));
 
   return { ok: true, oldSlug: existing.slug, newSlug: slug };
+}
+
+/**
+ * Fills the four search-engine columns with derived copy the moment a
+ * product has a name but has never had any of them written. `createDraft`
+ * lets The Rack's "New product" button create a nameless draft with nothing
+ * to write SEO from (issue #64), so those columns stay empty until the owner
+ * names it — this is what catches that moment. Called after every save that
+ * could be the one that names it (`saveProductAction`,
+ * `updateProductFieldAction` in `actions.ts`); a no-op whenever the product
+ * still has no name, or whenever any of the four columns already holds
+ * anything at all, so an owner's own words (or an earlier run of this same
+ * backfill) are never overwritten. Always uses the synchronous
+ * `draftStoredSeo`, never the model-backed `writeProductSeo` — this runs on every
+ * save, not just creation, so it can't add latency or a network dependency.
+ */
+export async function backfillDraftSeo(id: string): Promise<void> {
+  const db = await getDb();
+  const existing = await db.query.products.findFirst({ where: eq(products.id, id) });
+  if (!existing || !existing.displayName1.trim()) return;
+
+  const alreadyWritten =
+    Boolean(existing.metaTitle?.trim()) ||
+    existing.metaDescription.trim() !== "" ||
+    Boolean(existing.metaKeywords?.trim()) ||
+    Boolean(existing.socialImageAlt?.trim());
+  if (alreadyWritten) return;
+
+  const drafted = draftStoredSeo({
+    slug: existing.slug,
+    name: existing.name,
+    displayName1: existing.displayName1,
+    displayName2: existing.displayName2,
+    price: existing.priceCents / 100,
+    eyebrow: existing.eyebrow,
+    description: existing.description,
+    limitedNote: existing.limitedNote,
+  });
+
+  await db
+    .update(products)
+    .set({
+      metaTitle: drafted.metaTitle,
+      metaDescription: drafted.metaDescription,
+      metaKeywords: drafted.metaKeywords,
+      socialImageAlt: drafted.socialImageAlt,
+      updatedAt: new Date(),
+    })
+    .where(eq(products.id, id));
 }
 
 export type ReorderProductsResult = { ok: true };
@@ -263,6 +325,10 @@ export async function duplicateProduct(id: string): Promise<DuplicateProductResu
       why: existing.why,
       authenticityCopy: existing.authenticityCopy,
       authenticityFacts: existing.authenticityFacts,
+      metaTitle: existing.metaTitle,
+      metaKeywords: existing.metaKeywords,
+      socialImageUrl: existing.socialImageUrl,
+      socialImageAlt: existing.socialImageAlt,
       photoDir: existing.photoDir,
     })
     .returning({ id: products.id, slug: products.slug });
@@ -342,6 +408,10 @@ export type ProductFieldValues = {
   why: string | null;
   authenticityCopy: string | null;
   authenticityFacts: AuthenticityFact[];
+  metaTitle: string | null;
+  metaKeywords: string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
 };
 
 export type ProductField = keyof ProductFieldValues;
@@ -523,6 +593,53 @@ export async function updateProductField<F extends ProductField>(
         .set({ authenticityCopy: text, ...touch })
         .where(eq(products.id, id));
       return { ok: true, previous: existing.authenticityCopy } as UpdateProductFieldResult<F>;
+    }
+    case "metaTitle": {
+      const text = value === null ? null : String(value).trim() || null;
+      if (text && text.length > 60) {
+        return { ok: false, error: "Meta title must be 60 characters or fewer." };
+      }
+      await db
+        .update(products)
+        .set({ metaTitle: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.metaTitle } as UpdateProductFieldResult<F>;
+    }
+    case "metaKeywords": {
+      const text = value === null ? null : String(value).trim() || null;
+      if (text && text.length > 160) {
+        return { ok: false, error: "Meta keywords must be 160 characters or fewer." };
+      }
+      await db
+        .update(products)
+        .set({ metaKeywords: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.metaKeywords } as UpdateProductFieldResult<F>;
+    }
+    case "socialImageUrl": {
+      const text = value === null ? null : String(value).trim() || null;
+      if (text && !(text.startsWith("/") || text.startsWith("https://"))) {
+        return {
+          ok: false,
+          error: `Social image URL must start with "/" or be an https:// URL.`,
+        };
+      }
+      await db
+        .update(products)
+        .set({ socialImageUrl: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.socialImageUrl } as UpdateProductFieldResult<F>;
+    }
+    case "socialImageAlt": {
+      const text = value === null ? null : String(value).trim() || null;
+      if (text && (text.length < 8 || text.length > 125)) {
+        return { ok: false, error: "Alt text must be between 8 and 125 characters." };
+      }
+      await db
+        .update(products)
+        .set({ socialImageAlt: text, ...touch })
+        .where(eq(products.id, id));
+      return { ok: true, previous: existing.socialImageAlt } as UpdateProductFieldResult<F>;
     }
     default: {
       const _exhaustive: never = field;
@@ -1146,6 +1263,10 @@ export type AdminProduct = {
   why: string | null;
   authenticityCopy: string | null;
   authenticityFacts: AuthenticityFact[];
+  metaTitle: string | null;
+  metaKeywords: string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -1203,6 +1324,10 @@ export async function getProductForAdmin(id: string): Promise<AdminProduct | und
     why: row.why,
     authenticityCopy: row.authenticityCopy,
     authenticityFacts: row.authenticityFacts ?? [],
+    metaTitle: row.metaTitle,
+    metaKeywords: row.metaKeywords,
+    socialImageUrl: row.socialImageUrl,
+    socialImageAlt: row.socialImageAlt,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     publishedAt: row.publishedAt,

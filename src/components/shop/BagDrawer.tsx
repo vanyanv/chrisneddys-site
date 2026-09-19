@@ -120,15 +120,22 @@ export function BagDrawer({
     };
   }, [open]);
 
-  const drop = useCallback((slug: string) => {
+  const drop = useCallback((line: BagLine) => {
+    // Reported on the tap, same as `add_to_cart` — the whole line goes,
+    // regardless of the reduced-motion branch below skipping the animation.
+    track("remove_from_cart", {
+      currency: "USD",
+      value: (line.priceCents / 100) * line.qty,
+      items: [lineItem(line)],
+    });
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      removeFromBag(slug);
+      removeFromBag(line.slug);
       return;
     }
-    setRemoving(slug);
+    setRemoving(line.slug);
     window.setTimeout(() => {
-      removeFromBag(slug);
+      removeFromBag(line.slug);
       setRemoving(null);
     }, REMOVE_MS);
   }, []);
@@ -208,7 +215,7 @@ export function BagDrawer({
                 line={line}
                 index={i}
                 removing={removing === line.slug}
-                onRemove={() => drop(line.slug)}
+                onRemove={() => drop(line)}
               />
             ))}
           </ul>
@@ -352,7 +359,20 @@ function BagRow({
           <div className="cne-qty-sm">
             <button
               type="button"
-              onClick={() => setBagQty(line.slug, line.qty - 1)}
+              onClick={() => {
+                const next = line.qty - 1;
+                // The minus button is also the delete once it reaches zero
+                // (`setBagQty` drops the line) — report it the same as the
+                // Remove link, not as a silent decrement to nothing.
+                if (next <= 0) {
+                  track("remove_from_cart", {
+                    currency: "USD",
+                    value: (line.priceCents / 100) * line.qty,
+                    items: [lineItem(line)],
+                  });
+                }
+                setBagQty(line.slug, next);
+              }}
               aria-label={`Decrease ${line.name} quantity`}
             >
               &minus;

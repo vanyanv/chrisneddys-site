@@ -6,6 +6,7 @@ import { requireOwner } from "@/lib/auth";
 import {
   addImage,
   applyProductChanges,
+  backfillDraftSeo,
   createDraft,
   duplicateProduct,
   getProductForAdmin,
@@ -23,7 +24,9 @@ import {
   type ProductChange,
   type ProductField,
   type ProductFieldValues,
+  type ProductPatch,
 } from "@/lib/catalogAdmin";
+import { seoWriterConfigured, writeProductSeo, type WrittenSeo } from "@/lib/seoWriter";
 import type { AuthenticityFact } from "@/db/schema";
 
 /** Every write the storefront could show goes through here: the cached
@@ -37,6 +40,50 @@ function revalidateStorefront(...slugs: string[]): void {
   }
 }
 
+/** The rest of `product` carried through unchanged, with `fields` (the
+ * model's four lines, or the derived fallback's) laid over the search-engine columns
+ * — `updateProduct` takes a full patch, so both `createProductAction` and
+ * `generateProductSeoAction` build one of these rather than writing the four
+ * fields with four separate calls. */
+function seoPatch(product: AdminProduct, fields: WrittenSeo): ProductPatch {
+  return {
+    name: product.name,
+    displayName1: product.displayName1,
+    displayName2: product.displayName2,
+    eyebrow: product.eyebrow,
+    slug: product.slug,
+    priceCents: product.priceCents,
+    perOrderLimit: product.perOrderLimit,
+    oneSize: product.oneSize,
+    description: product.description,
+    metaDescription: fields.metaDescription,
+    limitedNote: product.limitedNote,
+    details: product.details,
+    fit: product.fit,
+    limitedCopy: product.limitedCopy,
+    why: product.why,
+    authenticityCopy: product.authenticityCopy,
+    authenticityFacts: product.authenticityFacts,
+    metaTitle: fields.metaTitle,
+    metaKeywords: fields.metaKeywords,
+    socialImageUrl: product.socialImageUrl,
+    socialImageAlt: fields.socialImageAlt,
+  };
+}
+
+/** Writes and saves a product's four search-engine fields in one go — the
+ * shared core of `createProductAction`'s creation-time write and the
+ * "Write with AI" button's `generateProductSeoAction`. Throws only if the
+ * save itself fails (in practice never, since the slug is unchanged), never
+ * because `writeProductSeo` failed — that function already falls back to
+ * derived copy on its own. */
+async function writeProductSeoFields(product: AdminProduct): Promise<WrittenSeo> {
+  const fields = await writeProductSeo(product);
+  const result = await updateProduct(product.id, seoPatch(product, fields));
+  if (!result.ok) throw new Error(result.error);
+  return fields;
+}
+
 export type CreateDraftState = { error?: string };
 
 export async function createProductAction(
@@ -48,6 +95,18 @@ export async function createProductAction(
   if (!name) return { error: "Give the product a name." };
 
   const { id } = await createDraft(name);
+
+  // A named product should arrive with its search-engine fields already
+  // written (issue #64), but nothing here is allowed to stop the product
+  // being created — worst case the owner sees the same blank fields
+  // creation always had before this existed.
+  try {
+    const product = await getProductForAdmin(id);
+    if (product) await writeProductSeoFields(product);
+  } catch (error) {
+    console.warn("[createProductAction] writing SEO fields failed, continuing", error);
+  }
+
   redirect(`/admin/products/${id}`);
 }
 
@@ -131,6 +190,25 @@ export async function saveProductAction(
   if (metaDescription.length > 155) {
     return { error: "Meta description must be 155 characters or fewer." };
   }
+  const metaTitle = String(formData.get("metaTitle") ?? "").trim();
+  if (metaTitle.length > 60) {
+    return { error: "Meta title must be 60 characters or fewer." };
+  }
+  const metaKeywords = String(formData.get("metaKeywords") ?? "").trim();
+  if (metaKeywords.length > 160) {
+    return { error: "Meta keywords must be 160 characters or fewer." };
+  }
+  const socialImageUrl = String(formData.get("socialImageUrl") ?? "").trim();
+  if (
+    socialImageUrl &&
+    !(socialImageUrl.startsWith("/") || socialImageUrl.startsWith("https://"))
+  ) {
+    return { error: `Social image URL must start with "/" or be an https:// URL.` };
+  }
+  const socialImageAlt = String(formData.get("socialImageAlt") ?? "").trim();
+  if (socialImageAlt && (socialImageAlt.length < 8 || socialImageAlt.length > 125)) {
+    return { error: "Social image alt text must be between 8 and 125 characters." };
+  }
 
   const result = await updateProduct(id, {
     name: String(formData.get("name") ?? "").trim(),
@@ -150,10 +228,15 @@ export async function saveProductAction(
     why: String(formData.get("why") ?? "").trim() || null,
     authenticityCopy: String(formData.get("authenticityCopy") ?? "").trim() || null,
     authenticityFacts: parseAuthenticityFacts(formData),
+    metaTitle: metaTitle || null,
+    metaKeywords: metaKeywords || null,
+    socialImageUrl: socialImageUrl || null,
+    socialImageAlt: socialImageAlt || null,
   });
 
   if (!result.ok) return { error: result.error };
 
+  await backfillDraftSeo(id);
   revalidateStorefront(result.oldSlug, result.newSlug);
 
   return { ok: true, savedAt: new Date().toISOString() };
@@ -284,6 +367,7 @@ export async function updateProductFieldAction<F extends ProductField>(
   await requireOwner();
   const result = await updateProductField(id, field, value);
   if (result.ok) {
+    await backfillDraftSeo(id);
     const product = await getProductForAdmin(id);
     if (product) revalidateStorefront(product.slug);
   }
@@ -400,4 +484,33 @@ export async function addImageAction(input: {
   const product = await getProductForAdmin(input.productId);
   if (product) revalidateStorefront(product.slug);
   return row;
+}
+
+export type GenerateProductSeoResult =
+  | { ok: true; fields: WrittenSeo; source: "ai" | "derived" }
+  | { ok: false; error: string };
+
+/** The "Search engines" accordion's "Write with AI" button: rewrites all
+ * four fields from scratch and saves them in one write. `writeProductSeo`
+ * already falls back to the derived copy when `OPENAI_API_KEY` is unset
+ * or the call fails, so this action's only jobs are to persist whichever
+ * copy it got and tell the caller which one that was, so the toast can say
+ * so honestly. */
+export async function generateProductSeoAction(id: string): Promise<GenerateProductSeoResult> {
+  await requireOwner();
+  const product = await getProductForAdmin(id);
+  if (!product) return { ok: false, error: "Product not found." };
+
+  let fields: WrittenSeo;
+  try {
+    fields = await writeProductSeoFields(product);
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Couldn't save the generated fields.",
+    };
+  }
+
+  revalidateStorefront(product.slug);
+  return { ok: true, fields, source: seoWriterConfigured() ? "ai" : "derived" };
 }

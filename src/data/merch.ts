@@ -155,6 +155,25 @@ export type MerchProduct = {
   /** The small label/value facts under the authenticity paragraph. */
   authenticityFacts?: { label: string; value: string }[];
   /**
+   * The `<title>` tag, when it should read differently from `displayName`.
+   * Search engines truncate around 60 characters, so anything past that is
+   * wasted.
+   */
+  metaTitle?: string;
+  /**
+   * Comma-separated terms for the page's `<meta name="keywords">` — most
+   * search engines ignore this today, but it costs nothing to set and an
+   * owner may still want it filled in.
+   */
+  metaKeywords?: string;
+  /**
+   * The image a share card (Open Graph/Twitter) uses instead of the first
+   * gallery photo — a root-relative path or a full `https://` URL.
+   */
+  socialImageUrl?: string;
+  /** Alt text for `socialImageUrl`, read by anything that can't show the image. */
+  socialImageAlt?: string;
+  /**
    * The certificate and brim-sticker photographs for the authenticity
    * section. Optional at the type level for any product that ships without
    * one; left unset here until the scans exist, the same way an unset
@@ -207,6 +226,7 @@ export const merch: MerchProduct[] = [
     oneSize: true,
     photoDir: "/shop/foam-trucker-blue",
     capColor: "#1f4bd6",
+    socialImageUrl: "/shop/foam-trucker-blue.png",
     views: [
       {
         id: "front",

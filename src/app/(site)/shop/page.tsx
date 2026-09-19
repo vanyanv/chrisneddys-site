@@ -10,15 +10,55 @@ import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { ProductShot } from "@/components/shop/ProductShot";
+import { ShopIndexTracking } from "@/components/shop/ShopIndexTracking";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { shopListLd } from "@/lib/merchLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { productMetadataName } from "@/lib/productSeo";
+import type { MerchProduct } from "@/data/merch";
 
-const title = "Shop — Chris N Eddy's Merch";
-const description =
-  "Merch from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. The Foam Trucker — Blue, $48, Capsule 01, only 50 made.";
+const LEDE = `Merch from ${brand.name}, the smash-burger location on Sunset in Hollywood.`;
 
-export const metadata: Metadata = pageMetadata({ title, description, path: "/shop/" });
+/**
+ * The shop index's title and description, read from the published catalogue
+ * rather than typed once and left behind: the line used to name "The Foam
+ * Trucker — Blue, $48" no matter what was actually for sale, which is exactly
+ * wrong the day a second product ships or the first one sells out for good.
+ */
+function shopIndexMetadata(products: MerchProduct[]): { title: string; description: string } {
+  if (products.length === 0) {
+    return {
+      title: "Shop — Chris N Eddy's Merch",
+      description: `${LEDE} Nothing in the shop right now — check back soon.`,
+    };
+  }
+  if (products.length === 1) {
+    const p = products[0]!;
+    // Not the all-caps display pair the product page's own Bowlby heading
+    // uses — see `productMetadataName`'s comment on why metadata wants the
+    // other order. The parenthetical (the drop's own colour/capsule note) is
+    // dropped the same way a product's own title does: it costs characters
+    // this line doesn't have to spend.
+    const name = productMetadataName(p).replace(/\s*\(.*\)\s*$/, "");
+    return {
+      title: `Shop — ${name}`,
+      description: `${LEDE} ${name}, ${formatPrice(p.price)}. One drop, while it lasts.`,
+    };
+  }
+  return {
+    title: "Shop — Chris N Eddy's Merch",
+    description: `${LEDE} ${products.length} drops in the shop right now.`,
+  };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const products = await listPublishedProducts();
+  const { title, description } = shopIndexMetadata(products);
+  const keywords = Array.from(
+    new Set([brand.name, "merch", ...products.map((p) => productMetadataName(p))]),
+  );
+  return pageMetadata({ title, description, path: "/shop/", keywords });
+}
 
 /** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
  * admin) invalidates it immediately regardless of this window. */
@@ -42,6 +82,7 @@ export default async function ShopPage() {
   // product list rather than after it; the inventory read is the only one
   // that genuinely has to wait, since it needs the slugs. Two hops, not three.
   const [merch, settings] = await Promise.all([listPublishedProducts(), getPublicStoreSettings()]);
+  const { description } = shopIndexMetadata(merch);
   const inventories = await listInventory(merch.map((product) => product.slug));
   const note = shippingReturnsNote(settings);
   // Same "only true once the shop has actually opened" rule the product
@@ -76,7 +117,7 @@ export default async function ShopPage() {
           Small runs from 5539 W. Sunset Blvd. When they’re gone they’re gone.
         </p>
 
-        <div className="cne-drops">
+        <ShopIndexTracking products={merch}>
           {merch.map((product, i) => {
             const line = inventoryLine(inventories[i], product.eyebrow);
             const flag = editionFlag(inventories[i]?.editionSize ?? null);
@@ -87,6 +128,7 @@ export default async function ShopPage() {
                 key={product.slug}
                 href={`/shop/${product.slug}/`}
                 className="cne-drop"
+                data-slug={product.slug}
               >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
                 <div className="cne-drop-art">
@@ -135,7 +177,7 @@ export default async function ShopPage() {
               </Link>
             );
           })}
-        </div>
+        </ShopIndexTracking>
 
         <p className="cne-drop-note">
           <span aria-hidden="true" /> One thing for sale right now. That’s the point.

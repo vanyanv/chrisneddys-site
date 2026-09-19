@@ -3,6 +3,7 @@ import { ID } from "@/lib/seo";
 import { priceString } from "@/lib/otter";
 import { type MerchProduct, type MerchView } from "@/data/merch";
 import type { InventoryStatus } from "@/lib/catalog";
+import { productMetadataName, productSocialImage, resolveProductSeo } from "@/lib/productSeo";
 
 /**
  * Product structured data.
@@ -25,31 +26,26 @@ import type { InventoryStatus } from "@/lib/catalog";
  */
 
 /**
- * The 1200x630 link preview. Always the generated card, never the photograph:
- * a product shot letterboxed into a social slot is a small object in a wide
- * grey field, and the card is built to that ratio on purpose.
- */
-export function socialCard(slug: string): string {
-  return `${brand.siteUrl}/shop/${slug}.png`;
-}
-
-/**
  * What Google is shown for the product.
  *
  * The photograph first, because a merchant listing wants the object and not a
- * poster of it; the generated social card second, since it is the 1200x630 that
- * link previews want and a second image costs nothing here. Preference order
- * for the photograph is the first gallery view's own shot, then the legacy
- * `product.photo` (Otter's asset, for a product built the old way), then
- * nothing — a product with neither falls back to the card alone.
+ * poster of it; the share card second, since it is the 1200x630 that link
+ * previews want and a second image costs nothing here. The card is the
+ * owner's own `socialImageUrl` where one is set, and otherwise the per-product
+ * card drawn at `shop/[product]/social-card` — never the hand-made
+ * `/shop/<slug>.png`, which only exists for the seeded product. Preference
+ * order for the photograph is the first gallery view's own shot, then the
+ * legacy `product.photo` (Otter's asset, for a product built the old way),
+ * then nothing — a product with neither falls back to the card alone.
  */
 export function productImage(product: {
   slug: string;
   photo?: string;
   photoDir?: string;
   views?: MerchView[];
+  socialImageUrl?: string | null;
 }): string[] {
-  const card = socialCard(product.slug);
+  const card = productSocialImage(product);
   const view = product.views?.[0];
 
   if (view?.photo) {
@@ -89,8 +85,16 @@ export function productLd(product: MerchProduct, inventory?: InventoryStatus, sh
     "@context": "https://schema.org",
     "@type": "Product",
     "@id": `${url}#product`,
-    name: product.name,
-    description: product.description,
+    // `product.name` is blank for anything created in the current admin and
+    // `product.description` is likewise optional there, so both go through the
+    // same resolvers the page's own `<head>` reads rather than a column that
+    // can be empty.
+    name: productMetadataName(product),
+    // The product's own sentence where it has one, and only then the snippet
+    // the page falls back to. A `description` here is not a search snippet and
+    // has no 155-character budget to respect, so preferring the full sentence
+    // over the shortened one is the right way round.
+    description: product.description?.trim() || resolveProductSeo(product).description,
     image: productImage(product),
     url,
     sku: `CNE-${product.slug.toUpperCase()}`,
@@ -124,7 +128,9 @@ export function shopListLd(products: MerchProduct[]) {
     itemListElement: products.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      name: p.name,
+      // Same resolver as `productLd`, so a Rack-created product with a blank
+      // `name` is not listed as an empty string.
+      name: productMetadataName(p),
       url: `${brand.siteUrl}/shop/${p.slug}/`,
     })),
   };

@@ -5,6 +5,7 @@ import { getEditionSizes, getOrderBySessionId, getPublicStoreSettings } from "@/
 import { formatPrice } from "@/lib/otter";
 import { canShowFullOrderDetails } from "@/lib/orderVisibility";
 import { ClearBagOnce } from "@/components/shop/ClearBagOnce";
+import { PurchaseOnce } from "@/components/shop/PurchaseOnce";
 
 /**
  * Reads a live order by a query-string session id and shows whatever the
@@ -154,6 +155,20 @@ export default async function ThanksPage({
   return (
     <Shell>
       <ClearBagOnce />
+      <PurchaseOnce
+        order={{
+          id: order.id,
+          number: order.number,
+          value: order.totalCents / 100,
+          currency: order.currency,
+          items: order.items.map((item) => ({
+            item_id: item.sku,
+            item_name: item.productName,
+            price: item.unitPriceCents / 100,
+            quantity: item.quantity,
+          })),
+        }}
+      />
       <h1>
         Thanks — order {order.number}
         {single?.editionNumber != null && (

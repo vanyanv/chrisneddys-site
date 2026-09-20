@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Site: the careers page has its own look now instead of sharing the privacy/terms page template. It gets a red hero band, a real photo and a proper card for the Indeed link, matching the rest of the site, and no longer calls a location a "counter" ([#72](https://github.com/vanyanv/chrisneddys-site/issues/72))
+
 ### Fixed
 
 - Site: a mistyped or dead link no longer dead-ends. Next only ran the site's branded "not on the menu" 404 for links inside the site itself — a URL that matched no route at all (an old bookmark, a typo, a broken external link) fell through to the framework's own bare, unstyled 404 with no header and no way back. There's now a proper one for that case too ([#70](https://github.com/vanyanv/chrisneddys-site/issues/70))

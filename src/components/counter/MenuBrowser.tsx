@@ -7,8 +7,17 @@ import { MenuRow } from "./MenuRow";
 import { ItemSheet } from "./ItemSheet";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
+import { Monster } from "@/components/mascots/Monster";
 
 const ORDER: MenuCategoryKey[] = ["combos", "sides", "secret", "drinks"];
+
+/** One small mascot per category header, colored per the site's mascot key. */
+const CATEGORY_MASCOT: Partial<Record<MenuCategoryKey, { bodyColor: string; irisColor: string }>> =
+  {
+    combos: { bodyColor: "#e63027", irisColor: "#2e5fd9" },
+    sides: { bodyColor: "#2e5fd9", irisColor: "#e63027" },
+    drinks: { bodyColor: "#b6e01f", irisColor: "#e63027" },
+  };
 
 /**
  * The whole menu, plus the sheet every row opens.
@@ -59,7 +68,17 @@ export function MenuBrowser() {
         <div className="cne-menu-main">
           {ORDER.map((key) => (
             <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
-              <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
+                {CATEGORY_MASCOT[key] && (
+                  <Monster
+                    species="classic"
+                    bodyColor={CATEGORY_MASCOT[key]!.bodyColor}
+                    irisColor={CATEGORY_MASCOT[key]!.irisColor}
+                    size={24}
+                  />
+                )}
+              </div>
               <div className="cne-cat-rule" aria-hidden="true" />
               <div className="cne-menu-grid">
                 {menu[key].map((it, i) => (

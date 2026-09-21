@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Location } from "@/data/locations";
 import { orderUrl, type OrderSurface } from "@/lib/otter";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
+import { Monster } from "@/components/mascots/Monster";
 
 /**
  * One store's card: name, address, hours and the button row every hand-copied
@@ -49,6 +50,19 @@ export function LocationCard({
 
   return (
     <>
+      {/* A wall-mural monster marking the location as open — the card that
+          wraps this component (`.cne-loc` on the index and the store page
+          alike) needs `position: relative` for the corner badge to sit on
+          it. A location that has not opened yet gets no mascot. */}
+      {loc.isOpen && (
+        <Monster
+          species="classic"
+          bodyColor="#b6e01f"
+          irisColor="#e63027"
+          size={24}
+          className="cne-badge-corner is-tr"
+        />
+      )}
       <div
         style={{
           display: "flex",

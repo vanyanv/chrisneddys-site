@@ -695,6 +695,7 @@ body {
 
 /* ---- locations cards ---------------------------------------------------- */
 .cne-loc {
+  position: relative;
   border: 2.5px solid var(--a-ink);
   background: var(--a-card);
   box-shadow: 4px 4px 0 var(--a-ink);
@@ -1481,6 +1482,7 @@ body {
 
 /* ---- footer ------------------------------------------------------------- */
 .cne-foot {
+  position: relative;
   background: var(--a-ink);
   color: #fff2c9;
   padding: 26px 15px;
@@ -1490,6 +1492,27 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.6;
+}
+/* Everything the footer actually says lives in this stacking layer, above the
+   faint numbers-wall texture (z-index 0) painted behind it. Without this, an
+   absolutely-positioned z-index:0 layer paints after normal-flow content and
+   would sit on top of the links rather than behind them. */
+.cne-foot-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+/* The corner mascot is pure decoration in the one dark corner of the site
+   that can take a glow; it sits above the texture and content alike but
+   never over the logo, nav or address text. */
+.cne-foot-monster {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 2;
+  pointer-events: none;
 }
 /* Every link in the footer is the brand yellow, as it was when the colour
    lived in an inline style on each anchor. 9.4:1 on the ink ground. */

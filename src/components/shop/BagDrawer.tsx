@@ -6,6 +6,7 @@ import { CapArt } from "./CapArt";
 import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
+import { Monster } from "@/components/mascots/Monster";
 
 /** How long the remove animation runs before the line actually leaves the store. */
 const REMOVE_MS = 280;
@@ -208,17 +209,35 @@ export function BagDrawer({
         </div>
 
         <div className="cne-dr-body">
-          <ul className="cne-bag-lines">
-            {lines.map((line, i) => (
-              <BagRow
-                key={line.slug}
-                line={line}
-                index={i}
-                removing={removing === line.slug}
-                onRemove={() => drop(line)}
-              />
-            ))}
-          </ul>
+          {lines.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Monster species="bubble" bodyColor="#e63027" irisColor="#2e5fd9" size={30} />
+                <span style={{ marginLeft: "-6px", marginBottom: "-4px" }}>
+                  <Monster species="bubble" bodyColor="#f5b82e" irisColor="#e63027" size={22} />
+                </span>
+              </div>
+              <p className="cne-dr-note">Nothing in the bag yet.</p>
+            </div>
+          ) : (
+            <ul className="cne-bag-lines">
+              {lines.map((line, i) => (
+                <BagRow
+                  key={line.slug}
+                  line={line}
+                  index={i}
+                  removing={removing === line.slug}
+                  onRemove={() => drop(line)}
+                />
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="cne-dr-foot">
@@ -288,7 +307,14 @@ export function BagDrawer({
                 disabled={checkoutPending}
                 style={{ cursor: checkoutPending ? "wait" : "pointer" }}
               >
-                {checkoutPending ? "TAKING YOU TO CHECKOUT…" : "CHECKOUT"}
+                {checkoutPending ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                    TAKING YOU TO CHECKOUT…
+                    <Monster species="classic" bodyColor="#e63027" irisColor="#2e5fd9" size={40} />
+                  </span>
+                ) : (
+                  "CHECKOUT"
+                )}
               </button>
               <p className="cne-dr-note">
                 You&rsquo;ll pay on Stripe&rsquo;s secure checkout page.

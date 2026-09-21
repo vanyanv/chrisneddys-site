@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/careers.css";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
+import { Monster } from "@/components/mascots/Monster";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
 const title = "Careers";
@@ -42,6 +43,13 @@ export default function CareersPage() {
 
       <section className="cne-cr-hero" aria-labelledby="cr-h1">
         <div className="cne-halftone" aria-hidden="true" />
+        <Monster
+          species="classic"
+          bodyColor="#b6e01f"
+          irisColor="#e63027"
+          size={42}
+          className="cne-cr-mascot"
+        />
         <div className="cne-cr-hero-in">
           <p className="cne-cr-eyebrow">Careers</p>
           <h1 id="cr-h1">Join the crew.</h1>

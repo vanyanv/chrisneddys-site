@@ -33,14 +33,14 @@ describe("openGraphFor / twitterFor", () => {
     expect(og.url).toBe("/menu/");
     expect(og.type).toBe("website");
     expect(og.images).toHaveLength(1);
-    expect(og.images[0]?.url).toBe("/og.jpg");
+    expect(og.images[0]?.url).toBe("/opengraph-image");
   });
 
   it("builds a summary_large_image twitter card from the same title and description", () => {
     const tw = twitterFor({ title: "T", description: "D" });
     expect(tw.card).toBe("summary_large_image");
     expect(tw.title).toBe("T");
-    expect(tw.images).toEqual(["/og.jpg"]);
+    expect(tw.images).toEqual(["/opengraph-image"]);
   });
 });
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { orderUrl, formatPrice } from "@/lib/otter";
 import { SLIDER_PRICE } from "@/data/menu";
 import { HERO } from "@/lib/heroImage";
+import { Monster } from "@/components/mascots/Monster";
 
 /**
  * Red panel, oversized display type, and the basket shot.
@@ -12,6 +13,13 @@ export function Hero() {
   return (
     <section className="cne-hero">
       <div className="cne-hero-halftone" aria-hidden="true" />
+      <Monster
+        species="classic"
+        bodyColor="#2e5fd9"
+        irisColor="#e63027"
+        size={46}
+        className="cne-badge-corner is-tr"
+      />
       <div className="cne-hero-in">
         <div>
           <h1>

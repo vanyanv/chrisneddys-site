@@ -3,6 +3,7 @@ import { locations, type Location } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { MascotDecor } from "@/components/mascots/MascotDecor";
 
 /**
  * One store's page. Beyond ranking for the neighbourhood, this is the page
@@ -18,9 +19,18 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
 
   return (
     <>
-      <section className="cne-sec">
+      <section className="cne-sec" style={{ position: "relative" }}>
         <div className="cne-eyebrow">{loc.isOpen ? "Open now" : "Opening soon"}</div>
-        <h1>{hood}.</h1>
+        {/* Wall-mural diamond behind the store's name — decorative only, so it
+            sits at `zIndex: 0` while the heading below is lifted above it. */}
+        <MascotDecor
+          kind="diamond"
+          colorA="#1a1612"
+          colorB="#f5b82e"
+          size={80}
+          style={{ position: "absolute", top: -20, right: -20, opacity: 0.85, zIndex: 0 }}
+        />
+        <h1 style={{ position: "relative", zIndex: 1 }}>{hood}.</h1>
 
         <div
           className={`cne-loc ${loc.isOpen ? "is-live" : "is-soon"}`}

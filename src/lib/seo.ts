@@ -10,11 +10,20 @@ import { brand } from "@/data/brand";
  * price, an address, an hour — rather than adjectives, because that is what
  * makes a snippet worth clicking on a phone.
  */
+/**
+ * `url` names `src/app/opengraph-image.tsx`'s generated route directly rather
+ * than relying on Next's file-convention auto-wiring, because `pageMetadata`
+ * below always sets `openGraph.images` itself (so a sub-page can never ship
+ * with no social image) — and that auto-wiring only fills the tag in when a
+ * segment's own metadata leaves `images` unset. Since it's a plain file
+ * directly under `src/app` (no route-group ancestor), Next serves it at
+ * exactly this path, with no generated hash suffix.
+ */
 export const OG_IMAGE = {
-  url: "/og.jpg",
+  url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "A Chris N Eddy's double slider — two smashed patties and two slices of cheese on a buttered Martin's roll",
+  alt: "The Chris N Eddy's red monster mascot beside the Chris N Eddy's wordmark",
 };
 
 /** Stable @ids, so every page's graph points at the same three nodes. */

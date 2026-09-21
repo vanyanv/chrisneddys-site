@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
+import { Bowlby_One, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/google";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
+import "@/styles/mascots.css";
+import { MascotDefs } from "@/components/mascots/MascotDefs";
 import { SiteHeader } from "@/components/counter/SiteHeader";
 import { SiteFooter } from "@/components/counter/SiteFooter";
 import { OrderDock } from "@/components/counter/OrderDock";
@@ -38,6 +40,20 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
   display: "optional",
   variable: "--font-mono-jb",
+});
+
+/**
+ * Not part of DESIGN.md's three-typeface system — added only for the small
+ * "SLIDERS" footer signature (`.cne-tag-word`), which is the one place the
+ * mural set calls for a marker-style scrawl. Exposed as its own CSS variable
+ * so it stays scoped to that one class instead of leaking into the shared
+ * type system.
+ */
+const marker = Permanent_Marker({
+  subsets: ["latin"],
+  weight: "400",
+  display: "optional",
+  variable: "--font-marker",
 });
 
 const SITE_TITLE = `${brand.name} — Smash Burger Sliders in LA, Open Late`;
@@ -144,7 +160,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     (shopOpen && settings ? shippingReturnsNote(settings)?.line : null) ?? TERMS_PENDING;
 
   return (
-    <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html
+      lang="en"
+      className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable} ${marker.variable}`}
+    >
       <body>
         {/* First focusable element on every page, so a keyboard or
             screen-reader user can jump past the header and tab strip
@@ -160,6 +179,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Analytics />
         <JsonLd />
         <RevealRoot />
+        {/* The `<symbol>` defs every `Monster`/`MascotDecor` instance
+            references via `<use href="#cne-...">` — mounted once here so
+            it's present on every page, however many mascots that page draws. */}
+        <MascotDefs />
         <TrackEvents />
         <SiteHeader />
         <LastCall />

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Monster } from "@/components/mascots/Monster";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -30,6 +31,9 @@ export default function NotFound() {
     >
       <div className="cne-halftone" />
       <div style={{ position: "relative", zIndex: 2, textAlign: "center", maxWidth: 640 }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Monster species="classic" bodyColor="#c6ff2b" irisColor="#e63027" size={58} />
+        </div>
         <div
           style={{
             fontFamily: "var(--font-display)",

@@ -2,6 +2,7 @@
 
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
+import { Monster } from "@/components/mascots/Monster";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -29,7 +30,16 @@ export function MenuRow({
       onClick={() => onOpen(item)}
       aria-haspopup="dialog"
     >
-      <span className="cne-row-thumb">
+      <span className="cne-row-thumb" style={{ position: "relative" }}>
+        {star && (
+          <Monster
+            species="classic"
+            bodyColor="#f5b82e"
+            irisColor="#e63027"
+            size={20}
+            className="cne-badge-corner is-tl"
+          />
+        )}
         {item.photo ? (
           /* The name alone. The button already announces the description and
              the price, so `itemPhotoAlt` would say both a second time, 31 rows

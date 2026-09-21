@@ -59,6 +59,13 @@
   color: #fff2c9;
 }
 
+.cne-cr-mascot {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+}
+
 /* ---- framed photo ----------------------------------------------------------- */
 .cne-cr-photo {
   margin: 26px 15px 0;
@@ -145,6 +152,11 @@
 
   .cne-cr-lede {
     font-size: 17px;
+  }
+
+  .cne-cr-mascot {
+    top: 24px;
+    right: 34px;
   }
 
   .cne-cr-photo {

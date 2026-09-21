@@ -4,6 +4,8 @@ import Image from "next/image";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
+import { Monster } from "@/components/mascots/Monster";
+import { MascotDecor } from "@/components/mascots/MascotDecor";
 
 /**
  * The footer is the only place every page of the site is linked from. That is
@@ -48,116 +50,136 @@ export function SiteFooter() {
     // Declared once on the whole footer: the only tracked links down here are
     // the per-store phone numbers, and every one of them belongs to "footer".
     <footer className="cne-foot" data-surface="footer">
-      <div className="cne-foot-top">
-        <div className="cne-foot-brand">
-          <Link
-            prefetch={false}
-            href="/"
-            aria-label={`${brand.name} — Home`}
-            className="cne-foot-mark"
-          >
-            <Image
-              src="/cne-logo.webp"
-              alt={brand.name}
-              width={309}
-              height={89}
-              loading="eager"
-              style={{ aspectRatio: "309 / 89" }}
-            />
-          </Link>
-          <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>
-          <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">
-            {brand.ig}
-          </a>
+      <MascotDecor
+        kind="numbers"
+        colorA="#c6ff2b"
+        size="140%"
+        style={{ position: "absolute", inset: 0, opacity: 0.05, pointerEvents: "none", zIndex: 0 }}
+      />
+      <Monster
+        species="blacklight"
+        bodyColor="#3ee06a"
+        irisColor="#2fb8ff"
+        pupilColor="#ff3b3b"
+        glowColor="#ff3b3b"
+        size={52}
+        className="cne-foot-monster"
+      />
+      <div className="cne-foot-content">
+        <div className="cne-foot-top">
+          <div className="cne-foot-brand">
+            <Link
+              prefetch={false}
+              href="/"
+              aria-label={`${brand.name} — Home`}
+              className="cne-foot-mark"
+            >
+              <Image
+                src="/cne-logo.webp"
+                alt={brand.name}
+                width={309}
+                height={89}
+                loading="eager"
+                style={{ aspectRatio: "309 / 89" }}
+              />
+            </Link>
+            <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>
+            <a href={brand.igUrl} target="_blank" rel="noopener noreferrer">
+              {brand.ig}
+            </a>
+          </div>
+
+          <div className="cne-foot-group">
+            <p className="cne-foot-h">Eat</p>
+            <nav aria-label="Eat">
+              <ul>
+                {EAT.map((item) => (
+                  <li key={item.href}>
+                    <Link prefetch={false} href={item.href}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+
+          <div className="cne-foot-group">
+            <p className="cne-foot-h">Locations</p>
+            <nav aria-label="Locations">
+              <ul>
+                {COUNTER_LINKS.map((item) => (
+                  <li key={item.href}>
+                    <Link prefetch={false} href={item.href}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
 
-        <div className="cne-foot-group">
-          <p className="cne-foot-h">Eat</p>
-          <nav aria-label="Eat">
-            <ul>
-              {EAT.map((item) => (
-                <li key={item.href}>
-                  <Link prefetch={false} href={item.href}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-
-        <div className="cne-foot-group">
-          <p className="cne-foot-h">Locations</p>
-          <nav aria-label="Locations">
-            <ul>
-              {COUNTER_LINKS.map((item) => (
-                <li key={item.href}>
-                  <Link prefetch={false} href={item.href}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      <div className="cne-foot-counters">
-        {locations.map((loc) => (
-          // The phone number inside reports which counter it rings. All three
-          // share the Hollywood number today; two of them stop as they open.
-          <div className="cne-foot-counter" key={loc.id} data-location={slugFor(loc)}>
-            {/* A label, not a link: this location is already linked by name in
+        <div className="cne-foot-counters">
+          {locations.map((loc) => (
+            // The phone number inside reports which counter it rings. All three
+            // share the Hollywood number today; two of them stop as they open.
+            <div className="cne-foot-counter" key={loc.id} data-location={slugFor(loc)}>
+              {/* A label, not a link: this location is already linked by name in
                 the Locations column above, and two anchors on one URL in one
                 block is the kind of duplication that makes a footer read as
                 padded rather than as a map. */}
-            <p className="cne-foot-h">{loc.neighbourhood}</p>
-            {loc.isOpen ? (
-              <>
-                <address>
-                  {loc.address}
-                  <br />
-                  {loc.city}, {loc.region} {loc.postal}
-                  {loc.phone && loc.phoneTel ? (
-                    <>
-                      <br />
-                      <a href={`tel:${loc.phoneTel}`}>{loc.phone}</a>
-                    </>
-                  ) : null}
-                </address>
-                <div className="cne-foot-hours">
-                  {loc.hours.map(([days, time]) => (
-                    <Fragment key={days}>
-                      <span>{days}</span>
-                      <span>{time}</span>
-                    </Fragment>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <p className="cne-foot-soon">Coming soon</p>
-            )}
-          </div>
-        ))}
-      </div>
+              <p className="cne-foot-h">{loc.neighbourhood}</p>
+              {loc.isOpen ? (
+                <>
+                  <address>
+                    {loc.address}
+                    <br />
+                    {loc.city}, {loc.region} {loc.postal}
+                    {loc.phone && loc.phoneTel ? (
+                      <>
+                        <br />
+                        <a href={`tel:${loc.phoneTel}`}>{loc.phone}</a>
+                      </>
+                    ) : null}
+                  </address>
+                  <div className="cne-foot-hours">
+                    {loc.hours.map(([days, time]) => (
+                      <Fragment key={days}>
+                        <span>{days}</span>
+                        <span>{time}</span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="cne-foot-soon">Coming soon</p>
+              )}
+            </div>
+          ))}
+        </div>
 
-      {/* The policies are linked from here rather than from the Eat column
+        {/* The policies are linked from here rather than from the Eat column
           above: they belong beside the copyright line, and adding three more
           links to the two named groups would pad the block those groups
           exist to keep tight. */}
-      <div className="cne-foot-legal">
-        <span>
-          © {new Date().getFullYear()} {brand.name}
-        </span>
-        <Link prefetch={false} href="/privacy/">
-          Privacy
-        </Link>
-        <Link prefetch={false} href="/returns/">
-          Returns
-        </Link>
-        <Link prefetch={false} href="/terms/">
-          Terms
-        </Link>
+        <div className="cne-foot-legal">
+          <span>
+            © {new Date().getFullYear()} {brand.name}
+          </span>
+          <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: 18 }}>
+            Sliders
+          </span>
+          <Link prefetch={false} href="/privacy/">
+            Privacy
+          </Link>
+          <Link prefetch={false} href="/returns/">
+            Returns
+          </Link>
+          <Link prefetch={false} href="/terms/">
+            Terms
+          </Link>
+        </div>
       </div>
     </footer>
   );

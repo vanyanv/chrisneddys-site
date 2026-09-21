@@ -9,6 +9,7 @@ import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
+import { Monster } from "@/components/mascots/Monster";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { ShopIndexTracking } from "@/components/shop/ShopIndexTracking";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -132,6 +133,21 @@ export default async function ShopPage() {
               >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
                 <div className="cne-drop-art">
+                  {/* Same "is this drop actually still on" signal the flag
+                      above already reads (`line?.soldOut`) — no separate
+                      limited/exclusive field exists on `MerchProduct`, and
+                      every product here is a capsule run by design, so a
+                      cap that's still available gets the mark and a sold-out
+                      one doesn't. */}
+                  {!line?.soldOut && (
+                    <Monster
+                      species="classic"
+                      bodyColor="#2e5fd9"
+                      irisColor="#e63027"
+                      size={26}
+                      className="cne-badge-corner is-tr"
+                    />
+                  )}
                   <ProductShot
                     product={product}
                     view={firstView(product)}

@@ -1,0 +1,110 @@
+/* Monster mascot illustrations — additive layer per the owner-approved
+   Sitewide Monster Map design. Pure addition: no existing selector here is
+   modified, only new ones. */
+
+.cne-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cne-blink 4.8s ease-in-out infinite;
+}
+.cne-teeth-top {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cne-chomp-up 1.9s ease-in-out infinite;
+}
+.cne-teeth-bottom {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cne-chomp-down 1.9s ease-in-out infinite;
+}
+@keyframes cne-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+@keyframes cne-chomp-up {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@keyframes cne-chomp-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-eye,
+  .cne-teeth-top,
+  .cne-teeth-bottom {
+    animation: none !important;
+  }
+}
+
+.cne-mascot {
+  display: block;
+  flex: none;
+}
+.cne-mascot-glow {
+  filter: drop-shadow(0 0 5px var(--glow, transparent))
+    drop-shadow(0 0 12px var(--glow, transparent));
+}
+
+.cne-badge-corner {
+  position: absolute;
+  z-index: 2;
+  filter: drop-shadow(1px 1px 0 var(--a-ink));
+  pointer-events: none;
+}
+.cne-badge-corner.is-tl {
+  top: -8px;
+  left: -8px;
+}
+.cne-badge-corner.is-tr {
+  top: -10px;
+  right: -8px;
+}
+
+.cne-divider-band {
+  height: 18px;
+  background-image:
+    linear-gradient(45deg, var(--a-ink) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--a-ink) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--a-ink) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--a-ink) 75%);
+  background-size: 22px 22px;
+  background-position:
+    0 0,
+    0 11px,
+    11px -11px,
+    -11px 0;
+  background-color: var(--a-yel);
+}
+
+.cne-tag-word {
+  font-family: var(--font-marker, "Permanent Marker", cursive);
+  display: inline-block;
+  transform: rotate(-3deg);
+  line-height: 1;
+}
+
+.cne-court-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}

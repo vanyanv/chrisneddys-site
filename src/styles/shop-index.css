@@ -42,6 +42,7 @@
 }
 
 .cne-drop-art {
+  position: relative;
   --cne-mark: 20px;
   border-bottom: 2.5px solid var(--a-ink);
 }

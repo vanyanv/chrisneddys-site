@@ -29,6 +29,11 @@ body {
      on prices, eyebrows, the marquee and card heights. */
   font-size: 14px;
   line-height: 1.6;
+  /* Belt-and-braces: no single element should ever be able to widen the page
+     past the viewport on mobile. `clip`, not `hidden` — `hidden` here would
+     turn html/body into a scroll container and break every `position: sticky`
+     descendant (the header, the item-sheet header, ...); `clip` doesn't. */
+  overflow-x: clip;
 }
 
 *,

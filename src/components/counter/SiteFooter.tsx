@@ -54,7 +54,15 @@ export function SiteFooter() {
         kind="numbers"
         colorA="#c6ff2b"
         size="140%"
-        style={{ position: "absolute", inset: 0, opacity: 0.05, pointerEvents: "none", zIndex: 0 }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          opacity: 0.05,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
       />
       <Monster
         species="blacklight"

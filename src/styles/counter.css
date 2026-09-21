@@ -1483,6 +1483,11 @@ body {
 /* ---- footer ------------------------------------------------------------- */
 .cne-foot {
   position: relative;
+  /* Clips the numbers-wall texture below, which is deliberately oversized
+     (140%, centered) so it bleeds off all four edges rather than stopping
+     short of them. Without this the bleed itself became visible page
+     overflow — see issue tracking mobile scroll overflow. */
+  overflow: hidden;
   background: var(--a-ink);
   color: #fff2c9;
   padding: 26px 15px;

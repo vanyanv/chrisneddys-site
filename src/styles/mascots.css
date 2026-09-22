@@ -94,7 +94,7 @@
 }
 
 .cne-tag-word {
-  font-family: var(--font-marker, "Permanent Marker", cursive);
+  font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
   display: inline-block;
   transform: rotate(-3deg);
   line-height: 1;

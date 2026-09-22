@@ -57,6 +57,7 @@ export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
         height={mapBox.h}
         decoding="async"
         loading={eager ? undefined : "lazy"}
+        fetchPriority={eager ? "high" : undefined}
         style={{ display: "block", width: "100%", height: "auto" }}
       />
 

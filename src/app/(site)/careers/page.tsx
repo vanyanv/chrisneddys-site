@@ -65,14 +65,33 @@ export default function CareersPage() {
 
       <div className="cne-cr-body">
         <div className="cne-cr-photo cne-rv">
-          <img
-            src="/photos/double-16x9.jpg"
-            alt=""
-            width={900}
-            height={506}
-            loading="lazy"
-            decoding="async"
-          />
+          {/* This is the LCP element on phones, so it ships eagerly and at high
+              priority — unlike the gallery photos elsewhere on the site, which are
+              genuinely below the fold. The JPEG stays the `<img src>` fallback
+              because `JsonLd.tsx` references that exact URL for structured data;
+              `sizes` is measured from `.cne-cr-photo` in careers.css. Regenerate the
+              AVIF/WebP cuts with `node scripts/build-photo-cuts.mjs` if the source
+              photo changes. */}
+          <picture>
+            <source
+              type="image/avif"
+              srcSet="/photos/double-16x9-480.avif 480w, /photos/double-16x9-720.avif 720w, /photos/double-16x9-900.avif 900w"
+              sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
+            />
+            <source
+              type="image/webp"
+              srcSet="/photos/double-16x9-480.webp 480w, /photos/double-16x9-720.webp 720w, /photos/double-16x9-900.webp 900w"
+              sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
+            />
+            <img
+              src="/photos/double-16x9.jpg"
+              alt=""
+              width={900}
+              height={506}
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
         </div>
 
         <div className="cne-cr-pitch cne-rv">

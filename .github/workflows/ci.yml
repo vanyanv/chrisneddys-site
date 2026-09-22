@@ -43,3 +43,26 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start server
+        # No env vars needed: same as the Build step above, this runs with no
+        # DATABASE_URL/PGLITE_DATA_DIR, so the storefront falls back to the
+        # in-repo catalogue (src/data/merch.ts) — see scripts/db-prepare.mjs
+        # and DEPLOY.md's "Database" section.
+        run: |
+          pnpm exec next start -p 3400 &
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3400/ > /dev/null; then
+              echo "Server is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Server did not start in time" >&2
+          exit 1
+
+      - name: Performance budget
+        run: pnpm perf:budget --base http://localhost:3400

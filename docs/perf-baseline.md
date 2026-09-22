@@ -277,3 +277,97 @@ with the context at `viewport: { width: 412, height: 823 }`,
 `PerformanceObserver` on `largest-contentful-paint`. The repo's own
 `@playwright/test` expects a newer Chromium than the one pinned above, so pass
 `executablePath` explicitly rather than running `playwright install`.
+
+## Checking a change
+
+The manual recipe above is how these baseline numbers were produced; day to
+day, use the two scripts this doc's numbers fed (issue #89) instead —
+`pnpm perf` for "did this make the page feel slower or shift more?" and
+`pnpm perf:budget` for "did this ship more bytes than the page is allowed to?".
+
+### `pnpm perf --compare` — is it actually slower?
+
+`pnpm perf` (`scripts/perf.mjs`) is this doc's real-browser method, packaged:
+real CDP throttling, LCP read from a `PerformanceObserver`, median of several
+runs. To check a change:
+
+```shell
+# On main, before your change:
+pnpm build && PORT=3100 pnpm start &
+pnpm perf --base http://localhost:3100 --out /tmp/before.json
+
+# On your branch, after your change (same server, rebuilt):
+pnpm build && pnpm perf --base http://localhost:3100 --compare /tmp/before.json
+```
+
+It prints a before/after/delta line per page and profile and **exits
+non-zero** if any page's LCP got worse by more than `max(100ms, 10%)` or its
+CLS got worse by more than `0.02` — small jitter passes, a real regression
+fails the comparison the same way it would fail CI.
+
+Useful flags: `--pages /,/menu/` to check just the pages you touched,
+`--profiles iphone` to skip the others, `--runs 1` for a quick check while
+iterating (use the default 3 before trusting a result), and `--frames` to
+also report idle/scroll frame timing (p95 frame time, long-task count) for
+animation-heavy changes.
+
+**The LCP-before-scroll gotcha:** LCP stops being measured the moment the
+_user_ does something — a click, a keypress, a real scroll. A script calling
+`scrollTo()` does **not** count as that, so if you read `largest-contentful-
+paint` entries _after_ a scroll test, whatever image happens to be painting
+at that moment gets misreported as LCP — this produced fake 9-12 second LCPs
+during this tooling's own development. `scripts/perf.mjs` snapshots LCP
+before it ever touches the scroll/frame-timing measurement; if you write your
+own probe, read LCP first and treat that as load-bearing.
+
+The home page's first-visit desktop intro (`src/lib/intro.ts`) is skipped by
+default (`--skip-intro`, on unless you pass `--with-intro`), by setting its
+`localStorage` gate before the page loads — otherwise desktop LCP on `/`
+would measure the intro overlay's own paint, not the page underneath it.
+
+### `pnpm perf:budget` — did this ship more bytes than it's allowed to?
+
+**The budget is calibrated to CI's browser.** CI runs the Chromium that the
+repo's pinned `@playwright/test` downloads (Chrome 153 when this was set up).
+Image totals depend on the browser: newer Chrome starts lazy-loaded images
+from further below the fold, so it fetches more of them on first load. On
+22 September 2026 the home page read 168 KB of images on iPhone in this
+sandbox's Chrome 141 and 309 KB in CI. Fonts, script, document and prefetch
+bytes were identical in both. So the image budgets in `perf-budget.json` come
+from the CI run, and a local run on an older Chromium reads lower and passes
+more easily. When a budget has to move, take the new number from the CI log,
+not from a local run.
+
+`pnpm perf:budget` (`scripts/perf-budget.mjs`) is deliberately **not** the
+throttled, multi-run method above — it applies no network or CPU throttling
+at all, so its byte counts depend only on what the page actually requests,
+not on simulated-network jitter, which is what lets it run in CI without
+flaking. It sums transferred bytes per resource type (document, font, image,
+script, stylesheet, fetch) from real CDP `Network` events, once in the
+`iphone` profile (402x874 @3x, median of 3 runs) and once at `desktop`, plus
+the byte size of whichever single request produced the page's LCP image, and
+checks each total against `scripts/perf-budget.json`. Exits non-zero and
+names every page, resource type, actual size and budget that a change
+breached:
+
+```shell
+pnpm build && PORT=3100 pnpm start &
+pnpm perf:budget --base http://localhost:3100
+```
+
+Most budgets in `scripts/perf-budget.json` are the numbers measured on
+`main` plus about 10% headroom — room for normal variation, not room to add
+a new image. Two are set lower, as **targets a fix is expected to hit**
+rather than headroom over what already ships: total font weight per page
+(`font`, budgeted at 115 KB, once the graffiti font is trimmed) and the home
+page's LCP image at the `iphone` profile's 3x device pixel ratio (`lcpImage`,
+budgeted at 80 KB, once the hero moves to AVIF). Until those fixes land,
+`pnpm perf:budget` is expected to fail on exactly those two lines — that is
+the check doing its job, not a false positive; if it starts failing on a
+_different_ page or resource type, that is a real regression.
+
+CI runs `pnpm perf:budget` against a production `pnpm start` after every
+build (see `.github/workflows/ci.yml`), using Playwright's own installed
+Chromium there instead of the `/opt/pw-browsers` build used for local
+development (both scripts fall back automatically — see `resolveChromium()`
+in either script, or set `PERF_CHROMIUM` to force a specific binary).

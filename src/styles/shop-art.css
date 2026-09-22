@@ -18,7 +18,7 @@
   position: absolute;
   top: -4px;
   right: -8px;
-  font-family: var(--font-marker);
+  font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
   font-size: 14px;
   line-height: 1;
   color: var(--color-cne-ink);

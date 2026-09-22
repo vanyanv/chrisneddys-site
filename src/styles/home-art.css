@@ -1,0 +1,59 @@
+/**
+ * Home page-only store art: idea 6's wall tethers behind "The three we sell
+ * most" cards. (Idea 2's watching eye needs no CSS of its own — it only adds
+ * a movable iris inside the existing `.cne-badge-corner` markup.)
+ */
+
+.cne-tether-wrap {
+  position: relative;
+}
+
+/* Cards paint over the tethers regardless of DOM order. */
+.cne-tether-wrap > .cne-cardgrid {
+  position: relative;
+  z-index: 1;
+}
+
+.cne-tethers {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Matches `.cne-cardgrid`'s own breakpoint — below it the cards stack into a
+   single column and there is nothing left to connect. */
+@media (min-width: 901px) {
+  .cne-tethers {
+    display: block;
+  }
+}
+
+.cne-tethers path {
+  stroke-dasharray: 1600;
+  stroke-dashoffset: 1600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-tethers.is-in path {
+    animation: cne-teth-draw 1.4s ease-in-out forwards;
+  }
+  .cne-tethers.is-in path.is-b {
+    animation-delay: 0.35s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-tethers path {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cne-teth-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}

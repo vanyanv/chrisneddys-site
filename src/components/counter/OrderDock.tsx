@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { orderUrl } from "@/lib/otter";
 import { statusLabel } from "@/lib/hours";
 import { useStoreStatus } from "@/lib/useStoreStatus";
+import { BiteTeeth } from "@/components/storeart/BiteTeeth";
 
 /**
  * The sticky bottom dock from the prototype: what Hollywood's clock is doing,
@@ -39,7 +40,9 @@ export function OrderDock() {
         target="_blank"
         rel="noopener noreferrer"
       >
+        <BiteTeeth position="top" />
         ORDER →
+        <BiteTeeth position="bottom" />
       </a>
     </div>
   );

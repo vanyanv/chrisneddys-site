@@ -3,6 +3,7 @@ import { Bowlby_One, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/g
 import "@/styles/globals.css";
 import "@/styles/counter.css";
 import "@/styles/mascots.css";
+import "@/styles/chrome-art.css";
 import { MascotDefs } from "@/components/mascots/MascotDefs";
 import { SiteHeader } from "@/components/counter/SiteHeader";
 import { SiteFooter } from "@/components/counter/SiteFooter";
@@ -16,6 +17,8 @@ import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { TrackEvents } from "@/components/shared/TrackEvents";
 import { PrefetchNav } from "@/components/counter/PrefetchNav";
+import { BackToTop } from "@/components/storeart/BackToTop";
+import { SlideCode } from "@/components/storeart/SlideCode";
 import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
 import { getPublicStoreSettings } from "@/lib/orders";
 import { shippingReturnsNote } from "@/lib/shopCopy";
@@ -200,6 +203,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             no DOM at all until it is opened. */}
         <BagDrawer shopOpen={shopOpen} pickupEnabled={pickupEnabled} shippingNote={shippingNote} />
         <OrderDock />
+        {/* Bottom-corner back-to-top monster (idea 15); renders hidden until
+            scrolled past ~1.5 screens. */}
+        <BackToTop />
+        {/* Type S-L-I-D-E on desktop and the page gets pulled into the vortex
+            (idea 14). Renders nothing until triggered. */}
+        <SlideCode />
         {/* Warms the six header routes once this page has loaded and the
             browser is idle. Renders nothing. */}
         <PrefetchNav />

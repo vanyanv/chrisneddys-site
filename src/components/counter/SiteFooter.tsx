@@ -6,6 +6,7 @@ import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
+import { FooterTag } from "@/components/storeart/FooterTag";
 
 /**
  * The footer is the only place every page of the site is linked from. That is
@@ -178,6 +179,7 @@ export function SiteFooter() {
           <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: 18 }}>
             Sliders
           </span>
+          <FooterTag />
           <Link prefetch={false} href="/privacy/">
             Privacy
           </Link>

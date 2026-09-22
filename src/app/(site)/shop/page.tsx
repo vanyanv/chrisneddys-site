@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "@/styles/shop-index.css";
 import "@/styles/shop-inventory.css";
+import "@/styles/opart-hover.css";
+import "@/styles/shop-art.css";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
 import { inventoryLine, listInventory, listPublishedProducts } from "@/lib/catalog";
@@ -10,6 +12,7 @@ import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { Monster } from "@/components/mascots/Monster";
+import { SleepingBadge } from "@/components/storeart/SleepingBadge";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { ShopIndexTracking } from "@/components/shop/ShopIndexTracking";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -132,14 +135,16 @@ export default async function ShopPage() {
                 data-slug={product.slug}
               >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
-                <div className="cne-drop-art">
+                <div className="cne-drop-art cne-opart-hover">
                   {/* Same "is this drop actually still on" signal the flag
                       above already reads (`line?.soldOut`) — no separate
                       limited/exclusive field exists on `MerchProduct`, and
                       every product here is a capsule run by design, so a
                       cap that's still available gets the mark and a sold-out
-                      one doesn't. */}
-                  {!line?.soldOut && (
+                      one gets the sleeping badge instead (idea 11). */}
+                  {line?.soldOut ? (
+                    <SleepingBadge size={26} />
+                  ) : (
                     <Monster
                       species="classic"
                       bodyColor="#2e5fd9"

@@ -1,0 +1,80 @@
+/* Checkerboard black-hole vortex — reusable band/intro art. Purely additive:
+   scoped to `.cne-vortex*` classes only, imported by `Vortex.tsx` itself. */
+
+.cne-vortex {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-cne-cream);
+}
+
+/* Placeholder and the real SVG share the box so nothing shifts layout when
+   the polygons swap in. */
+.cne-vortex-placeholder,
+.cne-vortex svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cne-vortex-placeholder {
+  background: var(--color-cne-cream);
+}
+
+.cne-vortex-band {
+  height: 250px;
+}
+@media (min-width: 901px) {
+  .cne-vortex-band {
+    height: 420px;
+  }
+}
+
+/* Idea 14: fills whatever fixed full-viewport box `SlideCode.tsx` puts it
+   in, rather than owning its own height like the band does. */
+.cne-vortex-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Idea 14: the SLIDE secret code's fixed overlay + the page content it
+   pulls into the vortex. Lives here, next to the `screen` variant it wraps,
+   rather than in its own stylesheet for a handful of rules. */
+.cne-slidecode {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.cne-slidecode.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-slidecode {
+    transition: opacity 0.3s ease;
+  }
+}
+
+/* Applied to `<main id="main">` at runtime by `SlideCode.tsx` — never
+   present in markup, so it costs nothing until the code is actually typed. */
+#main.cne-slide-target {
+  transition:
+    transform 0.9s cubic-bezier(0.6, 0, 0.8, 0.4),
+    opacity 0.9s ease;
+  transform-origin: 50% 46%;
+}
+#main.cne-slide-target.is-gone {
+  transform: scale(0.02) rotate(540deg);
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  #main.cne-slide-target {
+    transition: none;
+  }
+}

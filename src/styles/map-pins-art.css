@@ -1,0 +1,19 @@
+/**
+ * Idea 9: monster map pins. Replaces the old ring-and-dot pin (`globals.css`'s
+ * now-unused `.ring`/`.head` rules, left in place rather than pulled since
+ * this file only adds) with a small classic monster head on a short point —
+ * see `MapPinArt` in `MapPins.tsx`.
+ */
+.cne-pin-point {
+  fill: var(--a-ink);
+}
+
+.cne-pin-mon {
+  transition: transform 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.cne-map-pin.is-selected .cne-pin-mon {
+  transform: scale(1.22);
+}

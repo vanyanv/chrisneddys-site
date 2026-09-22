@@ -9,6 +9,9 @@ import { MapCallout } from "@/components/locations/MapCallout";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { Monster } from "@/components/mascots/Monster";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
+import { Vortex } from "@/components/storeart/Vortex";
+import { DripEdge } from "@/components/storeart/DripEdge";
+import { WallTethers } from "@/components/storeart/WallTethers";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -90,8 +93,14 @@ export default function HomePage() {
             Every topping free.
           </div>
         </div>
-        <FeaturedCards />
+        {/* Idea 6: squiggly tethers behind the three cards, desktop only. */}
+        <div className="cne-tether-wrap">
+          <WallTethers />
+          <FeaturedCards />
+        </div>
       </section>
+      {/* Idea 3: paint drips off this band's own cream. */}
+      <DripEdge color="var(--color-cne-cream)" seed={1} />
 
       <section className="cne-split">
         <div className="cne-split-l cne-sec cne-rv">
@@ -178,6 +187,9 @@ export default function HomePage() {
           </span>
         ))}
       </div>
+
+      {/* Decorative full-bleed band, directly above the footer. */}
+      <Vortex variant="band" />
     </>
   );
 }

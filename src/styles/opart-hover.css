@@ -1,0 +1,45 @@
+/* Idea 7: op-art hover.
+   A reusable class for photo wrappers: point at one and a black-and-cream
+   bullseye spins up over the wrapper's edges, like the store's op-art walls.
+   The bullseye is masked transparent in the middle, so it frames the photo
+   rather than covering the food. Desktop pointer only; off under reduced
+   motion. Self-contained — `position`/`overflow` are set defensively so the
+   class works even if the host wrapper forgot them. */
+.cne-opart-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.cne-opart-hover::after {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-radial-gradient(
+    circle,
+    var(--color-cne-ink) 0 9px,
+    var(--color-cne-cream) 9px 18px
+  );
+  -webkit-mask-image: radial-gradient(circle, transparent 50%, #000 72%);
+  mask-image: radial-gradient(circle, transparent 50%, #000 72%);
+  opacity: 0;
+  transform: scale(0.4) rotate(0deg);
+  transition:
+    opacity 0.25s ease,
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cne-opart-hover:hover::after,
+  .cne-opart-hover:focus-visible::after {
+    opacity: 1;
+    transform: scale(1) rotate(28deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-opart-hover::after {
+    transition: none;
+  }
+}

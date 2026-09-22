@@ -1,0 +1,219 @@
+/**
+ * Sitewide chrome art: the ORDER button's bite, the last-call monster's
+ * darting eye, the footer's self-writing tag, graffiti-tag section labels
+ * and the back-to-top monster. Imported once, from the `(site)` root layout.
+ */
+
+/* ---- idea 8: an ORDER button that bites --------------------------------- */
+.cne-orderbtn,
+.cne-dockbtn {
+  position: relative;
+  overflow: hidden;
+}
+.cne-bite {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0.95em;
+  pointer-events: none;
+  transition: transform 0.18s cubic-bezier(0.5, 1.6, 0.5, 1);
+}
+.cne-bite svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cne-bite-top {
+  top: 0;
+  transform: translateY(-100%);
+}
+.cne-bite-bottom {
+  bottom: 0;
+  transform: translateY(100%);
+}
+.cne-orderbtn:focus-visible .cne-bite-top,
+.cne-orderbtn:active .cne-bite-top,
+.cne-dockbtn:focus-visible .cne-bite-top,
+.cne-dockbtn:active .cne-bite-top {
+  transform: translateY(0);
+}
+.cne-orderbtn:focus-visible .cne-bite-bottom,
+.cne-orderbtn:active .cne-bite-bottom,
+.cne-dockbtn:focus-visible .cne-bite-bottom,
+.cne-dockbtn:active .cne-bite-bottom {
+  transform: translateY(0);
+}
+/* Hover only where a pointer can actually hover — a touch tap shouldn't get
+   stuck mid-bite from a simulated :hover that never un-hovers. */
+@media (hover: hover) and (pointer: fine) {
+  .cne-orderbtn:hover .cne-bite-top,
+  .cne-dockbtn:hover .cne-bite-top {
+    transform: translateY(0);
+  }
+  .cne-orderbtn:hover .cne-bite-bottom,
+  .cne-dockbtn:hover .cne-bite-bottom {
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-bite {
+    transition: none;
+  }
+}
+
+/* ---- idea 10: last-call monster ------------------------------------------ */
+.cne-lc-mon {
+  flex: none;
+}
+.cne-lc-dart {
+  animation: cneLcDart 2.2s steps(1) infinite;
+}
+@keyframes cneLcDart {
+  0% {
+    transform: translate(-4px, 1px);
+  }
+  25% {
+    transform: translate(4px, 1px);
+  }
+  50% {
+    transform: translate(-4px, 1px);
+  }
+  62% {
+    transform: translate(0, -3px);
+  }
+  80% {
+    transform: translate(4px, 1.5px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-lc-dart {
+    animation: none;
+  }
+}
+
+/* ---- idea 4: a tag that writes itself ------------------------------------ */
+.cne-foot-tag {
+  font-family: var(--font-marker), "Comic Sans MS", cursive;
+  font-size: 17px;
+  color: var(--color-cne-cream);
+}
+.cne-foot-tag-ink {
+  display: inline-block;
+  clip-path: inset(0 100% 0 0);
+}
+.cne-foot-tag.is-written .cne-foot-tag-ink {
+  animation: cneFootWrite 1.1s steps(16) forwards;
+}
+@keyframes cneFootWrite {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-foot-tag-ink {
+    clip-path: none;
+    animation: none;
+  }
+}
+
+/* ---- idea 13: graffiti-tag headings --------------------------------------
+   Overrides `.cne-eyebrow` from counter.css — this file is imported after
+   it, so a plain selector here wins without needing extra specificity. */
+.cne-eyebrow {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  font-family: var(--font-marker), "Comic Sans MS", cursive;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--color-cne-red);
+  transform: rotate(-2deg);
+  transform-origin: left center;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+}
+.cne-eyebrow::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: -1px;
+  width: 42px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 16'%3E%3Cpath d='M4 0v8a4 4 0 0 0 8 0V0M28 0v11a4 4 0 0 0 8 0V0' fill='%23e63027'/%3E%3C/svg%3E")
+    no-repeat left / contain;
+  pointer-events: none;
+}
+@media (min-width: 901px) {
+  .cne-eyebrow {
+    font-size: 18px;
+    padding-bottom: 13px;
+  }
+  .cne-eyebrow::after {
+    width: 52px;
+    height: 16px;
+  }
+}
+
+/* ---- idea 15: back-to-top monster ----------------------------------------
+   `--cne-backtop-dock` is set at runtime by `BackToTop` to the current
+   OrderDock's rendered height, so the button always clears it on a phone
+   and sits flush to the corner everywhere the dock isn't rendered. */
+.cne-backtop {
+  position: fixed;
+  right: 14px;
+  bottom: calc(14px + var(--cne-backtop-dock, 0px) + env(safe-area-inset-bottom));
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px) scale(0.85);
+  pointer-events: none;
+  transition:
+    opacity 0.25s,
+    transform 0.25s,
+    bottom 0.2s;
+  filter: drop-shadow(2px 2px 0 var(--color-cne-ink));
+}
+.cne-backtop.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.cne-backtop svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cne-backtop:focus-visible {
+  outline: 3px solid var(--color-cne-ink);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+.cne-backtop.is-hop svg {
+  animation: cneBackHop 0.6s ease-in-out;
+}
+@keyframes cneBackHop {
+  30% {
+    transform: translateY(-20px) rotate(-10deg);
+  }
+  60% {
+    transform: translateY(-8px) rotate(8deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-backtop {
+    transition: none;
+  }
+  .cne-backtop.is-hop svg {
+    animation: none;
+  }
+}

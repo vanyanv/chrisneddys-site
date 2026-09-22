@@ -107,15 +107,15 @@ export function WelcomeIntro() {
             <Vortex variant="screen" />
             <img
               className="cne-intro-logo"
-              src="/cne-logo.webp"
+              src="/cne-logo-lg.webp"
               onError={(e) => {
                 const img = e.currentTarget;
                 img.onerror = null;
-                img.src = "/cne-logo.png";
+                img.src = "/cne-logo-lg.png";
               }}
               alt=""
-              width={309}
-              height={89}
+              width={1236}
+              height={348}
             />
           </>
         )}

@@ -10,7 +10,7 @@
  * `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
  * labels/pills/prices/slugs/timestamps. The brand itself never renders as
  * type — `.adm-logo`/`.rack-logo`/`.adm-slip-logo` are all the same
- * `/cne-logo.webp` mark, sized per surface. Full primitive reference: CSS.md.
+ * `/cne-logo-2x.webp` mark, sized per surface. Full primitive reference: CSS.md.
  */
 @import "./tokens.css";
 * {

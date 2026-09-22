@@ -93,7 +93,7 @@
 
 /* ---- idea 4: a tag that writes itself ------------------------------------ */
 .cne-foot-tag {
-  font-family: var(--font-marker), "Comic Sans MS", cursive;
+  font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
   font-size: 17px;
   color: var(--color-cne-cream);
 }
@@ -123,7 +123,7 @@
   position: relative;
   display: inline-block;
   max-width: 100%;
-  font-family: var(--font-marker), "Comic Sans MS", cursive;
+  font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 1.3;

@@ -63,17 +63,24 @@ export function Hero() {
         <div className="cne-heromedia">
           {/* The loop this replaces was decoration, so it was loaded conditionally and
               never counted as the LCP. A still *is* the LCP: it ships eagerly, at high
-              priority, and is preloaded from `page.tsx`. */}
-          <img
-            src={HERO.src}
-            srcSet={HERO.srcSet}
-            sizes={HERO.sizes}
-            alt={HERO.alt}
-            width={HERO.width}
-            height={HERO.height}
-            fetchPriority="high"
-            decoding="async"
-          />
+              priority. It is deliberately not preloaded; `page.tsx` says why.
+
+              The <picture> exists only to offer AVIF ahead of the WebP `<img>` below —
+              same slot, same sizes, same box. It adds no layout of its own (see
+              `.cne-heromedia picture` in counter.css). */}
+          <picture>
+            <source type="image/avif" srcSet={HERO.avifSrcSet} sizes={HERO.sizes} />
+            <img
+              src={HERO.src}
+              srcSet={HERO.srcSet}
+              sizes={HERO.sizes}
+              alt={HERO.alt}
+              width={HERO.width}
+              height={HERO.height}
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
         </div>
       </div>
     </section>

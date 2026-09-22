@@ -114,9 +114,10 @@
 }
 
 @media (max-width: 699px) {
+  /* 4u of timeline padding + 1.6u, so the line runs through the dots. */
   .cne-drip-line,
   .cne-drip-drop {
-    left: calc(var(--u) * 1.6);
+    left: calc(var(--u) * 5.6);
   }
 }
 

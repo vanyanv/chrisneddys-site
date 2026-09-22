@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-order-links.mjs",
+    "icons:favicon": "node scripts/build-favicon.mjs",
     "images:shop": "node scripts/build-shop-images.mjs --in assets/shop/foam-trucker-blue --out public/shop/foam-trucker-blue",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/db-prepare.mjs migrate",

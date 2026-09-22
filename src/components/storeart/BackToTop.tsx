@@ -64,9 +64,11 @@ export function BackToTop() {
       className={`cne-backtop${visible && !overlayOpen ? " is-visible" : ""}${hop ? " is-hop" : ""}`}
       onClick={toTop}
       onAnimationEnd={() => setHop(false)}
-      aria-label="Back to top"
       tabIndex={visible && !overlayOpen ? 0 : -1}
     >
+      {/* Visible words so nobody has to guess what the monster is for; they
+          double as the button's accessible name. */}
+      <span className="cne-backtop-label">Scroll up</span>
       <svg
         viewBox="0 0 200 200"
         style={{ "--m-body": "#c6ff2b", "--m-iris": "#e63027" } as CSSProperties}

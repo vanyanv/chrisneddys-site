@@ -53,7 +53,7 @@ export default async function LocationPage({ params }: Params) {
           Business Profile until the doors do. The page's title, copy and
           visible address still say what is coming. */}
       {loc.isOpen && <JsonLdScript data={restaurantLd(loc)} />}
-      <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
+      <nav className="cne-sec cne-locd" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">
           <Link prefetch={false} href="/locations/" style={{ color: "inherit" }}>
             Locations
@@ -63,7 +63,7 @@ export default async function LocationPage({ params }: Params) {
       </nav>
       <StoreDetail loc={loc} hood={hood} />
       {!loc.isOpen && (
-        <section className="cne-sec cne-rv">
+        <section className="cne-sec cne-locd cne-rv">
           <div className="cne-eyebrow">Not open yet</div>
           <h2>First to know.</h2>
           <p className="cne-lede">
@@ -75,7 +75,7 @@ export default async function LocationPage({ params }: Params) {
         </section>
       )}
       {loc.isOpen && (
-        <section className="cne-sec cne-rv">
+        <section className="cne-sec cne-locd cne-rv">
           <div className="cne-eyebrow">After everyone else has closed</div>
           <h2>Open late.</h2>
           <p className="cne-lede">

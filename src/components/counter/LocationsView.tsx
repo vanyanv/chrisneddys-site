@@ -29,48 +29,56 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
        tags the Otter side the same way. */
     <div className="cne-locs" data-surface="locations-map">
       <div className="cne-mapwrap">
-        <div style={{ position: "relative", width: "100%" }}>
-          {mapCanvas}
-          <svg
-            viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
-            role="group"
-            aria-label="Pick a location on the map"
-            style={mapOverlayStyle}
-          >
-            {selected.isOpen && (
-              <circle
-                cx={projectX(selected.lng)}
-                cy={projectY(selected.lat)}
-                r={TWO_MILES}
-                className="cne-map-reach"
-              />
-            )}
-            {locations.map((loc) => (
-              <g
-                key={loc.id}
-                transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
-                className={pinClass(loc, sel)}
-              >
-                <MapPinArt loc={loc} />
+        {/* `.cne-split-frame` / `.cne-split-map` are the home page map
+            split's own classes (`counter.css`, "locations" region) — generic,
+            not scoped to that page, and reused here so this map fills its
+            desktop panel the same way: centred, with the roads fading into
+            the panel's own colour over any spare room instead of leaving a
+            flat empty strip. See `git show fb7b3bf`. */}
+        <div className="cne-split-frame">
+          <div className="cne-split-map" style={{ position: "relative" }}>
+            {mapCanvas}
+            <svg
+              viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
+              role="group"
+              aria-label="Pick a location on the map"
+              style={mapOverlayStyle}
+            >
+              {selected.isOpen && (
                 <circle
-                  className="hit"
-                  r={17}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`${loc.name} — ${loc.status}`}
-                  aria-pressed={loc.id === sel}
-                  onClick={() => setSel(loc.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSel(loc.id);
-                    }
-                  }}
+                  cx={projectX(selected.lng)}
+                  cy={projectY(selected.lat)}
+                  r={TWO_MILES}
+                  className="cne-map-reach"
                 />
-              </g>
-            ))}
-          </svg>
-          <MapCallout locationId={sel} />
+              )}
+              {locations.map((loc) => (
+                <g
+                  key={loc.id}
+                  transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
+                  className={pinClass(loc, sel)}
+                >
+                  <MapPinArt loc={loc} />
+                  <circle
+                    className="hit"
+                    r={17}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${loc.name} — ${loc.status}`}
+                    aria-pressed={loc.id === sel}
+                    onClick={() => setSel(loc.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSel(loc.id);
+                      }
+                    }}
+                  />
+                </g>
+              ))}
+            </svg>
+            <MapCallout locationId={sel} />
+          </div>
         </div>
       </div>
 

@@ -188,4 +188,14 @@
   .cne-cr-card p {
     font-size: 15px;
   }
+
+  /* The phone cap fits the phone-size label; at the desktop `.cne-big` size
+     (19px, 22px/34px padding) "SEE OPEN ROLES ON INDEED →" needs more than
+     320px and was wrapping to two lines at every desktop width. The button
+     sizes to its own label instead of a fixed cap, so it reads as one line
+     from 901px up without stretching edge to edge of the card. */
+  .cne-cr-card .cne-big {
+    max-width: none;
+    width: fit-content;
+  }
 }

@@ -84,12 +84,12 @@ export function SiteFooter() {
               className="cne-foot-mark"
             >
               <Image
-                src="/cne-logo.webp"
+                src="/cne-logo-2x.webp"
                 alt={brand.name}
                 width={309}
-                height={89}
+                height={87}
                 loading="eager"
-                style={{ aspectRatio: "309 / 89" }}
+                style={{ aspectRatio: "309 / 87" }}
               />
             </Link>
             <p>Smashed sliders, done right. Pop-up in {brand.founded}, Hollywood since 2021.</p>

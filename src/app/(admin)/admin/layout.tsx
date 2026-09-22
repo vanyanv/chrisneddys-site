@@ -69,10 +69,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="rack-guest-topbar">
           <div className="rack-brand">
             <Image
-              src="/cne-logo.webp"
+              src="/cne-logo-2x.webp"
               alt="Chris N Eddy's"
               width={309}
-              height={89}
+              height={87}
               className="rack-logo"
               priority
             />

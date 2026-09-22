@@ -54,7 +54,7 @@ export function SiteHeader() {
     <header className={`cne-header${lifted ? " is-lifted" : ""}`}>
       <div className="cne-nav">
         <Link prefetch={false} href="/" aria-label={`${brand.name} — Home`} className="cne-logo">
-          <Image src="/cne-logo.webp" alt={brand.name} width={309} height={89} priority />
+          <Image src="/cne-logo-2x.webp" alt={brand.name} width={309} height={87} priority />
         </Link>
         <div className="cne-nav-right">
           <OpenStatus head />

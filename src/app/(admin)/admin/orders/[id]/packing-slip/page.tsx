@@ -54,10 +54,10 @@ export default async function PackingSlipPage({ params }: { params: Promise<Para
         <header className="rack-slip-top">
           <div>
             <Image
-              src="/cne-logo.webp"
+              src="/cne-logo-2x.webp"
               alt={settings.storeName}
               width={309}
-              height={89}
+              height={87}
               className="rack-slip-logo"
               priority
             />

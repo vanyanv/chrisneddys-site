@@ -1,0 +1,56 @@
+/* Idea 16: peekaboo monsters.
+   The mascot beside each category heading keeps its normal resting spot —
+   only the paint moves, so the heading never reflows. `PeekabooMonsters`
+   adds `.cne-peeking` once, the first time the heading scrolls into view. */
+.cne-cat-peek {
+  display: inline-flex;
+}
+.cne-cat-peek.cne-peeking {
+  animation: cne-peek 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes cne-peek {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(6px) rotate(0deg);
+  }
+  55%,
+  80% {
+    transform: translateY(-9px) rotate(-8deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-cat-peek.cne-peeking {
+    animation: none;
+  }
+}
+
+/* Idea 12: checkerboard scroll bar, /menu only.
+   A thin strip pinned to the very top of the viewport. It sits inside the
+   sticky header's own top padding (`.cne-nav` has 8px), so its 5px never
+   touches the ORDER button or the tab row underneath, even though its
+   z-index is above the header's. */
+.cne-scrollbar-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cne-scrollbar-fill {
+  height: 100%;
+  width: 0%;
+  background: repeating-conic-gradient(var(--color-cne-ink) 0% 25%, var(--color-cne-cream) 0% 50%) 0
+    0 / 10px 10px;
+  transition: width 0.12s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-scrollbar-fill {
+    transition: none;
+  }
+}

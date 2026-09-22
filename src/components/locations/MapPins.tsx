@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+import "@/styles/map-pins-art.css";
 import { locations, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY, pxPerKm } from "@/data/laGeo";
 
@@ -11,19 +13,48 @@ export const mapOverlayStyle = {
   zIndex: 1,
 };
 
+/** The custom properties `cne-classic`/`cne-classic-sleep` (`MascotDefs`) read. */
+type PinStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
+
+/** Idea 9: each store's own color, read from `locations.ts`'s own ids —
+ * falls back to red for any id this map doesn't know about yet. The iris
+ * follows the same pairing the approved demo used: blue body gets a red
+ * iris, everything else gets a blue one, so no two colors are ever the same. */
+const PIN_BODY: Partial<Record<Location["id"], string>> = {
+  hollywood: "#e63027",
+  glendale: "#f5d20e",
+  vannuys: "#2e5fd9",
+};
+
+function pinStyle(id: Location["id"]): PinStyle {
+  const body = PIN_BODY[id] ?? "#e63027";
+  return { "--m-body": body, "--m-iris": body === "#2e5fd9" ? "#e63027" : "#2e5fd9" };
+}
+
 /**
- * The drawn part of a pin — ring, head, and the store's name above it.
+ * The drawn part of a pin — a small classic monster head on a short black
+ * point, plus the store's name above it. Asleep instead of awake for a
+ * "soon" location, same as a sold-out product (idea 11's `cne-classic-sleep`).
  *
  * Shared so the home page and /locations cannot drift apart: /locations wraps
  * this in a group that also carries the hit target and selection handlers,
  * while the home page draws it and nothing else.
  */
 export function MapPinArt({ loc }: { loc: Location }) {
+  const style = pinStyle(loc.id);
   return (
     <>
-      <circle className="ring" r={9} />
-      <circle className="head" r={6.4} />
-      <text className="cap" y={-13} textAnchor="middle">
+      <path className="cne-pin-point" d="M-5,-8 L0,0 L5,-8 Z" />
+      <use
+        href={loc.isOpen ? "#cne-classic" : "#cne-classic-sleep"}
+        className="cne-pin-mon"
+        x={-12}
+        y={-32}
+        width={24}
+        height={24}
+        style={style}
+      />
+      <text className="cap" y={-38} textAnchor="middle">
         {loc.name.toUpperCase()}
       </text>
     </>

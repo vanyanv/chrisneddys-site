@@ -8,6 +8,8 @@ import { ItemSheet } from "./ItemSheet";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
 import { Monster } from "@/components/mascots/Monster";
+import { PeekabooMonsters } from "@/components/storeart/PeekabooMonsters";
+import "@/styles/menu-art.css";
 
 const ORDER: MenuCategoryKey[] = ["combos", "sides", "secret", "drinks"];
 
@@ -33,6 +35,7 @@ export function MenuBrowser() {
 
   return (
     <>
+      <PeekabooMonsters />
       <div className="cne-menu">
         <aside className="cne-menu-side cne-sec">
           <div className="cne-eyebrow" id="cne-way-label">
@@ -67,16 +70,23 @@ export function MenuBrowser() {
 
         <div className="cne-menu-main">
           {ORDER.map((key) => (
-            <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
+            <section
+              className="cne-cat cne-sec cne-rv"
+              key={key}
+              id={`menu-${key}`}
+              data-peek-section={CATEGORY_MASCOT[key] ? true : undefined}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
                 {CATEGORY_MASCOT[key] && (
-                  <Monster
-                    species="classic"
-                    bodyColor={CATEGORY_MASCOT[key]!.bodyColor}
-                    irisColor={CATEGORY_MASCOT[key]!.irisColor}
-                    size={24}
-                  />
+                  <span className="cne-cat-peek" data-peek-mon>
+                    <Monster
+                      species="classic"
+                      bodyColor={CATEGORY_MASCOT[key]!.bodyColor}
+                      irisColor={CATEGORY_MASCOT[key]!.irisColor}
+                      size={24}
+                    />
+                  </span>
                 )}
               </div>
               <div className="cne-cat-rule" aria-hidden="true" />

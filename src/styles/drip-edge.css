@@ -1,0 +1,35 @@
+/* Idea 3: paint-drip dividers hanging off a colored section's bottom edge.
+   Scoped to `.cne-dripedge`, imported by `DripEdge.tsx` itself. */
+
+.cne-dripedge {
+  display: block;
+  width: 100%;
+  height: clamp(40px, 6vw, 70px);
+  /* Pulls up over the section's own border so the drips read as part of the
+     same colored block rather than a gap-then-shape below it. */
+  margin-top: -3px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cne-dripedge svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-dripedge svg {
+    animation: cne-drip-stretch 2.6s cubic-bezier(0.3, 0, 0.4, 1) infinite alternate;
+  }
+}
+
+@keyframes cne-drip-stretch {
+  from {
+    transform: scaleY(0.72);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}

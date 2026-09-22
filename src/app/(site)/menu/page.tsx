@@ -5,6 +5,7 @@ import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { SLIDER_PRICE, COMBO_FROM_PRICE, featuredItems } from "@/data/menu";
 import Link from "next/link";
 import { formatPrice } from "@/lib/otter";
+import { ScrollChecker } from "@/components/storeart/ScrollChecker";
 
 const title = "Menu & Prices — Sliders, Combos & Fries";
 /**
@@ -24,6 +25,8 @@ export const metadata: Metadata = pageMetadata({ title, description, path: "/men
 export default function MenuPage() {
   return (
     <>
+      {/* Idea 12: checkerboard scroll progress, /menu only. */}
+      <ScrollChecker />
       {/* The one page that carries the whole Menu node — every item, every
           price. Elsewhere the Restaurant nodes point at the stub. */}
       <JsonLdScript data={{ "@context": "https://schema.org", ...menuNode() }} />

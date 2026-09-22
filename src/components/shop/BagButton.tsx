@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { bagCount, hydrateBag, openBag, useBag } from "./bagStore";
+import "@/styles/shop-art.css";
+
+/** The custom property `cne-classic` (`MascotDefs`) reads. */
+type MonStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
+const MON_STYLE: MonStyle = { "--m-body": "#e63027", "--m-iris": "#2e5fd9" };
 
 /**
  * The bag button in the site header.
@@ -33,6 +38,10 @@ export function BagButton() {
 
   const previous = useRef(0);
   const [entrance, setEntrance] = useState<"new" | "bump" | null>(null);
+  // Idea 5: a quick chomp on the monster whenever an add lands, separate from
+  // `entrance` so it can run its own ~600ms and not fight the mount/bump
+  // animation sharing the same button.
+  const [chomping, setChomping] = useState(false);
 
   useEffect(() => {
     const was = previous.current;
@@ -42,7 +51,16 @@ export function BagButton() {
     // n → m is a nudge. Clearing first lets the same class replay back to back.
     setEntrance(null);
     const id = requestAnimationFrame(() => setEntrance(was === 0 ? "new" : "bump"));
-    return () => cancelAnimationFrame(id);
+    // Only an add gets the chomp; a removal just updates the count.
+    setChomping(false);
+    const chompFrame = count > was ? requestAnimationFrame(() => setChomping(true)) : 0;
+    const chompTimer = window.setTimeout(() => setChomping(false), 600);
+    return () => {
+      cancelAnimationFrame(id);
+      cancelAnimationFrame(chompFrame);
+      window.clearTimeout(chompTimer);
+      setChomping(false);
+    };
   }, [count]);
 
   return (
@@ -51,21 +69,19 @@ export function BagButton() {
         <button
           id="cne-bag-btn"
           type="button"
-          className={`cne-bagbtn${entrance ? ` is-${entrance}` : ""}`}
+          className={`cne-bagbtn${entrance ? ` is-${entrance}` : ""}${chomping ? " is-chomping" : ""}`}
           onClick={openBag}
           onAnimationEnd={() => setEntrance(null)}
           aria-haspopup="dialog"
           aria-label={`Open bag — ${count} ${count === 1 ? "item" : "items"}`}
         >
           <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
+            className="cne-bagbtn-mon"
+            viewBox="0 0 200 200"
+            style={MON_STYLE}
             aria-hidden="true"
           >
-            <path d="M4 7h16l-1.4 13.2a1 1 0 0 1-1 .8H6.4a1 1 0 0 1-1-.8L4 7Z" />
-            <path d="M8.5 10V6.5a3.5 3.5 0 0 1 7 0V10" />
+            <use href="#cne-classic" />
           </svg>
           <span className="cne-bagbtn-t">BAG</span>
           {/* Keyed on the count so React remounts the digit and the roll replays. */}

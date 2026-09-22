@@ -92,6 +92,29 @@ export function MascotDefs() {
           </g>
         </symbol>
 
+        {/* The classic body, asleep: the eye is covered by a body-colored disc
+            (no iris) with a closed-eye curve and three lashes drawn over it —
+            for sold-out merch and "soon" map pins, so "gone for now" reads as
+            resting rather than a plain grey label. */}
+        <symbol id="cne-classic-sleep" viewBox="0 0 200 200">
+          <use href="#cne-classic" />
+          <circle cx={100} cy={76} r={37} style={{ fill: "var(--m-body,#e63027)" }} />
+          <path
+            d="M68,74 Q100,100 132,74"
+            fill="none"
+            stroke="#14110d"
+            strokeWidth={8}
+            strokeLinecap="round"
+          />
+          <path
+            d="M78,86 l-6,10 M100,92 v11 M122,86 l6,10"
+            fill="none"
+            stroke="#14110d"
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
+        </symbol>
+
         <symbol id="cne-blacklight" viewBox="0 0 200 200">
           <circle
             cx={100}

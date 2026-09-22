@@ -9,6 +9,7 @@ import { brand } from "@/data/brand";
 import { orderUrl } from "@/lib/otter";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 import { BagButton } from "@/components/shop/BagButton";
+import { BiteTeeth } from "@/components/storeart/BiteTeeth";
 
 /**
  * The six primary destinations. Exported because `PrefetchNav` warms exactly
@@ -70,7 +71,9 @@ export function SiteHeader() {
             target="_blank"
             rel="noopener noreferrer"
           >
+            <BiteTeeth position="top" />
             ORDER<span className="cne-only-desk-i"> ONLINE →</span>
+            <BiteTeeth position="bottom" />
           </a>
         </div>
       </div>

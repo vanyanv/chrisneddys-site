@@ -3,6 +3,7 @@ import "@/styles/careers.css";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { Monster } from "@/components/mascots/Monster";
+import { DripEdge } from "@/components/storeart/DripEdge";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
 const title = "Careers";
@@ -59,6 +60,8 @@ export default function CareersPage() {
           </p>
         </div>
       </section>
+      {/* Idea 3: paint drips off the hero's own red. */}
+      <DripEdge color="var(--a-red-cta)" seed={2} />
 
       <div className="cne-cr-body">
         <div className="cne-cr-photo cne-rv">

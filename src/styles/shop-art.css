@@ -1,0 +1,74 @@
+/**
+ * Store-art additions to the shop: the sleeping sold-out badge (idea 11) and
+ * the header bag button's chomp (idea 5). Pure addition — the badge reuses
+ * `.cne-badge-corner` from `mascots.css` and the bag button's own
+ * `is-new`/`is-bump` entrance from `counter.css` untouched.
+ */
+
+/* ---- idea 11: sleeping sold-out monster ---------------------------------- */
+.cne-sleep-badge {
+  display: block;
+}
+
+.cne-sleep-badge svg {
+  display: block;
+}
+
+.cne-sleep-z {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  font-family: var(--font-marker);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-cne-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-sleep-z {
+    animation: cne-sleep-zz 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes cne-sleep-zz {
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+
+/* ---- idea 5: chomp into the bag ------------------------------------------ */
+/* The shopping-bag glyph swapped for a small classic monster, so there's
+   something with a mouth to chomp on arrival. */
+.cne-bagbtn-mon {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-bagbtn.is-chomping .cne-bagbtn-mon {
+    animation: cne-bag-chomp 0.5s ease-in-out;
+  }
+}
+
+@keyframes cne-bag-chomp {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.22) rotate(-10deg);
+  }
+  70% {
+    transform: scale(0.92) rotate(6deg);
+  }
+}

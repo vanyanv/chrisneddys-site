@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import "@/styles/opart-hover.css";
 import { Monster } from "@/components/mascots/Monster";
+import { SleepingBadge } from "@/components/storeart/SleepingBadge";
 import { ProductShot } from "./ProductShot";
 import { firstView, type MerchProduct } from "@/data/merch";
 
@@ -35,12 +37,18 @@ export function ProductGallery({
 
   return (
     <div className="cne-pdp-gal">
-      <div className={`cne-pdp-main${soldOut ? " is-soldout" : ""}`} id="cne-pdp-shot">
+      <div
+        className={`cne-pdp-main cne-opart-hover${soldOut ? " is-soldout" : ""}`}
+        id="cne-pdp-shot"
+      >
         {soldOut && <span className="cne-pdp-gone">All gone</span>}
         {/* Same not-sold-out signal the index card's badge uses — see
             `shop/page.tsx` for why there's no dedicated limited/exclusive
-            field to gate on instead. */}
-        {!soldOut && (
+            field to gate on instead. Sold out gets the sleeping badge
+            (idea 11) in the same corner instead. */}
+        {soldOut ? (
+          <SleepingBadge size={26} />
+        ) : (
           <Monster
             species="classic"
             bodyColor="#2e5fd9"

@@ -838,6 +838,7 @@ body {
 }
 .cne-loc-btns {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
   margin-top: 11px;
 }
@@ -855,10 +856,12 @@ body {
   display: block;
   color: var(--a-fg);
   /* A phone number or a price is one token — "544-3600" breaking after the
-     dash reads as a typo, not a line wrap. Keep every label on one line, and
-     the two narrow-width steps below buy that back at 320-340px, where a
-     long label and a half-width button no longer both fit. */
+     dash reads as a typo, not a line wrap. Keep every label on one line; the
+     max-content floor lets the row wrap instead when a long label and its
+     share of the row no longer both fit (buttons still share the width
+     equally whenever they fit side by side). */
   white-space: nowrap;
+  min-width: max-content;
 }
 .cne-mini.is-red {
   background: var(--a-red-cta);
@@ -933,10 +936,10 @@ body {
 
 /* ---- tablet tier: press + gram (600-900) --------------------------------
    Phone stacked the three quotes in one column and drew the gram grid as
-   three huge squares. Both get the multi-column room a tablet actually has;
-   `auto-fit`/`auto-fill` pick 2-3 press columns and 3-5 gram columns across
-   the tier rather than a single hard-coded count that only suits one edge
-   of it. */
+   three huge squares. Both get the multi-column room a tablet actually has,
+   with counts that divide what they hold: three quotes across and all six
+   gram photos in one row, as on desktop. A width-driven `auto-fill` count
+   left one quote or one or two photos stranded on a row of their own. */
 @media (min-width: 600px) and (max-width: 900px) {
   .cne-quote {
     border-left-width: 5px;
@@ -954,14 +957,14 @@ body {
   }
   .cne-pressrow {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
 
   .cne-ig {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
     gap: 6px;
-    padding: 0 28px 32px;
+    padding: 0 15px 32px;
   }
   .cne-ig > * {
     border-width: 2px;
@@ -2728,15 +2731,16 @@ body {
 
 /* ---- tablet tier: "Start here" cards (600-900) ---------------------------
    Phone's row layout (a 60px thumbnail with text beside it) came out as an
-   800px-wide sparse row at this width. Two photo cards across, scaled down
-   from the desktop card rather than stretching the phone row. `.cne-cardgrid`
+   800px-wide sparse row at this width. Three photo cards across, as on
+   desktop and scaled down from its card rather than stretching the phone
+   row (two across left the third card alone on a half-empty row). `.cne-cardgrid`
    is `position: relative` (home-art.css) and stays the ribbon's containing
    block at any column count, so `.cne-card-rib` needs nothing extra here. */
 @media (min-width: 600px) and (max-width: 900px) {
   .cne-cardgrid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
   }
   .cne-card {
     display: flex;

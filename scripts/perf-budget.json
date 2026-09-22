@@ -1,0 +1,137 @@
+{
+  "/": {
+    "iphone": {
+      "document": 71.0,
+      "font": 125,
+      "image": 340.5,
+      "script": 189.5,
+      "fetch": 182.0,
+      "lcpImage": 56.0
+    },
+    "desktop": {
+      "document": 71.0,
+      "font": 125,
+      "image": 225.0,
+      "script": 189.5,
+      "fetch": 182.0
+    }
+  },
+  "/menu/": {
+    "iphone": {
+      "document": 69.0,
+      "font": 125,
+      "image": 117.5,
+      "script": 189.5,
+      "fetch": 184.0
+    },
+    "desktop": {
+      "document": 69.0,
+      "font": 125,
+      "image": 117.5,
+      "script": 189.5,
+      "fetch": 184.5
+    }
+  },
+  "/locations/": {
+    "iphone": {
+      "document": 61.0,
+      "font": 125,
+      "image": 60.0,
+      "script": 189.5,
+      "fetch": 187.5,
+      "lcpImage": 34.0
+    },
+    "desktop": {
+      "document": 61.0,
+      "font": 125,
+      "image": 60.0,
+      "script": 189.5,
+      "fetch": 187.5,
+      "lcpImage": 34.0
+    }
+  },
+  "/shop/": {
+    "iphone": {
+      "document": 63.0,
+      "font": 125,
+      "image": 85.0,
+      "script": 189.5,
+      "fetch": 185.5,
+      "lcpImage": 59.0
+    },
+    "desktop": {
+      "document": 63.0,
+      "font": 125,
+      "image": 85.0,
+      "script": 189.5,
+      "fetch": 185.5,
+      "lcpImage": 59.0
+    }
+  },
+  "/shop/foam-trucker-blue/": {
+    "iphone": {
+      "document": 68.0,
+      "font": 125,
+      "image": 462.5,
+      "script": 195.0,
+      "fetch": 221.5
+    },
+    "desktop": {
+      "document": 68.0,
+      "font": 125,
+      "image": 217.5,
+      "script": 195.0,
+      "fetch": 221.5
+    }
+  },
+  "/about/": {
+    "iphone": {
+      "document": 67.0,
+      "font": 125,
+      "image": 26.0,
+      "script": 189.5,
+      "fetch": 184.0
+    },
+    "desktop": {
+      "document": 67.0,
+      "font": 125,
+      "image": 26.0,
+      "script": 189.5,
+      "fetch": 184.0
+    }
+  },
+  "/careers/": {
+    "iphone": {
+      "document": 63.5,
+      "font": 125,
+      "image": 64.5,
+      "script": 189.5,
+      "fetch": 221.5,
+      "lcpImage": 38.5
+    },
+    "desktop": {
+      "document": 63.5,
+      "font": 125,
+      "image": 51.0,
+      "script": 189.5,
+      "fetch": 221.5,
+      "lcpImage": 25.0
+    }
+  },
+  "/contact/": {
+    "iphone": {
+      "document": 66.0,
+      "font": 125,
+      "image": 26.0,
+      "script": 189.5,
+      "fetch": 184.5
+    },
+    "desktop": {
+      "document": 66.0,
+      "font": 125,
+      "image": 26.0,
+      "script": 189.5,
+      "fetch": 184.5
+    }
+  }
+}

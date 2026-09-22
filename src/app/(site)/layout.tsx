@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Bowlby_One, Inter, JetBrains_Mono, Permanent_Marker } from "next/font/google";
+import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
 import "@/styles/mascots.css";
@@ -46,16 +47,29 @@ const jetbrains = JetBrains_Mono({
 });
 
 /**
- * Not part of DESIGN.md's three-typeface system — added only for the small
- * "SLIDERS" footer signature (`.cne-tag-word`), which is the one place the
- * mural set calls for a marker-style scrawl. Exposed as its own CSS variable
- * so it stays scoped to that one class instead of leaking into the shared
+ * Not part of DESIGN.md's three-typeface system — used only for the graffiti
+ * eyebrows (`.cne-eyebrow`), the small "SLIDERS"/"Slide or Die" footer
+ * signature, and the sleeping badge's "z". Exposed as its own CSS variable
+ * so it stays scoped to those classes instead of leaking into the shared
  * type system.
+ *
+ * Loaded from a local subset (issue #87) instead of next/font/google's full
+ * Permanent Marker latin file (29 KB, preloaded ahead of the page's LCP
+ * image on every route even though the font paints small decorative text).
+ * The subset covers Basic Latin printable (U+0020-007E) plus the curly
+ * quotes/dashes/middle dot the copy actually uses (’ — · and their pairs
+ * ‘ – " "), since `.cne-eyebrow` is not forced to a single case — see
+ * scripts/subset-marker-font.sh for the exact command, source file and
+ * reasoning, and re-run it if new punctuation shows up in owner-edited copy.
+ * At ~18 KB it's still small enough to preload without hurting LCP.
  */
-const marker = Permanent_Marker({
-  subsets: ["latin"],
+const marker = localFont({
+  src: "../../fonts/permanent-marker-subset.woff2",
   weight: "400",
+  style: "normal",
   display: "optional",
+  preload: true,
+  adjustFontFallback: "Arial",
   variable: "--font-marker",
 });
 

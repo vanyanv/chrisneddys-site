@@ -74,6 +74,11 @@
   overflow: hidden;
 }
 
+.cne-cr-photo picture {
+  display: block;
+  width: 100%;
+}
+
 .cne-cr-photo img {
   display: block;
   width: 100%;

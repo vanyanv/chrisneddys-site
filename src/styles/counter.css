@@ -436,6 +436,11 @@ body {
   transform: rotate(-1deg);
   will-change: transform;
 }
+.cne-heromedia picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .cne-heromedia img {
   width: 100%;
   height: 100%;
@@ -977,7 +982,11 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  animation: cne-drop 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-lastcall {
+    animation: cne-drop 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+  }
 }
 @keyframes cne-drop {
   from {
@@ -1116,6 +1125,7 @@ body {
   transform: translateY(102%);
   transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
   max-height: 88vh;
+  max-height: 88dvh;
   display: flex;
   flex-direction: column;
 }
@@ -1166,7 +1176,7 @@ body {
 }
 /* Grows into spare height, never shrinks. The sheet's content does not fit a
    phone — hero, price, Ways, button and an open ticket come to about 980px
-   against 88vh — so something has to give, and it must not be this. The burger
+   against 88dvh — so something has to give, and it must not be this. The burger
    and the price are why the sheet was opened; the ticket is the part that was
    one tap down to begin with. So the body keeps its full height and the ticket
    below absorbs the overflow by scrolling inside itself. */

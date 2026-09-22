@@ -14,12 +14,26 @@ import { brand } from "@/data/brand";
  *
  * The preload in `app/page.tsx` must pass the *same* srcset and sizes. A
  * preload that disagrees with the `<img>` is a second, separate download.
+ *
+ * AVIF cuts (`hero-still-<w>.avif` plus the full-size `hero-still.avif`) sit
+ * alongside the WebP ones and are served first, via a `<picture>` in
+ * `Hero.tsx` — AVIF wins the byte-for-byte comparison at every width here,
+ * and the WebP `<img>` below is what browsers without AVIF support fall back
+ * to. A 402px-wide, 3x phone needs ~1100 device px for this slot, which is
+ * why 1100 is a rung in both ladders rather than jumping from 760/760 straight
+ * to the 1400w originals. Regenerate both ladders with
+ * `node scripts/build-photo-cuts.mjs` after replacing the source photo.
  */
+const WEBP_WIDTHS = [360, 560, 760, 1000, 1100] as const;
+const AVIF_WIDTHS = [360, 560, 760, 1100] as const;
+
 export const HERO = {
   src: "/hero-still.webp",
-  srcSet: [360, 560, 760, 1000]
-    .map((w) => `/hero-still-${w}.webp ${w}w`)
+  srcSet: WEBP_WIDTHS.map((w) => `/hero-still-${w}.webp ${w}w`)
     .concat("/hero-still.webp 1400w")
+    .join(", "),
+  avifSrcSet: AVIF_WIDTHS.map((w) => `/hero-still-${w}.avif ${w}w`)
+    .concat("/hero-still.avif 1400w")
     .join(", "),
   sizes: "(min-width: 901px) 42vw, calc(100vw - 36px)",
   width: 1400,

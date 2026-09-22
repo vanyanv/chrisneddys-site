@@ -3,7 +3,7 @@
     "iphone": {
       "document": 71.0,
       "font": 125,
-      "image": 185.0,
+      "image": 340.5,
       "script": 189.5,
       "fetch": 182.0,
       "lcpImage": 56.0
@@ -11,7 +11,7 @@
     "desktop": {
       "document": 71.0,
       "font": 125,
-      "image": 136.5,
+      "image": 225.0,
       "script": 189.5,
       "fetch": 182.0
     }
@@ -20,14 +20,14 @@
     "iphone": {
       "document": 69.0,
       "font": 125,
-      "image": 90.5,
+      "image": 117.5,
       "script": 189.5,
       "fetch": 184.0
     },
     "desktop": {
       "document": 69.0,
       "font": 125,
-      "image": 116.0,
+      "image": 117.5,
       "script": 189.5,
       "fetch": 184.5
     }
@@ -72,14 +72,14 @@
     "iphone": {
       "document": 68.0,
       "font": 125,
-      "image": 338.5,
+      "image": 462.5,
       "script": 195.0,
       "fetch": 221.5
     },
     "desktop": {
       "document": 68.0,
       "font": 125,
-      "image": 209.5,
+      "image": 217.5,
       "script": 195.0,
       "fetch": 221.5
     }

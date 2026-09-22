@@ -327,6 +327,17 @@ would measure the intro overlay's own paint, not the page underneath it.
 
 ### `pnpm perf:budget` — did this ship more bytes than it's allowed to?
 
+**The budget is calibrated to CI's browser.** CI runs the Chromium that the
+repo's pinned `@playwright/test` downloads (Chrome 153 when this was set up).
+Image totals depend on the browser: newer Chrome starts lazy-loaded images
+from further below the fold, so it fetches more of them on first load. On
+22 September 2026 the home page read 168 KB of images on iPhone in this
+sandbox's Chrome 141 and 309 KB in CI. Fonts, script, document and prefetch
+bytes were identical in both. So the image budgets in `perf-budget.json` come
+from the CI run, and a local run on an older Chromium reads lower and passes
+more easily. When a budget has to move, take the new number from the CI log,
+not from a local run.
+
 `pnpm perf:budget` (`scripts/perf-budget.mjs`) is deliberately **not** the
 throttled, multi-run method above — it applies no network or CPU throttling
 at all, so its byte counts depend only on what the page actually requests,

@@ -2528,9 +2528,38 @@ body {
     padding: 52px 44px;
     background: var(--a-cream);
   }
+  /* The map keeps its own shape, so whenever the card beside it is the
+     taller half there is room left over in this cell. The cell is painted
+     the map's own land colour and the map sits in the middle of it, its
+     roads fading out into that colour over half the spare room (at most
+     56px) instead of stopping at a hard edge. When the map is the taller
+     half, the `::before` spacer makes the row at least the map's height and
+     there is nothing to fade. The frame is the size container the map
+     measures that spare room against. */
   .cne-split-r {
     position: relative;
-    background: var(--a-bg);
+    background: var(--a-mapbg);
+  }
+  .cne-split-r::before {
+    content: "";
+    display: block;
+    aspect-ratio: 360 / 259;
+  }
+  .cne-split-frame {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    container-type: size;
+  }
+  .cne-split-map {
+    --spare: max(0px, 100cqh - 100cqw * 259 / 360);
+    --fade: min(56px, var(--spare) / 2);
+    position: relative;
+    width: 100%;
+  }
+  .cne-split-map > img {
+    mask-image: linear-gradient(#0000, #000 var(--fade), #000 calc(100% - var(--fade)), #0000);
   }
 }
 
@@ -2548,13 +2577,6 @@ body {
     max-width: 34ch;
     text-align: right;
     line-height: 1.5;
-  }
-  /* The map fills its half of the split and crops rather than letterboxes. */
-  .cne-split-r svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
 }
 /* On a phone the split is one column and the map is decoration we can drop. */

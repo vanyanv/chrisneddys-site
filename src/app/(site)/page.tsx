@@ -8,7 +8,6 @@ import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
 import { Monster } from "@/components/mascots/Monster";
-import { MascotDecor } from "@/components/mascots/MascotDecor";
 import { Vortex } from "@/components/storeart/Vortex";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
@@ -116,17 +115,12 @@ export default function HomePage() {
             LA, so the home page draws the same three the prototype does. It is
             a picture here — /locations owns the interactive version. */}
         <div className="cne-split-r">
-          <MascotDecor
-            kind="court"
-            colorA="#3a352c"
-            size="100%"
-            className="cne-court-bg"
-            style={{ opacity: 0.12 }}
-          />
-          <div style={{ position: "relative", width: "100%" }} aria-hidden="true">
-            <LocationsMapCanvas />
-            <MapPins />
-            <MapCallout />
+          <div className="cne-split-frame">
+            <div className="cne-split-map" aria-hidden="true">
+              <LocationsMapCanvas />
+              <MapPins />
+              <MapCallout />
+            </div>
           </div>
         </div>
       </section>

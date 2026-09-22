@@ -1,19 +1,15 @@
-import { locations } from "@/data/locations";
-import { mapBox, projectX, projectY, pxPerKm } from "@/data/laGeo";
-import { namedStreets, shields } from "@/data/laGeoPaths";
+import { mapBox } from "@/data/laGeo";
+import { SCALE_BAR, TWO_MILES } from "@/components/locations/mapLayout";
+import { placeMapLettering } from "@/components/locations/mapLettering";
 
-const TWO_MILES = 3.2187 * pxPerKm;
-
-/** Store labels win; a street name never sits underneath one. */
-const storeLabelAnchors = locations.map((l) => [projectX(l.lng), projectY(l.lat) - 13] as const);
-
-function labelIsClear(x: number, y: number): boolean {
-  if (x < 12 || x > mapBox.w - 12 || y < 9 || y > mapBox.h - 20) return false;
-  return !storeLabelAnchors.some(([cx, cy]) => Math.abs(cx - x) < 34 && Math.abs(cy - y) < 9);
-}
+/**
+ * Street names and shields that clear every pin, tag, plate and edge — worked
+ * out once per build, since none of those move. See `mapLettering.ts`.
+ */
+const lettering = placeMapLettering();
 
 /** The lettering layer sits over the geometry and under the pins. */
-const lettering = {
+const letteringStyle = {
   position: "absolute" as const,
   inset: 0,
   width: "100%",
@@ -61,16 +57,14 @@ export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
         style={{ display: "block", width: "100%", height: "auto" }}
       />
 
-      <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={lettering}>
-        {namedStreets.map((s) =>
-          labelIsClear(s.label[0], s.label[1]) ? (
-            <text key={`l-${s.name}`} className="cne-map-label" x={s.label[0]} y={s.label[1] - 2.6}>
-              {s.name}
-            </text>
-          ) : null,
-        )}
+      <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={letteringStyle}>
+        {lettering.labels.map((l) => (
+          <text key={`l-${l.name}`} className="cne-map-label" x={l.x} y={l.y}>
+            {l.name}
+          </text>
+        ))}
 
-        {shields.map((s) => (
+        {lettering.shields.map((s) => (
           <g key={s.ref} className="cne-map-shield" transform={`translate(${s.x},${s.y})`}>
             <rect x={-7.5} y={-5} width={15} height={10} rx={2.2} />
             <text y={2}>{s.ref}</text>
@@ -78,7 +72,7 @@ export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
         ))}
 
         {/* Scale bar, on its own plate so nothing reads through it. */}
-        <g transform={`translate(12,${mapBox.h - 13})`}>
+        <g transform={`translate(${SCALE_BAR.x},${SCALE_BAR.y})`}>
           <rect className="cne-map-plate" x={-6} y={-8} width={TWO_MILES + 30} height={16} rx={3} />
           <line x2={TWO_MILES} className="cne-map-rule" />
           <line y1={-2.6} y2={2.6} className="cne-map-rule" />

@@ -2561,6 +2561,11 @@ body {
   .cne-split-map > img {
     mask-image: linear-gradient(#0000, #000 var(--fade), #000 calc(100% - var(--fade)), #0000);
   }
+  /* The whole map is a link to /locations. */
+  .cne-split-map:focus-visible {
+    outline: 3px solid var(--a-red);
+    outline-offset: -6px;
+  }
 }
 
 /* The right-hand note beside a section heading — desktop only, as in the
@@ -2615,33 +2620,27 @@ body {
   position: relative;
   background: var(--a-mapbg);
   border-bottom: 3px solid var(--a-ink);
-  overflow: hidden;
+  /* clip, not hidden: hidden would make this a scroll container and stop the
+     desktop map sticking under the header. */
+  overflow: clip;
 }
 .cne-mapwrap svg {
   display: block;
   width: 100%;
   height: auto;
 }
-.cne-callout {
-  position: absolute;
-  background: var(--a-ink);
-  color: #fff2c9;
-  border: 2px solid var(--a-yel);
-  padding: 7px 10px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  pointer-events: none;
-  transform: translate(-50%, -185%);
-  white-space: nowrap;
-  z-index: 2;
-}
-.cne-callout small {
-  display: block;
-  font-weight: 400;
-  opacity: 0.7;
-  font-size: 8.5px;
-  margin-top: 2px;
+/* The map's own box. The map keeps its 360:259 shape, so on a phone held
+   sideways it would be taller than the screen and the one open store (low on
+   the map, in Hollywood) would sit under the fold with the order dock over
+   it. Capping the width by the height left between the sticky header and the
+   dock keeps the whole map on screen; the wrap's map colour fills the sides.
+   On an upright phone or a desktop the cap is far wider than the column, so
+   nothing changes there. */
+.cne-mapbox {
+  position: relative;
+  width: 100%;
+  max-width: max(300px, (100svh - var(--cne-stuck) - 72px) * 360 / 259);
+  margin-inline: auto;
 }
 .cne-notify {
   display: flex;
@@ -2669,9 +2668,17 @@ body {
     border-bottom: none;
     border-right: 4px solid var(--a-ink);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 26px;
+  }
+  /* The store list is usually taller than the map. Centred, the map floated
+     in the middle of a tall column with a band of empty paper above it;
+     pinned under the header instead, it starts level with "Find us." and
+     stays in view while the cards scroll past it. */
+  .cne-mapbox {
+    position: sticky;
+    top: calc(var(--cne-stuck) - 8px);
   }
   .cne-locs-list {
     padding: 38px 34px;
@@ -2686,13 +2693,6 @@ body {
   }
   .cne-locs-list h1::after {
     content: none;
-  }
-  .cne-callout {
-    font-size: 12px;
-    padding: 9px 13px;
-  }
-  .cne-callout small {
-    font-size: 11px;
   }
 }
 

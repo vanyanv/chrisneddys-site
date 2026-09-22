@@ -46,6 +46,9 @@ export type OrderSurface =
   | "location-card"
   | "location-page"
   | "locations-map"
+  // The quiet order link under the Ways buttons on /about, so a click from the
+  // story page's own path shows up separately from the header/hero surfaces.
+  | "about"
   // No caller passes this to `orderUrl` — there is no order link in the
   // footer — but `data-surface="footer"` is set on the `<footer>` itself in
   // SiteFooter.tsx so the per-store tel: links inside it report `call_click`

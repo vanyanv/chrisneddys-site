@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/about.css";
-import { TwoWays } from "@/components/about/TwoWays";
-import { StorySeam } from "@/components/about/StorySeam";
-import { StoryColumns } from "@/components/about/StoryColumns";
-import { StoryPress } from "@/components/about/StoryPress";
-import { StoryClose } from "@/components/about/StoryClose";
-import { DripEdge } from "@/components/storeart/DripEdge";
+import { DripStory } from "@/components/about/DripStory";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { brand } from "@/data/brand";
@@ -46,16 +41,10 @@ const aboutLd = {
 
 export default function AboutPage() {
   return (
-    <div className="cne-story">
+    <>
       <JsonLdScript data={breadcrumbLd([{ name: "About", path: "/about/" }])} />
       <JsonLdScript data={aboutLd} />
-      <TwoWays />
-      <StorySeam />
-      {/* Idea 3: paint drips off the seam band's own red. */}
-      <DripEdge color="var(--a-nav)" seed={3} />
-      <StoryColumns />
-      <StoryPress />
-      <StoryClose />
-    </div>
+      <DripStory />
+    </>
   );
 }

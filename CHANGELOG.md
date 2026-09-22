@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: the map beside "Where we are." on the home page no longer stops short on laptop-sized screens. On desktop windows narrower than about 1536px it ended partway down its panel with a faint basketball court showing in the empty strip underneath. The map now sits in the middle of its panel on the map's own paper colour, with the roads fading out at the top and bottom, and the stray court is gone ([#90](https://github.com/vanyanv/chrisneddys-site/issues/90))
 - Site: the mobile site no longer scrolls sideways or past the bottom of the page. The footer's faint numbers-wall texture was bleeding off its own edges uncontained on every page; it's now clipped in place ([#76](https://github.com/vanyanv/chrisneddys-site/issues/76))
 - Site: a mistyped or dead link no longer dead-ends. Next only ran the site's branded "not on the menu" 404 for links inside the site itself — a URL that matched no route at all (an old bookmark, a typo, a broken external link) fell through to the framework's own bare, unstyled 404 with no header and no way back. There's now a proper one for that case too ([#70](https://github.com/vanyanv/chrisneddys-site/issues/70))
 - Site: you can now skip past the header straight to the page content with a keyboard, instead of tabbing through the full nav on every single page. The contact page also names how to report an accessibility problem ([#71](https://github.com/vanyanv/chrisneddys-site/issues/71))

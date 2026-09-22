@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Vortex } from "./Vortex";
+import { INTRO_GATE_CLASS } from "@/lib/intro";
 import "@/styles/vortex.css";
 
 /**
@@ -82,6 +83,9 @@ export function SlideCode() {
 
     const onKeydown = (e: KeyboardEvent) => {
       if (isTypingTarget(e.target) || e.key.length !== 1) return;
+      // The welcome intro (issue #81) is its own vortex overlay — never let
+      // this one fire on top of it.
+      if (document.documentElement.classList.contains(INTRO_GATE_CLASS)) return;
       bufferRef.current = (bufferRef.current + e.key.toUpperCase()).slice(-CODE.length);
       if (bufferRef.current === CODE) {
         bufferRef.current = "";

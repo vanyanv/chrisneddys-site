@@ -1,0 +1,84 @@
+/* Home page welcome intro (issue #81) — a first-visit, desktop-only vortex
+   overlay. See src/lib/intro.ts for the gate and src/components/storeart/
+   WelcomeIntro.tsx for the timeline. Scoped to `.cne-intro-*` only. */
+
+/* Hidden by default so this costs nothing for the visitors who never get the
+   intro (returning visitors, mobile, reduced motion). The inline gate script
+   in WelcomeIntro.tsx adds `cne-intro-gate` to <html> synchronously, before
+   hydration, so this curtain covers the page before React — or even the
+   home page's own layout — has painted anything, and the real overlay
+   content (mounted a beat later by React) shares its cream background, so
+   the handoff is invisible. */
+.cne-intro-overlay {
+  display: none;
+}
+html.cne-intro-gate .cne-intro-overlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  /* Above the sticky header (z-index: 30) and the bag drawer (91). */
+  z-index: 9500;
+  overflow: hidden;
+  background: var(--color-cne-cream);
+  transform-origin: 50% 46%;
+}
+
+/* The whole overlay — vortex, logo and its own cream background together —
+   scales and rotates itself away, revealing the page underneath. */
+html.cne-intro-gate .cne-intro-overlay.is-out {
+  animation: cne-intro-out 0.6s cubic-bezier(0.7, 0, 0.9, 0.4) forwards;
+}
+@keyframes cne-intro-out {
+  to {
+    transform: scale(3.4) rotate(45deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* The real logo (see WelcomeIntro.tsx), zooming in from the vortex's own
+   vanishing point. 309x89 natural size — capped well under 2x. */
+.cne-intro-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(40vw, 600px);
+  height: auto;
+  filter: drop-shadow(6px 8px 0 rgba(20, 17, 13, 0.55));
+  animation: cne-intro-zoom 0.9s cubic-bezier(0.2, 1.35, 0.4, 1) 0.7s both;
+}
+@keyframes cne-intro-zoom {
+  from {
+    transform: translate(-50%, -50%) scale(0.05) rotate(-200deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.cne-intro-skip {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 9600;
+  font: 700 13px/1 var(--font-body);
+  color: var(--color-cne-ink);
+  background: var(--color-cne-cream);
+  border: 2px solid var(--color-cne-ink);
+  border-radius: 999px;
+  padding: 0.65em 1.1em;
+  cursor: pointer;
+}
+.cne-intro-skip:focus-visible {
+  outline: 3px solid var(--color-cne-red);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.cne-intro-gate .cne-intro-overlay.is-out,
+  .cne-intro-logo {
+    animation: none;
+  }
+}

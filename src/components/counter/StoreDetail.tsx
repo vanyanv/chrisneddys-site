@@ -19,7 +19,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
 
   return (
     <>
-      <section className="cne-sec" style={{ position: "relative" }}>
+      <section className="cne-sec cne-locd" style={{ position: "relative" }}>
         <div className="cne-eyebrow">{loc.isOpen ? "Open now" : "Opening soon"}</div>
         {/* Wall-mural diamond behind the store's name — decorative only, so it
             sits at `zIndex: 0` while the heading below is lifted above it. */}
@@ -63,7 +63,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         </div>
       </section>
 
-      <section className="cne-sec cne-rv">
+      <section className="cne-sec cne-locd cne-rv">
         <div className="cne-eyebrow">What we serve in {hood}</div>
         <h2>Same menu everywhere.</h2>
         <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, color: "var(--a-sub)" }}>
@@ -86,7 +86,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         </div>
       </section>
 
-      <section className="cne-sec cne-rv" style={{ paddingBottom: 30 }}>
+      <section className="cne-sec cne-locd cne-rv" style={{ paddingBottom: 30 }}>
         <div className="cne-eyebrow">Also nearby</div>
         <h2>Our other locations.</h2>
         {others.map((o) => (

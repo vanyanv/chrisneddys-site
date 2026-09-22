@@ -467,6 +467,56 @@
   }
 }
 
+/* ---- tablet tier (600-900px) ----------------------------------------------
+   Phone's stacked layout — full-width photo, four huge thumbs, buy box below
+   both — stretched to this width put a square product shot at ~750px tall
+   and pushed the title, price and Add to bag roughly a page down. Borrows
+   the desktop grid's two columns (photo + thumbs left, buy box right) so the
+   price and the button are on screen without waiting for 901px. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-pdp-crumb {
+    padding: 16px 20px 0;
+  }
+
+  .cne-pdp {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    gap: 20px;
+    padding: 16px 20px 8px;
+    align-items: start;
+  }
+
+  .cne-pdp-gal {
+    gap: 8px;
+  }
+
+  .cne-pdp-buy h1 {
+    font-size: 27px;
+  }
+
+  /* The buy row is already on screen beside the photo at this width — same
+     reasoning as the desktop rule further down. */
+  .cne-pdp-sticky {
+    display: none;
+  }
+}
+
+/* A short landscape window (874x402 and similar) still gets the two-column
+   tablet layout above, but half the column's width can still be taller than
+   the whole viewport for a square shot. Cap the shot to a share of the
+   viewport height and let its width follow from the aspect ratio already set
+   on `.cne-capshot`, so it never runs past the bottom of the screen. */
+@media (min-width: 600px) and (max-width: 900px) and (max-height: 500px) {
+  .cne-pdp-main {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cne-pdp-main .cne-capshot {
+    width: auto;
+    max-height: 65vh;
+  }
+}
+
 /* ---- desktop ------------------------------------------------------------ */
 @media (min-width: 901px) {
   .cne-pdp-crumb {

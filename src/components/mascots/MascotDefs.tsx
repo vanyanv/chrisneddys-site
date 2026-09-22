@@ -4,19 +4,24 @@
  * root layout — never inline per-instance, since `<symbol>` markup this size
  * repeated 19 times over would bloat every page for no visual difference.
  *
- * Pixel-matched to the owner-approved Sitewide Monster Map design artifact:
- * every id, coordinate and color default here is intentional. Don't "clean
- * up" a coordinate without checking the artifact first.
+ * The mouth and teeth were redrawn to match the murals on the Hollywood
+ * location's walls: a wide grin filling the bottom of the face, with a few
+ * fat, rounded, staggered teeth instead of small sharp spikes. Every other
+ * id, coordinate and color default here is still intentional. Don't "clean
+ * up" a coordinate without checking the murals first.
  */
 export function MascotDefs() {
   return (
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
       <defs>
         <clipPath id="cne-mouth-lg">
-          <ellipse cx={100} cy={150} rx={54} ry={32} />
+          <path d="M34.3,112 C71.1,121 128.9,121 165.7,112 Q172.7,113 169.7,124 A72,72 0 0 1 30.3,124 Q27.3,113 34.3,112 Z" />
         </clipPath>
         <clipPath id="cne-mouth-sm">
-          <ellipse cx={100} cy={132} rx={42} ry={24} />
+          <path d="M40,114 C73.6,122 126.4,122 160,114 Q167,115 164,126 A66,66 0 0 1 36,126 Q33,115 40,114 Z" />
+        </clipPath>
+        <clipPath id="cne-mouth-bubble">
+          <path d="M19.1,53 C36.4,57 63.6,57 80.9,53 Q87.9,54 84.9,59 A36,36 0 0 1 15.1,59 Q12.1,54 19.1,53 Z" />
         </clipPath>
 
         <symbol id="cne-classic" viewBox="0 0 200 200">
@@ -29,24 +34,50 @@ export function MascotDefs() {
             strokeWidth={9}
           />
           <g clipPath="url(#cne-mouth-lg)">
-            <ellipse cx={100} cy={150} rx={54} ry={32} fill="#14110d" />
+            <path
+              d="M34.3,112 C71.1,121 128.9,121 165.7,112 Q172.7,113 169.7,124 A72,72 0 0 1 30.3,124 Q27.3,113 34.3,112 Z"
+              fill="#14110d"
+            />
             <g className="cne-teeth-top">
-              <polygon points="52,123 66,123 59,148" fill="#fff8e7" />
-              <polygon points="68,123 80,123 74,141" fill="#fff8e7" />
-              <polygon points="82,123 99,123 90,150" fill="#fff8e7" />
-              <polygon points="101,123 115,123 108,144" fill="#fff8e7" />
-              <polygon points="117,123 131,123 124,149" fill="#fff8e7" />
-              <polygon points="133,123 147,123 140,142" fill="#fff8e7" />
+              <path
+                d="M32,106.4 C32,123.3 40.5,135.4 45,135.4 C49.5,135.4 60,123.3 60,106.4 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M62,110.3 C62,130.6 76.6,145.3 83,145.3 C89.4,145.3 102,130.6 102,110.3 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M99,110.3 C99,130 111.6,144.3 118,144.3 C124.4,144.3 139,130 139,110.3 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M137,106.8 C137,123.6 149.2,135.8 154,135.8 C158.8,135.8 167,123.6 167,106.8 Z"
+                fill="#fff8e7"
+              />
             </g>
             <g className="cne-teeth-bottom">
-              <polygon points="58,177 72,177 65,157" fill="#fff8e7" />
-              <polygon points="76,177 90,177 83,152" fill="#fff8e7" />
-              <polygon points="94,177 111,177 102,160" fill="#fff8e7" />
-              <polygon points="114,177 129,177 121,153" fill="#fff8e7" />
-              <polygon points="133,177 146,177 139,158" fill="#fff8e7" />
+              <path
+                d="M45,175.2 C45,158.3 59.6,146.2 65,146.2 C70.4,146.2 79,158.3 79,175.2 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M80,186 C80,168.6 92.9,156 99,156 C105.1,156 118,168.6 118,186 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M119,176.4 C119,160.1 128.6,148.4 134,148.4 C139.4,148.4 153,160.1 153,176.4 Z"
+                fill="#fff8e7"
+              />
             </g>
           </g>
-          <ellipse cx={100} cy={150} rx={54} ry={32} fill="none" stroke="#14110d" strokeWidth={7} />
+          <path
+            d="M34.3,112 C71.1,121 128.9,121 165.7,112 Q172.7,113 169.7,124 A72,72 0 0 1 30.3,124 Q27.3,113 34.3,112 Z"
+            fill="none"
+            stroke="#14110d"
+            strokeWidth={7}
+            strokeLinejoin="round"
+          />
           <g className="cne-eye">
             <circle cx={100} cy={76} r={33} fill="#fff8e7" stroke="#14110d" strokeWidth={6} />
             <circle
@@ -71,22 +102,50 @@ export function MascotDefs() {
             strokeWidth={9}
           />
           <g clipPath="url(#cne-mouth-sm)">
-            <ellipse cx={100} cy={132} rx={42} ry={24} fill="#14110d" />
+            <path
+              d="M40,114 C73.6,122 126.4,122 160,114 Q167,115 164,126 A66,66 0 0 1 36,126 Q33,115 40,114 Z"
+              fill="#14110d"
+            />
             <g className="cne-teeth-top">
-              <polygon points="64,112 76,112 70,130" fill="#fff8e7" />
-              <polygon points="80,112 90,112 85,125" fill="#fff8e7" />
-              <polygon points="94,112 108,112 101,132" fill="#fff8e7" />
-              <polygon points="112,112 124,112 118,127" fill="#fff8e7" />
-              <polygon points="128,112 140,112 134,131" fill="#fff8e7" />
+              <path
+                d="M38,108.2 C38,123.9 45.8,135.2 50,135.2 C54.2,135.2 64,123.9 64,108.2 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M66,111.6 C66,130.8 79.2,144.6 85,144.6 C90.8,144.6 102,130.8 102,111.6 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M100,111.5 C100,130.1 111.2,143.5 117,143.5 C122.8,143.5 136,130.1 136,111.5 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M134,108.4 C134,124.1 145.5,135.4 150,135.4 C154.5,135.4 162,124.1 162,108.4 Z"
+                fill="#fff8e7"
+              />
             </g>
             <g className="cne-teeth-bottom">
-              <polygon points="70,152 82,152 76,138" fill="#fff8e7" />
-              <polygon points="88,152 100,152 94,134" fill="#fff8e7" />
-              <polygon points="104,152 118,152 111,140" fill="#fff8e7" />
-              <polygon points="122,152 134,152 128,136" fill="#fff8e7" />
+              <path
+                d="M50,174.6 C50,158.9 63.9,147.6 69,147.6 C74.1,147.6 82,158.9 82,174.6 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M83,184 C83,167.8 94.6,156 100,156 C105.4,156 117,167.8 117,184 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M118,174.6 C118,159.5 126.9,148.6 132,148.6 C137.1,148.6 150,159.5 150,174.6 Z"
+                fill="#fff8e7"
+              />
             </g>
           </g>
-          <ellipse cx={100} cy={132} rx={42} ry={24} fill="none" stroke="#14110d" strokeWidth={6} />
+          <path
+            d="M40,114 C73.6,122 126.4,122 160,114 Q167,115 164,126 A66,66 0 0 1 36,126 Q33,115 40,114 Z"
+            fill="none"
+            stroke="#14110d"
+            strokeWidth={6}
+            strokeLinejoin="round"
+          />
           <g className="cne-eye">
             <circle cx={100} cy={78} r={30} fill="#fff8e7" stroke="#14110d" strokeWidth={6} />
             <circle
@@ -110,18 +169,40 @@ export function MascotDefs() {
             stroke="#14110d"
             strokeWidth={5}
           />
-          <g className="cne-eye">
-            <circle cx={50} cy={40} r={15} fill="#fff8e7" stroke="#14110d" strokeWidth={3} />
-            <circle cx={50} cy={40} r={7} style={{ fill: "var(--m-iris,#2e5fd9)" }} />
-            <circle cx={50} cy={40} r={3} fill="#14110d" />
+          <g clipPath="url(#cne-mouth-bubble)">
+            <path
+              d="M19.1,53 C36.4,57 63.6,57 80.9,53 Q87.9,54 84.9,59 A36,36 0 0 1 15.1,59 Q12.1,54 19.1,53 Z"
+              fill="#14110d"
+            />
+            <g className="cne-teeth-top">
+              <path
+                d="M27,47.5 C27,58.5 33,66.5 36,66.5 C39,66.5 45,58.5 45,47.5 Z"
+                fill="#fff8e7"
+              />
+              <path
+                d="M51,47.7 C51,58.7 58,66.7 61,66.7 C64,66.7 69,58.7 69,47.7 Z"
+                fill="#fff8e7"
+              />
+            </g>
+            <g className="cne-teeth-bottom">
+              <path
+                d="M39,93.9 C39,84.1 45,76.9 48,76.9 C51,76.9 57,84.1 57,93.9 Z"
+                fill="#fff8e7"
+              />
+            </g>
           </g>
           <path
-            d="M33,63 Q50,78 67,63"
+            d="M19.1,53 C36.4,57 63.6,57 80.9,53 Q87.9,54 84.9,59 A36,36 0 0 1 15.1,59 Q12.1,54 19.1,53 Z"
             fill="none"
             stroke="#14110d"
-            strokeWidth={5}
-            strokeLinecap="round"
+            strokeWidth={3.5}
+            strokeLinejoin="round"
           />
+          <g className="cne-eye">
+            <circle cx={50} cy={34} r={14} fill="#fff8e7" stroke="#14110d" strokeWidth={3} />
+            <circle cx={50} cy={34} r={7} style={{ fill: "var(--m-iris,#2e5fd9)" }} />
+            <circle cx={50} cy={34} r={3} fill="#14110d" />
+          </g>
         </symbol>
 
         <symbol id="cne-bullseye" viewBox="0 0 200 200">

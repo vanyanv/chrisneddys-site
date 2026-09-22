@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Site: the monster mascots' mouths now match the murals on the Hollywood location's walls, with a wide grin and a few big, rounded teeth instead of a small mouth full of sharp spikes ([#78](https://github.com/vanyanv/chrisneddys-site/issues/78))
 - Site: the careers page has its own look now instead of sharing the privacy/terms page template. It gets a red hero band, a real photo and a proper card for the Indeed link, matching the rest of the site, and no longer calls a location a "counter" ([#72](https://github.com/vanyanv/chrisneddys-site/issues/72))
 
 ### Fixed

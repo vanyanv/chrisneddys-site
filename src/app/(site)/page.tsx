@@ -12,6 +12,7 @@ import { MascotDecor } from "@/components/mascots/MascotDecor";
 import { Vortex } from "@/components/storeart/Vortex";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
+import { WelcomeIntro } from "@/components/storeart/WelcomeIntro";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -74,6 +75,9 @@ export default function HomePage() {
           states the Restaurant node. The two locations that have not opened
           state nothing anywhere until they do. */}
       <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* First-time desktop visitors only (issue #81) — see WelcomeIntro for
+          the no-flash gate. Renders an inert curtain div for everyone else. */}
+      <WelcomeIntro />
       <Hero />
       <Marquee />
       <div className="cne-divider-band" />

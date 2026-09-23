@@ -19,7 +19,7 @@
  */
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
-import { brand } from "@/data/brand";
+import { absoluteUrl } from "@/lib/siteOrigin";
 import { getProductBySlug } from "@/lib/catalog";
 import { productImage } from "@/lib/merchLd";
 import {
@@ -271,8 +271,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     expires_at: Math.floor(Date.now() / 1000) + SESSION_EXPIRES_SECONDS,
     metadata: { orderId: pending.orderId, orderNumber: pending.number, fulfilment },
     client_reference_id: pending.orderId,
-    success_url: `${brand.siteUrl}/shop/thanks/?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${brand.siteUrl}/shop/?cancelled=1`,
+    // The site's own origin, not the hard-coded production domain, so a test
+    // checkout on a Vercel preview comes back to that preview. In production
+    // this is still https://www.chrisneddys.com — see `src/lib/siteOrigin.ts`.
+    success_url: absoluteUrl("/shop/thanks/?session_id={CHECKOUT_SESSION_ID}"),
+    cancel_url: absoluteUrl("/shop/?cancelled=1"),
   };
 
   if (fulfilment === "ship") {

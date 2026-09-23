@@ -20,6 +20,7 @@
 import "server-only";
 import { getDb, type Db } from "@/db/client";
 import { brand } from "@/data/brand";
+import { absoluteUrl } from "@/lib/siteOrigin";
 import { getEditionSizes, getStoreSettings, type OrderWithItems } from "@/lib/orders";
 
 export type EmailResult = { sent: true } | { sent: false; reason: string };
@@ -107,7 +108,9 @@ function firstName(order: OrderWithItems): string | null {
   return name ? (name.split(/\s+/)[0] ?? null) : null;
 }
 
-const ORDER_LOOKUP_URL = `${brand.siteUrl}/shop/order/`;
+// Resolved per send rather than at import, so an order email sent from a
+// Vercel preview links back to that preview (see `src/lib/siteOrigin.ts`).
+const orderLookupUrl = () => absoluteUrl("/shop/order/");
 
 function itemLine(item: OrderItem, sizes: Map<string, number | null>): string {
   if (item.editionNumber !== null) {
@@ -428,14 +431,14 @@ export async function sendOrderConfirmation(order: OrderWithItems, db?: Db): Pro
     order.fulfilment === "pickup"
       ? "We'll email you again the moment it's ready to pick up."
       : "We'll email you again with tracking once it ships.",
-    `Check on this order any time: ${ORDER_LOOKUP_URL}`,
+    `Check on this order any time: ${orderLookupUrl()}`,
   ]);
 
   const rowsHtml = [
     ...order.items.map((item) => htmlItemRow(item, sizes)),
     htmlTotals(order, "Paid"),
     htmlFulfilmentBox(order, settings),
-    htmlButton(ORDER_LOOKUP_URL, "CHECK ORDER STATUS"),
+    htmlButton(orderLookupUrl(), "CHECK ORDER STATUS"),
     htmlNote("No account needed — your order number and email get you in."),
   ].join("");
 
@@ -485,7 +488,7 @@ export async function sendShippingNotice(order: OrderWithItems, db?: Db): Promis
       : "",
     ...order.items.map((item) => htmlItemRow(item, sizes)),
     htmlFulfilmentBox(order, settings),
-    htmlButton(ORDER_LOOKUP_URL, "TRACK THIS ORDER"),
+    htmlButton(orderLookupUrl(), "TRACK THIS ORDER"),
     htmlNote("Wrong address, or it hasn't turned up? Reply to this email — it reaches a person."),
   ].join("");
 

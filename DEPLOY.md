@@ -1,9 +1,9 @@
 # Deploying chrisneddys.com
 
-The site is a Next.js static export (`output: "export"`), so `pnpm build` writes a
-plain directory of files to `out/` and there is no server at runtime. Everything
-below is therefore host configuration, not application code — a static export
-cannot redirect, set a header, or canonicalise a hostname on its own.
+The site runs on Vercel as a standard Next.js app (`next build` / `next start`):
+storefront pages are static with revalidation, `/admin` and `/api` are server
+routes. The domain, chrisneddys.com, is registered at GoDaddy and points at
+Vercel through two DNS records — see **Vercel** below for the go-live steps.
 
 Two of these are SEO-critical and have to be right on day one, because both are
 expensive to correct later:
@@ -31,9 +31,9 @@ expensive to correct later:
 
 ## Security headers
 
-A static export cannot set a header on itself, so every one of these is host
-configuration — and none of them exists until someone adds it. The set below is
-the whole policy; the three host sections that follow each say where to paste it.
+On Vercel all of these ship from `headers()` in `next.config.mjs`. The set
+below is the whole policy; the other host sections further down say where it
+would go on a host that cannot run that config.
 
 | Header                      | Value                                                                              | Why                                                                                                                                                                                      |
 | --------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -209,7 +209,7 @@ an endpoint at:
 https://www.chrisneddys.com/api/stripe/webhook
 ```
 
-subscribed to exactly these four event types:
+subscribed to exactly these five event types:
 
 - `checkout.session.completed`
 - `checkout.session.async_payment_succeeded`
@@ -337,15 +337,70 @@ Two traps worth knowing, both of which have already cost an afternoon:
 
 ## Vercel
 
-The app now has a server (`next build` / `next start`), so this is a standard
+The app has a server (`next build` / `next start`), so this is a standard
 Next.js deployment. The security headers and cache policy above ship from
 `headers()` in `next.config.mjs` — one source for every host, Vercel included,
 so there is no `vercel.json` to add. `img-src` in that CSP also allows Vercel
 Blob (`https://*.public.blob.vercel-storage.com`), where product photos live.
+The same `headers()` sends `X-Robots-Tag: noindex, nofollow` on any
+`*.vercel.app` host, so the Vercel address never gets indexed as a second copy
+of the site.
 
-The only thing that still belongs in Vercel's own config is the apex → www
-redirect: add both domains in the project's Domains panel and set `www` as
-primary — Vercel issues the redirect itself, no `redirects` block needed.
+### Pointing chrisneddys.com at Vercel (GoDaddy)
+
+Every canonical tag, the sitemap, robots, structured data, `/llms.txt`, the
+Stripe return links and the emailed links already use
+`https://www.chrisneddys.com` (`brand.siteUrl`, `src/data/brand.ts`). That is
+also the host the old site is indexed under, so **www stays the primary
+domain** and the apex redirects to it.
+
+1. **Vercel → project → Settings → Domains.** Add `www.chrisneddys.com` and
+   `chrisneddys.com`. Make **www the primary**, and set `chrisneddys.com` to
+   _Redirect to_ `www.chrisneddys.com` (308/301). Vercel's own suggestion when
+   you add the apex is the reverse (www → apex) — do not accept that one, or
+   every canonical tag points at a URL that redirects.
+2. **GoDaddy → the domain → DNS.** Enter the records the Domains panel shows.
+   Normally that is an `A` record for `@` and a `CNAME` for `www`; Vercel now
+   shows a project-specific value (for example `…vercel-dns-0xx.com`) rather
+   than the old `76.76.21.21` / `cname.vercel-dns.com`, so copy what it says.
+   Delete the old `A`/`CNAME` records for `@` and `www` (they point at the old
+   CloudFront host). **Leave every `MX` and `TXT` record alone** — that is the
+   `chris@chrisneddys.com` mailbox.
+3. Vercel issues the certificates itself once DNS resolves.
+
+Do not also add a host redirect in `next.config.mjs`: if Vercel's primary ever
+got flipped, the two would redirect into each other.
+
+### After the switch
+
+```sh
+# apex -> www, path kept
+curl -sI https://chrisneddys.com/menu/            | grep -iE '^(HTTP|location)'
+#   HTTP/2 308 … location: https://www.chrisneddys.com/menu/
+
+# no trailing slash -> trailing slash (next.config.mjs `trailingSlash: true`)
+curl -sI https://www.chrisneddys.com/menu         | grep -iE '^(HTTP|location)'
+#   HTTP/2 308 … location: /menu/
+
+# unknown path -> a real 404
+curl -s -o /dev/null -w "%{http_code}\n" https://www.chrisneddys.com/does-not-exist/
+#   404
+
+# the security headers are on HTML, and www is indexable
+curl -sI https://www.chrisneddys.com/ | grep -iE 'strict-transport|content-security|x-robots'
+#   strict-transport-security and content-security-policy; no x-robots-tag
+```
+
+Then, in order: sign in again at `https://www.chrisneddys.com/admin` (a
+session from the `.vercel.app` address does not carry over, and passkeys only
+work on www); remove `SITE_ORIGIN` from Production if it was ever set to the
+Vercel address; point the Stripe webhook at
+`https://www.chrisneddys.com/api/stripe/webhook` (see **Payments**); and work
+through **Launch checklist** below.
+
+The sections from here to **Analytics before launch** describe other hosts
+(including the S3 + CloudFront setup the old site ran on). None of them apply
+on Vercel.
 
 ## Netlify / Cloudflare Pages
 
@@ -582,8 +637,8 @@ Ordered so that nothing is measured after the fact.
       `directions_click`, `menu_item_open`, `contact_submit`.
 - [ ] In GA4, mark `order_click`, `delivery_click` and `call_click` as key events.
 - [ ] `pnpm check:links`, and open the two bot-blocked delivery URLs by hand.
-- [ ] Run the four `curl` checks in **S3 + CloudFront → Verify**: apex → www,
-      `/menu` → `/menu/`, `/index.html` → `/`, and an unknown path → `404`.
+- [ ] Run the `curl` checks in **Vercel → After the switch**: apex → www,
+      `/menu` → `/menu/`, and an unknown path → `404`.
 - [ ] `curl -sI https://www.chrisneddys.com/_next/static/...` → expect
       `immutable`.
 - [ ] Ship the CSP as `Content-Security-Policy-Report-Only` first, walk the site

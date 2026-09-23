@@ -143,6 +143,22 @@ describe("POST /api/checkout — shop paused (issue #43)", () => {
 });
 
 describe("POST /api/checkout — shop open", () => {
+  it("sends a Vercel preview's shopper back to that preview, not the live domain", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_URL", "chrisneddys-site-git-x.vercel.app");
+    try {
+      const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "ship" });
+      expect(res.status).toBe(200);
+      const params = createMock.mock.calls[0]![0];
+      expect(params.success_url).toBe(
+        "https://chrisneddys-site-git-x.vercel.app/shop/thanks/?session_id={CHECKOUT_SESSION_ID}",
+      );
+      expect(params.cancel_url).toBe("https://chrisneddys-site-git-x.vercel.app/shop/?cancelled=1");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("builds a Checkout Session for a shipped order and reserves the cart", async () => {
     const res = await post({ items: [{ slug: SLUG, quantity: 1 }], fulfilment: "ship" });
     expect(res.status).toBe(200);

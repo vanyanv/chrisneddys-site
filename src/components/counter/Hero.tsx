@@ -19,7 +19,6 @@ export function Hero() {
     <section className="cne-hero">
       <div className="cne-hero-in">
         <div className="cne-hero-copy">
-          <div className="cne-hero-halftone" aria-hidden="true" />
           <div className="cne-hero-copy-in">
             <HeroOpenLine />
             <h1>

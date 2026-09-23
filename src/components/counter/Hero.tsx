@@ -1,74 +1,84 @@
 import Link from "next/link";
 import { orderUrl, formatPrice } from "@/lib/otter";
 import { SLIDER_PRICE } from "@/data/menu";
-import { HERO } from "@/lib/heroImage";
+import { HERO, HERO_WIDE } from "@/lib/heroImage";
 import { Watcher } from "@/components/storeart/Watcher";
+import { HeroOpenLine } from "@/components/counter/HeroOpenLine";
 
 /**
- * Red panel, oversized display type, and the basket shot.
- * On desktop the red becomes a left-hand panel and the media sits beside it —
- * see `.cne-hero-halftone` at the desktop breakpoint.
+ * "3A The Peek" (issue #112): a red copy panel and an edge-to-edge basket
+ * shot, split by a checkerboard seam borrowed from the store floor, with the
+ * corner monster peeking over the boundary between them. On a phone the
+ * photo stacks above the panel; from 600px up they sit side by side, panel
+ * left and photo right — see `.cne-hero-in` in counter.css for the shape at
+ * each tier.
  */
 export function Hero() {
   return (
     <section className="cne-hero">
-      <div className="cne-hero-halftone" aria-hidden="true" />
-      {/* Idea 2: its eye tracks the pointer on fine-pointer devices. */}
-      <Watcher className="cne-badge-corner is-tr" />
       <div className="cne-hero-in">
-        <div>
-          <h1>
-            LA&rsquo;S <span className="y">SMASH</span>
-            <br className="cne-br-desk" /> HIT.
-          </h1>
-          <p className="cne-hero-sub">
-            Sliders come with <b>two All-American smashed patties</b>,{" "}
-            <b>two slices of melted cheese</b> and your favorite toppings served on a buttered
-            Martin&rsquo;s Potato Roll.
-          </p>
-          {/* The price used to be the last four words of the paragraph, which put it as far
-              from the order button as the copy allowed. It reads as a fact strip now, one
-              line above the button that spends it. Hollywood only: Glendale and Van Nuys
-              have no hours in `locations.ts` because they are not serving yet.
-
-              The figure comes from the menu data rather than the copy: it and the /menu/
-              meta description had already drifted a dollar apart. */}
-          <p className="cne-hero-meta">
-            <span>
+        <div className="cne-hero-copy">
+          <div className="cne-hero-halftone" aria-hidden="true" />
+          <div className="cne-hero-copy-in">
+            <HeroOpenLine />
+            <h1>
+              LA&rsquo;S <span className="y">SMASH</span>
+              <br className="cne-br-desk" /> HIT.
+            </h1>
+            <p className="cne-hero-sub">
+              Sliders come with <b>two All-American smashed patties</b>,{" "}
+              <b>two slices of melted cheese</b> and your favorite toppings served on a buttered
+              Martin&rsquo;s Potato Roll.
+            </p>
+            {/* The figure comes from the menu data rather than the copy: it and the /menu/
+                meta description had already drifted a dollar apart. */}
+            <p className="cne-hero-meta">
               Sliders from <b>{formatPrice(SLIDER_PRICE)}</b>
-            </span>
-            <span className="cne-hero-dot" aria-hidden="true">
-              ·
-            </span>
-            <span>Hollywood</span>
-            <span className="cne-hero-dot is-addr" aria-hidden="true">
-              ·
-            </span>
-            <span className="cne-hero-addr">5539 W. Sunset Blvd</span>
-          </p>
-          <div className="cne-cta" data-surface="hero">
-            <a
-              className="cne-big is-primary"
-              href={orderUrl("hero")}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ORDER ONLINE →
-            </a>
-            <Link prefetch={false} className="cne-big is-secondary" href="/menu/">
-              <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
-            </Link>
+            </p>
+            <div className="cne-cta" data-surface="hero">
+              <a
+                className="cne-big is-primary"
+                href={orderUrl("hero")}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ORDER ONLINE →
+              </a>
+              <Link prefetch={false} className="cne-hero-menu" href="/menu/">
+                <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
+              </Link>
+            </div>
           </div>
         </div>
+        {/* aria-hidden checkerboard divider between the panel and the photo —
+            see `.cne-hero-seam` in counter.css. */}
+        <div className="cne-hero-seam" aria-hidden="true" />
         <div className="cne-heromedia">
           {/* The loop this replaces was decoration, so it was loaded conditionally and
               never counted as the LCP. A still *is* the LCP: it ships eagerly, at high
               priority. It is deliberately not preloaded; `page.tsx` says why.
 
-              The <picture> exists only to offer AVIF ahead of the WebP `<img>` below —
-              same slot, same sizes, same box. It adds no layout of its own (see
-              `.cne-heromedia picture` in counter.css). */}
+              The box is landscape (100vw x 76vw) on a phone, but the source is a
+              portrait 1400x1480 shot — a `cover` fit there would download the full
+              portrait width just to keep a band out of the middle. Below 600px the
+              two extra sources hand phones an art-directed landscape crop instead
+              (`HERO_WIDE`, cut from the middle of the same still by
+              `build-photo-cuts.mjs`); at 600px and up the box runs the full hero
+              height in its own half-width column, closer to the source's own
+              proportions, so the portrait cut (`HERO`) stays the better fit there. */}
           <picture>
+            <source
+              media="(max-width: 599px)"
+              type="image/avif"
+              srcSet={HERO_WIDE.avifSrcSet}
+              sizes={HERO_WIDE.sizes}
+            />
+            <source
+              media="(max-width: 599px)"
+              type="image/webp"
+              srcSet={HERO_WIDE.webpSrcSet}
+              sizes={HERO_WIDE.sizes}
+            />
             <source type="image/avif" srcSet={HERO.avifSrcSet} sizes={HERO.sizes} />
             <img
               src={HERO.src}
@@ -83,6 +93,10 @@ export function Hero() {
           </picture>
         </div>
       </div>
+      {/* Idea 2: its eye tracks the pointer on fine-pointer devices. Peeking over the
+          seam instead of sitting in the usual `.cne-badge-corner` spot — see
+          `.cne-hero-peek` in counter.css and the removed hero rule in home-art.css. */}
+      <Watcher className="cne-hero-peek" />
     </section>
   );
 }

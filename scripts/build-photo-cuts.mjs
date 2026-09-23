@@ -16,6 +16,11 @@
  *
  *     node scripts/build-photo-cuts.mjs
  *
+ * Also produces the hero's phone-only landscape crop (`hero-wide-*`), cut
+ * from the middle of the same `hero-still.webp` at a 100:76 ratio for the
+ * landscape box the hero uses below 600px — see the "Hero wide crop" comment
+ * in `main()` and `HERO_WIDE` in `src/lib/heroImage.ts`.
+ *
  * Re-run after replacing either source photo (`public/hero-still.webp` at
  * 1400×1480, or `public/photos/double-16x9.jpg` at 900×506).
  */
@@ -46,6 +51,20 @@ async function webpCut(src, outPath, width) {
   console.log(`${outPath} — ${buf.length} bytes`);
 }
 
+/** Same as `avifCut`/`webpCut`, but extracting `region` before the resize —
+ * the art-directed hero-wide crop below. */
+async function avifRegionCut(src, outPath, region, width) {
+  const buf = await sharp(src).extract(region).resize({ width }).avif(AVIF).toBuffer();
+  writeFileSync(outPath, buf);
+  console.log(`${outPath} — ${buf.length} bytes`);
+}
+
+async function webpRegionCut(src, outPath, region, width) {
+  const buf = await sharp(src).extract(region).resize({ width }).webp(WEBP).toBuffer();
+  writeFileSync(outPath, buf);
+  console.log(`${outPath} — ${buf.length} bytes`);
+}
+
 async function main() {
   const heroSrc = join(root, "public/hero-still.webp");
   const careersSrc = join(root, "public/photos/double-16x9.jpg");
@@ -72,6 +91,20 @@ async function main() {
   for (const w of [480, 720, 900]) {
     await avifCut(careersSrc, join(root, `public/photos/double-16x9-${w}.avif`), w);
     await webpCut(careersSrc, join(root, `public/photos/double-16x9-${w}.webp`), w);
+  }
+
+  // Hero wide crop ("3A The Peek", issue #112): below 600px the hero box is
+  // landscape (100vw x 76vw) but the source is the same portrait 1400x1480
+  // still, so a `cover` fit there would download the full 1400px width to
+  // throw away roughly half of it vertically. This extracts the central
+  // 1400x1064 band — the full width, at the 100:76 ratio the phone box
+  // actually is — before resizing, so the phone ladder is cut for the shape
+  // it fills instead of relying on CSS `object-fit` to crop a portrait
+  // source at full resolution. See `HERO_WIDE` in `lib/heroImage.ts`.
+  const wideRegion = { left: 0, top: 208, width: 1400, height: 1064 };
+  for (const w of [480, 800, 1200]) {
+    await avifRegionCut(heroSrc, join(root, `public/hero-wide-${w}.avif`), wideRegion, w);
+    await webpRegionCut(heroSrc, join(root, `public/hero-wide-${w}.webp`), wideRegion, w);
   }
 }
 

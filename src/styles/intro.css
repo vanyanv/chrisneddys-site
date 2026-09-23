@@ -23,16 +23,36 @@ html.cne-intro-gate .cne-intro-overlay {
   transform-origin: 50% 46%;
 }
 
+/* While the overlay is up, freeze the page's own looping art underneath it
+   (mascot blinks and chomps, marquees, pulses). It's fully covered, but the
+   browser would still repaint it every frame, stealing time from the intro.
+   The overlay's own animations are left running; everything picks up where
+   it left off the moment the gate class comes off. */
+html.cne-intro-gate *:not(.cne-intro-overlay, .cne-intro-overlay *) {
+  animation-play-state: paused !important;
+}
+
 /* The whole overlay — vortex, logo and its own cream background together —
-   scales and rotates itself away, revealing the page underneath. */
+   scales and rotates itself away, revealing the page underneath. Transform
+   and opacity only, so it stays on the compositor (a `visibility` step in
+   these keyframes knocked the whole exit back onto the main thread);
+   `WelcomeIntro` unmounts the overlay's contents once it's done. */
 html.cne-intro-gate .cne-intro-overlay.is-out {
+  pointer-events: none;
   animation: cne-intro-out 0.45s cubic-bezier(0.7, 0, 0.9, 0.4) forwards;
+}
+/* Hold the spin and the monsters still for the exit's split second. The
+   overlay's fade makes the browser redraw the whole overlay offscreen every
+   frame while anything inside it still moves; frozen, it's one cached
+   picture being scaled — the difference between ~26fps and 60fps on a
+   software-composited browser, and invisible mid-spin-out. */
+html.cne-intro-gate .cne-intro-overlay.is-out * {
+  animation-play-state: paused !important;
 }
 @keyframes cne-intro-out {
   to {
     transform: scale(3.4) rotate(45deg);
     opacity: 0;
-    visibility: hidden;
   }
 }
 

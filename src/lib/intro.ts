@@ -46,11 +46,13 @@ export function shouldShowIntro({
  * Inline, pre-hydration gate script: decides via `shouldShowIntro`'s logic
  * (hand-mirrored — a `<script>` can't import it), and if it should show,
  * adds `INTRO_GATE_CLASS` to `<html>` so `intro.css`'s curtain covers the
- * page before React ever runs. Wrapped in try/catch: a throw anywhere just
+ * page before React ever runs, and starts fetching the intro logo so it has
+ * downloaded and decoded by the time it zooms in, instead of the request
+ * only starting when React mounts the `<img>` after hydration. Wrapped in try/catch: a throw anywhere just
  * means the intro doesn't show.
  */
 export const INTRO_GATE_SCRIPT = `(function(){try{var k=${JSON.stringify(
   INTRO_STORAGE_KEY,
 )},c=${JSON.stringify(
   INTRO_GATE_CLASS,
-)},s=null;try{s=window.localStorage.getItem(k)}catch(e){}var w=matchMedia("(min-width: 901px)").matches,f=matchMedia("(hover: hover) and (pointer: fine)").matches,r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s===null&&w&&f&&!r){document.documentElement.classList.add(c)}}catch(e){}})();`;
+)},s=null;try{s=window.localStorage.getItem(k)}catch(e){}var w=matchMedia("(min-width: 901px)").matches,f=matchMedia("(hover: hover) and (pointer: fine)").matches,r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s===null&&w&&f&&!r){document.documentElement.classList.add(c);new Image().src="/cne-logo-lg.webp"}}catch(e){}})();`;

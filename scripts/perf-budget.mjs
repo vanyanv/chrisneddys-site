@@ -76,7 +76,7 @@ const TYPE_MAP = {
   XHR: "fetch",
 };
 
-const INTRO_STORAGE_KEY = "cne-welcome-intro-seen";
+const INTRO_STORAGE_KEY = "cne-welcome-intro-off";
 
 const LCP_INIT_SCRIPT = `
   window.__lcp = { url: "", tag: "" };

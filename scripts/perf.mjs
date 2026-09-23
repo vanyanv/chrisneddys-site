@@ -162,10 +162,10 @@ const INIT_SCRIPT = `
   }).observe({ type: "paint", buffered: true });
 `;
 
-// The home page's first-visit desktop intro (src/lib/intro.ts) gates on this
-// localStorage key. Left unset, desktop LCP on `/` measures the intro
+// The home page's desktop intro (src/lib/intro.ts) is skipped when this
+// localStorage key is set. Left unset, desktop LCP on `/` measures the intro
 // overlay instead of the page underneath it.
-const INTRO_STORAGE_KEY = "cne-welcome-intro-seen";
+const INTRO_STORAGE_KEY = "cne-welcome-intro-off";
 
 function resolveChromium() {
   const fromEnv = process.env.PERF_CHROMIUM;

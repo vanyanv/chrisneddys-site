@@ -21,6 +21,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 //    a port speaking no TLS, so photo upload fails with nothing in the server
 //    log. In production every URL is already https and the directive is a
 //    no-op for correctly-written pages — it stays there.
+//
+// Vercel Web Analytics needs nothing extra in production: it loads
+// /_vercel/insights/script.js and posts to /_vercel/insights/* on our own
+// origin. Only `next dev` swaps in a debug script from va.vercel-scripts.com.
 const isDev = process.env.NODE_ENV === "development";
 
 const CSP = [
@@ -29,7 +33,7 @@ const CSP = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://va.vercel-scripts.com" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.public.blob.vercel-storage.com",
   "font-src 'self'",

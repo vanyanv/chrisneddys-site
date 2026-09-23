@@ -16,6 +16,7 @@ import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { TrackEvents } from "@/components/shared/TrackEvents";
 import { PrefetchNav } from "@/components/counter/PrefetchNav";
 import { BackToTop } from "@/components/storeart/BackToTop";
@@ -226,6 +227,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Warms the six header routes once this page has loaded and the
             browser is idle. Renders nothing. */}
         <PrefetchNav />
+        {/* Vercel Web Analytics, alongside GA4 (not instead of it). Cookieless;
+            loads /_vercel/insights/script.js deferred from our own origin, so
+            the CSP already allows it. Nothing is sent from `next dev`. */}
+        <VercelAnalytics />
       </body>
     </html>
   );

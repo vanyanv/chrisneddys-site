@@ -93,7 +93,7 @@ test.describe.serial("the run (issue #36 phase 3)", () => {
 
     await expect(page.getByText("5 sold", { exact: true })).toBeVisible();
     await expect(page.getByText("1 held in a checkout", { exact: true })).toBeVisible();
-    await expect(page.getByText("44 still going", { exact: true })).toBeVisible();
+    await expect(page.getByText("44 for sale online", { exact: true })).toBeVisible();
 
     // Numbers 1-5 were claimed lowest-first by the four seeded paid orders
     // (2 + 1 + 1 + 1 units) — #1 is real, sold data, not a placeholder.
@@ -114,5 +114,24 @@ test.describe.serial("the run (issue #36 phase 3)", () => {
     // The order detail page rendered a real order, not a 404 — its number
     // heading is present.
     await expect(page.locator(".rack-page-title")).toBeVisible();
+  });
+
+  test("5. setting a number aside takes it off the shop, and putting it back returns it", async () => {
+    const shopLine = async () =>
+      (await (await page.request.get(`/shop/${FOAM_TRUCKER_SLUG}/`)).text()).match(
+        /\d+ OF 50 LEFT/,
+      )?.[0];
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/run\/?$/);
+    await page.getByTestId("run-cell-50").click();
+    await page.getByRole("button", { name: "Set aside", exact: true }).click();
+    await expect(page.getByTestId("run-cell-50")).toHaveClass(/is-aside/);
+    await expect(page.getByText("1 set aside", { exact: true })).toBeVisible();
+    await expect.poll(shopLine, { timeout: 10_000 }).toBe("43 OF 50 LEFT");
+
+    await page.getByRole("button", { name: "Put back on sale online" }).click();
+    await expect(page.getByTestId("run-cell-50")).toHaveClass(/is-available/);
+    await expect.poll(shopLine, { timeout: 10_000 }).toBe("44 OF 50 LEFT");
   });
 });

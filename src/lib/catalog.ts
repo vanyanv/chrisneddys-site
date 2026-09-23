@@ -188,7 +188,7 @@ export async function getProductBySlug(slug: string): Promise<MerchProduct | und
   return cachedProductBySlug(slug);
 }
 
-export type EditionCellStatus = "available" | "reserved" | "sold";
+export type EditionCellStatus = "available" | "reserved" | "sold" | "set_aside";
 export type EditionCell = { number: number; status: EditionCellStatus };
 
 export type InventoryStatus = {
@@ -295,26 +295,29 @@ async function queryInventoryList(slugs: string[]): Promise<(InventoryStatus | u
 }
 
 /**
- * Splits an edition run's rows into the three counts the map's legend and
- * the admin's own inventory line both need — pulled out as its own pure
- * function so it's testable without a database, and so the product page and
- * anything else reading `InventoryStatus.editions` can't each tally the
- * three states a different way.
+ * Splits an edition run's rows into the four counts the admin's run views
+ * need — pulled out as its own pure function so it's testable without a
+ * database, and so nothing reading `InventoryStatus.editions` tallies the
+ * states a different way. `setAside` is the part of the run the owner has
+ * taken off the online shop (sold at the location, kept back).
  */
 export function editionCounts(editions: EditionCell[]): {
   available: number;
   reserved: number;
   sold: number;
+  setAside: number;
 } {
   let available = 0;
   let reserved = 0;
   let sold = 0;
+  let setAside = 0;
   for (const cell of editions) {
     if (cell.status === "available") available++;
     else if (cell.status === "reserved") reserved++;
+    else if (cell.status === "set_aside") setAside++;
     else sold++;
   }
-  return { available, reserved, sold };
+  return { available, reserved, sold, setAside };
 }
 
 /**

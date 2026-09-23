@@ -88,7 +88,7 @@ describe("getRunForAdmin", () => {
     expect(run?.productId).toBe(draft.id);
     expect(run?.editionSize).toBe(5);
     expect(run?.locked).toBe(true);
-    expect(run?.counts).toEqual({ available: 3, reserved: 0, sold: 2 });
+    expect(run?.counts).toEqual({ available: 3, reserved: 0, sold: 2, setAside: 0 });
     expect(run?.numbers.map((n) => n.number)).toEqual([1, 2, 3, 4, 5]);
     expect(run?.numbers.map((n) => n.status)).toEqual([
       "sold",
@@ -129,7 +129,7 @@ describe("getRunForAdmin", () => {
     // Carried off the product row this query already loads, so the run page
     // needs no second read of the whole product just to print it.
     expect(run).toHaveProperty("productEyebrow");
-    expect(run?.counts).toEqual({ available: 3, reserved: 1, sold: 1 });
+    expect(run?.counts).toEqual({ available: 3, reserved: 1, sold: 1, setAside: 0 });
     expect(run?.locked).toBe(true);
 
     const sold = run?.numbers.find((n) => n.status === "sold");

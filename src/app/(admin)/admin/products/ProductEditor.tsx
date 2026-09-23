@@ -98,7 +98,14 @@ export function ProductEditor({
           ? { mode: "untracked" }
           : next === "quantity"
             ? { mode: "quantity", quantity: 0 }
-            : { mode: "edition", editionSize: 50, sold: 0, reserved: 0, available: 50 },
+            : {
+                mode: "edition",
+                editionSize: 50,
+                sold: 0,
+                reserved: 0,
+                available: 50,
+                setAside: 0,
+              },
       editions:
         next === "edition"
           ? Array.from({ length: 50 }, (_, i) => ({ number: i + 1, status: "available" as const }))
@@ -318,10 +325,41 @@ export function ProductEditor({
         )}
 
         {product.inventory.mode === "edition" && (
+          <div className="adm-field">
+            <label htmlFor={`online-${product.id}`} className="adm-label">
+              Left to sell online
+            </label>
+            <input
+              id={`online-${product.id}`}
+              type="number"
+              min={0}
+              max={product.inventory.available + product.inventory.setAside}
+              step={1}
+              className="adm-input"
+              defaultValue={String(
+                pendingApi.getValue(product.id, "onlineN") ?? product.inventory.available,
+              )}
+              onBlur={(e) => {
+                if (product.inventory.mode !== "edition") return;
+                const n = Math.round(Number(e.target.value));
+                if (!Number.isFinite(n) || n < 0) return;
+                if (n === product.inventory.available) pendingApi.clearValue(product.id, "onlineN");
+                else pendingApi.setValue(product.id, "onlineN", n);
+              }}
+            />
+            <p className="adm-help">
+              The rest of the run is set aside: sold at the location or kept back. The shop shows
+              how many of the run are left online.
+            </p>
+          </div>
+        )}
+
+        {product.inventory.mode === "edition" && (
           <>
             <p className="adm-inv-summary">
-              {product.inventory.available} available &middot; {product.inventory.reserved} in a
-              checkout &middot; {product.inventory.sold} sold
+              {product.inventory.available} for sale online &middot; {product.inventory.setAside}{" "}
+              set aside &middot; {product.inventory.reserved} in a checkout &middot;{" "}
+              {product.inventory.sold} sold
             </p>
             <a href={`/admin/products/${product.id}/run`} className="adm-run-link">
               Open the run &rarr;
@@ -330,13 +368,14 @@ export function ProductEditor({
               <span className="adm-edition-key is-available">Available</span>
               <span className="adm-edition-key is-reserved">In a checkout</span>
               <span className="adm-edition-key is-sold">Sold</span>
+              <span className="adm-edition-key is-aside">Set aside</span>
             </div>
             <div className="adm-edition-grid">
               {product.editions.map((edition) => (
                 <span
                   key={edition.number}
-                  className={`adm-edition-cell is-${edition.status}`}
-                  title={`#${edition.number} — ${edition.status}`}
+                  className={`adm-edition-cell is-${edition.status === "set_aside" ? "aside" : edition.status}`}
+                  title={`#${edition.number} — ${edition.status === "set_aside" ? "set aside" : edition.status}`}
                 >
                   {edition.number}
                 </span>

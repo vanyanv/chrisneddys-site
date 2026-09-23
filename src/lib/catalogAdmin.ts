@@ -10,7 +10,7 @@
  * `revalidatePath` after a write that the storefront could see — nothing
  * here touches the cache.
  */
-import { and, asc, desc, eq, gt, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, ne } from "drizzle-orm";
 import { getDb, type Db } from "@/db/client";
 import { imageThumbSrc } from "@/lib/productImage";
 import {
@@ -661,7 +661,7 @@ class BatchValidationError extends Error {
 
 export type ProductChange = {
   id: string;
-  field: ProductField | "inventoryN";
+  field: ProductField | "inventoryN" | "onlineN";
   value: unknown;
 };
 
@@ -691,7 +691,13 @@ export async function applyProductChanges(
 
   try {
     const applied = await db.transaction(async (tx) => {
-      for (const [index, change] of changes.entries()) {
+      // A new run size lands before a new online count, whichever the owner
+      // typed first: "left to sell online" is checked against the run.
+      const ordered = [...changes.entries()].sort(
+        ([ia, a], [ib, b]) =>
+          Number(a.field === "onlineN") - Number(b.field === "onlineN") || ia - ib,
+      );
+      for (const [index, change] of ordered) {
         if (change.field === "inventoryN") {
           const product = await tx.query.products.findFirst({
             where: eq(products.id, change.id),
@@ -714,6 +720,9 @@ export async function applyProductChanges(
           }
 
           const result = await setInventory(change.id, mode, Number(change.value), tx);
+          if (!result.ok) throw new BatchValidationError(result.error, index);
+        } else if (change.field === "onlineN") {
+          const result = await setOnlineCount(change.id, Number(change.value), tx);
           if (!result.ok) throw new BatchValidationError(result.error, index);
         } else {
           const result = await updateProductField(
@@ -924,6 +933,9 @@ export async function setInventory(
       if (existingNumbers.has(number)) continue;
       await db.insert(editions).values({ variantId: variant.id, number, status: "available" });
     }
+    // `inventory_quantity` was set to `size` above; with numbers set aside
+    // (or held) that's more than can actually be bought.
+    await syncAvailableMirror(db, variant.id);
 
     return { ok: true, slug: product.slug };
   }
@@ -968,6 +980,133 @@ export async function setInventory(
       .where(eq(variants.id, variant.id));
   }
 
+  return { ok: true, slug: product.slug };
+}
+
+/** `variants.inventory_quantity` for an edition product mirrors the count of
+ * `available` numbers — the same rule `syncVariantAvailableMirror` in
+ * `src/lib/orders.ts` applies after every reservation and payment. */
+async function syncAvailableMirror(db: Db, variantId: string): Promise<void> {
+  const rows = await db
+    .select({ id: editions.id })
+    .from(editions)
+    .where(and(eq(editions.variantId, variantId), eq(editions.status, "available")));
+  await db
+    .update(variants)
+    .set({ inventoryQuantity: rows.length, updatedAt: new Date() })
+    .where(eq(variants.id, variantId));
+}
+
+/**
+ * How many numbers of an edition run are for sale online — the "left to sell
+ * online" field. The run keeps its size (a run of 50 is still "only 50
+ * made"); numbers beyond `n` are `set_aside`, not deleted, so the shop reads
+ * "20 of 50 left".
+ *
+ * Lowering the count sets aside the lowest-numbered available numbers first
+ * (the ones that went out at the location first); raising it puts back the
+ * highest-numbered set-aside ones first. Sold numbers and numbers held in an
+ * open checkout are never touched, so `n` can't be more than what's
+ * available plus what's set aside. A specific number can be moved either
+ * way on the run page (`setEditionAside`).
+ */
+export async function setOnlineCount(
+  id: string,
+  n: number,
+  dbOverride?: Db,
+): Promise<SetInventoryResult> {
+  const db = await resolveDb(dbOverride);
+  const product = await db.query.products.findFirst({
+    where: eq(products.id, id),
+    with: { variants: { with: { editions: true } } },
+  });
+  if (!product) return { ok: false, error: "Product not found." };
+  const variant = product.variants[0];
+  if (!variant || variant.editionSize === null) {
+    return { ok: false, error: "Only a numbered edition has numbers to set aside." };
+  }
+  if (!Number.isInteger(n) || n < 0) {
+    return { ok: false, error: "Left to sell online must be zero or a positive whole number." };
+  }
+
+  const available = variant.editions
+    .filter((e) => e.status === "available")
+    .map((e) => e.number)
+    .sort((a, b) => a - b);
+  const aside = variant.editions
+    .filter((e) => e.status === "set_aside")
+    .map((e) => e.number)
+    .sort((a, b) => b - a);
+  const max = available.length + aside.length;
+  if (n > max) {
+    return {
+      ok: false,
+      error: `Only ${max} of the ${variant.editionSize} can go online — the rest are sold or held in an open checkout.`,
+    };
+  }
+
+  if (n < available.length) {
+    const toSetAside = available.slice(0, available.length - n);
+    await db
+      .update(editions)
+      .set({ status: "set_aside", reservedUntil: null, orderId: null, updatedAt: new Date() })
+      .where(and(eq(editions.variantId, variant.id), inArray(editions.number, toSetAside)));
+  } else if (n > available.length) {
+    const toPutBack = aside.slice(0, n - available.length);
+    await db
+      .update(editions)
+      .set({ status: "available", updatedAt: new Date() })
+      .where(and(eq(editions.variantId, variant.id), inArray(editions.number, toPutBack)));
+  }
+  await syncAvailableMirror(db, variant.id);
+  return { ok: true, slug: product.slug };
+}
+
+/**
+ * Moves one specific number between the online shop and set aside — the run
+ * page's per-number control, for when it matters which certificate numbers
+ * went out at the location. Only `available` and `set_aside` numbers move;
+ * a sold number or one held in an open checkout is refused.
+ */
+export async function setEditionAside(
+  productId: string,
+  number: number,
+  aside: boolean,
+): Promise<SetInventoryResult> {
+  const db = await getDb();
+  const product = await db.query.products.findFirst({
+    where: eq(products.id, productId),
+    with: { variants: { with: { editions: true } } },
+  });
+  if (!product) return { ok: false, error: "Product not found." };
+  const variant = product.variants[0];
+  const edition = variant?.editions.find((e) => e.number === number);
+  if (!variant || !edition) return { ok: false, error: `There's no number ${number} in this run.` };
+
+  const from = aside ? "available" : "set_aside";
+  if (edition.status !== from) {
+    return {
+      ok: false,
+      error:
+        edition.status === "sold"
+          ? `Number ${number} has already sold.`
+          : edition.status === "reserved"
+            ? `Number ${number} is in an open checkout right now.`
+            : aside
+              ? `Number ${number} is already set aside.`
+              : `Number ${number} is already for sale online.`,
+    };
+  }
+
+  await db
+    .update(editions)
+    .set(
+      aside
+        ? { status: "set_aside", reservedUntil: null, orderId: null, updatedAt: new Date() }
+        : { status: "available", updatedAt: new Date() },
+    )
+    .where(eq(editions.id, edition.id));
+  await syncAvailableMirror(db, variant.id);
   return { ok: true, slug: product.slug };
 }
 
@@ -1142,7 +1281,16 @@ export async function reorderImages(
 export type AdminInventorySummary =
   | { mode: "untracked" }
   | { mode: "quantity"; quantity: number }
-  | { mode: "edition"; editionSize: number; sold: number; reserved: number; available: number };
+  | {
+      mode: "edition";
+      editionSize: number;
+      sold: number;
+      reserved: number;
+      available: number;
+      /** Numbers taken off the online shop (`set_aside`) — part of the run,
+       * never part of what's left to buy online. */
+      setAside: number;
+    };
 
 function summarizeInventory(
   variant:
@@ -1156,7 +1304,15 @@ function summarizeInventory(
     const sold = variant.editions.filter((e) => e.status === "sold").length;
     const reserved = variant.editions.filter((e) => e.status === "reserved").length;
     const available = variant.editions.filter((e) => e.status === "available").length;
-    return { mode: "edition", editionSize: variant.editionSize, sold, reserved, available };
+    const setAside = variant.editions.filter((e) => e.status === "set_aside").length;
+    return {
+      mode: "edition",
+      editionSize: variant.editionSize,
+      sold,
+      reserved,
+      available,
+      setAside,
+    };
   }
   return { mode: "quantity", quantity: variant.inventoryQuantity ?? 0 };
 }
@@ -1239,7 +1395,10 @@ export type AdminProductImage = {
   position: number;
 };
 
-export type AdminEdition = { number: number; status: "available" | "reserved" | "sold" };
+export type AdminEdition = {
+  number: number;
+  status: "available" | "reserved" | "sold" | "set_aside";
+};
 
 export type AdminProduct = {
   id: string;

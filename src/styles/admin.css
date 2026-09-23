@@ -856,6 +856,10 @@
   background: var(--a-ink);
   border-color: var(--a-ink);
 }
+.adm-edition-key.is-aside::before,
+.adm-edition-cell.is-aside {
+  background: repeating-linear-gradient(135deg, var(--a-line) 0 2px, var(--a-card) 2px 6px);
+}
 .adm-edition-grid {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));

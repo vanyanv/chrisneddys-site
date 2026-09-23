@@ -37,7 +37,15 @@ export const productImageKindEnum = pgEnum("product_image_kind", [
   "certificate",
   "sticker",
 ]);
-export const editionStatusEnum = pgEnum("edition_status", ["available", "reserved", "sold"]);
+/** `set_aside`: a number from the run that isn't for sale online — sold at
+ * the location, given away or kept back by the owner. It still counts
+ * towards the run ("only 50 made") but never towards what's left to buy. */
+export const editionStatusEnum = pgEnum("edition_status", [
+  "available",
+  "reserved",
+  "sold",
+  "set_aside",
+]);
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",
   "paid",

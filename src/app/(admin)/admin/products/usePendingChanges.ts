@@ -8,8 +8,9 @@ import { applyProductChangesAction } from "./actions";
 /** Every field the Save bar can batch: the 17-field `ProductField` whitelist
  * plus the pseudo-field the sheet's stock cell and the editor's count/
  * edition-size field write through (`applyProductChanges` maps it onto
- * `setInventory` for whatever mode the product is currently in). */
-export type PendingField = ProductField | "inventoryN";
+ * `setInventory` for whatever mode the product is currently in), and
+ * `onlineN`, a numbered run's "left to sell online" (`setOnlineCount`). */
+export type PendingField = ProductField | "inventoryN" | "onlineN";
 
 export type PendingChangeValue = string | number | boolean | string[] | AuthenticityFact[] | null;
 

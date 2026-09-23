@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { RunForAdmin, RunNumberRow } from "@/lib/runAdmin";
+import { setEditionAsideAction } from "../../actions";
 
 function formatDateTime(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -85,6 +87,7 @@ function customerLabel(row: RunNumberRow): string {
 function cellClass(status: RunNumberRow["status"]): string {
   if (status === "sold") return "run-cell is-sold";
   if (status === "reserved") return "run-cell is-reserved";
+  if (status === "set_aside") return "run-cell is-aside";
   return "run-cell is-available";
 }
 
@@ -105,12 +108,26 @@ export function RunBoard({ run, serverNow }: { run: RunForAdmin; serverNow: numb
 
   const selected = run.numbers.find((n) => n.number === selectedNumber) ?? null;
 
+  const router = useRouter();
+  const [moving, startMoving] = useTransition();
+  const [moveError, setMoveError] = useState<string | null>(null);
+
+  function moveSelected(aside: boolean) {
+    if (!selected) return;
+    setMoveError(null);
+    startMoving(async () => {
+      const result = await setEditionAsideAction(run.productId, selected.number, aside);
+      if (!result.ok) setMoveError(result.error);
+      router.refresh();
+    });
+  }
+
   return (
     <div className="rack-order-grid">
       <div className="rack-order-main">
         <section className="rack-order-card">
           <h3 className="rack-eyebrow rack-order-card-head">Every number, and where it went</h3>
-          <p className="run-board-hint">Click one to see the order.</p>
+          <p className="run-board-hint">Click one to see its order, or to set it aside.</p>
           <div className="run-board-grid" role="group" aria-label="Every numbered edition">
             {run.numbers.map((row) => (
               <button
@@ -121,8 +138,11 @@ export function RunBoard({ run, serverNow }: { run: RunForAdmin; serverNow: numb
                 }`}
                 data-testid={`run-cell-${row.number}`}
                 aria-pressed={row.number === selectedNumber}
-                title={`#${row.number} — ${row.status}`}
-                onClick={() => setSelectedNumber(row.number)}
+                title={`#${row.number} — ${row.status === "set_aside" ? "set aside" : row.status}`}
+                onClick={() => {
+                  setSelectedNumber(row.number);
+                  setMoveError(null);
+                }}
               >
                 {row.number}
               </button>
@@ -139,7 +159,11 @@ export function RunBoard({ run, serverNow }: { run: RunForAdmin; serverNow: numb
             </span>
             <span>
               <i className="is-available"></i>
-              {run.counts.available} still going
+              {run.counts.available} for sale online
+            </span>
+            <span>
+              <i className="is-aside"></i>
+              {run.counts.setAside} set aside
             </span>
           </div>
         </section>
@@ -199,7 +223,41 @@ export function RunBoard({ run, serverNow }: { run: RunForAdmin; serverNow: numb
           </h3>
           {!selected && <p className="run-board-empty">Click any cell in the grid to see it.</p>}
           {selected?.status === "available" && (
-            <p className="run-board-empty">Still on the shelf — nobody has claimed it.</p>
+            <>
+              <p className="run-board-empty">For sale online — nobody has claimed it.</p>
+              <button
+                type="button"
+                className="rack-btn"
+                disabled={moving}
+                onClick={() => moveSelected(true)}
+              >
+                {moving ? "Saving…" : "Set aside"}
+              </button>
+              <p className="run-board-hint" style={{ marginTop: 8 }}>
+                For a number sold at the location or kept back. It stays part of the run but comes
+                off the online shop.
+              </p>
+            </>
+          )}
+          {selected?.status === "set_aside" && (
+            <>
+              <p className="run-detail-line">
+                Set aside: sold at the location or kept back, not for sale online.
+              </p>
+              <button
+                type="button"
+                className="rack-btn"
+                disabled={moving}
+                onClick={() => moveSelected(false)}
+              >
+                {moving ? "Saving…" : "Put back on sale online"}
+              </button>
+            </>
+          )}
+          {moveError && (
+            <p className="run-detail-line is-urgent" role="alert">
+              {moveError}
+            </p>
           )}
           {selected?.status === "reserved" && (
             <>

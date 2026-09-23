@@ -65,7 +65,7 @@ export type RunForAdmin = {
    * `setInventory`'s `EditionSizeLockedError` refuses to change
    * `editionSize` (`@/lib/catalogAdmin`). */
   locked: boolean;
-  counts: { available: number; reserved: number; sold: number };
+  counts: { available: number; reserved: number; sold: number; setAside: number };
   numbers: RunNumberRow[];
 };
 

@@ -101,8 +101,12 @@ async function main() {
   // actually is — before resizing, so the phone ladder is cut for the shape
   // it fills instead of relying on CSS `object-fit` to crop a portrait
   // source at full resolution. See `HERO_WIDE` in `lib/heroImage.ts`.
+  // 1000 tops the ladder rather than 1200: a 3x phone (393px -> 1179px) picks
+  // the largest rung, and at 1200 the AVIF is 58 KB against the 56 KB LCP
+  // budget in perf-budget.json; at 1000 it's ~44 KB and, on a photo of this
+  // kind, the 15% shortfall in device pixels is not visible.
   const wideRegion = { left: 0, top: 208, width: 1400, height: 1064 };
-  for (const w of [480, 800, 1200]) {
+  for (const w of [480, 800, 1000]) {
     await avifRegionCut(heroSrc, join(root, `public/hero-wide-${w}.avif`), wideRegion, w);
     await webpRegionCut(heroSrc, join(root, `public/hero-wide-${w}.webp`), wideRegion, w);
   }

@@ -58,9 +58,11 @@ export const HERO = {
  * only a band out of the middle; `build-photo-cuts.mjs` does that crop ahead
  * of time instead (the central 1400x1064 band, the same 100:76 ratio the box
  * fills), so the phone ladder is cut for the shape it actually renders into.
- * Full viewport width at every phone size, hence the flat `100vw`.
+ * Full viewport width at every phone size, hence the flat `100vw`. The ladder
+ * tops out at 1000 (not 1200) to keep the 3x-phone pick inside the LCP byte
+ * budget — see the note in `build-photo-cuts.mjs`.
  */
-const WIDE_WIDTHS = [480, 800, 1200] as const;
+const WIDE_WIDTHS = [480, 800, 1000] as const;
 
 export const HERO_WIDE = {
   avifSrcSet: WIDE_WIDTHS.map((w) => `/hero-wide-${w}.avif ${w}w`).join(", "),

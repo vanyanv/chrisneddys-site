@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
 import { Marquee } from "@/components/counter/Marquee";
@@ -113,14 +114,20 @@ export default function HomePage() {
         </div>
         {/* The pins are what make this read as our map rather than a map of
             LA, so the home page draws the same three the prototype does. It is
-            a picture here — /locations owns the interactive version. */}
+            a picture of the interactive one on /locations, and a way there:
+            the whole map links to it. */}
         <div className="cne-split-r">
           <div className="cne-split-frame">
-            <div className="cne-split-map" aria-hidden="true">
+            <Link
+              href="/locations/"
+              prefetch={false}
+              className="cne-split-map"
+              aria-label="See all three locations on the map"
+            >
               <LocationsMapCanvas />
               <MapPins />
               <MapCallout />
-            </div>
+            </Link>
           </div>
         </div>
       </section>

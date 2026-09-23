@@ -2727,6 +2727,11 @@ body {
   .cne-split-map > img {
     mask-image: linear-gradient(#0000, #000 var(--fade), #000 calc(100% - var(--fade)), #0000);
   }
+  /* The whole map is a link to /locations. */
+  .cne-split-map:focus-visible {
+    outline: 3px solid var(--a-red);
+    outline-offset: -6px;
+  }
 }
 
 /* ---- tablet tier: "Start here" cards (600-900) ---------------------------
@@ -2884,26 +2889,19 @@ body {
   width: 100%;
   height: auto;
 }
-.cne-callout {
-  position: absolute;
-  background: var(--a-ink);
-  color: #fff2c9;
-  border: 2px solid var(--a-yel);
-  padding: 7px 10px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  pointer-events: none;
-  transform: translate(-50%, -185%);
-  white-space: nowrap;
-  z-index: 2;
-}
-.cne-callout small {
-  display: block;
-  font-weight: 400;
-  opacity: 0.7;
-  font-size: 8.5px;
-  margin-top: 2px;
+/* On a phone held sideways the map keeps its 360:259 shape, so at full
+   width it would be taller than the screen and the one open store (low on
+   the map, in Hollywood) would sit under the fold. Capping its width by the
+   height left under the sticky header keeps the whole map on screen; the
+   wrap's map colour fills the sides. On an upright phone the cap is far wider
+   than the screen, so nothing changes there, and from 901px up the map sits
+   in the desktop panel's own frame (`.cne-split-frame`) instead. */
+@media (max-width: 900px) {
+  .cne-mapbox {
+    position: relative;
+    max-width: max(300px, (100svh - var(--cne-stuck) - 16px) * 360 / 259);
+    margin-inline: auto;
+  }
 }
 .cne-notify {
   display: flex;
@@ -2963,13 +2961,6 @@ body {
   }
   .cne-locs-list h1::after {
     content: none;
-  }
-  .cne-callout {
-    font-size: 12px;
-    padding: 9px 13px;
-  }
-  .cne-callout small {
-    font-size: 11px;
   }
 }
 

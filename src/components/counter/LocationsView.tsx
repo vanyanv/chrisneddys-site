@@ -2,10 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { locations, flagship, type Location } from "@/data/locations";
+import { locations, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
-import { MapPinArt, pinClass, TWO_MILES, mapOverlayStyle } from "@/components/locations/MapPins";
+import { MapPinArt, pinClass, mapOverlayStyle } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
+import { PIN } from "@/components/locations/mapLayout";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
 import { LocationCard } from "@/components/locations/LocationCard";
@@ -20,7 +21,20 @@ type LocationId = Location["id"];
 export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
   const [sel, setSel] = useState<LocationId>("hollywood");
 
-  const selected = locations.find((l) => l.id === sel) ?? flagship;
+  /* Picking a pin on a phone changes a card that is usually below the fold,
+     so without this the tap looks like it did nothing. Only scrolls when the
+     card isn't already fully on screen between the sticky header and the
+     order dock, so a desktop visitor with the list in view never moves. */
+  const pickFromMap = (loc: Location) => {
+    setSel(loc.id);
+    const card = document.querySelector<HTMLElement>(`[data-location="${slugFor(loc)}"]`);
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    if (r.top >= top && r.bottom <= window.innerHeight - 72) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    card.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
+  };
 
   return (
     /* `data-surface` sits on the whole view, not on one button row: every
@@ -34,9 +48,10 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
             not scoped to that page, and reused here so this map fills its
             desktop panel the same way: centred, with the roads fading into
             the panel's own colour over any spare room instead of leaving a
-            flat empty strip. See `git show fb7b3bf`. */}
+            flat empty strip. See `git show fb7b3bf`. `.cne-mapbox` keeps the
+            whole map on screen on a phone held sideways. */}
         <div className="cne-split-frame">
-          <div className="cne-split-map" style={{ position: "relative" }}>
+          <div className="cne-split-map cne-mapbox">
             {mapCanvas}
             <svg
               viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
@@ -44,14 +59,6 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               aria-label="Pick a location on the map"
               style={mapOverlayStyle}
             >
-              {selected.isOpen && (
-                <circle
-                  cx={projectX(selected.lng)}
-                  cy={projectY(selected.lat)}
-                  r={TWO_MILES}
-                  className="cne-map-reach"
-                />
-              )}
               {locations.map((loc) => (
                 <g
                   key={loc.id}
@@ -61,16 +68,17 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                   <MapPinArt loc={loc} />
                   <circle
                     className="hit"
-                    r={17}
+                    cy={PIN.hitY}
+                    r={PIN.hitR}
                     role="button"
                     tabIndex={0}
                     aria-label={`${loc.name} — ${loc.status}`}
                     aria-pressed={loc.id === sel}
-                    onClick={() => setSel(loc.id)}
+                    onClick={() => pickFromMap(loc)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        setSel(loc.id);
+                        pickFromMap(loc);
                       }
                     }}
                   />

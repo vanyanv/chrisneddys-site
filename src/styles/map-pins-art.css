@@ -17,3 +17,34 @@
 .cne-map-pin.is-selected .cne-pin-mon {
   transform: scale(1.22);
 }
+
+/* The paper plate behind a pin's name, so a road crossing behind it can't
+   cut through the letters (the freeway through GLENDALE). */
+.cne-pin-plate {
+  fill: var(--a-mapbg);
+  opacity: 0.9;
+}
+
+/* The "· SOON" tail on a location that hasn't opened yet. */
+.cne-map-pin .cne-pin-soon {
+  font-size: 6px;
+  font-weight: 700;
+  fill: var(--a-sub);
+}
+
+/* The open-now tag beside an open store's pin (`MapCallout`). */
+.cne-map-tag rect {
+  fill: var(--a-ink);
+  stroke: var(--a-yel);
+  stroke-width: 1.1;
+}
+.cne-map-tag .ptr {
+  fill: var(--a-yel);
+}
+.cne-map-tag text {
+  font-family: var(--font-mono);
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  fill: #fff2c9;
+}

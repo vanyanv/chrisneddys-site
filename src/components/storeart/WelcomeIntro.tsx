@@ -11,13 +11,13 @@ const EXIT_START_MS = 2400;
 const EXIT_DURATION_MS = 600;
 
 /**
- * Home page only (issue #81): the first-visit welcome vortex — see
+ * Home page only (issues #81, #102): the welcome vortex, every desktop visit — see
  * `src/lib/intro.ts` for the gating rules and `src/styles/intro.css` for the
  * curtain that keeps this flash-free.
  *
  * The inline script this renders decides, synchronously and before
- * hydration, whether this visit gets the intro; if so it marks the visitor
- * seen and adds `INTRO_GATE_CLASS` to `<html>`, which the CSS curtain keys
+ * hydration, whether this visit gets the intro; if so it adds
+ * `INTRO_GATE_CLASS` to `<html>`, which the CSS curtain keys
  * off immediately — no waiting on React. This component then notices the
  * class, mounts the actual vortex + logo inside that already-covered
  * viewport, and on any click/key/wheel/touch (or after ~2.4s) plays the same

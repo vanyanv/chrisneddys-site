@@ -1,4 +1,4 @@
-/* Home page welcome intro (issue #81) — a first-visit, desktop-only vortex
+/* Home page welcome intro (issue #81) — an every-visit, desktop-only vortex
    overlay. See src/lib/intro.ts for the gate and src/components/storeart/
    WelcomeIntro.tsx for the timeline. Scoped to `.cne-intro-*` only. */
 

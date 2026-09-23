@@ -320,9 +320,9 @@ during this tooling's own development. `scripts/perf.mjs` snapshots LCP
 before it ever touches the scroll/frame-timing measurement; if you write your
 own probe, read LCP first and treat that as load-bearing.
 
-The home page's first-visit desktop intro (`src/lib/intro.ts`) is skipped by
+The home page's desktop intro (`src/lib/intro.ts`) is skipped by
 default (`--skip-intro`, on unless you pass `--with-intro`), by setting its
-`localStorage` gate before the page loads — otherwise desktop LCP on `/`
+`localStorage` opt-out (`cne-welcome-intro-off`) before the page loads — otherwise desktop LCP on `/`
 would measure the intro overlay's own paint, not the page underneath it.
 
 ### `pnpm perf:budget` — did this ship more bytes than it's allowed to?

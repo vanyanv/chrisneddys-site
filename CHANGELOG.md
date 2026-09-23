@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Site: the vortex welcome intro with the logo now plays every time someone opens the home page on a computer, instead of only the very first time, which is why it seemed to have disappeared. It can still be skipped with a click or any key, and it still never shows on phones, tablets or for visitors who turn off motion ([#102](https://github.com/vanyanv/chrisneddys-site/issues/102))
 - Site: the Our Story page is a new design, "The Drip" — a red paint line runs down a seven-chapter timeline from Chris and Eddy meeting at 13 to the two upcoming locations, ending in a puddle with both Ways on the menu. Real photos from the parking-lot pop-up and the Sunset mural replace the old two-column layout, and a quiet order link and the Hollywood address sit under the Ways buttons ([#97](https://github.com/vanyanv/chrisneddys-site/issues/97))
 - Site: the monster in the bottom corner now says "Scroll up" beside it, so it's clear what tapping it does ([#92](https://github.com/vanyanv/chrisneddys-site/issues/92))
 - Site: the icon in the browser tab is now the blue monster with the mural grin and teeth instead of the plain red face, and link previews shared from the site show the same monster. Browsers that ask for the classic `favicon.ico` file get it too, instead of a missing file ([#93](https://github.com/vanyanv/chrisneddys-site/issues/93))

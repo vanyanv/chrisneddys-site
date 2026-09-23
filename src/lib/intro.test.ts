@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldShowIntro, type ShouldShowIntroInput } from "@/lib/intro";
+import { INTRO_GATE_SCRIPT, shouldShowIntro, type ShouldShowIntroInput } from "@/lib/intro";
 
 const BASE: ShouldShowIntroInput = {
   stored: null,
@@ -9,11 +9,11 @@ const BASE: ShouldShowIntroInput = {
 };
 
 describe("shouldShowIntro", () => {
-  it("shows for a first-time desktop visitor with no reduced-motion preference", () => {
+  it("shows for a desktop visitor with no reduced-motion preference, on every visit", () => {
     expect(shouldShowIntro(BASE)).toBe(true);
   });
 
-  it("never shows once the flag is stored, whatever its value", () => {
+  it("never shows once the opt-out is stored, whatever its value", () => {
     expect(shouldShowIntro({ ...BASE, stored: "1" })).toBe(false);
     expect(shouldShowIntro({ ...BASE, stored: "" })).toBe(false);
   });
@@ -34,5 +34,15 @@ describe("shouldShowIntro", () => {
     expect(
       shouldShowIntro({ stored: null, wide: false, finePointer: false, reducedMotion: true }),
     ).toBe(false);
+  });
+});
+
+describe("INTRO_GATE_SCRIPT", () => {
+  it("never writes to storage, so the intro plays on every visit", () => {
+    expect(INTRO_GATE_SCRIPT).not.toContain("setItem");
+  });
+
+  it("ignores the old once-per-browser flag", () => {
+    expect(INTRO_GATE_SCRIPT).not.toContain("cne-welcome-intro-seen");
   });
 });

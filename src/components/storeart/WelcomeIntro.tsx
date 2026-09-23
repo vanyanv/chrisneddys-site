@@ -5,10 +5,13 @@ import { Vortex } from "./Vortex";
 import { INTRO_GATE_CLASS, INTRO_GATE_SCRIPT } from "@/lib/intro";
 import "@/styles/intro.css";
 
-/** Logo zooms in this long after mount (see `.cne-intro-logo`'s animation-delay). */
-const EXIT_START_MS = 2400;
-/** How long the "whole overlay scales and rotates out" transition takes. */
-const EXIT_DURATION_MS = 600;
+/** The exit starts this long after mount: the logo has zoomed in by about
+ * 1s (see `.cne-intro-logo`'s animation) and holds for a beat. Shortened
+ * from 2.4s in issue #102, so the whole intro is gone by about 2s. */
+const EXIT_START_MS = 1600;
+/** How long the "whole overlay scales and rotates out" transition takes —
+ * keep in sync with `.cne-intro-overlay.is-out`'s animation in intro.css. */
+const EXIT_DURATION_MS = 450;
 
 /**
  * Home page only (issues #81, #102): the welcome vortex, every desktop visit — see
@@ -20,9 +23,9 @@ const EXIT_DURATION_MS = 600;
  * `INTRO_GATE_CLASS` to `<html>`, which the CSS curtain keys
  * off immediately — no waiting on React. This component then notices the
  * class, mounts the actual vortex + logo inside that already-covered
- * viewport, and on any click/key/wheel/touch (or after ~2.4s) plays the same
+ * viewport, and on any click/key/wheel/touch (or after ~1.6s) plays the same
  * exit every time before removing the class and unmounting — gone from the
- * DOM by about 3s. For everyone else it renders an empty, `display: none`
+ * DOM by about 2s. For everyone else it renders an empty, `display: none`
  * curtain div and nothing more: no listeners, no vortex polygons.
  */
 export function WelcomeIntro() {

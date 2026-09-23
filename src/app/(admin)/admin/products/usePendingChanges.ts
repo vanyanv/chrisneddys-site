@@ -107,6 +107,11 @@ export function usePendingChanges(onSaved?: (changes: PendingEntry[]) => void) {
       }
       showToast(result.error, { tone: "error" });
       return false;
+    } catch {
+      // A dropped connection or a server error used to fail silently here:
+      // the bar kept its count and nothing said the save never landed.
+      showToast("Couldn't save — check your connection and try again.", { tone: "error" });
+      return false;
     } finally {
       setSaving(false);
     }

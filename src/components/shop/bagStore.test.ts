@@ -4,6 +4,7 @@ import {
   bagSubtotal,
   buildBagLine,
   bumpBagLine,
+  refreshedBagLine,
   clean,
 } from "@/components/shop/bagStore";
 import { MAX_PER_ORDER, merch, firstView, type MerchProduct } from "@/data/merch";
@@ -115,6 +116,29 @@ describe("bumpBagLine", () => {
     expect(bumped.name).toBe(existing.name);
     expect(bumped.image).toEqual(existing.image);
     expect(bumped.addedAt).toBe(existing.addedAt);
+  });
+});
+
+describe("refreshedBagLine", () => {
+  it("picks up a price changed in /admin since the line was added", () => {
+    const existing = buildBagLine(trucker, 2);
+    const repriced: MerchProduct = { ...trucker, price: 52 };
+    const fresh = refreshedBagLine(existing, repriced);
+    expect(fresh.priceCents).toBe(5200);
+    expect(fresh.qty).toBe(2);
+    expect(fresh.addedAt).toBe(existing.addedAt);
+  });
+
+  it("clamps the quantity to a lowered perOrderLimit", () => {
+    const existing = buildBagLine(trucker, 4);
+    const fresh = refreshedBagLine(existing, { ...trucker, perOrderLimit: 2 });
+    expect(fresh.qty).toBe(2);
+    expect(fresh.perOrderLimit).toBe(2);
+  });
+
+  it("carries the new price through a bump too", () => {
+    const existing = buildBagLine(trucker, 1);
+    expect(bumpBagLine(existing, { ...trucker, price: 40 }, 1).priceCents).toBe(4000);
   });
 });
 

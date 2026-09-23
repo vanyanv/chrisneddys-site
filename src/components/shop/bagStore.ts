@@ -282,8 +282,38 @@ export function buildBagLine(product: MerchProduct, qty: number): BagLine {
  * removed and re-added.
  */
 export function bumpBagLine(line: BagLine, product: MerchProduct, qty: number): BagLine {
+  const fresh = refreshedBagLine(line, product);
+  return { ...fresh, qty: Math.min(fresh.perOrderLimit, line.qty + qty) };
+}
+
+/**
+ * An existing line with its display snapshot (name, price, photo, cap)
+ * re-read from the live product, quantity kept but clamped to the cap. A
+ * price or photo changed in /admin since the line was added would otherwise
+ * sit in the bag unchanged until checkout charged the new one.
+ */
+export function refreshedBagLine(line: BagLine, product: MerchProduct): BagLine {
   const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
-  return { ...line, qty: Math.min(perOrderLimit, line.qty + qty), perOrderLimit };
+  return {
+    ...line,
+    name: product.name,
+    displayName: product.displayName,
+    priceCents: Math.round(product.price * 100),
+    image: buildLineImage(product) ?? line.image,
+    perOrderLimit,
+    qty: Math.min(perOrderLimit, line.qty),
+  };
+}
+
+/** Brings the bag's line for `product` (if there is one) up to date with the
+ * live product — the product page calls this once the bag has loaded, so a
+ * buyer who comes back after a price change sees the price they'll pay. */
+export function refreshBagLine(product: MerchProduct) {
+  const existing = state.lines.find((l) => l.slug === product.slug);
+  if (!existing) return;
+  const fresh = refreshedBagLine(existing, product);
+  if (JSON.stringify(fresh) === JSON.stringify(existing)) return;
+  set({ lines: state.lines.map((l) => (l.slug === product.slug ? fresh : l)) });
 }
 
 /** Adds `qty` of `product` to the bag, snapshotting its current display

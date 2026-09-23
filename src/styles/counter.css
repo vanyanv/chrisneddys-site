@@ -356,18 +356,8 @@ body {
   color: #fff2c9;
   padding: 16px 15px 18px;
 }
-/* Scoped to the panel itself now rather than the whole hero, so it never has
-   to be clipped to stop at the seam — the panel's own box already ends there. */
-.cne-hero-halftone {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(#1a1612 1.15px, transparent 1.25px);
-  background-size: 9px 9px;
-  opacity: 0.16;
-  transition: opacity 0.5s;
-}
-/* Lifts the real copy above the halftone dots, the same way `.cne-hero-in`
-   used to for the whole hero. */
+/* The panel is plain red, with no halftone dots: the owner asked for them to
+   go. This still lifts the copy into its own stacking layer above the panel. */
 .cne-hero-copy-in {
   position: relative;
   z-index: 2;
@@ -2252,19 +2242,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-  /* Opaque and a shade denser than the phone dots, plus a second, larger
-     layer — the panel has the room to carry more texture here. */
-  .cne-hero-halftone {
-    opacity: 1;
-  }
-  .cne-hero-halftone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
-    background-size: 19px 19px;
-    opacity: 0.1;
   }
   /* Readable at 1x: the phone's 11px line is set for a 2x screen. The
      height is fixed for the same reason as the phone rule (see above). */

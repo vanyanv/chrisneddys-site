@@ -71,6 +71,15 @@ const nextConfig = {
         ],
       },
       {
+        // The Vercel-assigned `*.vercel.app` hosts (production alias and every
+        // preview) serve the same pages as www.chrisneddys.com. Canonical tags
+        // already point at www, but this keeps search engines from indexing
+        // the Vercel address as a second copy of the site at all.
+        source: "/(.*)",
+        has: [{ type: "host", value: "(?<vercelHost>.+)\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
         source: "/_next/static/(.*)",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },

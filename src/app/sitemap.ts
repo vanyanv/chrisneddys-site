@@ -21,9 +21,9 @@ export const dynamic = "force-static";
 const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 
 /** When the location set — addresses, hours, which locations are open — last moved. */
-const LOCATIONS_UPDATED = "2026-09-09";
+const LOCATIONS_UPDATED = "2026-09-23";
 /** When the site's copy and structure last changed. */
-const SITE_UPDATED = "2026-09-09";
+const SITE_UPDATED = "2026-09-23";
 /** When /returns and /terms were added. Both also carry the store settings
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */

@@ -59,12 +59,9 @@ const VARIANTS: Record<VortexVariant, VortexVariantConfig> = {
       pow: 1.85,
       hole: 140,
     },
-    monsters: [
-      { a0: 200, size: 92, dur: 3.4, delay: -0.4, body: "#2e5fd9", iris: "#e63027" },
-      { a0: -20, size: 82, dur: 3.4, delay: -1.3, body: "#e63027", iris: "#2e5fd9" },
-      { a0: 110, size: 76, dur: 3.4, delay: -2.1, body: "#f5d20e", iris: "#e63027" },
-      { a0: 290, size: 70, dur: 3.4, delay: -2.8, body: "#c6ff2b", iris: "#e63027" },
-    ],
+    // Owner call (issue #106): the band is now a thin strip, too short for
+    // the suck-in monsters to read at any size — dropped rather than shrunk.
+    monsters: [],
   },
   // Full-viewport intro/SLIDE-code geometry — ported from `ideas.mjs`'s
   // `INTRO`/`INTRO_MON` (the welcome-vortex demo), which is also the "those

@@ -63,7 +63,17 @@ export default async function LocationPage({ params }: Params) {
       </nav>
       <StoreDetail loc={loc} hood={hood} />
       {!loc.isOpen && (
-        <section className="cne-sec cne-locd cne-rv">
+        <section
+          id="notify"
+          className="cne-sec cne-locd cne-rv"
+          // Every "TELL ME WHEN IT OPENS" link (issue #108) on a coming-soon
+          // card — /order/, /locations/, and this page's own card — points
+          // here. `html`'s sitewide `scroll-padding-top` (counter.css)
+          // already clears the sticky header for any in-page anchor; this
+          // just says so explicitly on the element itself, the same belt-
+          // and-suspenders `legal.css` uses for its own jumped-to headings.
+          style={{ scrollMarginTop: "var(--cne-stuck)" }}
+        >
           <div className="cne-eyebrow">Not open yet</div>
           <h2>First to know.</h2>
           <p className="cne-lede">

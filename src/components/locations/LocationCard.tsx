@@ -1,8 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
+import Link from "next/link";
 import type { Location } from "@/data/locations";
 import { orderUrl, type OrderSurface } from "@/lib/otter";
+import { slugFor } from "@/lib/locationSlug";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
-import { Monster } from "@/components/mascots/Monster";
 
 /**
  * One store's card: name, address, hours and the button row every hand-copied
@@ -50,19 +51,6 @@ export function LocationCard({
 
   return (
     <>
-      {/* A wall-mural monster marking the location as open — the card that
-          wraps this component (`.cne-loc` on the index and the store page
-          alike) needs `position: relative` for the corner badge to sit on
-          it. A location that has not opened yet gets no mascot. */}
-      {loc.isOpen && (
-        <Monster
-          species="classic"
-          bodyColor="#b6e01f"
-          irisColor="#e63027"
-          size={24}
-          className="cne-badge-corner is-tr"
-        />
-      )}
       <div
         style={{
           display: "flex",
@@ -96,9 +84,9 @@ export function LocationCard({
 
       {loc.isOpen && children}
 
-      {showButtons && (
+      {(showButtons || !loc.isOpen) && (
         <div className="cne-loc-btns">
-          {loc.otter && (
+          {loc.isOpen && loc.otter && (
             <a
               className="cne-mini is-red"
               href={orderUrl(surface)}
@@ -108,11 +96,26 @@ export function LocationCard({
               ORDER
             </a>
           )}
-          <DirectionsLink loc={loc} className="cne-mini is-plain" />
-          {loc.phoneTel && (
+          {showButtons && <DirectionsLink loc={loc} className="cne-mini is-plain" />}
+          {showButtons && loc.phoneTel && (
             <a className="cne-mini is-plain" href={`tel:${loc.phoneTel}`}>
               CALL
             </a>
+          )}
+          {/* issue #108: the one thing a coming-soon card could not do —
+              take down interest in a store that hasn't opened yet. Jumps to
+              the store's own page and the purpose-built email signup
+              already there (`OpeningNotify.tsx`) rather than opening a
+              second, different pipeline. On the store's own page this is
+              the same URL already on screen, so it just scrolls. */}
+          {!loc.isOpen && (
+            <Link
+              prefetch={false}
+              className="cne-mini is-red"
+              href={`/locations/${slugFor(loc)}/#notify`}
+            >
+              TELL ME WHEN IT OPENS
+            </Link>
           )}
         </div>
       )}

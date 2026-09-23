@@ -4,11 +4,10 @@ import type { CSSProperties } from "react";
 type SleepStyle = CSSProperties & { "--m-body"?: string };
 
 /**
- * Idea 11: the sold-out corner badge. Sits in the same spot the awake
- * `Monster` badge uses (`cne-badge-corner is-tr`) when a product isn't sold
- * out, but asleep, with a small floating "z". Raw `<use>` rather than the
- * `Monster` component since `cne-classic-sleep` isn't in its species union —
- * this is the only place that needs it.
+ * Idea 11: the sold-out corner badge — a product photo's only mascot mark,
+ * shown once a run is gone, with a small floating "z". Raw `<use>` rather
+ * than the `Monster` component since `cne-classic-sleep` isn't in its
+ * species union — this is the only place that needs it.
  */
 export function SleepingBadge({ size = 26 }: { size?: number }) {
   const style: SleepStyle = { "--m-body": "#2e5fd9" };

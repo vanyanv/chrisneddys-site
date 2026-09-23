@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { orderUrl, formatPrice } from "@/lib/otter";
+import { formatPrice } from "@/lib/otter";
 import { SLIDER_PRICE } from "@/data/menu";
 import { HERO } from "@/lib/heroImage";
 import { Watcher } from "@/components/storeart/Watcher";
+import { HeroOrderButton } from "@/components/counter/HeroOrderButton";
 
 /**
  * Red panel, oversized display type, and the basket shot.
@@ -47,14 +48,7 @@ export function Hero() {
             <span className="cne-hero-addr">5539 W. Sunset Blvd</span>
           </p>
           <div className="cne-cta" data-surface="hero">
-            <a
-              className="cne-big is-primary"
-              href={orderUrl("hero")}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ORDER ONLINE →
-            </a>
+            <HeroOrderButton />
             <Link prefetch={false} className="cne-big is-secondary" href="/menu/">
               <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
             </Link>

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
-import { menu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
+import { foodMenu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
 import { PRIVACY_UPDATED } from "@/data/privacy";
 import { catalogueUpdatedAt, listPublishedProducts } from "@/lib/catalog";
 import { productSocialImage } from "@/lib/productSeo";
@@ -32,8 +32,8 @@ const RETURNS_TERMS_ADDED = "2026-09-14";
 const CAREERS_ADDED = "2026-09-19";
 
 /** The menu photography, so image search has a route in to the food. */
-const menuImages = (Object.keys(menu) as MenuCategoryKey[])
-  .flatMap((key) => menu[key])
+const menuImages = (Object.keys(foodMenu) as MenuCategoryKey[])
+  .flatMap((key) => foodMenu[key])
   .filter((item) => item.photo)
   .map((item) => `${brand.siteUrl}/menu/${item.photo}.webp`);
 

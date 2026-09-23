@@ -196,6 +196,28 @@ export function statusLabel(status: StoreStatus): string {
 }
 
 /**
+ * The hero order button's second line: the one fact worth adding to it, and
+ * only while a store can actually promise it.
+ *
+ * The button always says ORDER ONLINE — this never changes that, only adds
+ * to it. While the store is closed and knows when it reopens, "Opens 10 AM"
+ * is the qualifier worth showing on its own line underneath, in the same
+ * clock the header tag and the bottom dock already read from — not a
+ * countdown, not an invitation to schedule an order. Null means the button
+ * stays single-line: `status` is null before the client clock mounts, so a
+ * visitor arriving while the store is open sees no subline both before and
+ * after that mount — nothing flashes for them. A visitor arriving while it's
+ * closed sees the plain button for a moment and then the second line fills
+ * in, the same way the dock's own message does.
+ */
+export function orderCtaSubline(status: StoreStatus | null): string | null {
+  if (status?.state === "closed" && status.opensAt) {
+    return `Opens ${status.opensAt}`;
+  }
+  return null;
+}
+
+/**
  * A run of consecutive days, said the way a person says a range out loud: one
  * day is just itself, two days are "X and Y", three or more become
  * "X through Y" — the same shape `openingSpec` already groups its days into,

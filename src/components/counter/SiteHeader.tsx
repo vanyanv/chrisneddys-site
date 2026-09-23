@@ -36,11 +36,23 @@ export const TABS = [
  * The wordmark is centred at both sizes and takes no part in that flex row: it
  * is positioned against the header instead, so it sits on the true centre
  * rather than being pushed off it by whatever the pill currently reads.
+ *
+ * Below 901px the tab row itself drops HOME — the logo already goes there —
+ * via `.cne-tab-home { display: none }`, leaving MENU, LOCATIONS, SHOP, OUR
+ * STORY and CONTACT the width six tabs used to split five ways. The
+ * indicator's own arithmetic (`--cne-tab-n`, `--cne-tab-i`) runs against
+ * `MOBILE_TABS` rather than the full `TABS` for the same reason, or it
+ * slides to a position sized for six equal slots that no longer exist.
+ * Desktop hides the indicator entirely (`.cne-tabind { display: none }` at
+ * 901px+) and shows all six tabs from `TABS` itself, so it never sees
+ * `MOBILE_TABS`.
  */
+const MOBILE_TABS = TABS.filter((t) => t.href !== "/");
+
 export function SiteHeader() {
   const raw = usePathname() ?? "/";
   const path = raw === "/" ? "/" : raw.endsWith("/") ? raw : `${raw}/`;
-  const activeIndex = TABS.findIndex((t) => t.href === path);
+  const mobileActiveIndex = MOBILE_TABS.findIndex((t) => t.href === path);
   const [lifted, setLifted] = useState(false);
 
   useEffect(() => {
@@ -105,24 +117,25 @@ export function SiteHeader() {
             prefetch={false}
             key={t.href}
             href={t.href}
-            className="cne-tab"
+            className={t.href === "/" ? "cne-tab cne-tab-home" : "cne-tab"}
             aria-current={t.href === path ? "page" : undefined}
           >
             {t.label}
           </Link>
         ))}
-        {activeIndex >= 0 && (
+        {mobileActiveIndex >= 0 && (
           /* The slide is `--cne-tab-i` tabs wide, and only the stylesheet knows
              how wide a tab and the bar itself are — so it does the arithmetic.
              Passing a percentage from here would have to hardcode the bar's
-             own width and drift the moment either changes. */
+             own width and drift the moment either changes. Sized against
+             `MOBILE_TABS`, the five tabs actually laid out below 901px. */
           <span
             className="cne-tabind"
             aria-hidden="true"
             style={
               {
-                "--cne-tab-i": activeIndex,
-                "--cne-tab-n": TABS.length,
+                "--cne-tab-i": mobileActiveIndex,
+                "--cne-tab-n": MOBILE_TABS.length,
               } as CSSProperties
             }
           />

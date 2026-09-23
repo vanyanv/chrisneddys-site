@@ -158,9 +158,10 @@
 }
 
 /* ---- idea 15: back-to-top monster ----------------------------------------
-   `--cne-backtop-dock` is set at runtime by `BackToTop` to the current
-   OrderDock's rendered height, so the button always clears it on a phone
-   and sits flush to the corner everywhere the dock isn't rendered. */
+   `--cne-backtop-dock` is set at runtime by `BackToTop` to the combined
+   height of the bars pinned to a phone's bottom edge (the OrderDock and a
+   product page's buy bar), so the button always clears them and sits flush
+   to the corner everywhere they aren't rendered. */
 .cne-backtop {
   position: fixed;
   right: 14px;

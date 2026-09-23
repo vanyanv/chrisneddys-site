@@ -25,7 +25,7 @@ export const metadata: Metadata = pageMetadata({ title, description, path: "/ord
 const FAQ: FaqEntry[] = [
   {
     q: "How do I order from Chris N Eddy's?",
-    a: "Order online from our Hollywood location at 5539 W. Sunset Blvd through our Otter storefront, or call (323) 544-3600. Every item on this site links straight to its page on the storefront with the add-to-cart sheet already open.",
+    a: "Order online from our Hollywood location at 5539 W. Sunset Blvd through our ordering page, or call (323) 544-3600. Every item on this site links straight to its page on the storefront with the add-to-cart sheet already open.",
   },
   // Shared with /contact/'s "Answered already" card — one answer, defined once,
   // in src/data/faq.ts.
@@ -57,6 +57,12 @@ const FAQ: FaqEntry[] = [
 ];
 
 export default function OrderPage() {
+  // Split so a location that hasn't opened yet doesn't cost a phone the
+  // same full card — address, hours placeholder, footer link — that an
+  // actual pickup spot earns. See the compact row below (issue #108).
+  const openLocations = locations.filter((loc) => loc.isOpen);
+  const comingSoonLocations = locations.filter((loc) => !loc.isOpen);
+
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -91,8 +97,8 @@ export default function OrderPage() {
         <div className="cne-eyebrow">Pickup from Hollywood</div>
         <h1>Order now.</h1>
         <p className="cne-lede">
-          Online ordering runs through our Otter storefront at the Hollywood location, 5539 W.
-          Sunset Blvd. Prices there are the pickup prices you see on{" "}
+          Online ordering runs through our ordering page for the Hollywood location, 5539 W. Sunset
+          Blvd. Prices there are the pickup prices you see on{" "}
           <Link
             prefetch={false}
             href="/menu/"
@@ -121,10 +127,10 @@ export default function OrderPage() {
       <section className="cne-sec cne-rv">
         <div className="cne-eyebrow">Where it comes from</div>
         <h2>Pick your location.</h2>
-        {locations.map((loc) => (
+        {openLocations.map((loc) => (
           <div
             key={loc.id}
-            className={`cne-loc ${loc.isOpen ? "is-live" : "is-soon"}`}
+            className="cne-loc is-live"
             style={{ marginTop: 14 }}
             data-surface="location-card"
             data-location={slugFor(loc)}
@@ -135,23 +141,70 @@ export default function OrderPage() {
               addressAs="address"
               addressStyle={{ fontStyle: "normal" }}
               footer={
-                // No hours, no phone and no order link for a location that is
-                // not serving yet — every one of them would be a dead end. The
-                // details link still runs either way.
-                <>
-                  {!loc.isOpen && <div className="cne-loc-note">Opening date to be announced.</div>}
-                  <Link
-                    prefetch={false}
-                    href={`/locations/${slugFor(loc)}/`}
-                    className="cne-loc-note cne-loc-more"
-                  >
-                    {loc.neighbourhood} hours &amp; directions &rarr;
-                  </Link>
-                </>
+                <Link
+                  prefetch={false}
+                  href={`/locations/${slugFor(loc)}/`}
+                  className="cne-loc-note cne-loc-more"
+                >
+                  {loc.neighbourhood} hours &amp; directions &rarr;
+                </Link>
               }
             />
           </div>
         ))}
+
+        {/* Glendale and Van Nuys haven't opened, so each gets one compact
+            row instead of a full card with an address, a placeholder hours
+            line and a footer link — that's real space on a phone, and none
+            of it is a fact yet. "Tell me when it opens" (issue #108) is the
+            one thing worth a tap here; a "Details" link still reaches the
+            store's own page for the rest. */}
+        {comingSoonLocations.length > 0 && (
+          <div
+            style={{
+              marginTop: 14,
+              border: "2px solid var(--a-ink)",
+              background: "var(--a-card)",
+            }}
+          >
+            {comingSoonLocations.map((loc, i) => (
+              <div
+                key={loc.id}
+                data-surface="location-card"
+                data-location={slugFor(loc)}
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  padding: "10px 13px",
+                  borderTop: i === 0 ? "none" : "1px solid var(--a-line)",
+                }}
+              >
+                <span style={{ fontSize: 13, lineHeight: 1.4 }}>
+                  <strong>{loc.neighbourhood.toUpperCase()}</strong> — opening soon
+                </span>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <Link
+                    prefetch={false}
+                    href={`/locations/${slugFor(loc)}/`}
+                    className="cne-mini is-plain"
+                  >
+                    DETAILS
+                  </Link>
+                  <Link
+                    prefetch={false}
+                    className="cne-mini is-red"
+                    href={`/locations/${slugFor(loc)}/#notify`}
+                  >
+                    TELL ME WHEN IT OPENS
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="cne-sec cne-rv">

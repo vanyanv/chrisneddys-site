@@ -5,7 +5,6 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
-import { MascotDecor } from "@/components/mascots/MascotDecor";
 import { FooterTag } from "@/components/storeart/FooterTag";
 
 /**
@@ -34,6 +33,14 @@ const COUNTER_LINKS = [
   })),
 ];
 
+/** "Glendale" / "Glendale & Van Nuys" / "Glendale, Van Nuys & Burbank" — however
+ * many locations haven't opened yet, named in one phrase for the single
+ * compact "coming soon" line. */
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} & ${names[names.length - 1]}`;
+}
+
 /**
  * Whether a location prints an address is `isOpen`, the same flag the live
  * open/closed pill and the JSON-LD `openingHoursSpecification` are built from.
@@ -47,24 +54,13 @@ const COUNTER_LINKS = [
  * prints a number only once it answers its own.
  */
 export function SiteFooter() {
+  const openLocations = locations.filter((loc) => loc.isOpen);
+  const comingSoon = locations.filter((loc) => !loc.isOpen);
+
   return (
     // Declared once on the whole footer: the only tracked links down here are
     // the per-store phone numbers, and every one of them belongs to "footer".
     <footer className="cne-foot" data-surface="footer">
-      <MascotDecor
-        kind="numbers"
-        colorA="#c6ff2b"
-        size="140%"
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          opacity: 0.05,
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
       <Monster
         species="blacklight"
         bodyColor="#3ee06a"
@@ -130,7 +126,7 @@ export function SiteFooter() {
         </div>
 
         <div className="cne-foot-counters">
-          {locations.map((loc) => (
+          {openLocations.map((loc) => (
             // The phone number inside reports which counter it rings. All three
             // share the Hollywood number today; two of them stop as they open.
             <div className="cne-foot-counter" key={loc.id} data-location={slugFor(loc)}>
@@ -139,33 +135,37 @@ export function SiteFooter() {
                 block is the kind of duplication that makes a footer read as
                 padded rather than as a map. */}
               <p className="cne-foot-h">{loc.neighbourhood}</p>
-              {loc.isOpen ? (
-                <>
-                  <address>
-                    {loc.address}
+              <address>
+                {loc.address}
+                <br />
+                {loc.city}, {loc.region} {loc.postal}
+                {loc.phone && loc.phoneTel ? (
+                  <>
                     <br />
-                    {loc.city}, {loc.region} {loc.postal}
-                    {loc.phone && loc.phoneTel ? (
-                      <>
-                        <br />
-                        <a href={`tel:${loc.phoneTel}`}>{loc.phone}</a>
-                      </>
-                    ) : null}
-                  </address>
-                  <div className="cne-foot-hours">
-                    {loc.hours.map(([days, time]) => (
-                      <Fragment key={days}>
-                        <span>{days}</span>
-                        <span>{time}</span>
-                      </Fragment>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <p className="cne-foot-soon">Coming soon</p>
-              )}
+                    <a href={`tel:${loc.phoneTel}`}>{loc.phone}</a>
+                  </>
+                ) : null}
+              </address>
+              <div className="cne-foot-hours">
+                {loc.hours.map(([days, time]) => (
+                  <Fragment key={days}>
+                    <span>{days}</span>
+                    <span>{time}</span>
+                  </Fragment>
+                ))}
+              </div>
             </div>
           ))}
+          {/* Not-yet-open locations get one compact line rather than each its
+              own repeated "Coming soon" block — the Hollywood card above is
+              the one that has to carry real weight. */}
+          {comingSoon.length > 0 && (
+            <div className="cne-foot-counter" data-location="coming-soon">
+              <p className="cne-foot-soon">
+                {joinNames(comingSoon.map((loc) => loc.neighbourhood))} — coming soon.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* The policies are linked from here rather than from the Eat column

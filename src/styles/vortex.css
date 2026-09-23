@@ -31,14 +31,14 @@
    the placeholder box never resizes when the polygons swap in. Screen intro
    variant is excluded on purpose — it's the always-visible welcome overlay. */
 .cne-vortex-band {
-  height: 250px;
+  height: 96px;
   content-visibility: auto;
-  contain-intrinsic-size: auto 250px;
+  contain-intrinsic-size: auto 96px;
 }
 @media (min-width: 901px) {
   .cne-vortex-band {
-    height: 420px;
-    contain-intrinsic-size: auto 420px;
+    height: 140px;
+    contain-intrinsic-size: auto 140px;
   }
 }
 

@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { locations, flagship, type Location } from "@/data/locations";
-import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
@@ -40,10 +40,10 @@ export function menuNode() {
     name: `${brand.name} Menu`,
     url: `${brand.siteUrl}/menu/`,
     inLanguage: "en-US",
-    hasMenuSection: (Object.keys(menu) as MenuCategoryKey[]).map((key) => ({
+    hasMenuSection: (Object.keys(foodMenu) as MenuCategoryKey[]).map((key) => ({
       "@type": "MenuSection",
       name: categoryTitles[key],
-      hasMenuItem: menu[key].map((item) => ({
+      hasMenuItem: foodMenu[key].map((item) => ({
         "@type": "MenuItem",
         name: item.name,
         description: item.desc || undefined,

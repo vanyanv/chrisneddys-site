@@ -59,7 +59,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       }
       // `aria-modal` tells a screen reader the rest of the page is gone; it
       // does not stop Tab from walking into it. Without this, the tab after
-      // ADD ON OTTER lands on a menu row behind the scrim.
+      // ADD TO ORDER lands on a menu row behind the scrim.
       if (e.key !== "Tab") return;
       const sheet = sheetRef.current;
       if (!sheet) return;
@@ -279,9 +279,13 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                ADD ON OTTER · {formatPrice(item.price)} →
+                ADD TO ORDER · {formatPrice(item.price)} →
               </a>
-              <p className="cne-fine">Opens this exact item on our ordering page, ready to add.</p>
+              <p className="cne-fine">
+                {item.takesToppings
+                  ? "Opens this item on our ordering page. Tick your Way's toppings there — all free."
+                  : "Opens this exact item on our ordering page, ready to add."}
+              </p>
             </>
           )}
         </div>

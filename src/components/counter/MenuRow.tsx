@@ -16,18 +16,26 @@ export function MenuRow({
   item,
   star,
   eager,
+  /**
+   * Name + price only, no photo tile — for a phone reading a long list (the
+   * thirteen drinks) as fast as possible. The thumb still renders in the DOM
+   * so desktop, which never sets this, is untouched; `.is-compact` hides it
+   * below 901px in menu-art.css.
+   */
+  compact,
   onOpen,
 }: {
   item: MenuItem;
   star?: boolean;
   /** The rows above the fold. Lazy is the wrong default for those. */
   eager?: boolean;
+  compact?: boolean;
   onOpen: (item: MenuItem) => void;
 }) {
   return (
     <button
       type="button"
-      className={`cne-row${star ? " is-star" : ""}`}
+      className={`cne-row${star ? " is-star" : ""}${compact ? " is-compact" : ""}`}
       onClick={() => onOpen(item)}
       aria-haspopup="dialog"
     >

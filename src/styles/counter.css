@@ -301,6 +301,30 @@ body {
   transition: transform 0.34s cubic-bezier(0.35, 1.3, 0.4, 1);
 }
 
+/* Below 901px HOME drops out of the tab row — the logo already goes home —
+   leaving MENU, LOCATIONS, SHOP, OUR STORY and CONTACT the width six tabs
+   used to split five ways. That's what buys back a readable, tappable size:
+   `clamp()` keeps the type at least 11.5px even on a 375px phone (where it
+   sits at the floor) and lets it grow toward 13px as the strip widens past
+   ~460px, all the way through the 600-900px tablet tier. `min-height` is a
+   flat 44px rather than something padding has to add up to, so it holds at
+   every size in between. The short-landscape query below (max-height: 500px)
+   still trims this down further — that header is deliberately slimmer. */
+@media (max-width: 900px) {
+  .cne-tab.cne-tab-home {
+    display: none;
+  }
+  .cne-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    font-size: clamp(11.5px, 3vw, 13px);
+    letter-spacing: 0.01em;
+    padding: 8px 3px;
+  }
+}
+
 /* ---- hero --------------------------------------------------------------- */
 .cne-hero {
   position: relative;
@@ -420,6 +444,25 @@ body {
   background: #fff2c9;
   color: #1a1612;
   flex: 1;
+}
+
+/* The order button while the store is closed: "ORDER ONLINE" stays the main
+   line at the button's normal size, and "Opens 10 AM" rides underneath it,
+   smaller and on its own line. Splitting it out here — rather than running
+   both into one phrase — is what stops a narrow button from wrapping
+   mid-word ("OPENS 10 / AM"): the sub-line has nowhere to break because it
+   never shares a line with anything else. `.cne-big`'s own `line-height: 1`
+   is what these two lines are stacked against, so the button only grows by
+   what the sub-line itself adds. */
+.cne-cta-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.cne-cta-sub {
+  font-size: 0.65em;
+  white-space: nowrap;
 }
 
 .cne-heromedia {
@@ -1064,8 +1107,9 @@ body {
    The sticky header (logo row + tab strip) and the sticky bottom dock used to
    cost ~89px + ~62px of a viewport that only has ~400px to give, leaving the
    first menu item under the dock at load. The header rows drop their
-   vertical padding here (tabs stay >=36px tall, still a real tap target) and
-   the dock steps aside. */
+   vertical padding here (tabs stay >=36px tall, still a real tap target,
+   overriding the flat 44px the width-only query above sets) and the dock
+   steps aside. */
 @media (max-width: 900px) and (max-height: 500px) {
   :root {
     --cne-stuck: 86px;
@@ -1085,7 +1129,9 @@ body {
     padding: 7px 7px;
   }
   .cne-tab {
-    padding: 10px 4px;
+    min-height: 36px;
+    padding: 6px 3px;
+    font-size: clamp(11.5px, 2.4vw, 12.5px);
   }
   /* The header's own Order button is on screen the whole time, so on a
      landscape phone the dock is a second copy of it standing on the little
@@ -1634,10 +1680,6 @@ body {
 /* ---- footer ------------------------------------------------------------- */
 .cne-foot {
   position: relative;
-  /* Clips the numbers-wall texture below, which is deliberately oversized
-     (140%, centered) so it bleeds off all four edges rather than stopping
-     short of them. Without this the bleed itself became visible page
-     overflow — see issue tracking mobile scroll overflow. */
   overflow: hidden;
   background: var(--a-ink);
   color: #fff2c9;
@@ -1774,6 +1816,42 @@ body {
   color: var(--a-yel);
 }
 
+/* ---- phone tier: footer (<600) --------------------------------------------
+   The footer used to read as one long stack — brand, then all six Eat links,
+   then all four Locations links, then each store's own block — which is what
+   ran a phone's footer past 900px tall. Eat and Locations now sit side by
+   side under the brand block instead of queuing behind it, and every store
+   that hasn't opened yet collapses into the one line above rather than
+   repeating its own "Coming soon" block. Scoped to phone only — the tablet
+   and desktop tiers below already lay the same three top-level pieces out as
+   real columns and are untouched. */
+@media (max-width: 599px) {
+  .cne-foot {
+    padding: 18px 15px;
+  }
+  .cne-foot-content {
+    gap: 14px;
+  }
+  .cne-foot-brand {
+    grid-column: 1 / -1;
+    gap: 6px;
+  }
+  .cne-foot-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+  }
+  .cne-foot-h {
+    margin-bottom: 6px;
+  }
+  .cne-foot-counters {
+    gap: 10px;
+    padding-top: 12px;
+  }
+  .cne-foot-legal {
+    padding-top: 8px;
+  }
+}
+
 /* ---- tablet tier: footer (600-900) ---------------------------------------
    The phone rule leaves `.cne-foot-top` an implicit single column, which is
    correct at phone width but at 600-900 just stacks brand/Eat/Locations
@@ -1799,24 +1877,11 @@ body {
   }
 }
 
-/* Six tabs on a narrow phone. SHOP is short, but it still takes a sixth of the
-   strip away from LOCATIONS and OUR STORY, which were already the two that set
-   the floor. The second step is for 360px handsets, where a sixth of the strip
-   is 60px and the tracking has to go entirely. */
-@media (max-width: 480px) {
-  .cne-tab {
-    font-size: 8.5px;
-    letter-spacing: 0.02em;
-    padding: 10px 1px;
-  }
-}
-@media (max-width: 390px) {
-  .cne-tab {
-    font-size: 7.5px;
-    letter-spacing: 0;
-    padding: 10px 0;
-  }
-}
+/* Five tabs on a narrow phone (HOME dropped — see the `.cne-tab` rule up by
+   `.cne-tabind`) no longer need a stepped font-size on top of that rule's
+   `clamp()`: LOCATIONS and OUR STORY, the two that set the floor, fit at the
+   clamp's 11.5px minimum with the tight fixed letter-spacing and padding
+   already set there. */
 
 /* The status tag on a phone, stepping down the same way.
 

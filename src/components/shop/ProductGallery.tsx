@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import "@/styles/opart-hover.css";
-import { Monster } from "@/components/mascots/Monster";
 import { SleepingBadge } from "@/components/storeart/SleepingBadge";
 import { ProductShot } from "./ProductShot";
 import { firstView, type MerchProduct } from "@/data/merch";
@@ -42,21 +41,9 @@ export function ProductGallery({
         id="cne-pdp-shot"
       >
         {soldOut && <span className="cne-pdp-gone">All gone</span>}
-        {/* Same not-sold-out signal the index card's badge uses — see
-            `shop/page.tsx` for why there's no dedicated limited/exclusive
-            field to gate on instead. Sold out gets the sleeping badge
-            (idea 11) in the same corner instead. */}
-        {soldOut ? (
-          <SleepingBadge size={26} />
-        ) : (
-          <Monster
-            species="classic"
-            bodyColor="#2e5fd9"
-            irisColor="#e63027"
-            size={26}
-            className="cne-badge-corner is-tr"
-          />
-        )}
+        {/* A finished run gets the sleeping badge (idea 11) in the corner;
+            one still in stock gets no corner mark. */}
+        {soldOut && <SleepingBadge size={26} />}
         {/* Keyed on the view so the crossfade replays when the angle changes. */}
         <ProductShot
           key={view?.id ?? "none"}

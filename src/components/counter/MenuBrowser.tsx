@@ -2,24 +2,31 @@
 
 import Link from "next/link";
 
-import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import { foodMenu, categoryTitles, featuredItems, type MenuCategoryKey } from "@/data/menu";
+import { formatPrice } from "@/lib/otter";
 import { MenuRow } from "./MenuRow";
+import { MenuSectionChips } from "./MenuSectionChips";
 import { ItemSheet } from "./ItemSheet";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
-import { Monster } from "@/components/mascots/Monster";
-import { PeekabooMonsters } from "@/components/storeart/PeekabooMonsters";
 import "@/styles/menu-art.css";
 
-const ORDER: MenuCategoryKey[] = ["combos", "sides", "secret", "drinks"];
+/**
+ * Sliders first (the house slider leads, not buried under a side-dish
+ * heading), then the combos built from them, then fries and sides, then the
+ * Secret Menu, then Drinks. Both the phone jump chips and the desktop side
+ * list are built from this one array, so they can't drift out of sync.
+ */
+const ORDER: MenuCategoryKey[] = ["sliders", "combos", "fries", "secret", "drinks"];
 
-/** One small mascot per category header, colored per the site's mascot key. */
-const CATEGORY_MASCOT: Partial<Record<MenuCategoryKey, { bodyColor: string; irisColor: string }>> =
-  {
-    combos: { bodyColor: "#e63027", irisColor: "#2e5fd9" },
-    sides: { bodyColor: "#2e5fd9", irisColor: "#e63027" },
-    drinks: { bodyColor: "#b6e01f", irisColor: "#e63027" },
-  };
+/**
+ * Short labels for the phone chip strip — a pill is a bad place for the full
+ * "Slider & Fries Combos" heading. Every other section's chip matches its
+ * heading exactly, so only this one needs an entry.
+ */
+const CHIP_LABEL: Partial<Record<MenuCategoryKey, string>> = {
+  combos: "Combos",
+};
 
 /**
  * The whole menu, plus the sheet every row opens.
@@ -29,13 +36,17 @@ const CATEGORY_MASCOT: Partial<Record<MenuCategoryKey, { bodyColor: string; iris
  * sticky 300px rail — the Ways, the jump list, the pricing note — beside a
  * two-column grid of items. The category label is the same element in both, a
  * mono eyebrow on the phone and a display heading over a rule on desktop.
+ *
+ * The phone-only chip strip and compact "asked about most" list below are
+ * hidden entirely above 901px (`.cne-menu-chipnav`'s own media query,
+ * `.cne-only-phone`), so they cost the desktop grid nothing — it still only
+ * ever lays out the aside and `.cne-menu-main`.
  */
 export function MenuBrowser() {
   const { item, open, way, setWay, openItem, close } = useItemSheet();
 
   return (
     <>
-      <PeekabooMonsters />
       <div className="cne-menu">
         <aside className="cne-menu-side cne-sec">
           <div className="cne-eyebrow" id="cne-way-label">
@@ -47,7 +58,7 @@ export function MenuBrowser() {
               reader has to guess the relevance of. */}
           <WayPicker way={way} onChange={setWay} labelledBy="cne-way-label" />
 
-          {/* Desktop only — on a phone the sections are a thumb-flick apart. */}
+          {/* Desktop only — on a phone the chip strip below does this job. */}
           <nav className="cne-menu-jump" aria-label="Menu sections">
             {ORDER.map((key) => (
               <a key={key} href={`#menu-${key}`}>
@@ -68,30 +79,37 @@ export function MenuBrowser() {
           </p>
         </aside>
 
+        <MenuSectionChips
+          sections={ORDER.map((key) => ({ key, label: CHIP_LABEL[key] ?? categoryTitles[key] }))}
+        />
+
+        {/* Compact and near the top on a phone — a scan of the whole menu used
+            to end with this list six screens down, after the thing most people
+            actually came to check. Desktop keeps its own copy at the foot of
+            the item grid, where it always lived. */}
+        <section className="cne-only-phone cne-sec" aria-labelledby="cne-named-top-h">
+          <div className="cne-eyebrow" id="cne-named-top-h">
+            Asked about most
+          </div>
+          <ul className="cne-menu-named">
+            {featuredItems.map((i) => (
+              <li key={i.id}>
+                <Link prefetch={false} href={`/menu/${i.id}/`}>
+                  <span className="n">{i.name}</span>
+                  <span className="p">{formatPrice(i.price)} &rsaquo;</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <div className="cne-menu-main">
           {ORDER.map((key) => (
-            <section
-              className="cne-cat cne-sec cne-rv"
-              key={key}
-              id={`menu-${key}`}
-              data-peek-section={CATEGORY_MASCOT[key] ? true : undefined}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
-                {CATEGORY_MASCOT[key] && (
-                  <span className="cne-cat-peek" data-peek-mon>
-                    <Monster
-                      species="classic"
-                      bodyColor={CATEGORY_MASCOT[key]!.bodyColor}
-                      irisColor={CATEGORY_MASCOT[key]!.irisColor}
-                      size={24}
-                    />
-                  </span>
-                )}
-              </div>
+            <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
+              <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
               <div className="cne-cat-rule" aria-hidden="true" />
               <div className="cne-menu-grid">
-                {menu[key].map((it, i) => (
+                {foodMenu[key].map((it, i) => (
                   /* The first rows of the first section are on screen at load,
                      and `loading="lazy"` on an above-the-fold image just delays
                      it past the point the browser would have fetched it. */
@@ -99,6 +117,11 @@ export function MenuBrowser() {
                     key={it.id}
                     item={it}
                     eager={key === ORDER[0] && i < 2}
+                    // Drinks read as a compact name+price list on a phone —
+                    // thirteen photo tiles is two screens of scrolling for a
+                    // Coke. Desktop is unaffected; see `.is-compact` in
+                    // menu-art.css.
+                    compact={key === "drinks"}
                     onOpen={openItem}
                   />
                 ))}

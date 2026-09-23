@@ -32,9 +32,17 @@ export type MenuItem = {
   signature?: boolean;
   /** True when the item accepts the free topping modifiers (the Ways). */
   takesToppings?: boolean;
+  /**
+   * True for a row that is really merchandise wearing an Otter item id, not
+   * food — the Ball-Cap under Secret Menu. It stays in this file because its
+   * `otterId` and price are reconciled against the same storefront as every
+   * other row here, but `isFoodItem`/`foodMenu` below keep it off the food
+   * menu everywhere the menu is actually shown, browsed or crawled.
+   */
+  isMerch?: boolean;
 };
 
-export type MenuCategoryKey = "combos" | "sides" | "secret" | "drinks";
+export type MenuCategoryKey = "sliders" | "combos" | "fries" | "secret" | "drinks";
 
 /**
  * The date this file was last reconciled against the Otter storefront.
@@ -46,13 +54,52 @@ export type MenuCategoryKey = "combos" | "sides" | "secret" | "drinks";
 export const MENU_UPDATED = "2026-09-08";
 
 export const categoryTitles: Record<MenuCategoryKey, string> = {
+  sliders: "Sliders",
   combos: "Slider & Fries Combos",
-  sides: "On The Side",
+  fries: "Fries & Sides",
   secret: "Secret Menu",
   drinks: "Drinks",
 };
 
 export const menu: Record<MenuCategoryKey, MenuItem[]> = {
+  sliders: [
+    {
+      id: "chris-n-eddy-s-slider",
+      otterId: "de38e42c-7600-473f-913f-acb6b2a45aa8",
+      photo: "fe9754fa-6f48-423a-a833-b52f0a9c2f89",
+      name: "Chris N Eddy's Slider",
+      desc: "Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.",
+      price: 7.49,
+      signature: true,
+      takesToppings: true,
+    },
+    {
+      id: "single-patty-slider",
+      otterId: "9f342712-de8e-4a0f-9680-c55fbc60bc2e",
+      photo: "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d",
+      name: "Single Patty Slider",
+      desc: "One smashed patty and a slice of cheese on a buttered, toasted Martin’s roll.",
+      price: 6.49,
+      takesToppings: true,
+    },
+    {
+      id: "triple-patty-slider",
+      otterId: "123dd31f-36a8-48ff-9f6e-40aeb7b4c3d9",
+      photo: "cb39bdad-a744-46f1-b004-f78ac93596ff",
+      name: "Triple Patty Slider",
+      desc: "Three smashed patties on three slices of cheese.",
+      price: 8.49,
+      takesToppings: true,
+    },
+    {
+      id: "grilled-cheese",
+      otterId: "5a6adaac-1bee-49a9-afbd-9449756a0d1e",
+      photo: "51c416bb-c2f4-43b7-8710-5493f9d98ba3",
+      name: "Grilled Cheese",
+      desc: "Two slices of cheese in a buttered, reverse-toasted Martin’s potato bun.",
+      price: 4,
+    },
+  ],
   combos: [
     {
       id: "1-slider-and-fries",
@@ -91,43 +138,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       price: 11.69,
     },
   ],
-  sides: [
-    {
-      id: "chris-n-eddy-s-slider",
-      otterId: "de38e42c-7600-473f-913f-acb6b2a45aa8",
-      photo: "fe9754fa-6f48-423a-a833-b52f0a9c2f89",
-      name: "Chris N Eddy's Slider",
-      desc: "Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.",
-      price: 7.49,
-      signature: true,
-      takesToppings: true,
-    },
-    {
-      id: "single-patty-slider",
-      otterId: "9f342712-de8e-4a0f-9680-c55fbc60bc2e",
-      photo: "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d",
-      name: "Single Patty Slider",
-      desc: "One smashed patty and a slice of cheese on a buttered, toasted Martin’s roll.",
-      price: 6.49,
-      takesToppings: true,
-    },
-    {
-      id: "triple-patty-slider",
-      otterId: "123dd31f-36a8-48ff-9f6e-40aeb7b4c3d9",
-      photo: "cb39bdad-a744-46f1-b004-f78ac93596ff",
-      name: "Triple Patty Slider",
-      desc: "Three smashed patties on three slices of cheese.",
-      price: 8.49,
-      takesToppings: true,
-    },
-    {
-      id: "grilled-cheese",
-      otterId: "5a6adaac-1bee-49a9-afbd-9449756a0d1e",
-      photo: "51c416bb-c2f4-43b7-8710-5493f9d98ba3",
-      name: "Grilled Cheese",
-      desc: "Two slices of cheese in a buttered, reverse-toasted Martin’s potato bun.",
-      price: 4,
-    },
+  fries: [
     {
       id: "straight-cut-fries",
       otterId: "2736f0a2-a7c8-4901-8a3d-3f074367b70a",
@@ -214,6 +225,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       name: "Chris N Eddy's Ball-Cap (Limited Run)",
       desc: "Limited quantity. One size fits all.",
       price: 48,
+      isMerch: true,
     },
   ],
   drinks: [
@@ -332,6 +344,24 @@ export function itemById(id: string): MenuItem | undefined {
 }
 
 /**
+ * True for a row that belongs on the food menu — false for merch wearing an
+ * Otter item id (`isMerch`), such as the Ball-Cap under Secret Menu. Every
+ * surface that lists "the whole menu" — the phone/desktop browser, the Menu
+ * structured data, the sitemap's image list, `/llms.txt` — reads `foodMenu`
+ * rather than `menu` so that row is excluded by a rule instead of by deleting
+ * its data, which would also drop its price and Otter id from the one place
+ * that reconciles them against the storefront.
+ */
+export function isFoodItem(item: MenuItem): boolean {
+  return !item.isMerch;
+}
+
+/** `menu`, with every `isMerch` row filtered out of each category. */
+export const foodMenu: Record<MenuCategoryKey, MenuItem[]> = Object.fromEntries(
+  (Object.keys(menu) as MenuCategoryKey[]).map((key) => [key, menu[key].filter(isFoodItem)]),
+) as Record<MenuCategoryKey, MenuItem[]>;
+
+/**
  * Otter cannot accept preselected modifiers through a link, so instead of
  * making people choose toppings twice we name the exact checkboxes that appear
  * on the Otter item screen. `taps` are those checkbox labels verbatim.
@@ -384,7 +414,7 @@ export const extras = [
  * smaller thing wearing a similar name, and quoting it as the entry price
  * misdescribes what arrives in the bag.
  */
-const signatureSlider = menu.sides.find((i) => i.id === "chris-n-eddy-s-slider");
+const signatureSlider = menu.sliders.find((i) => i.id === "chris-n-eddy-s-slider");
 
 /** The signature slider's price. Every "sliders from" figure on the site. */
 export const SLIDER_PRICE = signatureSlider ? signatureSlider.price : 7.49;

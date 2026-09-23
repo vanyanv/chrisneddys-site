@@ -472,6 +472,16 @@
 .rack-edcell.is-sold {
   background: var(--rack-ink);
 }
+/* Set aside: part of the run, not for sale online — hatched, so it never
+   reads as either still going or sold. */
+.rack-edcell.is-aside,
+.rack-edlegend i.is-aside {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--rack-muted) 0 1.5px,
+    var(--rack-cream) 1.5px 4px
+  );
+}
 .rack-edcell.is-current {
   outline: 2px solid var(--rack-red-cta);
   outline-offset: 1px;
@@ -1230,6 +1240,10 @@
 .run-cell.is-sold {
   background: var(--rack-ink);
   color: var(--rack-paper);
+}
+.run-cell.is-aside {
+  background: repeating-linear-gradient(135deg, var(--rack-rule) 0 2px, var(--rack-cream) 2px 6px);
+  color: var(--rack-muted);
 }
 .run-cell.is-selected {
   outline: 2px solid var(--rack-ink);

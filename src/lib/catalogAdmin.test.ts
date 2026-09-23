@@ -664,6 +664,7 @@ describe("duplicateProduct", () => {
       sold: 0,
       reserved: 0,
       available: 5,
+      setAside: 0,
     });
 
     // A second duplicate of the same source doesn't clash with the first copy's slug.

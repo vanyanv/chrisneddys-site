@@ -19,7 +19,7 @@
  */
 import { brand } from "@/data/brand";
 import { locations, type Location } from "@/data/locations";
-import { menu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { hoursSentence } from "@/lib/hours";
@@ -83,8 +83,8 @@ function orderingSection(): string {
 }
 
 function menuSection(): string {
-  const sections = (Object.keys(menu) as MenuCategoryKey[]).map((key) => {
-    const items = menu[key].map(
+  const sections = (Object.keys(foodMenu) as MenuCategoryKey[]).map((key) => {
+    const items = foodMenu[key].map(
       (item) => `- ${item.name} — ${formatPrice(item.price)}${item.desc ? ` — ${item.desc}` : ""}`,
     );
     return [`### ${categoryTitles[key]}`, ...items].join("\n");

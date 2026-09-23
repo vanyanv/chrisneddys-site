@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildLlmsTxt } from "@/lib/llmsTxt";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
-import { allItems } from "@/data/menu";
+import { allItems, isFoodItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
 import { merch, type MerchProduct } from "@/data/merch";
 
@@ -36,11 +36,17 @@ describe("buildLlmsTxt", () => {
     }
   });
 
-  it("lists every menu item with its price", () => {
-    for (const item of allItems) {
+  it("lists every food menu item with its price", () => {
+    for (const item of allItems.filter(isFoodItem)) {
       expect(text).toContain(item.name);
       expect(text).toContain(formatPrice(item.price));
     }
+  });
+
+  it("never lists the Ball-Cap — it's merch, not food", () => {
+    const ballCap = allItems.find((i) => i.id === "chris-n-eddy-s-ball-cap-limited-run");
+    expect(ballCap).toBeDefined();
+    expect(text).not.toContain(ballCap!.name);
   });
 
   it("lists every published merch product with its price and page link", () => {

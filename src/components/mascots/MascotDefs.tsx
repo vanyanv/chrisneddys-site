@@ -253,39 +253,6 @@ export function MascotDefs() {
           />
         </symbol>
 
-        <symbol id="cne-numbers" viewBox="0 0 200 200">
-          <g
-            fontFamily="'JetBrains Mono',monospace"
-            fontWeight={700}
-            style={{ fill: "var(--num-color,#14110d)" }}
-          >
-            <text x={10} y={34} fontSize={26} transform="rotate(-8 10 34)">
-              13
-            </text>
-            <text x={66} y={20} fontSize={20} transform="rotate(5 66 20)">
-              89
-            </text>
-            <text x={118} y={42} fontSize={32} transform="rotate(-4 118 42)">
-              25
-            </text>
-            <text x={18} y={82} fontSize={22} transform="rotate(10 18 82)">
-              8
-            </text>
-            <text x={88} y={76} fontSize={18} transform="rotate(-12 88 76)">
-              21
-            </text>
-            <text x={150} y={92} fontSize={24} transform="rotate(6 150 92)">
-              34
-            </text>
-            <text x={36} y={122} fontSize={20} transform="rotate(-6 36 122)">
-              55
-            </text>
-            <text x={108} y={132} fontSize={28} transform="rotate(3 108 132)">
-              7
-            </text>
-          </g>
-        </symbol>
-
         <symbol id="cne-court" viewBox="0 0 200 200">
           <circle
             cx={100}

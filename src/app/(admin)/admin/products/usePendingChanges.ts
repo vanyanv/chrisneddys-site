@@ -8,8 +8,9 @@ import { applyProductChangesAction } from "./actions";
 /** Every field the Save bar can batch: the 17-field `ProductField` whitelist
  * plus the pseudo-field the sheet's stock cell and the editor's count/
  * edition-size field write through (`applyProductChanges` maps it onto
- * `setInventory` for whatever mode the product is currently in). */
-export type PendingField = ProductField | "inventoryN";
+ * `setInventory` for whatever mode the product is currently in), and
+ * `onlineN`, a numbered run's "left to sell online" (`setOnlineCount`). */
+export type PendingField = ProductField | "inventoryN" | "onlineN";
 
 export type PendingChangeValue = string | number | boolean | string[] | AuthenticityFact[] | null;
 
@@ -106,6 +107,11 @@ export function usePendingChanges(onSaved?: (changes: PendingEntry[]) => void) {
         setErrors((prev) => new Map(prev).set(keyFor(failed.id, failed.field), result.error));
       }
       showToast(result.error, { tone: "error" });
+      return false;
+    } catch {
+      // A dropped connection or a server error used to fail silently here:
+      // the bar kept its count and nothing said the save never landed.
+      showToast("Couldn't save — check your connection and try again.", { tone: "error" });
       return false;
     } finally {
       setSaving(false);

@@ -126,7 +126,7 @@ test.describe.serial("shop pause (issue #43)", () => {
     expect(new URL(page.url()).pathname).toBe(`/shop/${SLUG}/`);
 
     // Real content, untouched by the pause: the product name, the price,
-    // and the edition map. Not a specific dollar figure: `admin-sheet
+    // and the "N of M left" line. Not a specific dollar figure: `admin-sheet
     // .spec.ts` (like this file) mutates the shared catalogue and leaves its
     // price edits in place rather than reverting them, so by the time this
     // spec runs the real price is whatever that file last saved it as —
@@ -134,8 +134,9 @@ test.describe.serial("shop pause (issue #43)", () => {
     // regardless of run order.
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/FOAM TRUCKER/i);
     await expect(page.locator(".cne-pdp-price")).toContainText(/^\$\d+\.\d{2}$/);
-    await expect(page.locator(".cne-edmap")).toBeVisible();
-    await expect(page.locator(".cne-edmap-count")).toContainText(/of \d+ left|all gone/i);
+    await expect(page.locator(".cne-pdp-buy .cne-inv-text")).toContainText(
+      /\d+ OF \d+ LEFT|SOLD OUT/,
+    );
 
     // Only the buy control and its pill/card changed: the pause pill, the
     // owner's note in the pause card, and a disabled button carrying that

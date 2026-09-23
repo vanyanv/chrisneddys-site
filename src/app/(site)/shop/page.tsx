@@ -11,7 +11,6 @@ import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
-import { Monster } from "@/components/mascots/Monster";
 import { SleepingBadge } from "@/components/storeart/SleepingBadge";
 import { ProductShot } from "@/components/shop/ProductShot";
 import { ShopIndexTracking } from "@/components/shop/ShopIndexTracking";
@@ -136,23 +135,9 @@ export default async function ShopPage() {
               >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
                 <div className="cne-drop-art cne-opart-hover">
-                  {/* Same "is this drop actually still on" signal the flag
-                      above already reads (`line?.soldOut`) — no separate
-                      limited/exclusive field exists on `MerchProduct`, and
-                      every product here is a capsule run by design, so a
-                      cap that's still available gets the mark and a sold-out
-                      one gets the sleeping badge instead (idea 11). */}
-                  {line?.soldOut ? (
-                    <SleepingBadge size={26} />
-                  ) : (
-                    <Monster
-                      species="classic"
-                      bodyColor="#2e5fd9"
-                      irisColor="#e63027"
-                      size={26}
-                      className="cne-badge-corner is-tr"
-                    />
-                  )}
+                  {/* A sold-out capsule gets the sleeping badge (idea 11);
+                      one still available gets no corner mark. */}
+                  {line?.soldOut && <SleepingBadge size={26} />}
                   <ProductShot
                     product={product}
                     view={firstView(product)}
@@ -178,7 +163,10 @@ export default async function ShopPage() {
                       )}
                     </div>
                   )}
-                  <p>One size fits most. {product.limitedNote}</p>
+                  <p>
+                    {product.oneSize ? "One size fits most. " : ""}
+                    {product.limitedNote}
+                  </p>
                   {/* The index card's own "buy button": the whole card is a
                       link to the product page (which stays reachable either
                       way), so only this line's words change while paused —
@@ -191,7 +179,8 @@ export default async function ShopPage() {
                       "SHOP PAUSED"
                     ) : (
                       <>
-                        SECURE YOUR NUMBER <span aria-hidden="true">→</span>
+                        {inventories[i]?.editionSize != null ? "SECURE YOUR NUMBER" : "GET ONE"}{" "}
+                        <span aria-hidden="true">→</span>
                       </>
                     )}
                   </span>
@@ -201,9 +190,11 @@ export default async function ShopPage() {
           })}
         </ShopIndexTracking>
 
-        <p className="cne-drop-note">
-          <span aria-hidden="true" /> One thing for sale right now. That’s the point.
-        </p>
+        {merch.length === 1 && (
+          <p className="cne-drop-note">
+            <span aria-hidden="true" /> One thing for sale right now. That’s the point.
+          </p>
+        )}
       </section>
 
       <section className="cne-sec cne-rv">

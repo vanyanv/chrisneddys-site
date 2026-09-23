@@ -3,6 +3,7 @@ import {
   closingSummary,
   hoursSentence,
   losAngelesNow,
+  orderCtaSubline,
   statusLabel,
   statusParts,
   storeStatus,
@@ -102,6 +103,37 @@ describe("statusParts / statusLabel", () => {
 
     const unknown = storeStatus(glendale, at("2026-09-14T17:30:00Z"));
     expect(statusLabel(unknown)).toBe("");
+  });
+});
+
+describe("orderCtaSubline", () => {
+  it("has no subline before the client clock mounts", () => {
+    expect(orderCtaSubline(null)).toBeNull();
+  });
+
+  it("has no subline while open, so an open visitor never sees the button change", () => {
+    const status = storeStatus(hollywood, at("2026-09-14T17:30:00Z")); // Mon 10:30 AM
+    expect(orderCtaSubline(status)).toBeNull();
+  });
+
+  it("has no subline during last call — still open, no time promised", () => {
+    const status = storeStatus(hollywood, at("2026-09-15T07:20:00Z")); // Tue 12:20 AM
+    expect(orderCtaSubline(status)).toBeNull();
+  });
+
+  it("names the opening time while closed, matching the header tag and dock", () => {
+    const status = storeStatus(hollywood, at("2026-09-15T08:05:00Z")); // Tue 1:05 AM
+    expect(status).toMatchObject({ state: "closed", opensAt: "10 AM" });
+    expect(orderCtaSubline(status)).toBe("Opens 10 AM");
+  });
+
+  it("has no subline when closed with no opening time to name", () => {
+    expect(orderCtaSubline({ state: "closed", opensAt: null })).toBeNull();
+  });
+
+  it("has no subline for a location with no schedule at all", () => {
+    const status = storeStatus(glendale, at("2026-09-14T17:30:00Z"));
+    expect(orderCtaSubline(status)).toBeNull();
   });
 });
 

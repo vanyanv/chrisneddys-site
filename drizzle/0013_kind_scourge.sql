@@ -1,0 +1,1 @@
+ALTER TYPE "public"."edition_status" ADD VALUE 'set_aside';

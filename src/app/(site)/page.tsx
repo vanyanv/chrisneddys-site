@@ -8,7 +8,6 @@ import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
 import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
-import { Monster } from "@/components/mascots/Monster";
 import { Vortex } from "@/components/storeart/Vortex";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
@@ -85,10 +84,7 @@ export default function HomePage() {
       <section className="cne-sec is-band cne-rv">
         <div className="cne-sec-hd">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-              <div className="cne-eyebrow">★ The three we sell most</div>
-              <Monster species="classic" bodyColor="#f5b82e" irisColor="#e63027" size={18} />
-            </div>
+            <div className="cne-eyebrow">★ The three we sell most</div>
             <h2>Start here.</h2>
           </div>
           <div className="cne-sec-note">
@@ -134,14 +130,11 @@ export default function HomePage() {
 
       <section className="cne-sec cne-rv">
         <div className="cne-sec-hd">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <div>
-              <div className="cne-eyebrow">What they’re saying</div>
-              <h2>
-                Press<span className="cne-only-desk-i"> &amp; reviews</span>.
-              </h2>
-            </div>
-            <Monster species="classic" bodyColor="#f5b82e" irisColor="#e63027" size={34} />
+          <div>
+            <div className="cne-eyebrow">What they’re saying</div>
+            <h2>
+              Press<span className="cne-only-desk-i"> &amp; reviews</span>.
+            </h2>
           </div>
         </div>
         <div className="cne-pressrow">
@@ -193,7 +186,7 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Decorative full-bleed band, directly above the footer. */}
+      {/* Decorative full-bleed strip, directly above the footer. */}
       <Vortex variant="band" />
     </>
   );

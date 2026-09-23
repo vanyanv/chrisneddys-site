@@ -14,7 +14,6 @@ import {
   getProductBySlug,
   listInventory,
   listPublishedProducts,
-  nextAvailableEditionNumber,
 } from "@/lib/catalog";
 import {
   addImage,
@@ -255,33 +254,21 @@ describe("editionCounts", () => {
         { number: 3, status: "reserved" },
         { number: 4, status: "available" },
       ]),
-    ).toEqual({ available: 1, reserved: 1, sold: 2 });
+    ).toEqual({ available: 1, reserved: 1, sold: 2, setAside: 0 });
+  });
+
+  it("counts set-aside numbers on their own, not as sold", () => {
+    expect(
+      editionCounts([
+        { number: 1, status: "set_aside" },
+        { number: 2, status: "sold" },
+        { number: 3, status: "available" },
+      ]),
+    ).toEqual({ available: 1, reserved: 0, sold: 1, setAside: 1 });
   });
 
   it("returns all zeros for an empty run", () => {
-    expect(editionCounts([])).toEqual({ available: 0, reserved: 0, sold: 0 });
-  });
-});
-
-describe("nextAvailableEditionNumber", () => {
-  it("is the lowest-numbered available edition, not the lowest overall", () => {
-    expect(
-      nextAvailableEditionNumber([
-        { number: 1, status: "sold" },
-        { number: 2, status: "reserved" },
-        { number: 3, status: "available" },
-        { number: 4, status: "available" },
-      ]),
-    ).toBe(3);
-  });
-
-  it("is null once nothing is left to preview", () => {
-    expect(
-      nextAvailableEditionNumber([
-        { number: 1, status: "sold" },
-        { number: 2, status: "reserved" },
-      ]),
-    ).toBeNull();
+    expect(editionCounts([])).toEqual({ available: 0, reserved: 0, sold: 0, setAside: 0 });
   });
 });
 

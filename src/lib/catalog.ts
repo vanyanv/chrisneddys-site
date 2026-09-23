@@ -188,7 +188,7 @@ export async function getProductBySlug(slug: string): Promise<MerchProduct | und
   return cachedProductBySlug(slug);
 }
 
-export type EditionCellStatus = "available" | "reserved" | "sold";
+export type EditionCellStatus = "available" | "reserved" | "sold" | "set_aside";
 export type EditionCell = { number: number; status: EditionCellStatus };
 
 export type InventoryStatus = {
@@ -199,11 +199,10 @@ export type InventoryStatus = {
   /**
    * Every edition row for a tracked edition product, ordered by number —
    * `undefined` for a plain-quantity product, an untracked product, or the
-   * static fallback (which has no real editions to report at all). This is
-   * what the product page's edition map renders: `available` alone can't
-   * tell a buyer whether the gap to `editionSize` is a number held in
-   * somebody's open checkout right now or one that's actually sold, and the
-   * map exists specifically so it never has to guess (see `editionCounts`).
+   * static fallback (which has no real editions to report at all). The
+   * storefront no longer draws these (the shop shows "N of M left" from
+   * `listInventory`); they are here for callers that need to tell a number
+   * held in an open checkout from one that's sold (see `editionCounts`).
    */
   editions?: EditionCell[];
 };
@@ -241,13 +240,14 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
 }
 
 /**
- * The shop index's inventory read: every slug in one query, counts only.
+ * The storefront's inventory read (the shop index and the product page):
+ * every slug in one query, counts only.
  *
  * `queryInventory` above loads every edition row a product has — fifty of
- * them for a fifty-piece run — because the product page draws a map with one
- * cell per row. The index draws no map. It shows "N of 50 left", so all it
- * ever needed was the two numbers, and asking for the rows to count them
- * meant carrying the whole run across the wire per product, once per render.
+ * them for a fifty-piece run. Neither shop page draws the individual
+ * numbers; both show "N of M left", so all they ever need is the two
+ * numbers, and asking for the rows to count them would carry the whole run
+ * across the wire per product, once per render.
  * Here the count is a `count(*)` the database answers off
  * `editions_variant_status_idx`, and one query covers every product on the
  * page rather than one query each.
@@ -295,39 +295,29 @@ async function queryInventoryList(slugs: string[]): Promise<(InventoryStatus | u
 }
 
 /**
- * Splits an edition run's rows into the three counts the map's legend and
- * the admin's own inventory line both need — pulled out as its own pure
- * function so it's testable without a database, and so the product page and
- * anything else reading `InventoryStatus.editions` can't each tally the
- * three states a different way.
+ * Splits an edition run's rows into the four counts the admin's run views
+ * need — pulled out as its own pure function so it's testable without a
+ * database, and so nothing reading `InventoryStatus.editions` tallies the
+ * states a different way. `setAside` is the part of the run the owner has
+ * taken off the online shop (sold at the location, kept back).
  */
 export function editionCounts(editions: EditionCell[]): {
   available: number;
   reserved: number;
   sold: number;
+  setAside: number;
 } {
   let available = 0;
   let reserved = 0;
   let sold = 0;
+  let setAside = 0;
   for (const cell of editions) {
     if (cell.status === "available") available++;
     else if (cell.status === "reserved") reserved++;
+    else if (cell.status === "set_aside") setAside++;
     else sold++;
   }
-  return { available, reserved, sold };
-}
-
-/**
- * The lowest-numbered edition still `available` — the same one
- * `createPendingOrder` (`src/lib/orders.ts`) would claim first if a checkout
- * started this instant, since it locks available rows in ascending number
- * order. It is a preview, not a hold: nothing here reserves it, and another
- * buyer's checkout can still claim it first. Returns `null` once nothing is
- * left to preview.
- */
-export function nextAvailableEditionNumber(editions: EditionCell[]): number | null {
-  const numbers = editions.filter((e) => e.status === "available").map((e) => e.number);
-  return numbers.length > 0 ? Math.min(...numbers) : null;
+  return { available, reserved, sold, setAside };
 }
 
 /**
@@ -349,9 +339,8 @@ export async function getInventory(slug: string): Promise<InventoryStatus | unde
  * without the edition rows — what the shop index needs. Returns one entry
  * per slug given, in that order, `undefined` where there is no such product.
  *
- * The `editions` array is deliberately absent from every entry: only the
- * product page's edition map reads it, and it is the expensive part. Use
- * `getInventory` for that page.
+ * The `editions` array is deliberately absent from every entry: it is the
+ * expensive part, and neither shop page shows the individual numbers.
  */
 export async function listInventory(slugs: string[]): Promise<(InventoryStatus | undefined)[]> {
   if (shouldUseFallback()) {
@@ -366,7 +355,7 @@ export async function listInventory(slugs: string[]): Promise<(InventoryStatus |
 }
 
 /**
- * The "N of 50 left" / sold-out line the shop index card and the product page
+ * The "N of M left" / sold-out line the shop index card and the product page
  * both need, derived the same way in both places so the two can never say
  * different things about the same product. Returns `null` whenever nothing
  * new should render — untracked inventory (the honesty rule above), or a

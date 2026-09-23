@@ -106,6 +106,7 @@ export type RunOverview = {
   available: number;
   reserved: number;
   sold: number;
+  setAside: number;
   editions: AdminEdition[];
 };
 
@@ -127,6 +128,7 @@ export async function getRunOverview(): Promise<RunOverview | null> {
     available: row.inventory.available,
     reserved: row.inventory.reserved,
     sold: row.inventory.sold,
+    setAside: row.inventory.setAside,
     editions: detail.editions,
   };
 }

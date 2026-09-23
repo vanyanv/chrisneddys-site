@@ -149,14 +149,16 @@ export default async function MenuItemPage({ params }: Params) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            ADD ON OTTER · {formatPrice(item.price)}
+            ADD TO ORDER · {formatPrice(item.price)}
           </a>
           <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
             CALL {brand.phone}
           </a>
         </div>
         <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8 }}>
-          Opens this exact item on our ordering page, ready to add.
+          {item.takesToppings
+            ? "Opens this item on our ordering page. Tick your Way's toppings there — all free."
+            : "Opens this exact item on our ordering page, ready to add."}
         </p>
       </section>
 

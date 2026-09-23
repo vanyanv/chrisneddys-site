@@ -377,7 +377,9 @@ export default async function TodayPage() {
                         ? "is-sold"
                         : edition.status === "reserved"
                           ? "is-reserved"
-                          : ""
+                          : edition.status === "set_aside"
+                            ? "is-aside"
+                            : ""
                     }`}
                   />
                 ))}
@@ -395,6 +397,12 @@ export default async function TodayPage() {
                   <i className="is-sold"></i>
                   {run.sold} sold
                 </span>
+                {run.setAside > 0 && (
+                  <span>
+                    <i className="is-aside"></i>
+                    {run.setAside} set aside
+                  </span>
+                )}
               </div>
             </div>
           )}

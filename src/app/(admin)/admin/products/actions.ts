@@ -14,6 +14,7 @@ import {
   reorderImages,
   reorderProducts,
   removeImage,
+  setEditionAside,
   setInventory,
   setStatus,
   updateImage,
@@ -513,4 +514,21 @@ export async function generateProductSeoAction(id: string): Promise<GenerateProd
 
   revalidateStorefront(product.slug);
   return { ok: true, fields, source: seoWriterConfigured() ? "ai" : "derived" };
+}
+
+export type SetEditionAsideActionResult = { ok: true } | { ok: false; error: string };
+
+/** The run page's per-number control: take one number off the online shop
+ * (sold at the location, kept back) or put it back on sale. */
+export async function setEditionAsideAction(
+  productId: string,
+  number: number,
+  aside: boolean,
+): Promise<SetEditionAsideActionResult> {
+  await requireOwner();
+  const result = await setEditionAside(productId, number, aside);
+  if (!result.ok) return result;
+  revalidateStorefront(result.slug);
+  revalidatePath(`/admin/products/${productId}/run`);
+  return { ok: true };
 }

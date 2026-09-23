@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { addToBag, openBag } from "./bagStore";
+import { addToBag, openBag, refreshBagLine, useBag } from "./bagStore";
 import { flyToBag } from "./flyToBag";
 import { MAX_PER_ORDER, type MerchProduct } from "@/data/merch";
 import { pauseButtonLabel } from "@/lib/shopCopy";
@@ -105,6 +105,13 @@ export function BuyProvider({
       items: [lineItem(product, 1)],
     });
   }, [product]);
+
+  // A bag line for this product carries the price and cap from when it was
+  // added; once the stored bag has loaded, bring it up to the live values.
+  const bagReady = useBag().ready;
+  useEffect(() => {
+    if (bagReady) refreshBagLine(product);
+  }, [bagReady, product]);
 
   const setQty = useCallback(
     (n: number) => {

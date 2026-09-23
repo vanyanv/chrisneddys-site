@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { orderUrl, formatPrice } from "@/lib/otter";
+import { formatPrice } from "@/lib/otter";
 import { SLIDER_PRICE } from "@/data/menu";
 import { HERO, HERO_WIDE } from "@/lib/heroImage";
 import { Watcher } from "@/components/storeart/Watcher";
 import { HeroOpenLine } from "@/components/counter/HeroOpenLine";
+import { HeroOrderButton } from "@/components/counter/HeroOrderButton";
 
 /**
  * "3A The Peek" (issue #112): a red copy panel and an edge-to-edge basket
@@ -36,14 +37,7 @@ export function Hero() {
               Sliders from <b>{formatPrice(SLIDER_PRICE)}</b>
             </p>
             <div className="cne-cta" data-surface="hero">
-              <a
-                className="cne-big is-primary"
-                href={orderUrl("hero")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ORDER ONLINE →
-              </a>
+              <HeroOrderButton />
               <Link prefetch={false} className="cne-hero-menu" href="/menu/">
                 <span className="cne-only-desk-i">SEE THE&nbsp;</span>MENU
               </Link>

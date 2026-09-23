@@ -50,6 +50,11 @@ const nextConfig = {
   // webpack bundle mishandles (an "instance of URL" `fs` error); left as a
   // real `require`, resolved by Node itself at runtime, it works as shipped.
   serverExternalPackages: ["@electric-sql/pglite"],
+  // `/service-worker.js` is the other path site builders register a worker
+  // at; both answer with the kill switch in public/sw.js.
+  async rewrites() {
+    return [{ source: "/service-worker.js", destination: "/sw.js" }];
+  },
   async headers() {
     return [
       {
@@ -78,6 +83,12 @@ const nextConfig = {
         source: "/(.*)",
         has: [{ type: "host", value: "(?<vercelHost>.+)\\.vercel\\.app" }],
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
+        // The old site's service-worker kill switch (public/sw.js) must never
+        // be served stale, or a returning visitor keeps the old site longer.
+        source: "/:worker(sw|service-worker).js",
+        headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
       },
       {
         source: "/_next/static/(.*)",

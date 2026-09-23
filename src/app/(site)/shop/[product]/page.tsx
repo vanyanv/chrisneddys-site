@@ -6,16 +6,15 @@ import "@/styles/shop-inventory.css";
 import { brand } from "@/data/brand";
 import { MAX_PER_ORDER, TERMS_PENDING } from "@/data/merch";
 import {
-  getInventory,
   getProductBySlug,
   inventoryLine,
+  listInventory,
   listPublishedProducts,
 } from "@/lib/catalog";
 import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, pauseNotice, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
-import { EditionMap } from "@/components/shop/EditionMap";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -68,12 +67,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * is passed through as children and never becomes client JS.
  *
  * Below the buy grid are the sections a spec sheet actually supports: the
- * construction details, the fit note, the limited-to-50 explanation, the "why
+ * construction details, the fit note, the limited-run explanation, the "why
  * this one" line, and the authenticity section pairing the cap with its
  * certificate. Every one of them reads from `merch.ts`, and every field it
  * reads was confirmed on that sheet — nothing here is padded out with a
  * fabric weight or a shipping promise nobody has agreed to. `TERMS_PENDING`
  * still says out loud what has not been settled.
+ *
+ * Nothing on the page states a run size, a capsule or a size of its own:
+ * each of those comes from the product and its inventory as the owner set
+ * them in /admin, so changing the edition size there changes every place
+ * the page says it.
  */
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { product: slug } = await params;
@@ -83,7 +87,9 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   // waiting on, not the path that matters.
   const [product, inventory, settings] = await Promise.all([
     getProductBySlug(slug),
-    getInventory(slug),
+    // The counts-only read: the page shows "N of M left", not the edition
+    // rows themselves, so it doesn't need to load every numbered row.
+    listInventory([slug]).then(([inventory]) => inventory),
     getPublicStoreSettings(),
   ]);
   if (!product) notFound();
@@ -93,7 +99,19 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const perOrderLimit = product.perOrderLimit ?? MAX_PER_ORDER;
   const maxQty = inventory?.tracked ? Math.min(perOrderLimit, inventory.available) : perOrderLimit;
   const note = shippingReturnsNote(settings);
-  const flag = editionFlag(inventory?.editionSize ?? null);
+  const editionSize = inventory?.editionSize ?? null;
+  const flag = editionFlag(editionSize);
+  // The reel's words, every one of them read from the product: its capsule
+  // label (the eyebrow's last part, e.g. "Capsule 01"), the run size, the
+  // fit, the price.
+  const capsule = product.eyebrow.match(/capsule\s+\S+/i)?.[0];
+  const reel = [
+    capsule?.toLowerCase(),
+    flag.toLowerCase(),
+    editionSize !== null ? `numbered /${editionSize}` : null,
+    product.oneSize ? "one size fits most" : null,
+    formatPrice(product.price),
+  ].filter((word): word is string => Boolean(word));
   const shopOpen = isShopOpenFor(settings);
   // Only meaningful once the shop is actually open — a pre-launch shop
   // can't also be "paused", and the two states never mix on the page: the
@@ -116,18 +134,9 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       <div className="cne-mq" aria-hidden="true">
         <div className="cne-mq-track">
           {[...Array(2)].flatMap((_, pass) =>
-            [
-              "capsule 01",
-              "★",
-              flag.toLowerCase(),
-              "★",
-              "numbered /50",
-              "★",
-              "one size fits most",
-              "★",
-              formatPrice(product.price),
-              "★",
-            ].map((word, i) => <span key={`${pass}-${i}`}>{word}</span>),
+            reel
+              .flatMap((word) => [word, "★"])
+              .map((word, i) => <span key={`${pass}-${i}`}>{word}</span>),
           )}
         </div>
       </div>
@@ -163,25 +172,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               <span className="cne-price p">{formatPrice(product.price)}</span>
             </div>
 
-            {/* The edition map is the centrepiece for a numbered run: every
-                cell is a real row from `editions`, coloured by its own
-                status, so "11 of 50 left" is something a buyer can check
-                against the number on their certificate rather than take on
-                faith. A tracked product with no edition rows (plain
-                quantity) falls back to the plain text/bar line instead. */}
-            {inventory?.editions ? (
-              <EditionMap editions={inventory.editions} />
-            ) : (
-              line && (
-                <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
-                  <span className="cne-inv-text">{line.text}</span>
-                  {line.barRatio !== null && (
-                    <div className="cne-inv-bar" aria-hidden="true">
-                      <span style={{ width: `${line.barRatio * 100}%` }} />
-                    </div>
-                  )}
-                </div>
-              )
+            {/* "N of M left" and its bar, from the live inventory — the same
+                line the shop index card shows. Nothing when the run isn't
+                tracked (see `inventoryLine`). */}
+            {line && (
+              <div className={`cne-inv${line.soldOut ? " is-soldout" : ""}`}>
+                <span className="cne-inv-text">{line.text}</span>
+                {line.barRatio !== null && (
+                  <div className="cne-inv-bar" aria-hidden="true">
+                    <span style={{ width: `${line.barRatio * 100}%` }} />
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Pre-launch's own notice, unchanged — the shop has simply
@@ -214,7 +216,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               </>
             )}
 
-            {/* One size fits most, so there is no variant grid at all. The
+            {/* There are no size variants, so there is no size picker. The
                 scarcity line takes the space the size chips would have used. */}
             <div className="cne-limited">
               <span className="tag">{flag}</span>
@@ -222,10 +224,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </div>
 
             <div className="cne-pdp-lab">
-              <span>Size — one size fits most</span>
+              <span>{product.oneSize ? "Size — one size fits most" : "Per order"}</span>
             </div>
             <div className="cne-pdp-chips">
-              <span className="cne-chip is-static">ONE SIZE FITS MOST</span>
+              {product.oneSize && <span className="cne-chip is-static">ONE SIZE FITS MOST</span>}
               {/* States the real per-order cap enforced on the stepper below
                   (`perOrderLimit`, falling back to `MAX_PER_ORDER`) rather
                   than leaving it undiscoverable until someone hits it. */}
@@ -276,7 +278,9 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
             {product.limitedCopy && (
               <div className="cne-detail-block">
-                <div className="cne-pdp-lab">Limited to 50</div>
+                <div className="cne-pdp-lab">
+                  {editionSize !== null ? `Limited to ${editionSize}` : "Limited run"}
+                </div>
                 <p>{product.limitedCopy}</p>
               </div>
             )}
@@ -371,7 +375,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <div className="cne-eyebrow">While you’re here</div>
           <h2>Come eat.</h2>
           <p>
-            The Foam Trucker is from 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
+            Every drop comes out of 5539 W. Sunset Blvd — smashed sliders, two patties, two slices
             of cheese, every topping free.{" "}
             <Link prefetch={false} href="/menu/">
               See the menu

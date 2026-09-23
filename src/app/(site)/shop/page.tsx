@@ -178,7 +178,10 @@ export default async function ShopPage() {
                       )}
                     </div>
                   )}
-                  <p>One size fits most. {product.limitedNote}</p>
+                  <p>
+                    {product.oneSize ? "One size fits most. " : ""}
+                    {product.limitedNote}
+                  </p>
                   {/* The index card's own "buy button": the whole card is a
                       link to the product page (which stays reachable either
                       way), so only this line's words change while paused —
@@ -191,7 +194,8 @@ export default async function ShopPage() {
                       "SHOP PAUSED"
                     ) : (
                       <>
-                        SECURE YOUR NUMBER <span aria-hidden="true">→</span>
+                        {inventories[i]?.editionSize != null ? "SECURE YOUR NUMBER" : "GET ONE"}{" "}
+                        <span aria-hidden="true">→</span>
                       </>
                     )}
                   </span>
@@ -201,9 +205,11 @@ export default async function ShopPage() {
           })}
         </ShopIndexTracking>
 
-        <p className="cne-drop-note">
-          <span aria-hidden="true" /> One thing for sale right now. That’s the point.
-        </p>
+        {merch.length === 1 && (
+          <p className="cne-drop-note">
+            <span aria-hidden="true" /> One thing for sale right now. That’s the point.
+          </p>
+        )}
       </section>
 
       <section className="cne-sec cne-rv">

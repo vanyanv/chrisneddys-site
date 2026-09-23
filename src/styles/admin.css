@@ -856,6 +856,10 @@
   background: var(--a-ink);
   border-color: var(--a-ink);
 }
+.adm-edition-key.is-aside::before,
+.adm-edition-cell.is-aside {
+  background: repeating-linear-gradient(135deg, var(--a-line) 0 2px, var(--a-card) 2px 6px);
+}
 .adm-edition-grid {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -1383,7 +1387,11 @@
   align-items: center;
   gap: 16px;
   padding: 14px 22px;
-  z-index: 55;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  /* Above the phone product sheet (`.adm-mobile-sheet`, 56): at 55 the sheet
+     covered the bar completely, so an edit made on a phone (edition size,
+     price) could never be saved and the shop kept showing the old value. */
+  z-index: 57;
   box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
   transform: translateY(100%);
   opacity: 0;
@@ -1486,7 +1494,9 @@
     min-width: 0;
     width: 100%;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch; /* Room to scroll the last field clear of the save bar, which sits over
+       the bottom of this sheet whenever there's an unsaved change. */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 }
 

@@ -145,6 +145,19 @@ export function RackProductPanel({
     else pendingApi.setValue(product.id, "inventoryN", Math.round(n));
   }
 
+  const onlineN = Number(
+    pendingApi.getValue(product.id, "onlineN") ??
+      (product.inventory.mode === "edition" ? product.inventory.available : 0),
+  );
+
+  function commitOnlineN(raw: string) {
+    if (product.inventory.mode !== "edition") return;
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < 0) return;
+    if (n === product.inventory.available) pendingApi.clearValue(product.id, "onlineN");
+    else pendingApi.setValue(product.id, "onlineN", Math.round(n));
+  }
+
   async function changeMode(next: InventoryMode) {
     if (next === product.inventory.mode) return;
     if (product.inventory.mode === "edition" && product.inventory.sold > 0 && next !== "edition") {
@@ -168,7 +181,14 @@ export function RackProductPanel({
           ? { mode: "untracked" }
           : next === "quantity"
             ? { mode: "quantity", quantity: 0 }
-            : { mode: "edition", editionSize: 50, sold: 0, reserved: 0, available: 50 },
+            : {
+                mode: "edition",
+                editionSize: 50,
+                sold: 0,
+                reserved: 0,
+                available: 50,
+                setAside: 0,
+              },
       editions:
         next === "edition"
           ? Array.from({ length: 50 }, (_, i) => ({ number: i + 1, status: "available" as const }))
@@ -386,6 +406,8 @@ export function RackProductPanel({
         product={product}
         inventoryN={Number(inventoryN)}
         onCommitSize={commitInventoryN}
+        onlineN={onlineN}
+        onCommitOnline={commitOnlineN}
       />
 
       <div className="rack-hairline rack-status-row">
@@ -754,10 +776,14 @@ function RunSection({
   product,
   inventoryN,
   onCommitSize,
+  onlineN,
+  onCommitOnline,
 }: {
   product: AdminProduct;
   inventoryN: number;
   onCommitSize: (raw: string) => void;
+  onlineN: number;
+  onCommitOnline: (raw: string) => void;
 }) {
   if (product.inventory.mode === "untracked") {
     return (
@@ -801,7 +827,7 @@ function RunSection({
   // in `@/lib/catalogAdmin`; this input mirrors that here so an owner sees
   // the field go read-only rather than typing a new size and getting a
   // rejected save).
-  const { sold, reserved, available } = product.inventory;
+  const { sold, reserved, available, setAside } = product.inventory;
   const locked = sold > 0;
 
   return (
@@ -813,7 +839,8 @@ function RunSection({
         </a>
       </div>
       <p className="rack-run-copy">
-        {sold} sold, {reserved} held in open checkouts, {available} still going.
+        {available} for sale online, {setAside} set aside, {sold} sold online, {reserved} held in
+        open checkouts.
       </p>
       <div className="adm-field" style={{ marginTop: 8 }}>
         <label htmlFor={`run-size-${product.id}`} className="adm-label">
@@ -857,6 +884,29 @@ function RunSection({
           right now, while it&rsquo;s still just a number on a screen.
         </RunWarning>
       )}
+      {/* The run is how many were made; this is how many of them the online
+       * shop sells. The rest are set aside (`setOnlineCount`), so the shop
+       * reads "20 of 50 left" under "Only 50 made". */}
+      <div className="adm-field" style={{ marginTop: 12 }}>
+        <label htmlFor={`run-online-${product.id}`} className="adm-label">
+          Left to sell online
+        </label>
+        <input
+          id={`run-online-${product.id}`}
+          type="number"
+          min={0}
+          max={available + setAside}
+          step={1}
+          className="adm-input rack-mono"
+          defaultValue={String(onlineN)}
+          onBlur={(e) => onCommitOnline(e.target.value)}
+          onKeyDown={(e) => revertOnEscape(e, String(onlineN))}
+        />
+        <p className="rack-run-copy" style={{ marginTop: 6 }}>
+          The shop shows &ldquo;{onlineN} of {inventoryN} left&rdquo;. The rest of the run is set
+          aside: sold at the location or kept back. Pick which numbers on the run page.
+        </p>
+      </div>
       <div className="rack-edgrid" style={{ marginTop: 8 }}>
         {product.editions.map((edition) => (
           <span
@@ -866,16 +916,18 @@ function RunSection({
                 ? "is-sold"
                 : edition.status === "reserved"
                   ? "is-reserved"
-                  : ""
+                  : edition.status === "set_aside"
+                    ? "is-aside"
+                    : ""
             }`}
-            title={`#${edition.number} — ${edition.status}`}
+            title={`#${edition.number} — ${edition.status === "set_aside" ? "set aside" : edition.status}`}
           />
         ))}
       </div>
       <div className="rack-edlegend">
         <span>
           <i className="is-available"></i>
-          {available} going
+          {available} online
         </span>
         <span>
           <i className="is-reserved"></i>
@@ -884,6 +936,10 @@ function RunSection({
         <span>
           <i className="is-sold"></i>
           {sold} sold
+        </span>
+        <span>
+          <i className="is-aside"></i>
+          {setAside} set aside
         </span>
       </div>
     </div>

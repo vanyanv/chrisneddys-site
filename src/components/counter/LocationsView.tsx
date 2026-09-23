@@ -43,41 +43,50 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
        tags the Otter side the same way. */
     <div className="cne-locs" data-surface="locations-map">
       <div className="cne-mapwrap">
-        <div className="cne-mapbox">
-          {mapCanvas}
-          <svg
-            viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
-            role="group"
-            aria-label="Pick a location on the map"
-            style={mapOverlayStyle}
-          >
-            {locations.map((loc) => (
-              <g
-                key={loc.id}
-                transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
-                className={pinClass(loc, sel)}
-              >
-                <MapPinArt loc={loc} />
-                <circle
-                  className="hit"
-                  cy={PIN.hitY}
-                  r={PIN.hitR}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`${loc.name} — ${loc.status}`}
-                  aria-pressed={loc.id === sel}
-                  onClick={() => pickFromMap(loc)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      pickFromMap(loc);
-                    }
-                  }}
-                />
-              </g>
-            ))}
-          </svg>
-          <MapCallout locationId={sel} />
+        {/* `.cne-split-frame` / `.cne-split-map` are the home page map
+            split's own classes (`counter.css`, "locations" region) — generic,
+            not scoped to that page, and reused here so this map fills its
+            desktop panel the same way: centred, with the roads fading into
+            the panel's own colour over any spare room instead of leaving a
+            flat empty strip. See `git show fb7b3bf`. `.cne-mapbox` keeps the
+            whole map on screen on a phone held sideways. */}
+        <div className="cne-split-frame">
+          <div className="cne-split-map cne-mapbox">
+            {mapCanvas}
+            <svg
+              viewBox={`0 0 ${mapBox.w} ${mapBox.h}`}
+              role="group"
+              aria-label="Pick a location on the map"
+              style={mapOverlayStyle}
+            >
+              {locations.map((loc) => (
+                <g
+                  key={loc.id}
+                  transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
+                  className={pinClass(loc, sel)}
+                >
+                  <MapPinArt loc={loc} />
+                  <circle
+                    className="hit"
+                    cy={PIN.hitY}
+                    r={PIN.hitR}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${loc.name} — ${loc.status}`}
+                    aria-pressed={loc.id === sel}
+                    onClick={() => pickFromMap(loc)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        pickFromMap(loc);
+                      }
+                    }}
+                  />
+                </g>
+              ))}
+            </svg>
+            <MapCallout locationId={sel} />
+          </div>
         </div>
       </div>
 

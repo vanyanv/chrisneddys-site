@@ -448,6 +448,67 @@ body {
   display: block;
 }
 
+/* ---- tablet tier: hero (600-900) ----------------------------------------
+   Neither phone nor desktop: the two-column desktop shape borrowed at a
+   smaller scale, so the photo sits beside the copy instead of stacking under
+   it full-width. Without this the photo (aspect 4/5, full viewport width)
+   ran 700-1000px tall — on 874x402 landscape, twice the viewport. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-hero {
+    padding: 26px 28px 30px;
+  }
+  .cne-hero-in {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .cne-hero h1 {
+    font-size: clamp(34px, 6vw, 54px);
+    text-align: left;
+    letter-spacing: 0.6px;
+    text-shadow: 4px 4px 0 #1a1612;
+  }
+  .cne-hero-sub {
+    font-size: 15px;
+    line-height: 1.45;
+    margin-top: 14px;
+    max-width: 38ch;
+  }
+  .cne-hero-meta {
+    font-size: 12.5px;
+    gap: 0 9px;
+    margin-top: 12px;
+  }
+  /* There's room for one line at this width, same as desktop. */
+  .cne-hero-meta .cne-hero-addr {
+    flex-basis: auto;
+  }
+  .cne-hero-meta .cne-hero-dot.is-addr {
+    display: inline;
+  }
+  .cne-cta {
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .cne-big {
+    font-size: 12.5px;
+    padding: 14px 10px;
+  }
+  .cne-heromedia {
+    margin-top: 0;
+    /* Squarer, like desktop, and capped so it can never approach viewport
+       height on a short landscape window (874x402). object-fit: cover on the
+       image means a shorter box just crops the photo — nothing stretches. */
+    aspect-ratio: 1 / 1;
+    max-height: 62svh;
+    width: 100%;
+    border-width: 4px;
+    box-shadow: 9px 9px 0 #1a1612;
+    transform: rotate(-1.2deg);
+  }
+}
+
 /* ---- marquee ------------------------------------------------------------ */
 .cne-mq {
   background: #1a1612;
@@ -777,6 +838,7 @@ body {
 }
 .cne-loc-btns {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
   margin-top: 11px;
 }
@@ -793,6 +855,13 @@ body {
   text-decoration: none;
   display: block;
   color: var(--a-fg);
+  /* A phone number or a price is one token — "544-3600" breaking after the
+     dash reads as a typo, not a line wrap. Keep every label on one line; the
+     max-content floor lets the row wrap instead when a long label and its
+     share of the row no longer both fit (buttons still share the width
+     equally whenever they fit side by side). */
+  white-space: nowrap;
+  min-width: max-content;
 }
 .cne-mini.is-red {
   background: var(--a-red-cta);
@@ -863,6 +932,43 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* ---- tablet tier: press + gram (600-900) --------------------------------
+   Phone stacked the three quotes in one column and drew the gram grid as
+   three huge squares. Both get the multi-column room a tablet actually has,
+   with counts that divide what they hold: three quotes across and all six
+   gram photos in one row, as on desktop. A width-driven `auto-fill` count
+   left one quote or one or two photos stranded on a row of their own. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-quote {
+    border-left-width: 5px;
+    padding: 3px 0 3px 16px;
+    margin-bottom: 0;
+  }
+  .cne-quote p {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .cne-quote cite {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    margin-top: 8px;
+  }
+  .cne-pressrow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .cne-ig {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    padding: 0 15px 32px;
+  }
+  .cne-ig > * {
+    border-width: 2px;
+  }
 }
 
 /* ---- last-call banner + sticky dock ------------------------------------- */
@@ -952,6 +1058,41 @@ body {
   white-space: nowrap;
   text-decoration: none;
   display: inline-block;
+}
+
+/* ---- short landscape phones (874x402, 844x390, 932x430) -----------------
+   The sticky header (logo row + tab strip) and the sticky bottom dock used to
+   cost ~89px + ~62px of a viewport that only has ~400px to give, leaving the
+   first menu item under the dock at load. The header rows drop their
+   vertical padding here (tabs stay >=36px tall, still a real tap target) and
+   the dock steps aside. */
+@media (max-width: 900px) and (max-height: 500px) {
+  :root {
+    --cne-stuck: 86px;
+  }
+  .cne-nav {
+    padding: 4px 12px;
+  }
+  .cne-nav img {
+    height: 22px;
+  }
+  .cne-orderbtn {
+    padding: 11px 9px;
+    font-size: 10px;
+  }
+  .cne-header .cne-stat-a,
+  .cne-header .cne-stat-b {
+    padding: 7px 7px;
+  }
+  .cne-tab {
+    padding: 10px 4px;
+  }
+  /* The header's own Order button is on screen the whole time, so on a
+     landscape phone the dock is a second copy of it standing on the little
+     height there is. It steps aside until the phone is upright again. */
+  .cne-dock {
+    display: none;
+  }
 }
 
 /* ---- item sheet --------------------------------------------------------- */
@@ -1631,6 +1772,31 @@ body {
 }
 .cne-foot-legal a:hover {
   color: var(--a-yel);
+}
+
+/* ---- tablet tier: footer (600-900) ---------------------------------------
+   The phone rule leaves `.cne-foot-top` an implicit single column, which is
+   correct at phone width but at 600-900 just stacks brand/Eat/Locations
+   full-width with the actual text hugging the left edge — a big empty right
+   side, not a deliberate one-column read. Three narrower columns, the same
+   shape as desktop's, fix that; `.cne-foot-counters` is already
+   `auto-fit`/`minmax` unconditionally, so it already lays out 2-3 columns in
+   this range on its own. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-foot {
+    padding: 30px 28px;
+  }
+  .cne-foot-top {
+    grid-template-columns: 1.15fr 0.85fr 0.85fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .cne-foot-mark img {
+    height: 34px;
+  }
+  .cne-foot-counters {
+    gap: 24px;
+  }
 }
 
 /* Six tabs on a narrow phone. SHOP is short, but it still takes a sixth of the
@@ -2568,6 +2734,102 @@ body {
   }
 }
 
+/* ---- tablet tier: "Start here" cards (600-900) ---------------------------
+   Phone's row layout (a 60px thumbnail with text beside it) came out as an
+   800px-wide sparse row at this width. Three photo cards across, as on
+   desktop and scaled down from its card rather than stretching the phone
+   row (two across left the third card alone on a half-empty row). `.cne-cardgrid`
+   is `position: relative` (home-art.css) and stays the ribbon's containing
+   block at any column count, so `.cne-card-rib` needs nothing extra here. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-cardgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .cne-card {
+    display: flex;
+    flex-direction: column;
+    border: 3px solid var(--a-ink);
+    background: var(--a-card);
+    box-shadow: 5px 5px 0 var(--a-ink);
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+  }
+  .cne-card.is-star {
+    background: var(--a-card);
+    box-shadow: 5px 5px 0 var(--a-ink);
+    padding: 0;
+    margin: 0;
+    border: 3px solid var(--a-ink);
+  }
+  .cne-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    padding: 14px;
+  }
+  .cne-card-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border: none;
+    border-bottom: 3px solid var(--a-ink);
+  }
+  .cne-card:hover .cne-card-img {
+    transform: none;
+  }
+  .cne-card h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: 700;
+  }
+  .cne-card p {
+    font-size: 12.5px;
+    line-height: 1.4;
+    flex: 1;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    margin: 0;
+  }
+  .cne-card-ft {
+    justify-content: space-between;
+    margin-top: 6px;
+    gap: 10px;
+  }
+  .cne-card-pr {
+    font-size: 17px;
+  }
+  .cne-card-cta {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 9px 12px;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 var(--a-ink);
+    overflow: visible;
+  }
+  .cne-card-rib {
+    display: block;
+    position: absolute;
+    top: 9px;
+    left: -2px;
+    background: var(--a-yel);
+    color: #1a1612;
+    border: 2px solid var(--a-ink);
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 5px 10px;
+  }
+}
+
 /* The right-hand note beside a section heading — desktop only, as in the
    prototype, where it explains the pricing under "Start here." */
 .cne-sec-note {
@@ -2620,27 +2882,26 @@ body {
   position: relative;
   background: var(--a-mapbg);
   border-bottom: 3px solid var(--a-ink);
-  /* clip, not hidden: hidden would make this a scroll container and stop the
-     desktop map sticking under the header. */
-  overflow: clip;
+  overflow: hidden;
 }
 .cne-mapwrap svg {
   display: block;
   width: 100%;
   height: auto;
 }
-/* The map's own box. The map keeps its 360:259 shape, so on a phone held
-   sideways it would be taller than the screen and the one open store (low on
-   the map, in Hollywood) would sit under the fold with the order dock over
-   it. Capping the width by the height left between the sticky header and the
-   dock keeps the whole map on screen; the wrap's map colour fills the sides.
-   On an upright phone or a desktop the cap is far wider than the column, so
-   nothing changes there. */
-.cne-mapbox {
-  position: relative;
-  width: 100%;
-  max-width: max(300px, (100svh - var(--cne-stuck) - 72px) * 360 / 259);
-  margin-inline: auto;
+/* On a phone held sideways the map keeps its 360:259 shape, so at full
+   width it would be taller than the screen and the one open store (low on
+   the map, in Hollywood) would sit under the fold. Capping its width by the
+   height left under the sticky header keeps the whole map on screen; the
+   wrap's map colour fills the sides. On an upright phone the cap is far wider
+   than the screen, so nothing changes there, and from 901px up the map sits
+   in the desktop panel's own frame (`.cne-split-frame`) instead. */
+@media (max-width: 900px) {
+  .cne-mapbox {
+    position: relative;
+    max-width: max(300px, (100svh - var(--cne-stuck) - 16px) * 360 / 259);
+    margin-inline: auto;
+  }
 }
 .cne-notify {
   display: flex;
@@ -2664,21 +2925,28 @@ body {
     grid-template-columns: 1.25fr 0.75fr;
     align-items: stretch;
   }
+  /* The map keeps its own 360:259 shape, so at a width where the 1.25fr
+     column isn't wide enough to make the map as tall as the 3-card list
+     beside it (roughly 901-1300px, taller still the more the list wraps),
+     centering it in the flex row the old way just left flat, empty padding
+     above and below. Same fix as the home page's map split (`.cne-split-r` /
+     `.cne-split-frame` / `.cne-split-map`, `git show fb7b3bf`): the panel is
+     painted the map's own land colour, the map sits centred in a frame sized
+     to the full column, and `.cne-split-map > img`'s mask fades the roads
+     into that colour over the spare room instead of stopping at a hard
+     edge — so the leftover space reads as the map's own matte, not a gap.
+     `::before` guarantees the column is never shorter than the map itself
+     when the list is the short side instead. `.cne-split-frame` and
+     `.cne-split-map` are generic (defined with the home split above) and
+     `LocationsView` wraps the same `LocationsMapCanvas` in them. */
   .cne-mapwrap {
     border-bottom: none;
     border-right: 4px solid var(--a-ink);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 26px;
   }
-  /* The store list is usually taller than the map. Centred, the map floated
-     in the middle of a tall column with a band of empty paper above it;
-     pinned under the header instead, it starts level with "Find us." and
-     stays in view while the cards scroll past it. */
-  .cne-mapbox {
-    position: sticky;
-    top: calc(var(--cne-stuck) - 8px);
+  .cne-mapwrap::before {
+    content: "";
+    display: block;
+    aspect-ratio: 360 / 259;
   }
   .cne-locs-list {
     padding: 38px 34px;
@@ -2693,6 +2961,19 @@ body {
   }
   .cne-locs-list h1::after {
     content: none;
+  }
+}
+
+/* The location detail page (`/locations/[slug]/`) only — its sections used
+   bare `.cne-sec`, which has no max-width because the home page and others
+   rely on it for full-bleed bands. At 1024px and up that let its text and
+   the "Our other locations" cards run edge to edge of the viewport, the
+   same 1280px cap `contact.css` and `careers.css` already give their own
+   pages. Scoped to this one class rather than `.cne-sec` itself. */
+@media (min-width: 1024px) {
+  .cne-locd {
+    max-width: 1280px;
+    margin-inline: auto;
   }
 }
 
@@ -2718,6 +2999,28 @@ body {
   font-size: 14px;
   line-height: 1.6;
   color: var(--a-sub);
+}
+/* The /menu/[item] photo. Sized like a responsive image (`max-width` and
+   `height: auto`, not a fixed `width`) so the tablet rule below can bound it
+   by `max-height` too without the two constraints fighting each other. */
+.cne-item-photo-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+/* A short, wide viewport — a landscape phone or tablet — has room for the
+   520px-wide product shot's full width but not its height: at 874x402 the
+   image's own aspect ratio wants 346px, which is fine, but the same photo at
+   900x420 or a shorter device would run past the fold before the buttons
+   under it. Bounding it by `vh` keeps it under ~60% of whatever viewport it
+   lands in without touching the portrait case, where 60vh is far taller than
+   the photo ever gets and the rule never binds. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-item-photo-img {
+    max-height: 60vh;
+    width: auto;
+  }
 }
 /* A phone reads the menu as one column, so the wrapper is inert here and the
    sections keep the `.cne-sec` rhythm they had. The desktop grid is below. */
@@ -3059,13 +3362,59 @@ h3 {
   }
 }
 
-/* The prototype only ever rendered at 1440, where the item grid has ~480px a
-   column. Two columns need roughly 400px each once the 300px rail and the page
-   padding are out, so between the desktop breakpoint and 1280 the grid runs as
-   one column rather than pushing the page sideways. */
-@media (min-width: 901px) and (max-width: 1279px) {
+/* The prototype only ever rendered at 1440 (two 480px columns) or at phone
+   widths (one column at ~380px, full-bleed). Everything from 600 up to 1280
+   falls between those two drawings: `.cne-row` is a flex row of a fixed thumb,
+   a flexible name and a fixed price, so stretched across a 600-1200px main
+   column it puts the price hundreds of pixels from the name it prices. Rather
+   than pick one column width from a frame that never ran this wide, every row
+   in this band steps down to a smaller, denser size and the grid auto-fills
+   as many 260px-minimum tracks as fit, sharing the width between them — two
+   columns across most of this band, one only in the narrow strip just past
+   901px where the rail takes its share (the rail only changes what sits
+   beside the grid, not the grid's own width budget). The 260px floor is what
+   keeps a lone column from reappearing across the whole band the way the
+   single-column fallback used to. */
+@media (min-width: 600px) and (max-width: 1279px) {
   .cne-menu-grid {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0 24px;
+  }
+  .cne-row {
+    gap: 10px;
+    padding: 11px 0;
+  }
+  .cne-row-thumb {
+    width: 52px;
+    height: 52px;
+    border-width: 2px;
+    font-size: 9px;
+    padding: 3px;
+  }
+  .cne-row:hover .cne-row-thumb {
+    transform: scale(1.05);
+  }
+  .cne-row-name .n {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .cne-row-name .d {
+    font-size: 12px;
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .cne-row-price {
+    font-size: 14.5px;
+  }
+  .cne-chev {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
   }
 }
 
@@ -3077,19 +3426,19 @@ h3 {
    tab added is ~40px the run has to find before it reaches the wordmark. */
 @media (min-width: 901px) and (max-width: 1339px) {
   .cne-header {
-    gap: 12px;
-    padding: 0 18px;
+    gap: 8px;
+    padding: 0 12px;
   }
   .cne-nav img {
-    height: 34px;
+    height: 29px;
   }
   .cne-tabs {
     gap: 1px;
   }
   .cne-tab {
-    font-size: 9.5px;
+    font-size: 11px;
     letter-spacing: 0.01em;
-    padding: 8px 3px;
+    padding: 8px 2px;
   }
   /* 12.2px, not 12: the order button in this band is 48.8px tall (13px on 1.6
      leading, 11px padding, 3px rule) and the tag sits level with it or it is
@@ -3820,6 +4169,27 @@ h3 {
   .cne-bag-scrim,
   .cne-cap {
     transition: none !important;
+  }
+}
+
+/* ---- short viewports (e.g. 874x402) --------------------------------------
+   The bag sheet's head + foot (subtotal, shipping note, checkout button,
+   "Keep shopping"/"Track it") can run taller than 90dvh on their own on a
+   short phone in landscape, and `.cne-dr-body`'s own `flex: 1` scroll region
+   left no way to reach what came after it. Below, the drawer itself becomes
+   the one scroll container — full height, head and foot scroll with the
+   lines rather than being squeezed against them — so everything stays
+   reachable. */
+@media (max-width: 900px) and (max-height: 500px) {
+  .cne-drawer {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cne-dr-body {
+    flex: none;
+    overflow: visible;
   }
 }
 

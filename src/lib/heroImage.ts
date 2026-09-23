@@ -10,7 +10,9 @@ import { brand } from "@/data/brand";
  * whole of the LCP story.
  *
  * `sizes` is measured, not guessed: the slot is 346 CSS px at a 390px viewport
- * and 618 at 1516, which is what the two clauses below describe.
+ * and 618 at 1516, and between 600 and 900px, where the photo sits beside the
+ * headline, it runs 41-43% of the viewport (244px at 600, 389 at 900). The
+ * three clauses below describe those.
  *
  * The preload in `app/page.tsx` must pass the *same* srcset and sizes. A
  * preload that disagrees with the `<img>` is a second, separate download.
@@ -35,7 +37,7 @@ export const HERO = {
   avifSrcSet: AVIF_WIDTHS.map((w) => `/hero-still-${w}.avif ${w}w`)
     .concat("/hero-still.avif 1400w")
     .join(", "),
-  sizes: "(min-width: 901px) 42vw, calc(100vw - 36px)",
+  sizes: "(min-width: 901px) 42vw, (min-width: 600px) 43vw, calc(100vw - 36px)",
   width: 1400,
   height: 1480,
   alt: "A basket of Chris N Eddy's smashed cheeseburger sliders",

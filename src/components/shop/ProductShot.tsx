@@ -28,6 +28,7 @@ export function ProductShot({
   priority = false,
   className = "",
   thumb = false,
+  cropToFrame = false,
 }: {
   product: MerchProduct;
   view: MerchView | undefined;
@@ -45,6 +46,18 @@ export function ProductShot({
    * is skipped and `.cne-pdp-t .cne-capshot`'s `1 / 1` rule wins instead.
    */
   thumb?: boolean;
+  /**
+   * True where the frame around the shot sets its own crop and the photo's
+   * real aspect ratio must not fight it — the /shop/ index card, whose
+   * `.cne-drop-art .cne-capshot.is-photo` rule wants every card the same
+   * shape regardless of what the photo itself happens to be (a square Foam
+   * Trucker shot next to a future widescreen one). Skips the same inline
+   * `aspectRatio` that `thumb` skips, for the same reason: so the frame's
+   * own CSS ratio is the only one in play instead of losing to an inline
+   * style. The product page's main shot leaves this off on purpose — there
+   * the photo's real shape is the point.
+   */
+  cropToFrame?: boolean;
 }) {
   if (!view) {
     return <CapArt color={product.capColor} className={className} />;
@@ -75,7 +88,7 @@ export function ProductShot({
     return (
       <div
         className={`cne-capshot is-photo ${className}`.trim()}
-        style={thumb ? undefined : { aspectRatio: `${width} / ${height}` }}
+        style={thumb || cropToFrame ? undefined : { aspectRatio: `${width} / ${height}` }}
       >
         <img
           src={fullSrc}

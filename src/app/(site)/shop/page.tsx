@@ -158,6 +158,7 @@ export default async function ShopPage() {
                     view={firstView(product)}
                     sizes="(min-width: 901px) 700px, 100vw"
                     priority
+                    cropToFrame
                   />
                 </div>
                 <div className="cne-drop-b">

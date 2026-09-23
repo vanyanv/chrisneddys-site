@@ -136,7 +136,7 @@ export default async function MenuItemPage({ params }: Params) {
               width={720}
               height={479}
               decoding="async"
-              style={{ display: "block", width: "100%", height: "auto" }}
+              className="cne-item-photo-img"
             />
           </div>
         )}

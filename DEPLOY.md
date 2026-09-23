@@ -346,6 +346,11 @@ The same `headers()` sends `X-Robots-Tag: noindex, nofollow` on any
 `*.vercel.app` host, so the Vercel address never gets indexed as a second copy
 of the site.
 
+Vercel Web Analytics (`<Analytics />` from `@vercel/analytics/next` in
+`src/app/(site)/layout.tsx`) runs next to GA4. It only records once
+**Analytics** is enabled on the project in the Vercel dashboard; its script and
+beacons are same-origin (`/_vercel/insights/*`), so the CSP needs no change.
+
 ### Pointing chrisneddys.com at Vercel (GoDaddy)
 
 Every canonical tag, the sitemap, robots, structured data, `/llms.txt`, the

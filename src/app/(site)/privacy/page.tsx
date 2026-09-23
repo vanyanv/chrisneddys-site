@@ -39,7 +39,8 @@ export const revalidate = 60;
  *   Better Auth (`src/lib/betterAuth.ts`) — which sets the one first-party
  *   session cookie this site issues. There is no customer account or
  *   password.
- * - The analytics are `Analytics.tsx` (GA4) and nothing else; the event list
+ * - The analytics are `Analytics.tsx` (GA4) and Vercel Web Analytics (page
+ *   views only, in `(site)/layout.tsx`) and nothing else; the GA4 event list
  *   is the `TrackEvent` union in `lib/track.ts`.
  * - Before checkout, the only thing written to the browser is `cne.bag.v1`
  *   (`src/components/shop/bagStore.ts`), in `localStorage`.
@@ -168,7 +169,7 @@ export default async function PrivacyPage() {
         <section className="cne-lg-sec" aria-labelledby="p-auto">
           <h2 id="p-auto">What gets measured automatically</h2>
           <p>
-            We use one analytics tool to understand which pages people read and which buttons they
+            We use two analytics tools to understand which pages people read and which buttons they
             press — how many, not who.
           </p>
           <ul>
@@ -177,13 +178,18 @@ export default async function PrivacyPage() {
               visit, roughly where in the world you are, and the kind of device and browser you
               used.
             </li>
+            <li>
+              <strong>Vercel Web Analytics</strong>, from the company that hosts this site, which
+              sets no cookies and counts page views, the country you are in, and the kind of device
+              and browser you used.
+            </li>
           </ul>
           <p>
-            Alongside page views, it receives a named event when you do one of a fixed set of
-            things: tap an order, delivery, phone or directions link; open an item on the menu; view
-            a product, add one to the bag, or open the bag; send the contact form; or join an
-            opening list. An event carries what was tapped and which part of the page it was tapped
-            from.
+            Alongside page views, Google Analytics receives a named event when you do one of a fixed
+            set of things: tap an order, delivery, phone or directions link; open an item on the
+            menu; view a product, add one to the bag, or open the bag; send the contact form; or
+            join an opening list. An event carries what was tapped and which part of the page it was
+            tapped from.
           </p>
           <p className="cne-lg-note">
             An analytics event never carries your name, email address, phone number, message or

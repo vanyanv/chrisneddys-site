@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Site: Vercel Web Analytics now counts page views too, alongside Google Analytics (which stays exactly as it was). It sets no cookies, and the privacy page now names it. The page views show up under Analytics in the Vercel dashboard once Analytics is turned on for the project there ([#126](https://github.com/vanyanv/chrisneddys-site/issues/126))
+
 ### Changed
 
 - Site: "SMASH" in the home page headline is now the same yellow as the ORDER ONLINE button, instead of a brighter yellow ([#124](https://github.com/vanyanv/chrisneddys-site/issues/124))

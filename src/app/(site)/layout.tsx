@@ -16,6 +16,7 @@ import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { TrackEvents } from "@/components/shared/TrackEvents";
 import { PrefetchNav } from "@/components/counter/PrefetchNav";
 import { BackToTop } from "@/components/storeart/BackToTop";
@@ -194,6 +195,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
         />
         <Analytics />
+        <VercelAnalytics />
         <JsonLd />
         <RevealRoot />
         {/* The `<symbol>` defs every `Monster`/`MascotDecor` instance

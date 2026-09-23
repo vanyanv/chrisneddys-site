@@ -34,6 +34,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.3",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.0",
     "better-auth": "^1.7.5",
     "drizzle-orm": "^0.45.2",

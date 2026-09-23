@@ -9,10 +9,13 @@ import { brand } from "@/data/brand";
  * clean — 10ms total blocking time, zero layout shift — so this image is the
  * whole of the LCP story.
  *
- * `sizes` is measured, not guessed: the slot is 346 CSS px at a 390px viewport
- * and 618 at 1516, and between 600 and 900px, where the photo sits beside the
- * headline, it runs 41-43% of the viewport (244px at 600, 389 at 900). The
- * three clauses below describe those.
+ * "3A The Peek" (issue #112) put the photo in its own edge-to-edge column
+ * instead of a bordered box beside the copy: the slot is now ~50% of the
+ * viewport from 600px up (panel left, photo right) and, below 600px, the
+ * full viewport width at a 76vw-tall landscape crop — see `HERO_WIDE` below,
+ * which is what a phone actually downloads. `HERO`'s own portrait ladder and
+ * `sizes` only matter at 600px and up now; the phone `<source>`s in
+ * `Hero.tsx` take priority under that.
  *
  * The preload in `app/page.tsx` must pass the *same* srcset and sizes. A
  * preload that disagrees with the `<img>` is a second, separate download.
@@ -37,10 +40,34 @@ export const HERO = {
   avifSrcSet: AVIF_WIDTHS.map((w) => `/hero-still-${w}.avif ${w}w`)
     .concat("/hero-still.avif 1400w")
     .join(", "),
-  sizes: "(min-width: 901px) 42vw, (min-width: 600px) 43vw, calc(100vw - 36px)",
+  // Only actually selected at 600px and up (see the phone-only `<source>`s in
+  // Hero.tsx); the 100vw clause is a defensive fallback for a browser old
+  // enough to support neither AVIF nor WebP nor the phone sources' media
+  // matching, not the common case below 600px.
+  sizes: "(min-width: 600px) 50vw, 100vw",
   width: 1400,
   height: 1480,
   alt: "A basket of Chris N Eddy's smashed cheeseburger sliders",
+} as const;
+
+/**
+ * The phone-only landscape crop (issue #112's "3A The Peek"). The hero box
+ * below 600px is 100vw wide and 76vw tall — landscape — while `HERO` above is
+ * cut from the still's native 1400x1480 portrait. A `cover` fit on that
+ * portrait source in a landscape box downloads the full 1400px width to keep
+ * only a band out of the middle; `build-photo-cuts.mjs` does that crop ahead
+ * of time instead (the central 1400x1064 band, the same 100:76 ratio the box
+ * fills), so the phone ladder is cut for the shape it actually renders into.
+ * Full viewport width at every phone size, hence the flat `100vw`. The ladder
+ * tops out at 1000 (not 1200) to keep the 3x-phone pick inside the LCP byte
+ * budget — see the note in `build-photo-cuts.mjs`.
+ */
+const WIDE_WIDTHS = [480, 800, 1000] as const;
+
+export const HERO_WIDE = {
+  avifSrcSet: WIDE_WIDTHS.map((w) => `/hero-wide-${w}.avif ${w}w`).join(", "),
+  webpSrcSet: WIDE_WIDTHS.map((w) => `/hero-wide-${w}.webp ${w}w`).join(", "),
+  sizes: "100vw",
 } as const;
 
 /** Absolute URL for the hero still, for structured data and social cards. */

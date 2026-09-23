@@ -326,7 +326,28 @@ body {
 }
 
 /* ---- hero --------------------------------------------------------------- */
+/* "3A The Peek" (issue #112): a red copy panel and an edge-to-edge photo,
+   split by a checkerboard seam borrowed from the store floor
+   (`.cne-hero-seam`), with the corner monster peeking over the boundary
+   between them (`.cne-hero-peek`, see `Watcher`). `.cne-hero` owns only the
+   outer edge, so the photo can run flush to it — `.cne-hero-in` carries the
+   actual shape, a flex column here with the photo reordered first, and a
+   three-track grid (panel / seam / photo) from the tablet tier up (see
+   below and `@media (min-width: 901px)`). */
 .cne-hero {
+  position: relative;
+  overflow: hidden;
+}
+.cne-hero-in {
+  display: flex;
+  flex-direction: column;
+}
+/* Visual order only, phone default: the copy stays first in the DOM (a
+   screen reader and a crawler meet the headline before the photo) and this
+   just moves the photo above it for sighted phone layout. The tablet and
+   desktop tiers reset both back to source order for the grid below. */
+.cne-hero-copy {
+  order: 1;
   position: relative;
   /* The tab strip's red, not the display red, and for the same reason: cream
      tops out at 4.35:1 on #E63027, so nothing set on it at body size passes.
@@ -334,8 +355,9 @@ body {
   background: var(--a-navsurf);
   color: #fff2c9;
   padding: 16px 15px 18px;
-  overflow: hidden;
 }
+/* Scoped to the panel itself now rather than the whole hero, so it never has
+   to be clipped to stop at the seam — the panel's own box already ends there. */
 .cne-hero-halftone {
   position: absolute;
   inset: 0;
@@ -344,9 +366,48 @@ body {
   opacity: 0.16;
   transition: opacity 0.5s;
 }
-.cne-hero-in {
+/* Lifts the real copy above the halftone dots, the same way `.cne-hero-in`
+   used to for the whole hero. */
+.cne-hero-copy-in {
   position: relative;
   z-index: 2;
+}
+/* The live open/closed line — see `HeroOpenLine.tsx`. */
+.cne-hero-open {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Fixed regardless of content: the line is null until mount (a static
+     export has no clock at build time — see `useStoreStatus`), and letting
+     its height depend on text that arrives after mount would drop the
+     headline down under it once the clock resolves. */
+  height: 14px;
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--a-yel-ink);
+}
+.cne-hero-open-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  /* The one positive colour on the site, same as the header's status dot. */
+  background: var(--a-ok);
+  flex: none;
+}
+.cne-hero-open.is-last .cne-hero-open-dot {
+  background: var(--a-red-deep);
+}
+.cne-hero-open.is-shut .cne-hero-open-dot {
+  background: var(--a-red);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-hero-open-dot {
+    animation: cne-pulse 2.2s ease-in-out infinite;
+  }
 }
 .cne-hero h1 {
   font-family: var(--font-display);
@@ -377,38 +438,25 @@ body {
   font-weight: 700;
 }
 
+/* One fact now instead of three, so this is a plain mono line rather than a
+   wrapping flex row — the figure comes from the menu data, not hand-typed,
+   so it can't drift from what `/menu/` charges. */
 .cne-hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 7px;
   margin-top: 10px;
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  /* Full-strength cream. Fading this line is the obvious move and the wrong one — see the
-     WCAG note on `.cne-hero-sub` at the desktop breakpoint. Only the separators fade. */
   color: #fff2c9;
 }
 .cne-hero-meta b {
   color: #fff2c9;
   font-weight: 700;
 }
-.cne-hero-dot {
-  opacity: 0.45;
-}
-/* The three facts don't fit one phone line, and left to itself the row wraps after a
-   separator — a dot dangling off the end of line one. So the break is placed rather than
-   allowed: the address takes its own row and the separator before it goes. */
-.cne-hero-meta .cne-hero-addr {
-  flex-basis: 100%;
-}
-.cne-hero-meta .cne-hero-dot.is-addr {
-  display: none;
-}
 .cne-cta {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 15px;
 }
@@ -440,10 +488,32 @@ body {
   color: #1a1612;
   flex: 1.7;
 }
-.cne-big.is-secondary {
-  background: #fff2c9;
-  color: #1a1612;
-  flex: 1;
+/* The menu link used to be a second `.cne-big` button (`.is-secondary`); now
+   ORDER ONLINE is the only button and this rides beside it as plain text, set
+   in the display face so it still reads as part of the CTA row rather than
+   as body copy. Focus ring comes from the sitewide `:focus-visible` rule. */
+.cne-hero-menu {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: #fff2c9;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  flex: none;
+}
+
+/* The checkerboard seam between the panel and the photo — the store floor,
+   as a divider. `aria-hidden`, pure CSS: two ink squares and two cream
+   squares per tile, repeated down the strip. Phone/tablet run it horizontal,
+   under the photo; the tablet and desktop tiers below turn it vertical. */
+.cne-hero-seam {
+  flex: none;
+  height: 18px;
+  background-image: repeating-conic-gradient(#1a1612 0% 25%, #fff2c9 0% 50%);
+  background-size: 18px 18px;
+  border-top: 2px solid #1a1612;
+  border-bottom: 2px solid #1a1612;
 }
 
 /* The order button while the store is closed: "ORDER ONLINE" stays the main
@@ -466,18 +536,13 @@ body {
 }
 
 .cne-heromedia {
+  order: -1;
   position: relative;
-  z-index: 2;
-  margin-top: 15px;
-  border: 3px solid #1a1612;
-  box-shadow: 6px 6px 0 #1a1612;
-  /* The hero is a still of a basket, shot at 0.95:1. A landscape box cover-crops
-     41% of it away — the pile is the product, so the slot follows the photo. */
-  aspect-ratio: 4 / 5;
+  /* Landscape box (100vw x 76vw), portrait source — see `HERO_WIDE` in
+     `heroImage.ts` for the art-directed crop this box actually downloads. */
+  height: 76vw;
   overflow: hidden;
   background: #1a1612;
-  transform: rotate(-1deg);
-  will-change: transform;
 }
 .cne-heromedia picture {
   display: block;
@@ -488,26 +553,107 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 45%;
   display: block;
 }
 
-/* ---- tablet tier: hero (600-900) ----------------------------------------
-   Neither phone nor desktop: the two-column desktop shape borrowed at a
-   smaller scale, so the photo sits beside the copy instead of stacking under
-   it full-width. Without this the photo (aspect 4/5, full viewport width)
-   ran 700-1000px tall — on 874x402 landscape, twice the viewport. */
-@media (min-width: 600px) and (max-width: 900px) {
-  .cne-hero {
-    padding: 26px 28px 30px;
+/* The corner monster, now peeking over the seam instead of sitting in
+   `.cne-badge-corner`'s usual top-right spot (see `Watcher.tsx` and the
+   removed hero rule in `home-art.css`). Positioned against `.cne-hero`
+   itself so it can straddle the boundary regardless of which side of the
+   flex/grid layout that boundary falls on. */
+.cne-hero-peek {
+  position: absolute;
+  z-index: 5;
+  width: 78px;
+  height: 78px;
+  right: 20px;
+  /* Centred on the seam: the photo is 76vw tall and the seam sits directly
+     under it at 18px, so the seam's own centre is 76vw + 9px from the
+     hero's top — minus half the badge's own height lands the badge astride
+     it, per the design brief. */
+  top: calc(76vw - 30px);
+  transform: rotate(8deg);
+  filter: drop-shadow(1px 1px 0 var(--a-ink));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cne-heromedia picture {
+    animation: cne-hero-photoin 6s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  .cne-hero-peek {
+    animation: cne-hero-peekin 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+  }
+}
+/* Replaces `cne-mediain`'s rotate/scale pop: a single slow settle rather than
+   a bounce, so the photo reads as the still it is rather than as decoration.
+   `.cne-heromedia`'s own `overflow: hidden` clips the 6% overshoot. */
+@keyframes cne-hero-photoin {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+/* Phone default: up from under the seam it rests on. The desktop tier below
+   swaps only `animation-name` for one that comes in from the panel side
+   instead — duration, easing and the 0.5s delay all carry over from here. */
+@keyframes cne-hero-peekin {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotate(8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(8deg);
+  }
+}
+/* The swap-in for the tablet and desktop tiers, both of which rest the
+   monster at -10deg instead of 8deg: sliding up from below would cross the
+   seam it's meant to land on, so it comes in from the panel side instead. */
+@keyframes cne-hero-peekin-desk {
+  from {
+    opacity: 0;
+    transform: translate(-60%, 0) rotate(-30deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-10deg);
+  }
+}
+
+/* ---- tablet tier: hero (600-900) ----------------------------------------
+   The two-column shape starts here rather than at desktop: panel and photo
+   side by side, split by the same seam turned vertical, at smaller type. */
+@media (min-width: 600px) and (max-width: 900px) {
   .cne-hero-in {
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap: 24px;
-    align-items: center;
+    grid-template-columns: 1fr 16px 1fr;
+    /* Short landscape windows (874x402) are the reason this is a cap rather
+       than a fixed height, same concern the old aspect-ratio box had. */
+    height: min(64svh, 560px);
+    min-height: 420px;
   }
+  .cne-hero-copy,
+  .cne-heromedia {
+    order: 0;
+  }
+  .cne-hero-copy {
+    padding: 26px 28px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cne-hero-open {
+    height: 16px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+  }
+  /* 5.6vw rather than 6vw: at a landscape phone (844px) "LA'S SMASH" is
+     ~330px wide, which keeps its right edge clear of the monster below. */
   .cne-hero h1 {
-    font-size: clamp(34px, 6vw, 54px);
+    font-size: clamp(34px, 5.6vw, 54px);
     text-align: left;
     letter-spacing: 0.6px;
     text-shadow: 4px 4px 0 #1a1612;
@@ -520,35 +666,44 @@ body {
   }
   .cne-hero-meta {
     font-size: 12.5px;
-    gap: 0 9px;
     margin-top: 12px;
-  }
-  /* There's room for one line at this width, same as desktop. */
-  .cne-hero-meta .cne-hero-addr {
-    flex-basis: auto;
-  }
-  .cne-hero-meta .cne-hero-dot.is-addr {
-    display: inline;
   }
   .cne-cta {
     gap: 10px;
     margin-top: 18px;
   }
-  .cne-big {
+  .cne-big,
+  .cne-hero-menu {
     font-size: 12.5px;
+  }
+  .cne-big {
     padding: 14px 10px;
   }
+  .cne-hero-seam {
+    height: auto;
+    background-size: 16px 16px;
+    border-top: none;
+    border-bottom: none;
+    border-left: 2px solid #1a1612;
+    border-right: 2px solid #1a1612;
+  }
   .cne-heromedia {
-    margin-top: 0;
-    /* Squarer, like desktop, and capped so it can never approach viewport
-       height on a short landscape window (874x402). object-fit: cover on the
-       image means a shorter box just crops the photo — nothing stretches. */
-    aspect-ratio: 1 / 1;
-    max-height: 62svh;
-    width: 100%;
-    border-width: 4px;
-    box-shadow: 9px 9px 0 #1a1612;
-    transform: rotate(-1.2deg);
+    height: 100%;
+  }
+  /* High on the seam and leaning onto the photo side, above where the
+     headline's top line lands even in a 420px-tall landscape window. */
+  .cne-hero-peek {
+    width: 100px;
+    height: 100px;
+    right: auto;
+    left: calc(50% - 36px);
+    top: 22px;
+    transform: rotate(-10deg);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cne-hero-peek {
+      animation-name: cne-hero-peekin-desk;
+    }
   }
 }
 
@@ -2075,19 +2230,32 @@ body {
     box-shadow: 4px 4px 0 var(--a-ink);
   }
 
-  /* hero: red panel on the left, page ground on the right */
+  /* hero: red panel on the left, edge-to-edge photo on the right */
   .cne-hero {
-    background: var(--a-bg);
-    padding: 46px 44px 42px;
     border-bottom: 4px solid var(--a-ink);
   }
+  .cne-hero-in {
+    display: grid;
+    grid-template-columns: 1fr 24px 1fr;
+    /* The height the brief specs directly: tall enough to be a real hero,
+       capped so it never eats a whole 900px laptop screen, and never so
+       short a squeezed window collapses the copy. */
+    height: min(80svh, 720px);
+    min-height: 520px;
+  }
+  .cne-hero-copy,
+  .cne-heromedia {
+    order: 0;
+  }
+  .cne-hero-copy {
+    padding: 46px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* Opaque and a shade denser than the phone dots, plus a second, larger
+     layer — the panel has the room to carry more texture here. */
   .cne-hero-halftone {
-    /* `inset` must come first: as a shorthand it resets all four longhands, so
-       declaring it after them wiped the panel out and left cream on cream. */
-    inset: 0;
-    right: 41%;
-    background: var(--a-navsurf);
-    border-right: 4px solid var(--a-ink);
     opacity: 1;
   }
   .cne-hero-halftone::after {
@@ -2098,16 +2266,22 @@ body {
     background-size: 19px 19px;
     opacity: 0.1;
   }
-  .cne-hero-in {
-    display: grid;
-    grid-template-columns: 1.06fr 0.94fr;
-    gap: 46px;
-    align-items: center;
-    max-width: 1352px;
-    color: #fff2c9;
+  /* Readable at 1x: the phone's 11px line is set for a 2x screen. The
+     height is fixed for the same reason as the phone rule (see above). */
+  .cne-hero-open {
+    height: 20px;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 15px;
   }
+  .cne-hero-open-dot {
+    width: 8px;
+    height: 8px;
+  }
+  /* 84px, not 88: "LA'S SMASH" then ends ~30px short of the seam at 1440,
+     so the monster on it never clips the H. */
   .cne-hero h1 {
-    font-size: 88px;
+    font-size: 84px;
     text-align: left;
     line-height: 0.84;
     letter-spacing: 1px;
@@ -2128,16 +2302,8 @@ body {
   .cne-hero-meta {
     font-size: 15px;
     letter-spacing: 0.08em;
-    gap: 0 10px;
     margin-top: 20px;
     animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
-  }
-  /* There's room for one row here, so the placed break is undone. */
-  .cne-hero-meta .cne-hero-addr {
-    flex-basis: auto;
-  }
-  .cne-hero-meta .cne-hero-dot.is-addr {
-    display: inline;
   }
   .cne-cta {
     gap: 16px;
@@ -2168,25 +2334,38 @@ body {
     transform: translate(-2px, -2px);
     box-shadow: 10px 10px 0 #1a1612;
   }
+  .cne-hero-menu {
+    font-size: 15px;
+  }
+
+  .cne-hero-seam {
+    height: auto;
+    /* 2 squares across a 24px strip: each square is 12px. */
+    background-size: 24px 24px;
+    border-top: none;
+    border-bottom: none;
+    border-left: 2px solid #1a1612;
+    border-right: 2px solid #1a1612;
+  }
 
   .cne-heromedia {
-    margin-top: 0;
-    /* Squarer than the phone: there's a headline column beside it here, so the
-       block takes the width the grid gives it and stops. See the phone note. */
-    aspect-ratio: 1 / 1;
-    border-width: 5px;
-    box-shadow: 14px 14px 0 #1a1612;
-    transform: rotate(-1.4deg);
-    animation: cne-mediain 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) 0.1s both;
+    height: 100%;
   }
-  @keyframes cne-mediain {
-    from {
-      opacity: 0;
-      transform: rotate(-7deg) scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: rotate(-1.4deg) scale(1);
+
+  /* Near the top of the seam: the copy is centred in a 520-720px panel, so
+     the headline's top line never rises above ~140px and the monster
+     (24-152px) only ever brushes the empty space beside it. */
+  .cne-hero-peek {
+    width: 128px;
+    height: 128px;
+    right: auto;
+    left: calc(50% - 64px);
+    top: 24px;
+    transform: rotate(-10deg);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cne-hero-peek {
+      animation-name: cne-hero-peekin-desk;
     }
   }
   .cne-mq {
@@ -3362,9 +3541,8 @@ h3 {
 /* ---- more desktop values the port had rounded off ----------------------- */
 @media (min-width: 901px) {
   /* `.cne-big.is-primary` carries the phone's 1.7 flex ratio, which out-weighs
-     the `.cne-big { flex: none }` beside it. Desktop sizes both to their label. */
-  .cne-big.is-primary,
-  .cne-big.is-secondary {
+     the `.cne-big { flex: none }` beside it. Desktop sizes it to its label. */
+  .cne-big.is-primary {
     flex: none;
   }
 

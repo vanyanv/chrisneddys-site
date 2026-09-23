@@ -1,23 +1,10 @@
 /**
  * Home page-only store art: idea 6's wall tethers behind "The three we sell
  * most" cards. (Idea 2's watching eye needs no CSS of its own — it only adds
- * a movable iris inside the existing `.cne-badge-corner` markup.)
+ * a movable iris inside the existing `.cne-badge-corner` markup. The hero's
+ * own corner monster no longer uses `.cne-badge-corner` at all — see
+ * `.cne-hero-peek` in counter.css, added for "3A The Peek", issue #112.)
  */
-
-/* The hero's corner monster (`Watcher`, idea 2) sits at a fixed offset from
-   the hero's top-right corner. Below 901px the hero is one full-width panel
-   and the headline is centred across it, so at narrow widths the monster's
-   usual size and offset land right on top of "HIT." Scaling it down from its
-   own top-right corner tucks it back into the corner without moving it or
-   hiding it — same spot, smaller footprint. Scoped to the hero's own badge so
-   the corner badges elsewhere (menu rows, location cards, the shop gallery)
-   are untouched. */
-@media (max-width: 900px) {
-  .cne-hero .cne-badge-corner.is-tr {
-    transform: scale(0.6);
-    transform-origin: top right;
-  }
-}
 
 .cne-tether-wrap {
   position: relative;

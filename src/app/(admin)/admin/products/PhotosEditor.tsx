@@ -128,6 +128,7 @@ function MiniSlot({
         error?: string;
         id?: string;
         urlFull?: string;
+        urlMid?: string;
         urlThumb?: string;
       };
       if (!res.ok || !json.ok || !json.id) throw new Error(json.error ?? "Upload failed.");
@@ -138,6 +139,7 @@ function MiniSlot({
         alt: `${kind} photo`,
         src: "",
         urlFull: json.urlFull ?? null,
+        urlMid: json.urlMid ?? null,
         urlThumb: json.urlThumb ?? null,
         position: 0,
       });
@@ -313,6 +315,7 @@ export function PhotosEditor({
           error?: string;
           id?: string;
           urlFull?: string;
+          urlMid?: string;
           urlThumb?: string;
         };
         if (!res.ok || !json.ok || !json.id) throw new Error(json.error ?? "Upload failed.");
@@ -326,6 +329,7 @@ export function PhotosEditor({
               alt: "",
               src: "",
               urlFull: json.urlFull ?? null,
+              urlMid: json.urlMid ?? null,
               urlThumb: json.urlThumb ?? null,
               position: product.views.length,
             },

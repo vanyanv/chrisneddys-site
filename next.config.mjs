@@ -105,7 +105,7 @@ const nextConfig = {
         // it's bound to a named parameter. This is the closest supported
         // form: a named, repeated `:path*` segment with the extension as its
         // own custom-regex parameter.
-        source: "/:path*.:ext(webp|jpg|jpeg|png|svg)",
+        source: "/:path*.:ext(webp|jpg|jpeg|png|svg|avif)",
         headers: [{ key: "Cache-Control", value: "public, max-age=604800" }],
       },
       // Deliberately no blanket HTML rule: server-rendered and ISR routes

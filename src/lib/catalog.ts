@@ -54,6 +54,7 @@ type ImageRow = {
   height: number;
   kind: "view" | "certificate" | "sticker";
   urlFull?: string | null;
+  urlMid?: string | null;
   urlThumb?: string | null;
 };
 
@@ -71,6 +72,7 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
         width: img.width,
         height: img.height,
         url: img.urlFull ?? undefined,
+        midUrl: img.urlMid ?? undefined,
         thumbUrl: img.urlThumb ?? undefined,
       },
     }));

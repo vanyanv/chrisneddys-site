@@ -138,6 +138,13 @@ export const productImages = pgTable(
      */
     urlFull: text("url_full"),
     urlThumb: text("url_thumb"),
+    /** A 400px-wide WebP cut, alongside the 720px full and 200px thumb —
+     * added for issue #151 so the thumbnail strip isn't pulling the full
+     * 720px image at 2x for an 80px on-screen tile. Null for every row
+     * uploaded before this shipped (no backfill) and for seeded images;
+     * `src/components/shop/ProductShot.tsx` falls back to the 200w/720w
+     * srcSet when it's absent. */
+    urlMid: text("url_mid"),
     ...timestamps,
   },
   (t) => [unique("product_images_product_view_unique").on(t.productId, t.viewId)],

@@ -375,3 +375,52 @@ describe("listInventory", () => {
     expect(single?.editions).toBeUndefined();
   });
 });
+
+// Issue #151: the 400px cut an upload gets alongside its thumb and full
+// sizes has to survive the trip from `product_images.url_mid` through
+// `mapProductRow` to `MerchView.photo.midUrl`, the field `ProductShot.tsx`
+// reads in the thumbnail strip.
+describe("listPublishedProducts surfaces an uploaded image's midUrl", () => {
+  it("carries url_mid through as photo.midUrl when the row has one", async () => {
+    const draft = await createDraft("Mid Cut Surfaced Product");
+    await updateProductField(draft.id, "priceCents", 3000);
+    await setInventory(draft.id, "quantity", 5);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/mid-surface-full.webp",
+      urlMid: "https://example.com/mid-surface-mid.webp",
+      urlThumb: "https://example.com/mid-surface-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+    await setStatus(draft.id, "published");
+
+    const product = await getProductBySlug(draft.slug);
+    expect(product?.views[0]?.photo?.midUrl).toBe("https://example.com/mid-surface-mid.webp");
+  });
+
+  it("leaves photo.midUrl undefined for an upload with no url_mid (no backfill)", async () => {
+    const draft = await createDraft("No Mid Cut Surfaced Product");
+    await updateProductField(draft.id, "priceCents", 3000);
+    await setInventory(draft.id, "quantity", 5);
+    await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/no-mid-full.webp",
+      urlThumb: "https://example.com/no-mid-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+    await setStatus(draft.id, "published");
+
+    const product = await getProductBySlug(draft.slug);
+    expect(product?.views[0]?.photo?.midUrl).toBeUndefined();
+  });
+});

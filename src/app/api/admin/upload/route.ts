@@ -2,9 +2,10 @@
  * POST /api/admin/upload
  *
  * Owner-only. Accepts one product image as multipart form data, resizes it
- * with `sharp` into the two cuts the storefront expects (a 720px-wide WebP
- * at quality 82, a 200px-wide thumb), uploads both to Vercel Blob, and
- * inserts (or replaces) the corresponding `product_images` row.
+ * with `sharp` into the three cuts the storefront expects (a 720px-wide WebP
+ * at quality 82, a 400px-wide mid cut for the thumbnail strip, and a
+ * 200px-wide thumb), uploads all three to Vercel Blob, and inserts (or
+ * replaces) the corresponding `product_images` row.
  *
  * Requires `BLOB_READ_WRITE_TOKEN`. Never falls back to writing into
  * `public/` — an admin upload with no Blob store connected is a 400, not a
@@ -22,6 +23,7 @@ export const runtime = "nodejs";
 const MAX_BYTES = 20 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const FULL_WIDTH = 720;
+const MID_WIDTH = 400;
 const THUMB_WIDTH = 200;
 const WEBP_QUALITY = 82;
 
@@ -71,17 +73,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const metadata = await source.metadata();
 
   const fullPipeline = sharp(inputBuffer).resize({ width: FULL_WIDTH, withoutEnlargement: true });
+  const midPipeline = sharp(inputBuffer).resize({ width: MID_WIDTH, withoutEnlargement: true });
   const thumbPipeline = sharp(inputBuffer).resize({ width: THUMB_WIDTH, withoutEnlargement: true });
 
-  const [fullResult, thumbResult] = await Promise.all([
+  const [fullResult, midResult, thumbResult] = await Promise.all([
     fullPipeline.webp({ quality: WEBP_QUALITY }).toBuffer({ resolveWithObject: true }),
+    midPipeline.webp({ quality: WEBP_QUALITY }).toBuffer(),
     thumbPipeline.webp({ quality: WEBP_QUALITY }).toBuffer(),
   ]);
 
   const basePath = `products/${productId}/${viewId}-${Date.now()}`;
 
-  const [fullBlob, thumbBlob] = await Promise.all([
+  const [fullBlob, midBlob, thumbBlob] = await Promise.all([
     put(`${basePath}.webp`, fullResult.data, {
+      access: "public",
+      addRandomSuffix: true,
+      contentType: "image/webp",
+      token,
+    }),
+    put(`${basePath}-mid.webp`, midResult, {
       access: "public",
       addRandomSuffix: true,
       contentType: "image/webp",
@@ -105,6 +115,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     label,
     alt,
     urlFull: fullBlob.url,
+    urlMid: midBlob.url,
     urlThumb: thumbBlob.url,
     width,
     height,
@@ -121,6 +132,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     ok: true,
     id: row.id,
     urlFull: fullBlob.url,
+    urlMid: midBlob.url,
     urlThumb: thumbBlob.url,
     width,
     height,

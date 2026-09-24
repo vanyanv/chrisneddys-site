@@ -26,6 +26,15 @@ export const OG_IMAGE = {
   alt: "The Chris N Eddy's red monster mascot beside the Chris N Eddy's wordmark",
 };
 
+/**
+ * The home page's description, and the sitewide Organization's in the JSON-LD,
+ * so search snippets and the structured data describe the business the same
+ * way. No single address here: this is sitewide and there is more than one
+ * location.
+ */
+export const SITE_DESCRIPTION =
+  "Smash burger sliders, shakes and fries, open late. Two smashed patties, two slices of cheese, a buttered Martin’s roll. Hollywood now, Glendale and Van Nuys soon.";
+
 /** Stable @ids, so every page's graph points at the same three nodes. */
 export const ID = {
   org: `${brand.siteUrl}/#org`,

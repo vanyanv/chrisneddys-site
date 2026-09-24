@@ -14,7 +14,7 @@ import { RevealRoot } from "@/components/counter/Reveal";
 import { BagDrawer } from "@/components/shop/BagDrawer";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
-import { OG_IMAGE } from "@/lib/seo";
+import { OG_IMAGE, SITE_DESCRIPTION } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -78,9 +78,6 @@ const marker = localFont({
 // Home page title, and the line link previews show. Kept under ~60 characters
 // so Google shows it whole; other pages use the template below.
 const SITE_TITLE = `${brand.name} | ${brand.tagline}: Sliders, Shakes & Fries`;
-// No single address here: this is sitewide and there is more than one location.
-const SITE_DESCRIPTION =
-  "Smash burger sliders, shakes and fries, open late. Two smashed patties, two slices of cheese, a buttered Martin’s roll. Hollywood now, Glendale and Van Nuys soon.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(brand.siteUrl),

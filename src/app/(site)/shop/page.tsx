@@ -19,7 +19,8 @@ import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { productMetadataName } from "@/lib/productSeo";
 import type { MerchProduct } from "@/data/merch";
 
-const LEDE = `Merch from ${brand.name}, the smash-burger location on Sunset in Hollywood.`;
+// No single location: this lede fronts every shop snippet, and there is more than one.
+const LEDE = `Merch from ${brand.name}, the Los Angeles smash-burger restaurant.`;
 
 /**
  * The shop index's title and description, read from the published catalogue
@@ -42,8 +43,11 @@ function shopIndexMetadata(products: MerchProduct[]): { title: string; descripti
     // dropped the same way a product's own title does: it costs characters
     // this line doesn't have to spend.
     const name = productMetadataName(p).replace(/\s*\(.*\)\s*$/, "");
+    // The layout's title template already ends in the brand name, so a
+    // product name that starts with it would say it twice.
+    const bare = name.startsWith(`${brand.name} `) ? name.slice(brand.name.length + 1) : name;
     return {
-      title: `Shop — ${name}`,
+      title: `Shop — ${bare}`,
       description: `${LEDE} ${name}, ${formatPrice(p.price)}. One drop, while it lasts.`,
     };
   }

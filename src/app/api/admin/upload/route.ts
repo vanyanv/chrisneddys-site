@@ -61,7 +61,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const viewId = kind === "view" ? requestedViewId || crypto.randomUUID() : requestedViewId;
-  const alt = "Product photo — edit this alt text";
+  // Empty until the owner writes one: the admin flags an image with no alt
+  // text, and the shop falls back to the product's name (`shopperAlt`), so a
+  // placeholder addressed to the owner never reaches a customer.
+  const alt = "";
 
   const inputBuffer = Buffer.from(await file.arrayBuffer());
   const source = sharp(inputBuffer);

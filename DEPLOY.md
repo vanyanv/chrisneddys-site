@@ -56,7 +56,7 @@ script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
 style-src 'self' 'unsafe-inline';
 img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com;
 font-src 'self';
-connect-src 'self' https://api.web3forms.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com;
+connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com;
 upgrade-insecure-requests
 ```
 
@@ -66,7 +66,8 @@ Every origin in it was read off a built `out/`, not assumed:
 
 - **`script-src`** — `googletagmanager.com` is gtag.js, appended by the snippet in
   `Analytics.tsx`. It is the only third-party script origin the site needs.
-- **`connect-src`** — `api.web3forms.com` is where both forms POST. The
+- **`connect-src`** — both forms post to this site's own server (a server
+  action that emails through Resend), so they need nothing beyond `'self'`. The
   `google-analytics.com` wildcards cover GA4's regional collection endpoints
   (`region1.`, `region2.`, …), which are not optional and are not on the bare
   hostname.
@@ -154,6 +155,14 @@ answering instead of 503ing — only once both `STRIPE_SECRET_KEY` and
 `EMAIL_FROM`; without them an order email is logged instead of sent, and
 never fails the checkout or webhook it's attached to. All four are listed
 under **Environment variables** below.
+
+The contact form and the opening-list signups use the same Resend sender
+(`src/lib/siteForms.ts`): each submission is emailed to `brand.email` (the
+address the site shows) with the visitor as reply-to. Two sets of DNS records
+have to exist for that mail to arrive, both in Vercel's DNS tab since the
+nameservers moved there: Resend's domain records from resend.com/domains, so
+`EMAIL_FROM` on `@chrisneddys.com` can send at all, and the MX records of
+whichever service hosts the `brand.email` mailbox, so it can receive.
 
 **Test mode first.** Use Stripe's test-mode keys end to end — a real Checkout
 Session, a real webhook delivery, a real (test) card — before ever setting
@@ -313,12 +322,11 @@ and write real data). Locally they go in `.env.local`, which is gitignored.
 | `BLOB_READ_WRITE_TOKEN` | Product photo uploads. The store must be **public** — the storefront links the images directly and the CSP only allows `*.public.blob.vercel-storage.com`                                                                                                                               | The admin's photo-upload card is disabled; it never writes into `public/`                                                                          |
 | `STRIPE_SECRET_KEY`     | Creating Checkout Sessions. Use a restricted key (`rk_...`) scoped to write on Checkout Sessions and read on Tax — see **Payments** above                                                                                                                                               | Checkout stays closed; `POST /api/checkout` 503s                                                                                                   |
 | `STRIPE_WEBHOOK_SECRET` | Verifying the webhook that marks an order paid and assigns edition numbers                                                                                                                                                                                                              | Checkout stays closed — half a Stripe setup is not enough                                                                                          |
-| `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails                                                                                                                                                                                                                                           | Emails are logged, never sent; a missing key never fails a checkout                                                                                |
+| `RESEND_API_KEY`        | Order confirmation / shipping / pickup emails, and the contact form and opening-list signups (sent to `brand.email`)                                                                                                                                                                    | Emails are logged, never sent; a missing key never fails a checkout. The two forms say they aren't wired up yet and point to email and phone       |
 | `EMAIL_FROM`            | The verified "from" address, e.g. `Chris N Eddy's <orders@chrisneddys.com>`                                                                                                                                                                                                             | As above                                                                                                                                           |
 | `OPENAI_API_KEY`        | Writing a new product's search-engine fields the moment it is created — the page title, the meta description, the keywords and the share picture's alt text. Get one from the [OpenAI dashboard](https://platform.openai.com/api-keys). Server-side only; it is never sent to a browser | Nothing breaks: the fields are worked out from the product instead, and an owner can still write or rewrite every one of them by hand in the admin |
 | `OPENAI_MODEL`          | Overrides which model writes those fields. The default is a small fast one, which is what four short lines of copy needs; point this at another if you would rather                                                                                                                     | `gpt-5.4-mini` is used                                                                                                                             |
 | `NEXT_PUBLIC_GA_ID`     | Overrides the GA4 measurement ID — see **Analytics before launch**                                                                                                                                                                                                                      | The repo default in `Analytics.tsx` is used                                                                                                        |
-| `NEXT_PUBLIC_W3F_KEY`   | Web3Forms key for the `/contact/` form                                                                                                                                                                                                                                                  | The form still validates but falls back to mailto/phone                                                                                            |
 
 Two traps worth knowing, both of which have already cost an afternoon:
 

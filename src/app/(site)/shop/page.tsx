@@ -7,7 +7,7 @@ import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
 import { inventoryLine, listInventory, listPublishedProducts } from "@/lib/catalog";
 import { getPublicStoreSettings } from "@/lib/orders";
-import { editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
+import { CLOSED_BUTTON_LABEL, editionFlag, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
 import { SleepingBadge } from "@/components/storeart/SleepingBadge";
@@ -90,7 +90,8 @@ export default async function ShopPage() {
   // Same "only true once the shop has actually opened" rule the product
   // page follows (issue #43) — pre-launch has its own, unrelated "still
   // being sorted" copy below, and never this one.
-  const paused = isShopOpenFor(settings) && isShopPausedFor(settings);
+  const shopOpen = isShopOpenFor(settings);
+  const paused = shopOpen && isShopPausedFor(settings);
 
   return (
     <>
@@ -176,6 +177,8 @@ export default async function ShopPage() {
                       "SOLD OUT"
                     ) : paused ? (
                       "SHOP PAUSED"
+                    ) : !shopOpen ? (
+                      CLOSED_BUTTON_LABEL
                     ) : (
                       <>
                         {inventories[i]?.editionSize != null ? "SECURE YOUR NUMBER" : "GET ONE"}{" "}

@@ -5,7 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // do (see the note in src/app/api/checkout/route.test.ts).
 vi.mock("server-only", () => ({}));
 
-import { hasPaymentKeys, isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
+import {
+  hasPaymentKeys,
+  isShopOpenFor,
+  isShopPausedFor,
+  shopClosedReasons,
+} from "@/lib/shopStatus";
 import type { StoreSettings } from "@/lib/orders";
 
 /** A minimal `StoreSettings`-shaped object — only the fields the predicates
@@ -123,5 +128,25 @@ describe("isShopPausedFor (issue #43)", () => {
     // page and the checkout route are what decide to check `isShopOpenFor`
     // first, not this function.
     expect(isShopPausedFor(settingsWith({ shopPaused: true }))).toBe(true);
+  });
+});
+
+describe("shopClosedReasons", () => {
+  it("names just the missing webhook secret when that is all that is missing", () => {
+    process.env.STRIPE_SECRET_KEY = "sk_test_fake";
+    expect(shopClosedReasons(settingsWith({}))).toEqual([
+      "STRIPE_WEBHOOK_SECRET is not set in Vercel.",
+    ]);
+  });
+
+  it("lists every missing piece, and is empty exactly when the shop is open", () => {
+    expect(
+      shopClosedReasons(settingsWith({ returnsPolicy: null, supportEmail: " " })),
+    ).toHaveLength(4);
+    process.env.STRIPE_SECRET_KEY = "sk_test_fake";
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_fake";
+    const open = settingsWith({});
+    expect(shopClosedReasons(open)).toEqual([]);
+    expect(isShopOpenFor(open)).toBe(true);
   });
 });

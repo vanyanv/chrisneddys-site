@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { imageFullSrc, imageThumbSrc } from "./productImage";
+import {
+  LEGACY_PLACEHOLDER_ALT,
+  imageFullSrc,
+  imageThumbSrc,
+  needsAltText,
+  shopperAlt,
+} from "./productImage";
 
 const seeded = { src: "front", urlFull: null, urlThumb: null };
 const uploaded = {
@@ -45,5 +51,18 @@ describe("imageFullSrc", () => {
 
   it("prefers the uploaded blob url", () => {
     expect(imageFullSrc("/shop/foam-trucker-blue", uploaded)).toBe(uploaded.urlFull);
+  });
+});
+
+describe("shopperAlt", () => {
+  it("never hands a shopper the old upload placeholder", () => {
+    expect(shopperAlt(LEGACY_PLACEHOLDER_ALT, "Foam Trucker")).toBe("Foam Trucker");
+    expect(shopperAlt("", "Foam Trucker")).toBe("Foam Trucker");
+    expect(needsAltText(LEGACY_PLACEHOLDER_ALT)).toBe(true);
+  });
+
+  it("keeps the owner's own alt text", () => {
+    expect(shopperAlt("Front of the blue hat", "Foam Trucker")).toBe("Front of the blue hat");
+    expect(needsAltText("Front of the blue hat")).toBe(false);
   });
 });

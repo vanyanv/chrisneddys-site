@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import type { PgliteDatabase } from "drizzle-orm/pglite";
-import { eq } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import { getDb } from "./client.ts";
 import { seedCatalogue } from "./seed.ts";
 import * as schema from "./schema.ts";
@@ -145,5 +145,26 @@ describe("seedCatalogue never overwrites owner edits", () => {
     // duplicate rows created for the already-existing number.
     const allEditions = await db.select().from(editions).where(eq(editions.variantId, variant.id));
     expect(allEditions).toHaveLength(50);
+  });
+
+  it("does not recreate numbers an owner removed by shrinking the run", async () => {
+    const db = await getDb();
+    await seedCatalogue(db);
+
+    const variant = await db.query.variants.findFirst({
+      where: eq(variants.sku, "CNE-FOAM-TRUCKER-BLUE"),
+    });
+    if (!variant) throw new Error("expected the seeded variant to exist");
+
+    // What /admin's edition resize does going from 50 to 20.
+    await db.update(variants).set({ editionSize: 20 }).where(eq(variants.id, variant.id));
+    await db
+      .delete(editions)
+      .where(and(eq(editions.variantId, variant.id), gt(editions.number, 20)));
+
+    await seedCatalogue(db);
+
+    const allEditions = await db.select().from(editions).where(eq(editions.variantId, variant.id));
+    expect(allEditions).toHaveLength(20);
   });
 });

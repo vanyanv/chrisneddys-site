@@ -24,6 +24,7 @@ import { unstable_cache } from "next/cache";
 import { getDb, hasDatabase } from "@/db/client";
 import { editions, products, variants, type AuthenticityFact } from "@/db/schema";
 import { merch, MERCH_UPDATED, type MerchProduct, type MerchView } from "@/data/merch";
+import { shopperAlt } from "@/lib/productImage";
 
 const CACHE_TAGS = ["catalogue"];
 const REVALIDATE_SECONDS = 60;
@@ -64,7 +65,7 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
     .map((img) => ({
       id: img.viewId,
       label: img.label,
-      caption: img.alt,
+      caption: shopperAlt(img.alt, row.name),
       photo: {
         src: img.src,
         width: img.width,
@@ -109,7 +110,7 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
               src: certificate.src,
               width: certificate.width,
               height: certificate.height,
-              alt: certificate.alt,
+              alt: shopperAlt(certificate.alt, `${row.name} certificate`),
               url: certificate.urlFull ?? undefined,
               thumbUrl: certificate.urlThumb ?? undefined,
             },
@@ -117,7 +118,7 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
               src: sticker.src,
               width: sticker.width,
               height: sticker.height,
-              alt: sticker.alt,
+              alt: shopperAlt(sticker.alt, `${row.name} sticker`),
               url: sticker.urlFull ?? undefined,
               thumbUrl: sticker.urlThumb ?? undefined,
             },

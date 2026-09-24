@@ -4,6 +4,7 @@ import {
   pauseButtonLabel,
   pauseCheckoutMessage,
   pauseNotice,
+  runSizeConflicts,
   shippingReturnsNote,
 } from "@/lib/shopCopy";
 import type { StoreSettings } from "@/lib/orders";
@@ -126,14 +127,14 @@ describe("pauseNotice", () => {
     const notice = pauseNotice(null);
     expect(notice.heading).toBe("The shop's shut for a couple of days.");
     expect(notice.body).toBe(
-      "We're restocking the counter and nobody's here to pack boxes. Your number will still be there.",
+      "We're restocking and nobody's here to pack boxes. Your number will still be there.",
     );
   });
 
   it("folds the owner's note into the fixed sentence, not in place of it", () => {
     const notice = pauseNotice("Back Thursday");
     expect(notice.body).toBe(
-      "We're restocking the counter and nobody's here to pack boxes. Back Thursday. Your number will still be there.",
+      "We're restocking and nobody's here to pack boxes. Back Thursday. Your number will still be there.",
     );
   });
 
@@ -163,5 +164,21 @@ describe("pauseCheckoutMessage", () => {
 
   it("includes the owner's note when set", () => {
     expect(pauseCheckoutMessage("Back Thursday")).toContain("Back Thursday");
+  });
+});
+
+describe("runSizeConflicts", () => {
+  const note = "Only 50 made. Individually numbered /50. No restock, no second run.";
+
+  it("flags copy that states a different run size from the edition", () => {
+    expect(runSizeConflicts([note], 20)).toEqual([50]);
+  });
+
+  it("is quiet when the copy and the edition agree", () => {
+    expect(runSizeConflicts([note, "Capsule 01 is limited to 50."], 50)).toEqual([]);
+  });
+
+  it("is quiet for a product with no edition", () => {
+    expect(runSizeConflicts([note], null)).toEqual([]);
   });
 });

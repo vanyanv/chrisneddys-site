@@ -51,6 +51,26 @@ export function isShopOpenFor(settings: StoreSettings): boolean {
 }
 
 /**
+ * What is still keeping checkout closed, in the owner's words — one line per
+ * missing piece, in the order `isShopOpenFor` checks them. Empty exactly when
+ * `isShopOpenFor(settings)` is true. `/admin/settings` lists these on its
+ * "The shop is closed" card so the owner knows which setting to fix rather
+ * than having to guess which of four it is.
+ */
+export function shopClosedReasons(settings: StoreSettings): string[] {
+  const reasons: string[] = [];
+  if (!process.env.STRIPE_SECRET_KEY) {
+    reasons.push("STRIPE_SECRET_KEY is not set in Vercel.");
+  }
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    reasons.push("STRIPE_WEBHOOK_SECRET is not set in Vercel.");
+  }
+  if (!settings.returnsPolicy?.trim()) reasons.push("No returns policy is set below.");
+  if (!settings.supportEmail?.trim()) reasons.push("No support email is set below.");
+  return reasons;
+}
+
+/**
  * Whether the owner has deliberately paused a shop that is otherwise open.
  *
  * This is a second, separate gate from `isShopOpenFor` and is never folded

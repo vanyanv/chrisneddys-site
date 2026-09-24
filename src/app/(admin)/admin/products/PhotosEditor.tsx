@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { AdminProduct, AdminProductImage } from "@/lib/catalogAdmin";
-import { imageThumbSrc } from "@/lib/productImage";
+import { imageThumbSrc, needsAltText } from "@/lib/productImage";
 import { reorderImagesAction, removeImageAction, updateImageAction } from "./actions";
 import { usePointerListReorder } from "./usePointerListReorder";
 
@@ -323,7 +323,7 @@ export function PhotosEditor({
               id: json.id,
               viewId: `view-${product.views.length + 1}`,
               label: "VIEW",
-              alt: "Product photo — edit this alt text",
+              alt: "",
               src: "",
               urlFull: json.urlFull ?? null,
               urlThumb: json.urlThumb ?? null,
@@ -417,9 +417,21 @@ export function PhotosEditor({
               id={`alt-${selectedImage.id}`}
               className="adm-textarea"
               rows={2}
-              defaultValue={selectedImage.alt}
-              onBlur={(e) => saveField(selectedImage.id, "alt", e.target.value)}
+              defaultValue={needsAltText(selectedImage.alt) ? "" : selectedImage.alt}
+              placeholder="Describe the photo for someone who can't see it"
+              onBlur={(e) => {
+                // Leaving an empty box untouched is not an edit; saving it
+                // would only trip the 8-character minimum.
+                if (e.target.value === "" && needsAltText(selectedImage.alt)) return;
+                saveField(selectedImage.id, "alt", e.target.value);
+              }}
             />
+            {needsAltText(selectedImage.alt) && (
+              <p className="adm-help adm-help-warn">
+                No alt text yet. The shop reads out the product name for this photo until you add
+                one.
+              </p>
+            )}
           </div>
           {fieldError && (
             <p className="adm-error" role="alert">

@@ -1,9 +1,12 @@
 import type { CSSProperties } from "react";
 
-export type MonsterSpecies = "classic" | "blacklight" | "bubble";
+/** `classic-sleep` is the classic body with its eye shut: a store or product
+ * that is not ready yet (see `MascotDefs`). */
+export type MonsterSpecies = "classic" | "classic-sleep" | "blacklight" | "bubble";
 
 const VIEW_BOX: Record<MonsterSpecies, string> = {
   classic: "0 0 200 200",
+  "classic-sleep": "0 0 200 200",
   blacklight: "0 0 200 200",
   bubble: "0 0 100 100",
 };

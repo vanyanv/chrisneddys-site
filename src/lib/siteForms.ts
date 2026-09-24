@@ -43,7 +43,11 @@ const MAX_SENDS = 5;
 
 /** Neighbourhoods the opening list is offered for — anything else is not a
  * signup this site asked for. */
-const OPENING_HOODS = new Set(locations.filter((l) => !l.isOpen).map((l) => l.neighbourhood));
+// Read at send time, not once at load: a store that opens stops taking
+// sign-ups at that moment (Van Nuys, `VAN_NUYS_OPENS_AT`).
+function isOpeningHood(hood: string): boolean {
+  return locations.some((l) => !l.isOpen && l.neighbourhood === hood);
+}
 
 function field(data: FormData, key: string): string {
   return String(data.get(key) ?? "").trim();
@@ -127,7 +131,7 @@ export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
   const email = field(data, "email");
   const hood = field(data, "location");
 
-  if (!emailLooksSendable(email) || email.length > EMAIL_MAX || !OPENING_HOODS.has(hood)) {
+  if (!emailLooksSendable(email) || email.length > EMAIL_MAX || !isOpeningHood(hood)) {
     return { ok: false, reason: "invalid" };
   }
 

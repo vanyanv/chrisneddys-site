@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { brand } from "@/data/brand";
+import { hasPassed, VAN_NUYS_OPENS_AT } from "@/data/locations";
 
 /**
  * Search snippets have hard budgets: Google renders roughly the first 60
@@ -30,10 +31,15 @@ export const OG_IMAGE = {
  * The home page's description, and the sitewide Organization's in the JSON-LD,
  * so search snippets and the structured data describe the business the same
  * way. No single address here: this is sitewide and there is more than one
- * location.
+ * location. A function, not a constant, because it changes by itself when
+ * Van Nuys opens (`VAN_NUYS_OPENS_AT`).
  */
-export const SITE_DESCRIPTION =
-  "Smash burger sliders, shakes and fries, open late. Two smashed patties, two slices of cheese, a buttered Martin’s roll. Hollywood now, Glendale and Van Nuys soon.";
+export function siteDescription(): string {
+  const where = hasPassed(VAN_NUYS_OPENS_AT)
+    ? "Hollywood and Van Nuys now, Glendale soon."
+    : "Hollywood now, Glendale and Van Nuys soon.";
+  return `Smash burger sliders, shakes and fries, open late. Two smashed patties, two slices of cheese, a buttered Martin’s roll. ${where}`;
+}
 
 /** Stable @ids, so every page's graph points at the same three nodes. */
 export const ID = {

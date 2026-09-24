@@ -3,6 +3,7 @@ import "@/styles/map-pins-art.css";
 import { locations, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import { PIN, SOON_SUFFIX, capWidth } from "@/components/locations/mapLayout";
+import { locationMonster } from "@/components/locations/locationArt";
 
 export const mapOverlayStyle = {
   position: "absolute" as const,
@@ -15,19 +16,10 @@ export const mapOverlayStyle = {
 /** The custom properties `cne-classic`/`cne-classic-sleep` (`MascotDefs`) read. */
 type PinStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
 
-/** Idea 9: each store's own color, read from `locations.ts`'s own ids —
- * falls back to red for any id this map doesn't know about yet. The iris
- * follows the same pairing the approved demo used: blue body gets a red
- * iris, everything else gets a blue one, so no two colors are ever the same. */
-const PIN_BODY: Partial<Record<Location["id"], string>> = {
-  hollywood: "#e63027",
-  glendale: "#f5d20e",
-  vannuys: "#2e5fd9",
-};
-
+/** Idea 9: each store's own colour, from `locationArt.ts`. */
 function pinStyle(id: Location["id"]): PinStyle {
-  const body = PIN_BODY[id] ?? "#e63027";
-  return { "--m-body": body, "--m-iris": body === "#2e5fd9" ? "#e63027" : "#2e5fd9" };
+  const { body, iris } = locationMonster(id);
+  return { "--m-body": body, "--m-iris": iris };
 }
 
 /**

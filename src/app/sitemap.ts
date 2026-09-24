@@ -40,8 +40,8 @@ const latest = (...isos: string[]): string => isos.sort().at(-1)!;
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
-/** When /careers last changed (the "Join the crew." redesign). */
-const CAREERS_UPDATED = "2026-09-20";
+/** When /careers last changed (the store-art pass, issue #146). */
+const CAREERS_UPDATED = "2026-09-24";
 
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(foodMenu) as MenuCategoryKey[])

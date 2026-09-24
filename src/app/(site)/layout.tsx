@@ -14,7 +14,7 @@ import { RevealRoot } from "@/components/counter/Reveal";
 import { BagDrawer } from "@/components/shop/BagDrawer";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
-import { OG_IMAGE, SITE_DESCRIPTION } from "@/lib/seo";
+import { OG_IMAGE, siteDescription } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -79,49 +79,54 @@ const marker = localFont({
 // so Google shows it whole; other pages use the template below.
 const SITE_TITLE = `${brand.name} | ${brand.tagline}: Sliders, Shakes & Fries`;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(brand.siteUrl),
-  title: {
-    default: SITE_TITLE,
-    template: `%s · ${brand.name}`,
-  },
-  description: SITE_DESCRIPTION,
-  applicationName: brand.name,
-  authors: [{ name: brand.name, url: brand.siteUrl }],
-  creator: brand.name,
-  publisher: brand.name,
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: brand.siteUrl,
-    siteName: brand.name,
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    // The same line as og:title. A card that says only the brand name where the
-    // Facebook one says what the brand sells is a worse card for no reason.
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [OG_IMAGE.url],
-  },
-  alternates: {
-    canonical: "/",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+// A function rather than a constant: the description changes by itself when
+// Van Nuys opens (`siteDescription`), and this layout regenerates every minute.
+export function generateMetadata(): Metadata {
+  const description = siteDescription();
+  return {
+    metadataBase: new URL(brand.siteUrl),
+    title: {
+      default: SITE_TITLE,
+      template: `%s · ${brand.name}`,
+    },
+    description,
+    applicationName: brand.name,
+    authors: [{ name: brand.name, url: brand.siteUrl }],
+    creator: brand.name,
+    publisher: brand.name,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: brand.siteUrl,
+      siteName: brand.name,
+      title: SITE_TITLE,
+      description,
+      images: [OG_IMAGE],
+    },
+    twitter: {
+      card: "summary_large_image",
+      // The same line as og:title. A card that says only the brand name where the
+      // Facebook one says what the brand sells is a worse card for no reason.
+      title: SITE_TITLE,
+      description,
+      images: [OG_IMAGE.url],
+    },
+    alternates: {
+      canonical: "/",
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-video-preview": -1,
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+        "max-snippet": -1,
+      },
     },
-  },
-};
+  };
+}
 
 /** Mirrors the stagger RevealRoot applies, so the two agree on the first frame. */
 const REVEAL_ABOVE_FOLD = `(function(){try{var n=document.querySelectorAll('.cne-rv'),h=window.innerHeight,i,e;for(i=0;i<n.length;i++){e=n[i];if(e.getBoundingClientRect().top<h){e.style.transitionDelay=(i%4)*60+'ms';e.classList.add('is-in')}}}catch(_){}})()`;

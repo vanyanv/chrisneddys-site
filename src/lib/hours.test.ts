@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   closingSummary,
   hoursSentence,
@@ -156,9 +156,14 @@ describe("closingSummary / hoursSentence", () => {
   });
 
   it("returns empty strings for a location that isn't open yet, rather than inventing hours", () => {
+    // Van Nuys opens by itself at VAN_NUYS_OPENS_AT; pin the clock before it
+    // so this keeps testing a not-yet-open store after that date.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
     expect(closingSummary(glendale)).toBe("");
     expect(hoursSentence(glendale)).toBe("");
     expect(closingSummary(vannuys)).toBe("");
     expect(hoursSentence(vannuys)).toBe("");
+    vi.useRealTimers();
   });
 });

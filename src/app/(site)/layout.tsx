@@ -17,6 +17,7 @@ import { JsonLd } from "@/components/shared/JsonLd";
 import { OG_IMAGE } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TrackEvents } from "@/components/shared/TrackEvents";
 import { PrefetchNav } from "@/components/counter/PrefetchNav";
 import { BackToTop } from "@/components/storeart/BackToTop";
@@ -231,6 +232,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             loads /_vercel/insights/script.js deferred from our own origin, so
             the CSP already allows it. Nothing is sent from `next dev`. */}
         <VercelAnalytics />
+        {/* Vercel Speed Insights — tracks Web Vitals (LCP, CLS, FID/INP, etc.)
+            for performance monitoring. Cookieless, loads from our origin. */}
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -30,7 +30,7 @@ export function LastCall() {
         <use href="#cne-classic" />
         <circle cx={100} cy={76} r={30} fill="#fff8e7" />
         <g className="cne-lc-dart">
-          <circle cx={100} cy={76} r={16} fill="#2e5fd9" stroke="#14110d" strokeWidth={4} />
+          <circle cx={100} cy={76} r={16} fill="#2e5fd9" />
           <circle cx={100} cy={76} r={7} fill="#14110d" />
         </g>
         <circle cx={100} cy={76} r={33} fill="none" stroke="#14110d" strokeWidth={6} />

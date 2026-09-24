@@ -183,7 +183,10 @@ export default function OrderPage() {
                 }}
               >
                 <span style={{ fontSize: 13, lineHeight: 1.4 }}>
-                  <strong>{loc.neighbourhood.toUpperCase()}</strong> — opening soon
+                  <strong>{loc.neighbourhood.toUpperCase()}</strong> —{" "}
+                  {loc.openingAnnouncement
+                    ? `${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`
+                    : "opening soon"}
                 </span>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <Link

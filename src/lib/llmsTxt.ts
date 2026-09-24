@@ -47,7 +47,17 @@ function locationSection(loc: Location): string {
   const pageLine = `- Page: ${locationPageUrl(loc)}`;
 
   if (!loc.isOpen) {
-    return [heading, "Status: opening soon.", pageLine].join("\n");
+    return [
+      heading,
+      `Status: ${loc.openingAnnouncement ?? "opening soon"}.`,
+      ...(loc.openingAnnouncement
+        ? [
+            `- Address: ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
+            ...(loc.phone ? [`- Phone: ${loc.phone}`] : []),
+          ]
+        : []),
+      pageLine,
+    ].join("\n");
   }
 
   const lines = [
@@ -58,7 +68,7 @@ function locationSection(loc: Location): string {
   if (loc.phone) lines.push(`- Phone: ${loc.phone}`);
   const hours = hoursSentence(loc);
   if (hours) lines.push(`- Hours: ${hours}`);
-  if (loc.otter) lines.push(`- Order online: ${storeUrl}`);
+  if (loc.orderUrl) lines.push(`- Order online: ${loc.orderUrl}`);
   lines.push(pageLine);
   return lines.join("\n");
 }
@@ -134,8 +144,8 @@ export function buildLlmsTxt(products: MerchProduct[]): string {
     `${brand.name} is a smash-burger location on Sunset Blvd in Hollywood, Los Angeles ` +
     `(${brand.tagline}). The signature order is the slider: two smashed patties, two ` +
     `slices of cheese, a buttered Martin's roll, every topping free. Order pickup direct ` +
-    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. Glendale and ` +
-    `Van Nuys locations are opening soon.`;
+    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. Van Nuys ` +
+    `has its grand opening Friday at 6 PM; Glendale is opening soon.`;
 
   return [
     `# ${brand.name}`,

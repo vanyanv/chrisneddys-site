@@ -127,35 +127,36 @@ export function restaurantNode(loc: Location) {
     // carries the location. Listing them separately is what lets a result
     // offer "order delivery" as well as "order pickup"; before this the only
     // stated way to buy was pickup, which is not what most people want at 1AM.
-    potentialAction: loc.isOpen
-      ? [
-          {
-            "@type": "OrderAction",
-            target: {
-              "@type": "EntryPoint",
-              urlTemplate: storeUrl,
-              actionPlatform: [
-                "http://schema.org/DesktopWebPlatform",
-                "http://schema.org/MobileWebPlatform",
-              ],
+    potentialAction:
+      loc.isOpen && loc.orderUrl
+        ? [
+            {
+              "@type": "OrderAction",
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: loc.orderUrl,
+                actionPlatform: [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform",
+                ],
+              },
+              deliveryMethod: "http://purl.org/goodrelations/v1#DirectPickup",
             },
-            deliveryMethod: "http://purl.org/goodrelations/v1#DirectPickup",
-          },
-          ...deliveryPlatforms.map((platform) => ({
-            "@type": "OrderAction",
-            name: `Order delivery on ${platform.name}`,
-            target: {
-              "@type": "EntryPoint",
-              urlTemplate: platform.url,
-              actionPlatform: [
-                "http://schema.org/DesktopWebPlatform",
-                "http://schema.org/MobileWebPlatform",
-              ],
-            },
-            deliveryMethod: "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
-          })),
-        ]
-      : undefined,
+            ...deliveryPlatforms.map((platform) => ({
+              "@type": "OrderAction",
+              name: `Order delivery on ${platform.name}`,
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: platform.url,
+                actionPlatform: [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform",
+                ],
+              },
+              deliveryMethod: "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+            })),
+          ]
+        : undefined,
     acceptsReservations: false,
   };
 }

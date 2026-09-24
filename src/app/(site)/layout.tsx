@@ -75,7 +75,7 @@ const marker = localFont({
   variable: "--font-marker",
 });
 
-const SITE_TITLE = `${brand.name} — Smash Burger Sliders in LA, Open Late`;
+const SITE_TITLE = brand.name;
 const SITE_DESCRIPTION =
   "Smash burger sliders from our Hollywood location — two smashed patties, two slices of cheese, a buttered Martin’s roll, every topping free. Open late.";
 

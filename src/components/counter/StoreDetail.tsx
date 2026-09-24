@@ -20,7 +20,9 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
   return (
     <>
       <section className="cne-sec cne-locd" style={{ position: "relative" }}>
-        <div className="cne-eyebrow">{loc.isOpen ? "Open now" : "Opening soon"}</div>
+        <div className="cne-eyebrow">
+          {loc.isOpen ? "Open now" : (loc.openingAnnouncement ?? "Opening soon")}
+        </div>
         {/* Wall-mural diamond behind the store's name — decorative only, so it
             sits at `zIndex: 0` while the heading below is lifted above it. */}
         <MascotDecor
@@ -53,7 +55,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
             showButtonsWhenClosed
             footer={
               loc.isOpen &&
-              !loc.otter && (
+              !loc.orderUrl && (
                 <div className="cne-loc-note">
                   Online ordering for this store isn&rsquo;t live on Otter yet.
                 </div>
@@ -103,7 +105,9 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
               <br />
               {o.city}, {o.region}
             </div>
-            <div className="cne-loc-note">{o.isOpen ? "Open now →" : "Opening soon →"}</div>
+            <div className="cne-loc-note">
+              {o.isOpen ? "Open now →" : `${o.openingAnnouncement ?? "Opening soon"} →`}
+            </div>
           </Link>
         ))}
       </section>

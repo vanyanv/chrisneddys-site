@@ -33,14 +33,6 @@ const COUNTER_LINKS = [
   })),
 ];
 
-/** "Glendale" / "Glendale & Van Nuys" / "Glendale, Van Nuys & Burbank" — however
- * many locations haven't opened yet, named in one phrase for the single
- * compact "coming soon" line. */
-function joinNames(names: string[]): string {
-  if (names.length <= 1) return names[0] ?? "";
-  return `${names.slice(0, -1).join(", ")} & ${names[names.length - 1]}`;
-}
-
 /**
  * Whether a location prints an address is `isOpen`, the same flag the live
  * open/closed pill and the JSON-LD `openingHoursSpecification` are built from.
@@ -156,16 +148,16 @@ export function SiteFooter() {
               </div>
             </div>
           ))}
-          {/* Not-yet-open locations get one compact line rather than each its
-              own repeated "Coming soon" block — the Hollywood card above is
-              the one that has to carry real weight. */}
-          {comingSoon.length > 0 && (
-            <div className="cne-foot-counter" data-location="coming-soon">
+          {/* Not-yet-open locations get one compact status line each, so a
+              confirmed launch can be named without making every future store
+              look open before it is. */}
+          {comingSoon.map((loc) => (
+            <div className="cne-foot-counter" data-location={slugFor(loc)} key={loc.id}>
               <p className="cne-foot-soon">
-                {joinNames(comingSoon.map((loc) => loc.neighbourhood))} — coming soon.
+                {loc.neighbourhood} — {loc.openingAnnouncement ?? "coming soon"}.
               </p>
             </div>
-          )}
+          ))}
         </div>
 
         {/* The policies are linked from here rather than from the Eat column

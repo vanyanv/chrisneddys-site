@@ -26,7 +26,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const title = loc.isOpen ? `${hood} Smash Burgers, Open Late` : `${hood} Smash Burgers & Sliders`;
   const description = loc.isOpen
     ? `Chris N Eddy’s smash burger sliders in ${hood}, at ${loc.address}. Chris-cut fries, every topping free, open until ${closingSummary(loc)}.`
-    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}: the same smashed sliders, chris-cut fries and Secret Menu we serve at our Hollywood location.`;
+    : `Chris N Eddy’s is coming to ${hood} at ${loc.address}${
+        loc.openingAnnouncement ? `, with its ${loc.openingAnnouncement.toLowerCase()}` : ""
+      }: the same smashed sliders, chris-cut fries and Secret Menu we serve in Hollywood.`;
 
   return pageMetadata({ title, description, path: `/locations/${slug}/` });
 }
@@ -77,9 +79,9 @@ export default async function LocationPage({ params }: Params) {
           <div className="cne-eyebrow">Not open yet</div>
           <h2>First to know.</h2>
           <p className="cne-lede">
-            The {hood} location is being built. We do not have a date to give you yet, and we would
-            rather say that than invent one — leave an email and you will hear from us the day it
-            starts serving.
+            {loc.openingAnnouncement
+              ? `The ${hood} location has a date: ${loc.openingAnnouncement}. Leave an email and we will send the opening update.`
+              : `The ${hood} location is being built. We do not have a date to give you yet, and we would rather say that than invent one — leave an email and you will hear from us the day it starts serving.`}
           </p>
           <OpeningNotify hood={hood} />
         </section>

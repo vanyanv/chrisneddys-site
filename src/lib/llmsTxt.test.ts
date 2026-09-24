@@ -20,8 +20,8 @@ describe("buildLlmsTxt", () => {
     expect(text).toMatch(/1 AM|2 AM/);
   });
 
-  it("never states a phone number or hours for a location that hasn't opened", () => {
-    for (const loc of notOpen) {
+  it("keeps undated locations private and publishes only confirmed launch facts", () => {
+    for (const loc of notOpen.filter((location) => !location.openingAnnouncement)) {
       expect(loc.phone).toBeUndefined();
       // The section for this location is everything between its own heading
       // and the next `###`/`##` heading.
@@ -34,6 +34,19 @@ describe("buildLlmsTxt", () => {
       expect(section).not.toMatch(/\d{1,2}(:\d{2})?\s?(AM|PM)/);
       expect(section.toLowerCase()).not.toContain("address");
     }
+
+    const announced = notOpen.find((location) => location.openingAnnouncement)!;
+    expect(text).toContain(announced.openingAnnouncement!);
+    expect(text).toContain(announced.address);
+    expect(text).toContain(announced.phone!);
+
+    const start = text.indexOf(`### ${announced.name}`);
+    const rest = text.slice(start + 1);
+    const nextHeadingOffset = rest.search(/\n#{2,3} /);
+    const section = nextHeadingOffset === -1 ? rest : rest.slice(0, nextHeadingOffset);
+    expect(section).not.toContain("10 AM");
+    expect(section).not.toContain("1 AM");
+    expect(section).not.toContain("2 AM");
   });
 
   it("lists every food menu item with its price", () => {

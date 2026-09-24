@@ -21,7 +21,8 @@ import { emailLooksSendable } from "@/lib/siteFormFields";
  * for the privilege.
  *
  * Sent the same way as the contact form: the `joinOpeningList` server action
- * emails the signup through Resend to the address the site shows. When email
+ * emails the signup through Resend to the address the site shows, then sends
+ * the visitor one email back with the opening date, address and hours. When email
  * isn't set up the field still renders and validates, and falls through to
  * email — the same failure path the guest check uses.
  */
@@ -93,8 +94,8 @@ export function OpeningNotify({ hood }: { hood: string }) {
   if (status === "sent") {
     return (
       <div className="cne-loc-note" role="status" style={{ marginTop: 14 }}>
-        <strong>You&rsquo;re on the list.</strong> We&rsquo;ll email you once the {hood} location is
-        serving — nothing else.
+        <strong>You&rsquo;re on the list.</strong> Check your inbox: we just sent you the details
+        for {hood}.
       </div>
     );
   }

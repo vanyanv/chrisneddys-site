@@ -83,7 +83,7 @@ export default async function PrivacyPage() {
           <p>
             Placing an order gives us your name, email, shipping address and what you bought; your
             card details go straight to Stripe and never reach our servers. Two contact forms send
-            us what you type into them. One analytics tool counts pages and taps. A hat in the shop
+            us what you type into them. Two analytics tools count pages and taps. A hat in the shop
             bag stays in your own browser until you check out. There is no customer account, and we
             don&rsquo;t sell any of it.
           </p>

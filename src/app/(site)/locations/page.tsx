@@ -9,7 +9,7 @@ import { slugFor } from "@/lib/locationSlug";
 import { closingSummary } from "@/lib/hours";
 
 const title = "Locations — Hollywood, Glendale & Van Nuys";
-const description = `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd), open until ${closingSummary(flagship)}. Van Nuys grand opening Friday at 6 PM; Glendale opening soon.`;
+const description = `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd), open until ${closingSummary(flagship)}. Van Nuys grand opening Friday, Sept 25 at 6 PM; Glendale opening soon.`;
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/locations/" });
 

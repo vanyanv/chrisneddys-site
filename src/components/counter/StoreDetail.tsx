@@ -4,6 +4,7 @@ import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { LocationCard } from "@/components/locations/LocationCard";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
+import { LiveOpenLabel } from "@/components/shared/LiveOpenLabel";
 
 /**
  * One store's page. Beyond ranking for the neighbourhood, this is the page
@@ -21,7 +22,11 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
     <>
       <section className="cne-sec cne-locd" style={{ position: "relative" }}>
         <div className="cne-eyebrow">
-          {loc.isOpen ? "Open now" : (loc.openingAnnouncement ?? "Opening soon")}
+          {loc.isOpen ? (
+            <LiveOpenLabel locationId={loc.id} />
+          ) : (
+            (loc.openingAnnouncement ?? "Opening soon")
+          )}
         </div>
         {/* Wall-mural diamond behind the store's name — decorative only, so it
             sits at `zIndex: 0` while the heading below is lifted above it. */}
@@ -106,7 +111,11 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
               {o.city}, {o.region}
             </div>
             <div className="cne-loc-note">
-              {o.isOpen ? "Open now →" : `${o.openingAnnouncement ?? "Opening soon"} →`}
+              {o.isOpen ? (
+                <LiveOpenLabel locationId={o.id} suffix=" →" />
+              ) : (
+                `${o.openingAnnouncement ?? "Opening soon"} →`
+              )}
             </div>
           </Link>
         ))}

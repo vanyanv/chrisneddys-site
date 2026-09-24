@@ -5,7 +5,13 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
-import { ID, SITE_DESCRIPTION } from "@/lib/seo";
+import { ID, siteDescription } from "@/lib/seo";
+
+/** "+13235443600" -> "+1 323-544-3600", the form `brand.phoneIntl` uses. */
+function intlPhone(tel: string | undefined): string | undefined {
+  if (!tel || !/^\+1\d{10}$/.test(tel)) return tel;
+  return `+1 ${tel.slice(2, 5)}-${tel.slice(5, 8)}-${tel.slice(8)}`;
+}
 
 /** One `<script type="application/ld+json">`, escaped the way Next does it. */
 export function JsonLdScript({ data }: { data: object }): ReactElement {
@@ -97,10 +103,10 @@ export function restaurantNode(loc: Location) {
     // `hasMenu` points at the node; `menu` is the URL Google's food-establishment
     // documentation asks for, and the one a result can actually link to.
     menu: `${brand.siteUrl}/menu/`,
-    // Only the location that answers it. Three addresses across two cities
-    // sharing one number is the pattern local search treats as a virtual
-    // office — and Glendale and Van Nuys have no line to answer yet.
-    telephone: loc.phone ? brand.phoneIntl : undefined,
+    // Only the location that answers it, and that location's own line. Three
+    // addresses across two cities sharing one number is the pattern local
+    // search treats as a virtual office.
+    telephone: intlPhone(loc.phoneTel),
     email: brand.email,
     address: {
       "@type": "PostalAddress",
@@ -196,7 +202,7 @@ export function JsonLd(): ReactElement {
       height: 512,
     },
     image: RESTAURANT_IMAGES,
-    description: SITE_DESCRIPTION,
+    description: siteDescription(),
     slogan: brand.tagline,
     // The listings that already carry the reviews, photos and menus search
     // engines use to reconcile "Chris N Eddy's" into one entity. Without these

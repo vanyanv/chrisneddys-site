@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { buildLlmsTxt } from "@/lib/llmsTxt";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
@@ -7,7 +7,6 @@ import { formatPrice } from "@/lib/otter";
 import { merch, type MerchProduct } from "@/data/merch";
 
 const flagship = locations.find((l) => l.id === "hollywood")!;
-const notOpen = locations.filter((l) => !l.isOpen);
 
 describe("buildLlmsTxt", () => {
   const text = buildLlmsTxt(merch);
@@ -21,6 +20,12 @@ describe("buildLlmsTxt", () => {
   });
 
   it("keeps undated locations private and publishes only confirmed launch facts", () => {
+    // Van Nuys opens by itself at VAN_NUYS_OPENS_AT; pin the clock before it
+    // so this keeps testing a not-yet-open store after that date.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
+    const text = buildLlmsTxt(merch);
+    const notOpen = locations.filter((l) => !l.isOpen);
     for (const loc of notOpen.filter((location) => !location.openingAnnouncement)) {
       expect(loc.phone).toBeUndefined();
       // The section for this location is everything between its own heading
@@ -47,6 +52,7 @@ describe("buildLlmsTxt", () => {
     expect(section).not.toContain("10 AM");
     expect(section).not.toContain("1 AM");
     expect(section).not.toContain("2 AM");
+    vi.useRealTimers();
   });
 
   it("lists every food menu item with its price", () => {

@@ -18,7 +18,7 @@
  * verbatim would otherwise put that word in someone's mouth.
  */
 import { brand } from "@/data/brand";
-import { locations, type Location } from "@/data/locations";
+import { hasPassed, locations, VAN_NUYS_OPENS_AT, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
@@ -82,9 +82,9 @@ function orderingSection(): string {
   const lines = [
     "## How To Order",
     `Order direct on our own storefront for pickup — it's the cheaper way to buy, since the delivery apps set their own prices and add their own fees: ${storeUrl}`,
-    `Every online order runs through the Hollywood location today${
-      openLocations.length === 1 ? "" : " — the other locations have not opened yet"
-    }.`,
+    openLocations.length === 1
+      ? `Every online order runs through the ${openLocations[0]!.name} location today — the other locations have not opened yet.`
+      : `Pickup orders go to the location you choose: ${openLocations.map((l) => l.name).join(" and ")} each have their own order link under Locations above.`,
     `Delivery: ${deliveryPlatforms.map((p) => `${p.name} (${p.url})`).join(", ")}.`,
     `Catering: ${cateringPlatform.name} (${cateringPlatform.url}).`,
     `Order page: ${siteUrl("/order/")}`,
@@ -140,12 +140,16 @@ function optionalSection(): string {
  * `await listPublishedProducts()` (`src/lib/catalog.ts`) from the route.
  */
 export function buildLlmsTxt(products: MerchProduct[]): string {
+  const vanNuysOpen = hasPassed(VAN_NUYS_OPENS_AT);
   const summary =
     `${brand.name} is a Los Angeles smash-burger restaurant (${brand.tagline}), open now ` +
-    `on Sunset Blvd in Hollywood. The signature order is the slider: two smashed patties, two ` +
+    `on Sunset Blvd in Hollywood${vanNuysOpen ? " and on Sherman Way in Van Nuys" : ""}. ` +
+    `The signature order is the slider: two smashed patties, two ` +
     `slices of cheese, a buttered Martin's roll, every topping free. Order pickup direct ` +
-    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. Van Nuys ` +
-    `has its grand opening Friday, Sept 25 at 6 PM; Glendale is opening soon.`;
+    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. ` +
+    (vanNuysOpen
+      ? `Glendale is opening soon.`
+      : `Van Nuys has its grand opening Friday, Sept 25 at 6 PM; Glendale is opening soon.`);
 
   return [
     `# ${brand.name}`,

@@ -3,7 +3,7 @@ import "@/styles/careers.css";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import Link from "next/link";
-import { locations } from "@/data/locations";
+import { hasPassed, locations, VAN_NUYS_OPENS_AT } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
 import { DripEdge } from "@/components/storeart/DripEdge";
@@ -33,6 +33,9 @@ const INDEED_URL = "https://www.indeed.com/cmp/Chris-N-Eddy's";
  * mural wall, and each store gets a tile in its own monster's colour.
  */
 export default function CareersPage() {
+  // The copy changes by itself when Van Nuys opens; this page regenerates
+  // every minute, like the rest of the storefront.
+  const vanNuysOpen = hasPassed(VAN_NUYS_OPENS_AT);
   return (
     <div className="cne-cr">
       <JsonLdScript data={breadcrumbLd([{ name: "Careers", path: "/careers/" }])} />
@@ -56,8 +59,17 @@ export default function CareersPage() {
           <p className="cne-cr-eyebrow">Careers</p>
           <h1 id="cr-h1">Join the crew.</h1>
           <p className="cne-cr-lede">
-            Hollywood is open now. Glendale and Van Nuys are next &mdash; that&rsquo;s more shifts,
-            more kitchens, more people.
+            {vanNuysOpen ? (
+              <>
+                Hollywood and Van Nuys are open now. Glendale is next &mdash; that&rsquo;s more
+                shifts, more kitchens, more people.
+              </>
+            ) : (
+              <>
+                Hollywood is open now. Glendale and Van Nuys are next &mdash; that&rsquo;s more
+                shifts, more kitchens, more people.
+              </>
+            )}
           </p>
         </div>
         {/* The crew: one monster per store, in the store's own colour, asleep
@@ -101,9 +113,9 @@ export default function CareersPage() {
 
         <div className="cne-cr-pitch cne-rv">
           <p>
-            We&rsquo;re a Hollywood smash-burger spot opening two more locations, in Glendale and
-            Van Nuys &mdash; that means more shifts, more kitchens and more people needed to run
-            them.
+            {vanNuysOpen
+              ? "We’re a Hollywood smash-burger spot that has just opened in Van Nuys, with Glendale next — that means more shifts, more kitchens and more people needed to run them."
+              : "We’re a Hollywood smash-burger spot opening two more locations, in Glendale and Van Nuys — that means more shifts, more kitchens and more people needed to run them."}
           </p>
           <p>
             Open roles, pay and how to apply all live on our Indeed page, kept current there rather

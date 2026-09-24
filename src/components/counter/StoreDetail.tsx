@@ -172,7 +172,11 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
               />
             </>
           ) : (
-            <Tunnel body={mon.body} iris={mon.iris} asleep={!loc.openingAnnouncement} />
+            <Tunnel
+              body={mon.body}
+              iris={mon.iris}
+              asleep={!loc.isOpen && !loc.openingAnnouncement}
+            />
           )}
         </div>
       </section>

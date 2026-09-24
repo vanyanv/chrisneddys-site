@@ -80,7 +80,7 @@ export default async function LocationPage({ params }: Params) {
           <h2>First to know.</h2>
           <p className="cne-lede">
             {loc.openingAnnouncement
-              ? `The ${hood} location has a date: ${loc.openingAnnouncement}. Leave an email and we will send the opening update.`
+              ? `The ${hood} location has a date: ${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}. Leave an email and we will send the opening update.`
               : `The ${hood} location is being built. We do not have a date to give you yet, and we would rather say that than invent one — leave an email and you will hear from us the day it starts serving.`}
           </p>
           <OpeningNotify hood={hood} />

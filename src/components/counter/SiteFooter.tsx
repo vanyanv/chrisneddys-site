@@ -155,6 +155,12 @@ export function SiteFooter() {
             <div className="cne-foot-counter" data-location={slugFor(loc)} key={loc.id}>
               <p className="cne-foot-soon">
                 {loc.neighbourhood} — {loc.openingAnnouncement ?? "coming soon"}.
+                {loc.openingAnnouncement ? (
+                  <>
+                    <br />
+                    {loc.address}, {loc.city}, {loc.region} {loc.postal}
+                  </>
+                ) : null}
               </p>
             </div>
           ))}

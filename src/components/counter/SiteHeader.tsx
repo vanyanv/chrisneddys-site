@@ -46,12 +46,18 @@ export const TABS = [
  * Desktop hides the indicator entirely (`.cne-tabind { display: none }` at
  * 901px+) and shows all six tabs from `TABS` itself, so it never sees
  * `MOBILE_TABS`.
+ *
+ * On the shop's own pages (`/shop/` and everything under it) the header drops
+ * the red for the admin's cream and the wordmark carries STORE beside it, the
+ * way the admin's top bar does (issue #132). The rest of the site keeps the
+ * red header.
  */
 const MOBILE_TABS = TABS.filter((t) => t.href !== "/");
 
 export function SiteHeader() {
   const raw = usePathname() ?? "/";
   const path = raw === "/" ? "/" : raw.endsWith("/") ? raw : `${raw}/`;
+  const isShop = path.startsWith("/shop/");
   const mobileActiveIndex = MOBILE_TABS.findIndex((t) => t.href === path);
   const [lifted, setLifted] = useState(false);
 
@@ -63,10 +69,13 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className={`cne-header${lifted ? " is-lifted" : ""}`}>
+    <header className={`cne-header${lifted ? " is-lifted" : ""}${isShop ? " is-shop" : ""}`}>
       <div className="cne-nav">
         <Link prefetch={false} href="/" aria-label={`${brand.name} — Home`} className="cne-logo">
           <Image src="/cne-logo-2x.webp" alt={brand.name} width={309} height={87} priority />
+          {/* The shop wears the admin's lockup: the same mark with STORE
+              beside it, on the admin's cream (`.cne-header.is-shop`). */}
+          {isShop && <span className="cne-logo-tag">STORE</span>}
         </Link>
         <div className="cne-nav-right">
           <OpenStatus head />

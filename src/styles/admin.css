@@ -459,6 +459,10 @@
   color: var(--a-sub);
   margin: 4px 0 0;
 }
+.adm-help-warn {
+  color: var(--a-red-cta);
+  font-weight: 600;
+}
 /* one field's own validation message, vs. `.adm-error`'s one-per-form */
 .adm-field-error {
   font-size: 12px;

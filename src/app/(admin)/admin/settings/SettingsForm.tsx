@@ -94,6 +94,7 @@ function previewStoreSettings(base: StoreSettings, values: FormValues): StoreSet
 export function SettingsForm({
   settings,
   shopOpen,
+  closedReasons = [],
   connections,
   changePassword,
   passkeys,
@@ -110,6 +111,9 @@ export function SettingsForm({
    * once the shop is already open, is read straight off `settings` rather
    * than passed in separately, and is orthogonal to this prop entirely. */
   shopOpen: boolean;
+  /** `shopClosedReasons` (`src/lib/shopStatus.ts`): what is still missing
+   * while the shop is closed, listed under the closed card. */
+  closedReasons?: string[];
   connections: ReactNode;
   changePassword: ReactNode;
   /** issue #51: passkeys, in the same "Sign-in & passkeys" section as
@@ -225,6 +229,13 @@ export function SettingsForm({
               ? "Stripe is connected, and a returns policy and support email are both set — checkout is live."
               : "Checkout stays closed until Stripe is connected and a returns policy and support email are both set below."}
           </p>
+          {!shopOpen && closedReasons.length > 0 && (
+            <ul className="adm-closed-reasons">
+              {closedReasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          )}
         </div>
         <span className={`adm-pill ${shopOpen ? "is-live" : "is-yellow"}`}>
           {shopOpen ? "Open" : "Closed"}

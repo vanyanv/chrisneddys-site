@@ -6,7 +6,7 @@ import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { listOwners } from "@/lib/owners";
 import { listPasskeysForEmail } from "@/lib/passkeys";
 import { getSettingsForAdmin } from "@/lib/settingsAdmin";
-import { isShopOpenFor } from "@/lib/shopStatus";
+import { isShopOpenFor, shopClosedReasons } from "@/lib/shopStatus";
 import { SettingsForm } from "./SettingsForm";
 import { ConnectionsCard } from "./ConnectionsCard";
 import { ChangePasswordCard } from "./ChangePasswordCard";
@@ -53,6 +53,7 @@ export default async function AdminSettingsPage() {
   ]);
 
   const shopOpen = isShopOpenFor(settings);
+  const closedReasons = shopClosedReasons(settings);
   const initials = ownerInitials(session);
 
   return (
@@ -112,6 +113,7 @@ export default async function AdminSettingsPage() {
           <SettingsForm
             settings={settings}
             shopOpen={shopOpen}
+            closedReasons={closedReasons}
             connections={<ConnectionsCard />}
             changePassword={<ChangePasswordCard />}
             passkeys={<PasskeysCard passkeys={passkeys} />}

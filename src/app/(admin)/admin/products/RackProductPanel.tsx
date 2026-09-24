@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { AdminProduct, InventoryMode } from "@/lib/catalogAdmin";
 import { imageThumbSrc } from "@/lib/productImage";
 import { joinRequirements, missingPublishRequirements } from "@/lib/publishRequirements";
+import { runSizeConflicts } from "@/lib/shopCopy";
 import { generateProductSeoAction, setInventoryPlainAction } from "./actions";
 import { PhotosEditor } from "./PhotosEditor";
 import { RowMenu, type RowMenuAction } from "./RowMenu";
@@ -829,6 +830,16 @@ function RunSection({
   // rejected save).
   const { sold, reserved, available, setAside } = product.inventory;
   const locked = sold > 0;
+  const conflicts = runSizeConflicts(
+    [
+      product.limitedNote,
+      product.description,
+      product.limitedCopy,
+      product.metaDescription,
+      ...product.details,
+    ],
+    inventoryN,
+  );
 
   return (
     <div className="rack-hairline">
@@ -882,6 +893,20 @@ function RunSection({
           <strong>Set this once.</strong> Every number becomes a promise printed on a certificate
           the instant it sells, so the size locks for good the moment the first one does. Get it
           right now, while it&rsquo;s still just a number on a screen.
+        </RunWarning>
+      )}
+      {/* The shop's "ONLY N MADE" flag reads this field; the product's own
+       * copy is free text. When they disagree the product page says both
+       * (the owner's 2026-09-24 report: "only 20 made" beside "only 50
+       * made / numbered /50"), so say so here, where either can be fixed. */}
+      {conflicts.length > 0 && (
+        <RunWarning>
+          <strong>
+            The product&rsquo;s copy says {conflicts.join(" and ")}, but Edition size is{" "}
+            {inventoryN}.
+          </strong>{" "}
+          The shop shows both numbers. If {inventoryN} is how many are left to sell online, set
+          Edition size to how many were made and use &ldquo;Left to sell online&rdquo; below.
         </RunWarning>
       )}
       {/* The run is how many were made; this is how many of them the online

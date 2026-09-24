@@ -145,6 +145,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         product={product}
         soldOut={soldOut}
         paused={paused}
+        closed={!shopOpen}
         pauseNote={settings.pauseNote}
         maxQty={maxQty}
       >
@@ -186,16 +187,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               </div>
             )}
 
-            {/* Pre-launch's own notice, unchanged — the shop has simply
-                never opened, and adding to the bag is still allowed while
-                it isn't. Mutually exclusive with the pause banner below:
+            {/* Pre-launch's own notice — the shop has simply never opened.
+                It no longer invites an add to the bag: a page that says
+                checkout isn't open beside a live ADD TO BAG button read as
+                a contradiction, so the buy button is disabled below
+                (`BuyProvider`'s `closed` prop) until it is. Mutually exclusive with the pause banner below:
                 `paused` is only ever true once `shopOpen` already is. */}
-            {!shopOpen && (
-              <p className="cne-shopnotice">
-                The shop isn&rsquo;t taking orders yet. Add this to your bag anyway: it stays saved
-                on this device until checkout opens.
-              </p>
-            )}
+            {!shopOpen && <p className="cne-shopnotice">The shop isn&rsquo;t taking orders yet.</p>}
 
             {/* The pause state (issue #43): the owner has shut the counter
                 for a few days from `/admin/settings`, on a shop that was

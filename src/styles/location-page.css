@@ -133,6 +133,7 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   transform: rotate(-1.5deg);
+  text-wrap: balance;
 }
 
 .cne-lp-btns {

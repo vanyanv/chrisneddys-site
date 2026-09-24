@@ -83,7 +83,14 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
             )}
           </div>
 
-          {loc.isOpen ? (
+          {!loc.isOpen && loc.openingAnnouncement && (
+            <p className="cne-lp-ticket">{loc.openingAnnouncement}</p>
+          )}
+          {/* A store with an opening date shows its hours already, the same
+              box as an open one, so the page is ready the day the doors open
+              (Van Nuys, owner's call 2026-09-24). An undated store's `hours`
+              is only a "Date to be announced" placeholder, so it waits. */}
+          {(loc.isOpen || loc.openingAnnouncement) && (
             <dl className="cne-lp-hrs">
               {loc.hours.map(([day, hrs]) => (
                 <div key={day}>
@@ -92,8 +99,6 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
                 </div>
               ))}
             </dl>
-          ) : (
-            loc.openingAnnouncement && <p className="cne-lp-ticket">{loc.openingAnnouncement}</p>
           )}
 
           <div className="cne-lp-btns">

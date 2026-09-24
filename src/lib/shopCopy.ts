@@ -40,6 +40,31 @@ export function editionFlag(editionSize: number | null): string {
   return editionSize !== null ? `ONLY ${editionSize} MADE` : "LIMITED RUN";
 }
 
+/**
+ * Run sizes the owner's own copy states ("Only 50 made", "numbered /50",
+ * "limited to 50") that disagree with the edition size the admin actually
+ * has — the shop's "ONLY N MADE" flag and "N OF M LEFT" line read the
+ * edition size, while the scarcity note and description are free text, so
+ * the two can drift and the product page says both. Returns the distinct
+ * conflicting numbers, empty when they agree or there is no edition.
+ */
+export function runSizeConflicts(
+  texts: (string | null | undefined)[],
+  editionSize: number | null,
+): number[] {
+  if (editionSize === null) return [];
+  const pattern = /(\d+)\s+made\b|(?<!\d)\/\s?(\d+)\b|limited to\s+(\d+)\b/gi;
+  const found = new Set<number>();
+  for (const text of texts) {
+    if (!text) continue;
+    for (const match of text.matchAll(pattern)) {
+      const n = Number(match[1] ?? match[2] ?? match[3]);
+      if (n !== editionSize) found.add(n);
+    }
+  }
+  return [...found];
+}
+
 export type ShippingReturnsNote = {
   /** e.g. "Ships flat $6 in the US · free over $75 · or pick up at 5539 W. Sunset Blvd." */
   line: string;
@@ -117,7 +142,7 @@ export function pauseNotice(pauseNote: string | null): PauseNotice {
   const note = pauseNote?.trim();
   return {
     heading: "The shop's shut for a couple of days.",
-    body: `We're restocking the counter and nobody's here to pack boxes.${
+    body: `We're restocking and nobody's here to pack boxes.${
       note ? ` ${note}.` : ""
     } Your number will still be there.`,
   };
@@ -128,6 +153,14 @@ export function pauseNotice(pauseNote: string | null): PauseNotice {
  * haven't. Uppercased to match every other state this button carries
  * (`ADD TO BAG`, `SOLD OUT`), which are typeset in caps rather than styled
  * with `text-transform`. */
+/**
+ * The disabled buy button's label (product page and shop index card) while
+ * the shop has never opened — `isShopOpenFor` false. Echoes the product
+ * page's own "The shop isn't taking orders yet." notice rather than saying
+ * anything new, so the button and the sentence above it agree.
+ */
+export const CLOSED_BUTTON_LABEL = "NOT TAKING ORDERS YET";
+
 export function pauseButtonLabel(pauseNote: string | null): string {
   const note = pauseNote?.trim();
   return note ? note.toUpperCase() : "SHOP PAUSED";

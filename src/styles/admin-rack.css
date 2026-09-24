@@ -1750,6 +1750,12 @@
   color: var(--rack-muted);
   margin-top: 6px;
 }
+.adm-closed-reasons {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  list-style: disc;
+  font-weight: 600;
+}
 @media (max-width: 900px) {
   .rack-settings-body {
     grid-template-columns: 1fr;

@@ -46,3 +46,26 @@ export function imageFullSrc(
   if (photoDir && image.src) return `${photoDir}/${image.src}.webp`;
   return image.urlThumb ?? null;
 }
+
+/**
+ * The alt text every upload used to be stored with until the owner typed a
+ * real one. It reached customers verbatim on the product page, so it is now
+ * treated as "no alt text yet" wherever it is read: rows written before the
+ * fix still carry it, and new uploads store an empty string instead.
+ */
+export const LEGACY_PLACEHOLDER_ALT = "Product photo — edit this alt text";
+
+/** Whether an image still needs the owner to write its alt text. */
+export function needsAltText(alt: string | null | undefined): boolean {
+  const text = alt?.trim() ?? "";
+  return text === "" || text === LEGACY_PLACEHOLDER_ALT;
+}
+
+/**
+ * The alt text a shopper's screen reader gets: the owner's own, or — until
+ * they write one — the fallback (the product's name), never a placeholder
+ * addressed to the owner.
+ */
+export function shopperAlt(alt: string | null | undefined, fallback: string): string {
+  return needsAltText(alt) ? fallback : (alt ?? "").trim();
+}

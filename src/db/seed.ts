@@ -173,20 +173,23 @@ export async function seedCatalogue(db: Db): Promise<void> {
     .onConflictDoNothing({ target: variants.sku })
     .returning({ id: variants.id });
 
-  const variantId =
-    insertedVariant?.id ??
-    (
-      await db.query.variants.findFirst({
-        where: eq(variants.sku, FOAM_TRUCKER_SKU),
-        columns: { id: true },
-      })
-    )?.id;
+  const variant = await db.query.variants.findFirst({
+    where: eq(variants.sku, FOAM_TRUCKER_SKU),
+    columns: { id: true, editionSize: true },
+  });
+  const variantId = insertedVariant?.id ?? variant?.id;
   if (!variantId) throw new Error("could not find or create the variant row");
 
   // Insert-only per number: an edition an owner has since sold, reserved,
   // or otherwise changed the status of must not be reset to "available" by
-  // a later reseed — only numbers that don't exist yet are created.
-  for (let number = 1; number <= EDITION_SIZE; number++) {
+  // a later reseed — only numbers that don't exist yet are created. And only
+  // up to the run size the variant has *now*: an owner who resized the run
+  // in /admin (say 50 to 20) had numbers 21-50 deleted, and recreating them
+  // as "available" on every deploy put "50 OF 20 LEFT" on the shop and
+  // offered numbers for sale that are not part of the run. A variant the
+  // owner switched off editions (`editionSize` null) gets none.
+  const runSize = variant ? (variant.editionSize ?? 0) : EDITION_SIZE;
+  for (let number = 1; number <= runSize; number++) {
     await db
       .insert(editions)
       .values({ variantId, number, status: "available" })

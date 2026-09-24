@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import type { Location } from "@/data/locations";
-import { orderUrl, type OrderSurface } from "@/lib/otter";
+import { withUtm, type OrderSurface } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
 
@@ -86,10 +86,10 @@ export function LocationCard({
 
       {(showButtons || !loc.isOpen) && (
         <div className="cne-loc-btns">
-          {loc.isOpen && loc.otter && (
+          {loc.isOpen && loc.orderUrl && (
             <a
               className="cne-mini is-red"
-              href={orderUrl(surface)}
+              href={withUtm(loc.orderUrl, surface)}
               target="_blank"
               rel="noopener noreferrer"
             >

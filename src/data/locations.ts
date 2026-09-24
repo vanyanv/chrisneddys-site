@@ -20,14 +20,15 @@ export type Location = {
   postal: string;
   status: string;
   isOpen: boolean;
+  /** Public launch copy shown before a dated opening; absent for an undated store. */
+  openingAnnouncement?: string;
   /**
-   * Present once this store takes online orders through Otter — today that is
-   * Hollywood only. `otter.ts` has one global storefront rather than one per
-   * location, so this is a flag, not a per-store config: whether the ORDER
-   * button (and an `OrderAction` in JSON-LD) makes sense for this address is
-   * `Boolean(loc.otter)`.
+   * Present once this store has its own Otter pickup storefront. The ORDER
+   * button and structured OrderAction are still gated by `isOpen`, so a URL
+   * can be staged before launch without inviting premature orders.
    */
-  otter?: true;
+  /** This location's direct pickup storefront. Only rendered as an order action once open. */
+  orderUrl?: string;
   lat: number;
   lng: number;
   hours: Array<[string, string]>;
@@ -46,7 +47,7 @@ export const locations: Location[] = [
     postal: "90028",
     status: "Open daily",
     isOpen: true,
-    otter: true,
+    orderUrl: brand.orderUrl,
     phone: brand.phone,
     phoneTel: brand.phoneTel,
     lat: 34.098,
@@ -87,16 +88,25 @@ export const locations: Location[] = [
     id: "vannuys",
     name: "Van Nuys",
     neighbourhood: "Van Nuys",
-    sub: "Opening soon",
+    sub: "Grand opening Friday at 6 PM",
     address: "14523 Sherman Way",
     city: "Van Nuys",
     region: "CA",
     postal: "91405",
-    status: "Opening soon",
+    status: "Grand opening Friday at 6 PM",
     isOpen: false,
+    openingAnnouncement: "Grand opening Friday at 6 PM",
+    phone: "(818) 208-9315",
+    phoneTel: "+18182089315",
+    orderUrl:
+      "https://order.tryotter.com/s/chris-n-eddys/14523-sherman-way%2C-van-nuys%2C-ca-91405%2C-usa-los-angeles/3dff7900-1388-4332-8079-091c3bb96eb4?fulfillment_mode=pickup",
     lat: 34.2011,
     lng: -118.4497,
-    hours: [["Launch", "Date to be announced"]],
+    hours: [
+      ["Mon–Thu", "10:00 AM – 1:00 AM"],
+      ["Fri–Sat", "10:00 AM – 2:00 AM"],
+      ["Sunday", "10:00 AM – 2:00 AM"],
+    ],
   },
 ];
 

@@ -123,7 +123,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               footer={
                 loc.isOpen ? (
                   <>
-                    {!loc.otter && (
+                    {!loc.orderUrl && (
                       <div className="cne-loc-note">
                         Online ordering for this store isn&rsquo;t live on Otter yet.
                       </div>
@@ -138,7 +138,9 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                   </>
                 ) : (
                   <>
-                    <div className="cne-loc-note">Opening date to be announced.</div>
+                    <div className="cne-loc-note">
+                      {loc.openingAnnouncement ?? "Opening date to be announced."}
+                    </div>
                     <Link
                       prefetch={false}
                       href={`/locations/${slugFor(loc)}/`}

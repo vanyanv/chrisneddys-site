@@ -3,7 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CapArt } from "./CapArt";
-import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
+import {
+  bagSubtotal,
+  closeBag,
+  reloadBag,
+  removeFromBag,
+  setBagQty,
+  useBag,
+  type BagLine,
+} from "./bagStore";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 import { getGaIdentity } from "@/lib/gaIdentity";
@@ -81,10 +89,13 @@ export function BagDrawer({
 
   // Safari (every iPhone browser) keeps the page alive in its back-forward
   // cache when checkout leaves for Stripe, so Back restores it mid-"TAKING YOU
-  // TO CHECKOUT…" with the button disabled. Nothing is in flight by then.
+  // TO CHECKOUT…" with the button disabled. Nothing is in flight by then. The
+  // bag is re-read first: if the order was paid, the thanks page emptied it.
   useEffect(() => {
     const onShow = (e: PageTransitionEvent) => {
-      if (e.persisted) setCheckoutPending(false);
+      if (!e.persisted) return;
+      reloadBag();
+      setCheckoutPending(false);
     };
     window.addEventListener("pageshow", onShow);
     return () => window.removeEventListener("pageshow", onShow);

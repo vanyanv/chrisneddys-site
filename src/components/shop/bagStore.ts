@@ -255,6 +255,25 @@ export function hydrateBag() {
 }
 
 /**
+ * Re-reads the saved bag, for a page Safari restores from its back-forward
+ * cache: its in-memory bag is from before it was left, and the thanks page
+ * may have emptied the saved one since (`ClearBagOnce`). Without this, Back
+ * from a paid order would offer to check out the paid items again.
+ */
+export function reloadBag(): BagLine[] {
+  let lines: BagLine[] = [];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    lines = raw ? clean(JSON.parse(raw).lines) : [];
+  } catch {
+    lines = [];
+  }
+  state = { ...state, lines, open: state.open && lines.length > 0, ready: true };
+  emit();
+  return lines;
+}
+
+/**
  * Builds a fresh line's display snapshot from a live product — the pure
  * core of `addToBag`'s "this slug isn't in the bag yet" branch, pulled out
  * so it's directly testable without touching the module's private state or

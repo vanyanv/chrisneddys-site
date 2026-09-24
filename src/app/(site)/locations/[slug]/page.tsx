@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { closingSummary } from "@/lib/hours";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { allLocationSlugs, locationBySlug } from "@/lib/locationSlug";
 import { StoreDetail } from "@/components/counter/StoreDetail";
-import { OpeningNotify } from "@/components/locations/OpeningNotify";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -57,52 +55,7 @@ export default async function LocationPage({ params }: Params) {
           Business Profile until the doors do. The page's title, copy and
           visible address still say what is coming. */}
       {loc.isOpen && <JsonLdScript data={restaurantLd(loc)} />}
-      <nav className="cne-sec cne-locd" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
-        <div className="cne-eyebrow">
-          <Link prefetch={false} href="/locations/" style={{ color: "inherit" }}>
-            Locations
-          </Link>{" "}
-          / {hood}
-        </div>
-      </nav>
       <StoreDetail loc={loc} hood={hood} />
-      {!loc.isOpen && (
-        <section
-          id="notify"
-          className="cne-sec cne-locd cne-rv"
-          // Every "TELL ME WHEN IT OPENS" link (issue #108) on a coming-soon
-          // card — /order/, /locations/, and this page's own card — points
-          // here. `html`'s sitewide `scroll-padding-top` (counter.css)
-          // already clears the sticky header for any in-page anchor; this
-          // just says so explicitly on the element itself, the same belt-
-          // and-suspenders `legal.css` uses for its own jumped-to headings.
-          style={{ scrollMarginTop: "var(--cne-stuck)" }}
-        >
-          <div className="cne-eyebrow">Not open yet</div>
-          <h2>First to know.</h2>
-          <p className="cne-lede">
-            {loc.openingAnnouncement
-              ? `The ${hood} location has a date: ${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}. Leave an email and we will send the opening update.`
-              : `The ${hood} location is being built. We do not have a date to give you yet, and we would rather say that than invent one — leave an email and you will hear from us the day it starts serving.`}
-          </p>
-          <OpeningNotify hood={hood} />
-        </section>
-      )}
-      {loc.isOpen && (
-        <section className="cne-sec cne-locd cne-rv">
-          <div className="cne-eyebrow">After everyone else has closed</div>
-          <h2>Open late.</h2>
-          <p className="cne-lede">
-            We serve until {closingSummary(loc)}. Most places around {hood} are dark by ten, which
-            is why so much of what we smash goes out after midnight — to people coming off a shift,
-            out of a show on Sunset, or off the 101 with nowhere else still cooking.
-          </p>
-          <p className="cne-lede">
-            The full menu runs the whole time. Nothing is pulled at midnight, and the fries are cut
-            the same right up to close — {closingSummary(loc)} — as they are at noon.
-          </p>
-        </section>
-      )}
     </>
   );
 }

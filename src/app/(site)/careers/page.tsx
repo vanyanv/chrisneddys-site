@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import "@/styles/careers.css";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
+import Link from "next/link";
+import { locations } from "@/data/locations";
+import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
 import { DripEdge } from "@/components/storeart/DripEdge";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
+import { MascotDecor } from "@/components/mascots/MascotDecor";
+import { locationMonster } from "@/components/locations/locationArt";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
 const title = "Careers";
@@ -22,7 +28,9 @@ const INDEED_URL = "https://www.indeed.com/cmp/Chris-N-Eddy's";
  * would have no way to keep in sync with what Indeed actually shows.
  *
  * Its own red-band hero and framed photo (off `legal.css`, which /privacy,
- * /terms and /returns still use) — see careers.css.
+ * /terms and /returns still use) — see careers.css. The art pass: the crew is
+ * the three stores' monsters lined up in the hero, the photo is the Hollywood
+ * mural wall, and each store gets a tile in its own monster's colour.
  */
 export default function CareersPage() {
   return (
@@ -44,13 +52,6 @@ export default function CareersPage() {
 
       <section className="cne-cr-hero" aria-labelledby="cr-h1">
         <div className="cne-halftone" aria-hidden="true" />
-        <Monster
-          species="classic"
-          bodyColor="#b6e01f"
-          irisColor="#e63027"
-          size={42}
-          className="cne-cr-mascot"
-        />
         <div className="cne-cr-hero-in">
           <p className="cne-cr-eyebrow">Careers</p>
           <h1 id="cr-h1">Join the crew.</h1>
@@ -59,6 +60,23 @@ export default function CareersPage() {
             more kitchens, more people.
           </p>
         </div>
+        {/* The crew: one monster per store, in the store's own colour, asleep
+            until that store has an opening date. */}
+        <ul className="cne-cr-crew" aria-hidden="true">
+          {locations.map((l) => {
+            const m = locationMonster(l.id);
+            return (
+              <li key={l.id}>
+                <Monster
+                  species={l.isOpen || l.openingAnnouncement ? "classic" : "classic-sleep"}
+                  bodyColor={m.body}
+                  irisColor={m.iris}
+                  size={96}
+                />
+              </li>
+            );
+          })}
+        </ul>
       </section>
       {/* Idea 3: paint drips off the hero's own red. */}
       <DripEdge color="var(--a-red-cta)" seed={2} />
@@ -67,31 +85,18 @@ export default function CareersPage() {
         <div className="cne-cr-photo cne-rv">
           {/* This is the LCP element on phones, so it ships eagerly and at high
               priority — unlike the gallery photos elsewhere on the site, which are
-              genuinely below the fold. The JPEG stays the `<img src>` fallback
-              because `JsonLd.tsx` references that exact URL for structured data;
-              `sizes` is measured from `.cne-cr-photo` in careers.css. Regenerate the
-              AVIF/WebP cuts with `node scripts/build-photo-cuts.mjs` if the source
-              photo changes. */}
-          <picture>
-            <source
-              type="image/avif"
-              srcSet="/photos/double-16x9-480.avif 480w, /photos/double-16x9-720.avif 720w, /photos/double-16x9-900.avif 900w"
-              sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
-            />
-            <source
-              type="image/webp"
-              srcSet="/photos/double-16x9-480.webp 480w, /photos/double-16x9-720.webp 720w, /photos/double-16x9-900.webp 900w"
-              sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
-            />
-            <img
-              src="/photos/double-16x9.jpg"
-              alt=""
-              width={900}
-              height={506}
-              fetchPriority="high"
-              decoding="async"
-            />
-          </picture>
+              genuinely below the fold. `sizes` is measured from `.cne-cr-photo`
+              in careers.css. Regenerate the cuts with `pnpm images:art` if the
+              source photo changes. */}
+          <ArtPhoto
+            name="hollywood-wall"
+            widths={[480, 720, 900]}
+            width={900}
+            height={506}
+            sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
+            alt="The dining room wall at Chris N Eddy's Hollywood: grinning one-eyed monsters, checkerboards, bullseyes and Sliders tags painted over the tables."
+            priority
+          />
         </div>
 
         <div className="cne-cr-pitch cne-rv">
@@ -106,8 +111,45 @@ export default function CareersPage() {
           </p>
         </div>
 
+        <section className="cne-cr-stores cne-rv" aria-labelledby="cr-stores">
+          <h2 id="cr-stores">Our locations</h2>
+          <ul>
+            {locations.map((l) => {
+              const m = locationMonster(l.id);
+              return (
+                <li key={l.id}>
+                  <Link
+                    prefetch={false}
+                    href={`/locations/${slugFor(l)}/`}
+                    className={`cne-cr-store ${l.isOpen ? "is-live" : "is-soon"}`}
+                  >
+                    <Monster
+                      species={l.isOpen || l.openingAnnouncement ? "classic" : "classic-sleep"}
+                      bodyColor={m.body}
+                      irisColor={m.iris}
+                      size={48}
+                    />
+                    <span className="cne-cr-store-name">{l.neighbourhood}</span>
+                    {/* The store's own static status line ("Open daily"), not the
+                        live clock: this page has no other client code, and it
+                        is a jobs page, not a place to check the hours. */}
+                    <span className="cne-cr-store-note">{l.status}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
         <section className="cne-cr-roles cne-rv" aria-labelledby="cr-roles">
           <div className="cne-cr-card">
+            <MascotDecor
+              kind="bullseye"
+              colorA="#1a1612"
+              colorB="#fff2c9"
+              size={84}
+              className="cne-cr-card-eye"
+            />
             <p className="cne-cr-card-eyebrow">Open roles &middot; live on Indeed</p>
             <h2 id="cr-roles">See what&rsquo;s hiring right now.</h2>
             <p>

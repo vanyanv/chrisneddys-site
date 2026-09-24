@@ -59,11 +59,33 @@
   color: #fff2c9;
 }
 
-.cne-cr-mascot {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 1;
+/* The crew: the three stores' monsters in a row along the bottom of the hero
+   (under the lede on phones, standing at the right edge from 901px). */
+.cne-cr-crew {
+  position: relative;
+  z-index: 2;
+  list-style: none;
+  display: flex;
+  gap: 4px;
+  margin: 18px 0 -4px;
+  padding: 0;
+}
+.cne-cr-crew li {
+  line-height: 0;
+  filter: drop-shadow(3px 3px 0 var(--a-ink));
+}
+.cne-cr-crew svg {
+  width: 60px;
+  height: 60px;
+}
+.cne-cr-crew li:nth-child(1) {
+  transform: rotate(-8deg);
+}
+.cne-cr-crew li:nth-child(2) {
+  transform: translateY(-6px) rotate(4deg);
+}
+.cne-cr-crew li:nth-child(3) {
+  transform: rotate(10deg);
 }
 
 /* ---- framed photo ----------------------------------------------------------- */
@@ -97,16 +119,95 @@
   margin: 0 0 14px;
 }
 
+/* ---- the stores ------------------------------------------------------------ */
+.cne-cr-stores {
+  padding: 18px 15px 18px;
+}
+.cne-cr-stores h2 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--a-red-cta);
+  margin: 0 0 10px;
+  padding: 0;
+}
+.cne-cr-stores h2::after {
+  content: none;
+}
+.cne-cr-stores ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.cne-cr-store {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 12px 6px 10px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--a-ink);
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 3px 3px 0 var(--a-ink);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.cne-cr-store.is-live {
+  background: var(--a-cream);
+}
+.cne-cr-store.is-soon {
+  border-style: dashed;
+  box-shadow: none;
+}
+.cne-cr-store:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
+.cne-cr-store-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.cne-cr-store-note {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+
 /* ---- open roles card ---------------------------------------------------- */
 .cne-cr-roles {
   padding: 8px 15px 4px;
 }
 
 .cne-cr-card {
+  position: relative;
+  overflow: hidden;
   background: var(--a-cream);
   border: 2.5px solid var(--a-ink);
   box-shadow: 4px 4px 0 var(--a-shadow);
   padding: 18px 20px;
+}
+
+/* The mural's bullseye, half off the card's top right corner. */
+.cne-cr-card-eye {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  pointer-events: none;
 }
 
 .cne-cr-card-eyebrow {
@@ -117,6 +218,7 @@
   text-transform: uppercase;
   color: var(--a-red-cta);
   margin: 0 0 8px;
+  padding-right: 56px;
 }
 
 .cne-cr-card h2 {
@@ -159,9 +261,67 @@
     font-size: 17px;
   }
 
-  .cne-cr-mascot {
-    top: 24px;
-    right: 34px;
+  .cne-cr-hero-in {
+    padding-right: 360px;
+  }
+
+  .cne-cr-crew {
+    position: absolute;
+    right: 44px;
+    bottom: -8px;
+    margin: 0;
+    gap: 10px;
+  }
+
+  .cne-cr-crew svg {
+    width: 104px;
+    height: 104px;
+  }
+
+  .cne-cr-stores {
+    padding: 34px 44px 22px;
+  }
+
+  .cne-cr-stores h2 {
+    font-size: 12px;
+  }
+
+  .cne-cr-stores ul {
+    gap: 18px;
+  }
+
+  .cne-cr-store {
+    padding: 18px 10px 16px;
+    box-shadow: 4px 4px 0 var(--a-ink);
+  }
+
+  .cne-cr-store:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--a-ink);
+  }
+
+  .cne-cr-store.is-soon:hover {
+    box-shadow: none;
+  }
+
+  .cne-cr-store svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .cne-cr-store-name {
+    font-size: 17px;
+  }
+
+  .cne-cr-store-note {
+    font-size: 10px;
+  }
+
+  .cne-cr-card-eye {
+    width: 120px;
+    height: 120px;
+    top: -42px;
+    right: -42px;
   }
 
   .cne-cr-photo {

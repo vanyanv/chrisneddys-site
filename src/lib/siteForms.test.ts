@@ -73,11 +73,16 @@ describe("sendContactMessage", () => {
     expect(url).toBe("https://api.resend.com/emails");
     const payload = JSON.parse(init.body);
     expect(payload.to).toBe(brand.email);
-    expect(payload.from).toBe("Chris N Eddy's <hello@chrisneddys.com>");
+    // Its own sender on the same domain, so form mail stands apart from orders.
+    expect(payload.from).toBe("Chris N Eddy's Website <website@chrisneddys.com>");
     expect(payload.reply_to).toBe("delivered@resend.dev");
     expect(payload.subject).toBe("[Catering & events] Sam Rivera — chrisneddys.com");
     expect(payload.text).toContain("Forty sliders for a birthday on the 12th?");
-    expect(payload.text).toContain("Phone: —");
+    expect(payload.text).toContain("Phone: not given");
+    expect(payload.html).toContain("REPLY TO SAM");
+    expect(payload.html).toContain(
+      "mailto:delivered@resend.dev?subject=Re%3A%20Catering%20%26%20events",
+    );
   });
 
   it("escapes what the visitor typed in the HTML body and keeps the subject on one line", async () => {

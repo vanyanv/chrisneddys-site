@@ -321,6 +321,16 @@
   border: 2.5px dashed var(--a-ink);
   padding: 20px 15px 18px;
 }
+.cne-notify-email {
+  font-size: 14px;
+}
+/* iOS zooms the page into a text box under 16px on tap, in every iPhone
+   browser; iPhone and iPad only (see the same rule in admin.css). */
+@supports (-webkit-touch-callout: none) {
+  .cne-notify-email {
+    font-size: 16px;
+  }
+}
 .cne-lp-notify-mon {
   position: absolute;
   top: -26px;

@@ -5,6 +5,7 @@ import {
   imageThumbSrc,
   needsAltText,
   shopperAlt,
+  thumbStripSrcSet,
 } from "./productImage";
 
 const seeded = { src: "front", urlFull: null, urlThumb: null };
@@ -64,5 +65,55 @@ describe("shopperAlt", () => {
   it("keeps the owner's own alt text", () => {
     expect(shopperAlt("Front of the blue hat", "Foam Trucker")).toBe("Front of the blue hat");
     expect(needsAltText("Front of the blue hat")).toBe(false);
+  });
+});
+
+describe("thumbStripSrcSet", () => {
+  const base = "/shop/foam-trucker-blue/front";
+  const thumbSrc = `${base}-thumb.webp`;
+  const fullSrc = `${base}.webp`;
+
+  it("offers the repo photography's own -mid.webp cut in the strip", () => {
+    expect(thumbStripSrcSet({ thumb: true, base, thumbSrc, fullSrc })).toBe(
+      `${thumbSrc} 200w, ${base}-mid.webp 400w, ${fullSrc} 720w`,
+    );
+  });
+
+  it("offers an upload's stored midUrl in the strip when one was saved", () => {
+    const url = "https://x.public.blob.vercel-storage.com/a.webp";
+    const uploadedThumbSrc = "https://x.public.blob.vercel-storage.com/a-thumb.webp";
+    const midUrl = "https://x.public.blob.vercel-storage.com/a-mid.webp";
+    expect(
+      thumbStripSrcSet({
+        thumb: true,
+        base,
+        thumbSrc: uploadedThumbSrc,
+        fullSrc: url,
+        url,
+        thumbUrl: uploadedThumbSrc,
+        midUrl,
+      }),
+    ).toBe(`${uploadedThumbSrc} 200w, ${midUrl} 400w, ${url} 720w`);
+  });
+
+  it("falls back to the plain 200w/720w pair for an upload with no midUrl (no backfill)", () => {
+    const url = "https://x.public.blob.vercel-storage.com/a.webp";
+    const uploadedThumbSrc = "https://x.public.blob.vercel-storage.com/a-thumb.webp";
+    expect(
+      thumbStripSrcSet({
+        thumb: true,
+        base,
+        thumbSrc: uploadedThumbSrc,
+        fullSrc: url,
+        url,
+        thumbUrl: uploadedThumbSrc,
+      }),
+    ).toBe(`${uploadedThumbSrc} 200w, ${url} 720w`);
+  });
+
+  it("uses the plain pair outside the thumbnail strip regardless of what's available", () => {
+    expect(thumbStripSrcSet({ thumb: false, base, thumbSrc, fullSrc })).toBe(
+      `${thumbSrc} 200w, ${fullSrc} 720w`,
+    );
   });
 });

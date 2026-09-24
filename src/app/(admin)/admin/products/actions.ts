@@ -476,6 +476,7 @@ export async function addImageAction(input: {
   label: string;
   alt: string;
   urlFull: string;
+  urlMid?: string;
   urlThumb: string;
   width: number;
   height: number;

@@ -56,9 +56,19 @@ export type MerchView = {
    * `url`/`thumbUrl` are set instead of (never alongside a meaningful) `src`
    * for an image uploaded through /admin — a full Vercel Blob URL for each
    * cut. `ProductShot` prefers these over the `photoDir`-relative path when
-   * present.
+   * present. `midUrl` is the 400px-wide cut (issue #151) — present for an
+   * image uploaded since that shipped, `undefined` for one uploaded before it
+   * (no backfill), in which case `ProductShot`'s thumbnail strip falls back to
+   * its original 200w/720w pair.
    */
-  photo?: { src: string; width: number; height: number; url?: string; thumbUrl?: string };
+  photo?: {
+    src: string;
+    width: number;
+    height: number;
+    url?: string;
+    midUrl?: string;
+    thumbUrl?: string;
+  };
 };
 
 /** A single authenticity-section image: the certificate, or the brim sticker. */

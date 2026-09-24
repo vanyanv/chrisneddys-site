@@ -528,6 +528,47 @@ describe("image add/move/remove", () => {
   });
 });
 
+describe("addImage urlMid (issue #151)", () => {
+  it("stores and surfaces the 400px cut when the caller passes one", async () => {
+    const draft = await createDraft("Mid Cut Product");
+    const img = await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/1.webp",
+      urlMid: "https://example.com/1-mid.webp",
+      urlThumb: "https://example.com/1-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+
+    const admin = await getProductForAdmin(draft.id);
+    const view = admin?.views.find((v) => v.id === img.id);
+    expect(view?.urlMid).toBe("https://example.com/1-mid.webp");
+  });
+
+  it("leaves urlMid null for a caller that doesn't pass one — no backfill of existing uploads", async () => {
+    const draft = await createDraft("No Mid Cut Product");
+    const img = await addImage({
+      productId: draft.id,
+      kind: "view",
+      viewId: crypto.randomUUID(),
+      label: "FRONT",
+      alt: "front view alt text",
+      urlFull: "https://example.com/1.webp",
+      urlThumb: "https://example.com/1-thumb.webp",
+      width: 720,
+      height: 720,
+    });
+
+    const admin = await getProductForAdmin(draft.id);
+    const view = admin?.views.find((v) => v.id === img.id);
+    expect(view?.urlMid).toBeNull();
+  });
+});
+
 describe("reorderProducts", () => {
   it("sets position 0..n-1 for the given order, and the storefront follows it", async () => {
     const a = await createDraft("Reorder Product A");

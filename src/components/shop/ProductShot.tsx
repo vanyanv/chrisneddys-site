@@ -1,5 +1,6 @@
 import { CapArt, type CapView } from "./CapArt";
 import type { MerchProduct, MerchView } from "@/data/merch";
+import { thumbStripSrcSet } from "@/lib/productImage";
 
 /**
  * One product image.
@@ -64,7 +65,7 @@ export function ProductShot({
   }
 
   if (view.photo) {
-    const { src, width, height, url, thumbUrl } = view.photo;
+    const { src, width, height, url, midUrl, thumbUrl } = view.photo;
     const base = `${product.photoDir ?? ""}/${src}`;
     const fullSrc = url ?? `${base}.webp`;
     const thumbSrc = thumbUrl ?? `${base}-thumb.webp`;
@@ -78,12 +79,14 @@ export function ProductShot({
     // and leaving its candidates alone means the photograph a customer
     // actually studies is the same file it has always been.
     //
-    // Only photography built by `scripts/build-shop-images.mjs` has the middle
-    // cut; an image uploaded through /admin is two cuts and nothing else.
-    const midded = thumb && !url && !thumbUrl;
-    const srcSet = midded
-      ? `${thumbSrc} 200w, ${base}-mid.webp 400w, ${fullSrc} 720w`
-      : `${thumbSrc} 200w, ${fullSrc} 720w`;
+    // Repo photography built by `scripts/build-shop-images.mjs` always has the
+    // middle cut. An image uploaded through /admin (issue #151) gets one too
+    // — `POST /api/admin/upload` writes a `-mid` Blob alongside the thumb and
+    // full cuts and stores its URL as `midUrl` — but a row uploaded before
+    // that shipped has no `midUrl` (there is no backfill) and falls back to
+    // the plain 200w/720w pair, same as it always rendered. See
+    // `thumbStripSrcSet` (`src/lib/productImage.ts`) for the three cases.
+    const srcSet = thumbStripSrcSet({ thumb, base, thumbSrc, fullSrc, url, thumbUrl, midUrl });
 
     return (
       <div

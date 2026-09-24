@@ -1124,6 +1124,10 @@ export type AddImageInput = {
   label: string;
   alt: string;
   urlFull: string;
+  /** The 400px-wide cut (issue #151) — optional so existing callers/tests
+   * that don't care about it still type-check; `/api/admin/upload` always
+   * passes one for a new or replaced image. */
+  urlMid?: string;
   urlThumb: string;
   width: number;
   height: number;
@@ -1155,6 +1159,7 @@ export async function addImage(input: AddImageInput): Promise<{ id: string }> {
       height: input.height,
       kind: input.kind,
       urlFull: input.urlFull,
+      urlMid: input.urlMid ?? null,
       urlThumb: input.urlThumb,
     })
     .onConflictDoUpdate({
@@ -1165,6 +1170,7 @@ export async function addImage(input: AddImageInput): Promise<{ id: string }> {
         width: input.width,
         height: input.height,
         urlFull: input.urlFull,
+        urlMid: input.urlMid ?? null,
         urlThumb: input.urlThumb,
         updatedAt: new Date(),
       },
@@ -1391,6 +1397,7 @@ export type AdminProductImage = {
    * Empty for an upload, which carries absolute Blob URLs instead. */
   src: string;
   urlFull: string | null;
+  urlMid: string | null;
   urlThumb: string | null;
   position: number;
 };
@@ -1456,6 +1463,7 @@ export async function getProductForAdmin(id: string): Promise<AdminProduct | und
     alt: img.alt,
     src: img.src,
     urlFull: img.urlFull,
+    urlMid: img.urlMid,
     urlThumb: img.urlThumb,
     position: img.position,
   });

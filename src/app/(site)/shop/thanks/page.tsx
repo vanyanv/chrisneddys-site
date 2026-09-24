@@ -161,11 +161,14 @@ export default async function ThanksPage({
         order={{
           id: order.id,
           number: order.number,
-          value: order.totalCents / 100,
+          value: order.subtotalCents / 100,
+          shipping: order.shippingCents / 100,
+          tax: order.taxCents / 100,
           currency: order.currency,
           items: order.items.map((item) => ({
-            item_id: item.sku,
+            item_id: item.product.slug,
             item_name: item.productName,
+            item_variant: item.sku,
             price: item.unitPriceCents / 100,
             quantity: item.quantity,
           })),

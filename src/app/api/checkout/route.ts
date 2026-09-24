@@ -104,7 +104,22 @@ const EXPIRY_GRACE_MINUTES = 10;
 type CheckoutBody = {
   items: { slug: string; quantity: number }[];
   fulfilment: Fulfilment;
+  ga?: { clientId: string; sessionId?: string };
 };
+
+function parseGa(raw: unknown): CheckoutBody["ga"] {
+  if (!raw || typeof raw !== "object") return undefined;
+  const { clientId, sessionId } = raw as Record<string, unknown>;
+  if (typeof clientId !== "string" || !/^\d{1,12}\.\d{1,12}$/.test(clientId)) return undefined;
+  return {
+    clientId,
+    sessionId:
+      (typeof sessionId === "string" || typeof sessionId === "number") &&
+      /^\d{1,16}$/.test(String(sessionId))
+        ? String(sessionId)
+        : undefined,
+  };
+}
 
 function badRequest(error: string, code?: string): NextResponse {
   return NextResponse.json(code ? { error, code } : { error }, { status: 400 });
@@ -135,7 +150,7 @@ function mergeDuplicateSlugs(
  * Returns `null` (having already responded) on anything malformed. */
 function parseBody(raw: unknown): CheckoutBody | NextResponse {
   if (typeof raw !== "object" || raw === null) return badRequest("Malformed request.");
-  const { items, fulfilment } = raw as Record<string, unknown>;
+  const { items, fulfilment, ga } = raw as Record<string, unknown>;
 
   if (fulfilment !== "ship" && fulfilment !== "pickup") {
     return badRequest("Choose shipping or pickup.");
@@ -157,7 +172,7 @@ function parseBody(raw: unknown): CheckoutBody | NextResponse {
     parsed.push({ slug, quantity: qty });
   }
 
-  return { items: mergeDuplicateSlugs(parsed), fulfilment };
+  return { items: mergeDuplicateSlugs(parsed), fulfilment, ga: parseGa(ga) };
 }
 
 /** Turns a `QuoteLineError` (from `quoteCart` or a race in
@@ -199,7 +214,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const raw = await request.json().catch(() => null);
   const parsed = parseBody(raw);
   if (parsed instanceof NextResponse) return parsed;
-  const { items, fulfilment } = parsed;
+  const { items, fulfilment, ga } = parsed;
 
   // The sweep has to finish before anything below claims stock, but it reads
   // nothing the settings read produces, so the two go out together rather
@@ -269,7 +284,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     invoice_creation: { enabled: true },
     integration_identifier: INTEGRATION_IDENTIFIER,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_EXPIRES_SECONDS,
-    metadata: { orderId: pending.orderId, orderNumber: pending.number, fulfilment },
+    metadata: {
+      orderId: pending.orderId,
+      orderNumber: pending.number,
+      fulfilment,
+      ...(ga ? { gaClientId: ga.clientId, gaSessionId: ga.sessionId ?? "" } : {}),
+    },
     client_reference_id: pending.orderId,
     // The site's own origin, not the hard-coded production domain, so a test
     // checkout on a Vercel preview comes back to that preview. In production

@@ -3,4 +3,4 @@
  * the privacy page and is the `lastmod` the sitemap reports for that URL, so
  * the two cannot disagree about when the terms someone agreed to last moved.
  */
-export const PRIVACY_UPDATED = "2026-09-14";
+export const PRIVACY_UPDATED = "2026-09-24";

@@ -28,3 +28,9 @@ export function shouldTrack(hostname: string, search: string): boolean {
   void search;
   return hostname === "chrisneddys.com" || hostname.endsWith(".chrisneddys.com");
 }
+
+/** Shared by the browser tag, Checkout identity capture, and Measurement Protocol. */
+export const GA_MEASUREMENT_ID = (process.env.NEXT_PUBLIC_GA_ID || "G-9WECB13653").replace(
+  /[^A-Za-z0-9-]/g,
+  "",
+);

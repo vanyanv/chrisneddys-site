@@ -35,6 +35,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  delete process.env.GA4_API_SECRET;
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_fake";
   constructEventMock.mockReset();
   sendOrderConfirmationMock.mockReset();
@@ -132,6 +133,36 @@ function sessionCompletedEvent(
 }
 
 describe("POST /api/stripe/webhook", () => {
+  it("reports a confirmed purchase from the webhook using Checkout's GA identity", async () => {
+    process.env.GA4_API_SECRET = "test-secret";
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      const sessionId = "cs_test_ga_purchase";
+      await pendingOrderWithSession(sessionId);
+      constructEventMock.mockReturnValueOnce(
+        sessionCompletedEvent("evt_ga_purchase", sessionId, {
+          metadata: {
+            fulfilment: "pickup",
+            gaClientId: "123456.987654",
+            gaSessionId: "1234567890",
+          },
+        }),
+      );
+
+      const res = await post("raw-body");
+      expect(res.status).toBe(200);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+      expect(payload.client_id).toBe("123456.987654");
+      expect(payload.events[0].name).toBe("purchase");
+      expect(payload.events[0].params.transaction_id).toMatch(/^CNE-/);
+    } finally {
+      vi.unstubAllGlobals();
+      delete process.env.GA4_API_SECRET;
+    }
+  });
+
   it("400s on a bad signature", async () => {
     constructEventMock.mockImplementationOnce(() => {
       throw new Error("signature mismatch");

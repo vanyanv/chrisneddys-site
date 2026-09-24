@@ -154,6 +154,9 @@ export function GuestCheck(): ReactElement {
       // Fired only once the form is genuinely delivered, not on submit — a
       // conversion that counts attempts counts its own failures as successes.
       track("contact_submit", { topic });
+      if (topic === "Catering & events" || topic === "Partnerships") {
+        track("generate_lead", { topic });
+      }
     } catch {
       setStatus("error");
       setFailure("That didn't go through.");

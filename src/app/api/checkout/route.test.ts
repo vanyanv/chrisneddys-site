@@ -143,6 +143,19 @@ describe("POST /api/checkout — shop paused (issue #43)", () => {
 });
 
 describe("POST /api/checkout — shop open", () => {
+  it("passes only validated GA identifiers through Stripe metadata", async () => {
+    const res = await post({
+      items: [{ slug: SLUG, quantity: 1 }],
+      fulfilment: "pickup",
+      ga: { clientId: "123456.987654", sessionId: "1234567890" },
+    });
+    expect(res.status).toBe(200);
+    expect(createMock.mock.calls[0]![0].metadata).toMatchObject({
+      gaClientId: "123456.987654",
+      gaSessionId: "1234567890",
+    });
+  });
+
   it("sends a Vercel preview's shopper back to that preview, not the live domain", async () => {
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("VERCEL_URL", "chrisneddys-site-git-x.vercel.app");

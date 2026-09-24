@@ -76,7 +76,6 @@ export function Watcher({ className }: { className?: string }) {
         <circle cx={EYE_CX} cy={EYE_CY} r={17} fill="#e63027" stroke="#14110d" strokeWidth={4} />
         <circle cx={EYE_CX} cy={EYE_CY} r={7} fill="#14110d" />
       </g>
-      <circle cx={EYE_CX} cy={EYE_CY} r={33} fill="none" stroke="#14110d" strokeWidth={6} />
     </svg>
   );
 }

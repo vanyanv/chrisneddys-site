@@ -33,7 +33,6 @@ export function LastCall() {
           <circle cx={100} cy={76} r={16} fill="#2e5fd9" stroke="#14110d" strokeWidth={4} />
           <circle cx={100} cy={76} r={7} fill="#14110d" />
         </g>
-        <circle cx={100} cy={76} r={33} fill="none" stroke="#14110d" strokeWidth={6} />
       </svg>
       <i aria-hidden="true" />
       Last call — kitchen closes in {status.minutesLeft} min

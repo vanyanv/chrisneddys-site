@@ -79,7 +79,7 @@ export function MascotDefs() {
             strokeLinejoin="round"
           />
           <g className="cne-eye">
-            <circle cx={100} cy={76} r={33} fill="#fff8e7" stroke="#14110d" strokeWidth={6} />
+            <circle cx={100} cy={76} r={33} fill="#fff8e7" />
             <circle
               cx={100}
               cy={76}
@@ -170,7 +170,7 @@ export function MascotDefs() {
             strokeLinejoin="round"
           />
           <g className="cne-eye">
-            <circle cx={100} cy={78} r={30} fill="#fff8e7" stroke="#14110d" strokeWidth={6} />
+            <circle cx={100} cy={78} r={30} fill="#fff8e7" />
             <circle
               cx={100}
               cy={78}
@@ -222,7 +222,7 @@ export function MascotDefs() {
             strokeLinejoin="round"
           />
           <g className="cne-eye">
-            <circle cx={50} cy={34} r={14} fill="#fff8e7" stroke="#14110d" strokeWidth={3} />
+            <circle cx={50} cy={34} r={14} fill="#fff8e7" />
             <circle cx={50} cy={34} r={7} style={{ fill: "var(--m-iris,#2e5fd9)" }} />
             <circle cx={50} cy={34} r={3} fill="#14110d" />
           </g>

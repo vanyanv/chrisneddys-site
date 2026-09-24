@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import "@/styles/opart-hover.css";
 import { SleepingBadge } from "@/components/storeart/SleepingBadge";
 import { ProductShot } from "./ProductShot";
 import { firstView, type MerchProduct } from "@/data/merch";
@@ -36,10 +35,7 @@ export function ProductGallery({
 
   return (
     <div className="cne-pdp-gal">
-      <div
-        className={`cne-pdp-main cne-opart-hover${soldOut ? " is-soldout" : ""}`}
-        id="cne-pdp-shot"
-      >
+      <div className={`cne-pdp-main${soldOut ? " is-soldout" : ""}`} id="cne-pdp-shot">
         {soldOut && <span className="cne-pdp-gone">All gone</span>}
         {/* A finished run gets the sleeping badge (idea 11) in the corner;
             one still in stock gets no corner mark. */}

@@ -23,6 +23,7 @@ import {
   editions,
   orderItems,
   orders,
+  products,
   storeSettings,
   stripeEvents,
   variants,
@@ -1047,12 +1048,15 @@ export async function releaseExpiredReservations(now: Date = new Date(), db?: Db
 // ---------------------------------------------------------------------------
 
 export type OrderWithItems = typeof orders.$inferSelect & {
-  items: (typeof orderItems.$inferSelect)[];
+  items: (typeof orderItems.$inferSelect & { product: typeof products.$inferSelect })[];
 };
 
 export async function getOrder(id: string, db?: Db): Promise<OrderWithItems | undefined> {
   const database = await resolveDb(db);
-  return database.query.orders.findFirst({ where: eq(orders.id, id), with: { items: true } });
+  return database.query.orders.findFirst({
+    where: eq(orders.id, id),
+    with: { items: { with: { product: true } } },
+  });
 }
 
 export async function getOrderBySessionId(
@@ -1062,7 +1066,7 @@ export async function getOrderBySessionId(
   const database = await resolveDb(db);
   return database.query.orders.findFirst({
     where: eq(orders.stripeCheckoutSessionId, sessionId),
-    with: { items: true },
+    with: { items: { with: { product: true } } },
   });
 }
 
@@ -1075,7 +1079,7 @@ export async function getOrderByNumberAndEmail(
   const database = await resolveDb(db);
   return database.query.orders.findFirst({
     where: and(eq(orders.number, number), sql`lower(${orders.email}) = lower(${email})`),
-    with: { items: true },
+    with: { items: { with: { product: true } } },
   });
 }
 
@@ -1357,6 +1361,6 @@ export async function getOrderByPaymentIntentId(
   const database = await resolveDb(db);
   return database.query.orders.findFirst({
     where: eq(orders.stripePaymentIntentId, paymentIntentId),
-    with: { items: true },
+    with: { items: { with: { product: true } } },
   });
 }

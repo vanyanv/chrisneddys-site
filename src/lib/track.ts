@@ -6,8 +6,9 @@
  * from "tapped ORDER in the hero" — a distinction GA4's own outbound-click
  * measurement cannot make, because both go to the same URL.
  *
- * Every event here is an *intent* signal except `contact_submit` and
- * `notify_signup`. For the menu, the sale happens on Otter, on a domain this
+ * Menu and outbound click events are *intent* signals. Completed contact and
+ * opening-list submissions, qualified leads, and paid merch purchases are
+ * outcomes. For the menu, the sale happens on Otter, on a domain this
  * tag cannot reach — naming those events `*_click` rather than `conversion`
  * is deliberate, so the number people report can't be mistaken for revenue.
  * `begin_checkout` is the shop's own exception: once `STRIPE_SECRET_KEY` and
@@ -22,6 +23,7 @@ type Primitive = string | number | boolean | undefined;
 export type TrackItem = {
   item_id: string;
   item_name: string;
+  item_variant?: string;
   price: number;
   quantity: number;
 };
@@ -34,6 +36,8 @@ export type TrackEvent =
   | "order_click"
   /** Left for a third-party delivery platform. */
   | "delivery_click"
+  /** Left for the catering platform, distinct from individual delivery. */
+  | "catering_click"
   /** Tapped the phone number. */
   | "call_click"
   /** Tapped through to turn-by-turn directions. */
@@ -42,6 +46,8 @@ export type TrackEvent =
   | "menu_item_open"
   /** Sent the guest check on /contact/. */
   | "contact_submit"
+  /** A successful catering or partnership enquiry. */
+  | "generate_lead"
   /** The guest check could not be sent. Carries a reason, never a message. */
   | "contact_error"
   /** Joined the opening list for a store that has not opened yet. */

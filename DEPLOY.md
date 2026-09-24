@@ -329,6 +329,7 @@ and write real data). Locally they go in `.env.local`, which is gitignored.
 | `OPENAI_API_KEY`        | Writing a new product's search-engine fields the moment it is created — the page title, the meta description, the keywords and the share picture's alt text. Get one from the [OpenAI dashboard](https://platform.openai.com/api-keys). Server-side only; it is never sent to a browser | Nothing breaks: the fields are worked out from the product instead, and an owner can still write or rewrite every one of them by hand in the admin |
 | `OPENAI_MODEL`          | Overrides which model writes those fields. The default is a small fast one, which is what four short lines of copy needs; point this at another if you would rather                                                                                                                     | `gpt-5.4-mini` is used                                                                                                                             |
 | `NEXT_PUBLIC_GA_ID`     | Overrides the GA4 measurement ID — see **Analytics before launch**                                                                                                                                                                                                                      | The repo default in `Analytics.tsx` is used                                                                                                        |
+| `GA4_API_SECRET`        | GA4 Measurement Protocol secret for confirmed Stripe purchases from the webhook. Create it under the same GA4 web stream as `NEXT_PUBLIC_GA_ID`. Server-side only; never prefix it with `NEXT_PUBLIC_`                                                                                  | The thank-you page still reports purchases, but a buyer who never returns from Stripe cannot be counted in GA4                                     |
 
 Two traps worth knowing, both of which have already cost an afternoon:
 
@@ -623,16 +624,12 @@ S3 website redirect rules are still live.
 
 ## Analytics before launch
 
-The repo defaults to `G-9WECB13653` (`src/components/shared/Analytics.tsx`,
-overridable with `NEXT_PUBLIC_GA_ID`). The Gatsby site on the domain today
-reports through `GTM-WQF95WC` into a different measurement ID, `G-QBQRJG4LSQ`.
-
-Before the first production build, open **GA4 Admin → Data streams** and settle
-whether those two IDs are two streams of one property or two separate
-properties. If they are separate, shipping the default starts a brand-new
-history on launch day and orphans everything already in the old one — set
-`NEXT_PUBLIC_GA_ID` to the existing ID instead. This is a one-way door: it
-cannot be backfilled after the fact.
+The live site and repo use `G-9WECB13653` by default; `NEXT_PUBLIC_GA_ID`
+overrides it. Confirm that the dashboard property being reviewed contains
+this exact web stream. Create `GA4_API_SECRET` in that stream and set it only
+on the server to report confirmed Stripe purchases when a buyer does not
+return to the site. The thank-you page sends the same transaction ID as a
+browser fallback; GA4 deduplicates purchases by transaction ID.
 
 In the same property, GA4 Enhanced Measurement → "Page changes based on
 browser history events" must stay **ON**. This site's `Analytics.tsx` never
@@ -641,16 +638,28 @@ route change is a `history.pushState` this setting is what turns into a
 `page_view` — turn it off and every SPA navigation after the first stops
 being counted.
 
+In GA4, exclude `checkout.stripe.com` from unwanted referrals. Register the
+event-scoped custom dimensions `surface`, `location`, `platform`, and `topic`
+to use them in standard reports. Mark `purchase` and `generate_lead` as key
+events. Keep `order_click`, `delivery_click`, `catering_click`, and `call_click`
+as intent metrics: each measures a handoff, not a completed food sale or call.
+For completed food orders, use Otter's order reporting by the `utm_source=site`
+and `utm_campaign` values on outbound links; joining those orders to GA4
+sessions would require an Otter data integration.
+
 ---
 
 ## Launch checklist
 
 Ordered so that nothing is measured after the fact.
 
-- [ ] Walk the site on a phone with `?ga_debug=1` and confirm the six events land
-      in GA4 DebugView: `order_click`, `delivery_click`, `call_click`,
-      `directions_click`, `menu_item_open`, `contact_submit`.
-- [ ] In GA4, mark `order_click`, `delivery_click` and `call_click` as key events.
+- [ ] Walk the site with `?ga_debug=1` and confirm `page_view` fires once per
+      navigation, plus `order_click`, `delivery_click`, `catering_click`,
+      `call_click`, `directions_click`, `menu_item_open`, `contact_submit`,
+      `generate_lead` (for catering or partnership enquiries), and `notify_signup`.
+- [ ] With a Stripe test payment, confirm one `purchase` per transaction ID,
+      with matching item IDs from `view_item`, merchandise `value`, `shipping`,
+      and `tax`. Check a buyer who closes Checkout without returning to the site.
 - [ ] `pnpm check:links`, and open the two bot-blocked delivery URLs by hand.
 - [ ] Run the `curl` checks in **Vercel → After the switch**: apex → www,
       `/menu` → `/menu/`, and an unknown path → `404`.

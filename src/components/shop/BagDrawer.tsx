@@ -6,6 +6,7 @@ import { CapArt } from "./CapArt";
 import { bagSubtotal, closeBag, removeFromBag, setBagQty, useBag, type BagLine } from "./bagStore";
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
+import { getGaIdentity } from "@/lib/gaIdentity";
 import { Monster } from "@/components/mascots/Monster";
 
 /** How long the remove animation runs before the line actually leaves the store. */
@@ -148,6 +149,7 @@ export function BagDrawer({
 
     const items: TrackItem[] = lines.map(lineItem);
     track("begin_checkout", { currency: "USD", value: bagSubtotal(lines), items });
+    const ga = await getGaIdentity();
 
     try {
       const res = await fetch("/api/checkout", {
@@ -156,6 +158,7 @@ export function BagDrawer({
         body: JSON.stringify({
           items: lines.map((line) => ({ slug: line.slug, quantity: line.qty })),
           fulfilment,
+          ga,
         }),
       });
 

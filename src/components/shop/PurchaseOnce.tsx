@@ -8,6 +8,8 @@ export type PurchaseOrder = {
   id: string;
   number: string;
   value: number;
+  shipping: number;
+  tax: number;
   currency: string;
   items: TrackItem[];
 };
@@ -43,6 +45,8 @@ export function PurchaseOnce({ order }: { order: PurchaseOrder }) {
     track("purchase", {
       transaction_id: order.number,
       value: order.value,
+      shipping: order.shipping,
+      tax: order.tax,
       currency: order.currency.toUpperCase(),
       items: order.items,
     });

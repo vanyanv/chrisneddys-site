@@ -44,6 +44,7 @@ import {
 import type { ShipTo } from "@/db/schema";
 import { sendOrderConfirmation, sendRefundConfirmation } from "@/lib/email";
 import { getStripe } from "@/lib/stripe";
+import { sendConfirmedPurchase } from "@/lib/gaPurchase";
 
 export const runtime = "nodejs";
 
@@ -101,6 +102,16 @@ async function handleSessionPaid(session: Stripe.Checkout.Session): Promise<void
 
   const order = await getOrder(result.orderId);
   if (order) await sendOrderConfirmation(order);
+
+  // Reporting must not hold up a paid order or its confirmation email. The
+  // browser thank-you page remains a fallback when GA4 cannot be reached.
+  if (order) {
+    try {
+      await sendConfirmedPurchase(order, session.metadata);
+    } catch (error) {
+      console.warn(`GA4 purchase reporting failed for ${order.number}`, error);
+    }
+  }
 
   catalogueChanged();
 }

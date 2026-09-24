@@ -31,14 +31,14 @@
  * events `TrackEvents.tsx` sends, which additionally say which surface the
  * click came from.
  */
-import { shouldTrack } from "@/lib/analytics";
+import { GA_MEASUREMENT_ID, shouldTrack } from "@/lib/analytics";
 
 // Sanitised before it ever reaches the template literal below: GA_ID is
 // interpolated straight into an inline `<script>` with no escaping, so an
 // override that somehow carried `</script>` or a stray quote would be a
 // self-inflicted injection. A real measurement ID is only ever letters,
 // digits and hyphens, so anything else is simply dropped.
-const GA_ID = (process.env.NEXT_PUBLIC_GA_ID || "G-9WECB13653").replace(/[^A-Za-z0-9-]/g, "");
+const GA_ID = GA_MEASUREMENT_ID;
 
 // `shouldTrack` (see src/lib/analytics.ts) is serialised into the inline
 // snippet below by `toString()`, so there is exactly one copy of the gating

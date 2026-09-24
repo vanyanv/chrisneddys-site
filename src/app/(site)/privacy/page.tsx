@@ -13,7 +13,7 @@ const description =
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/privacy/" });
 
-const UPDATED_HUMAN = "14 September 2026";
+const UPDATED_HUMAN = "24 September 2026";
 
 /** Re-checked at most once a minute, like the rest of the shop — the support
  * email in the Contact section comes from the same `store_settings` row
@@ -188,16 +188,19 @@ export default async function PrivacyPage() {
           </ul>
           <p>
             Alongside page views, Google Analytics receives a named event when you do one of a fixed
-            set of things: tap an order, delivery, phone or directions link; open an item on the
-            menu; view a product, add one to the bag, or open the bag; send the contact form; or
-            join an opening list. An event carries what was tapped and which part of the page it was
-            tapped from.
+            set of things: tap an order, delivery, catering, phone or directions link; open an item
+            on the menu; view a product, add one to the bag, or open the bag; send the contact form;
+            or join an opening list. When a shop payment is confirmed, Google Analytics also
+            receives the order number, products bought, and the amounts for merchandise, shipping
+            and tax. To connect a payment to the earlier visit, we pass Google Analytics browser and
+            session identifiers through checkout. Events can carry what was tapped and which part of
+            the page it was tapped from.
           </p>
           <p className="cne-lg-note">
-            An analytics event never carries your name, email address, phone number, message or
-            anything from an order. When a form fails, the event says only <em>why</em> — a fixed
-            word like <code>network</code> or <code>rejected</code> — and never what you had typed.
-            This is deliberate and it is enforced in the code, not by policy.
+            An analytics event never carries your name, email address, phone number or message. When
+            a form fails, the event says only <em>why</em> — a fixed word like <code>network</code>{" "}
+            or <code>rejected</code> — and never what you had typed. This is deliberate and it is
+            enforced in the code, not by policy.
           </p>
         </section>
 

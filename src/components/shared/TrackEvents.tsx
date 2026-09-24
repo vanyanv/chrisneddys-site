@@ -5,7 +5,7 @@ import { track, type TrackEvent } from "@/lib/track";
 import { platformByHost } from "@/data/delivery";
 
 /**
- * One delegated listener for every conversion click on the site.
+ * One delegated listener for every commercial outbound click on the site.
  *
  * The alternative is an `onClick` on each of the twenty-odd order, call and
  * directions links, which means every new link is untracked until someone
@@ -77,7 +77,7 @@ export function TrackEvents() {
           // `data-surface` the two were the same column twice. Otter's own
           // report still shows it, which is what it was for.
         } else if (host in platformByHost) {
-          event = "delivery_click";
+          event = platformByHost[host] === "ezcater" ? "catering_click" : "delivery_click";
           props.platform = platformByHost[host];
         } else if (
           host === "www.google.com" ||

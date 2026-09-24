@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "@/styles/shop-index.css";
 import "@/styles/shop-inventory.css";
-import "@/styles/opart-hover.css";
 import "@/styles/shop-art.css";
 import { brand } from "@/data/brand";
 import { TERMS_PENDING, firstView } from "@/data/merch";
@@ -134,7 +133,7 @@ export default async function ShopPage() {
                 data-slug={product.slug}
               >
                 <span className="cne-drop-flag">{line?.soldOut ? "SOLD OUT" : flag}</span>
-                <div className="cne-drop-art cne-opart-hover">
+                <div className="cne-drop-art">
                   {/* A sold-out capsule gets the sleeping badge (idea 11);
                       one still available gets no corner mark. */}
                   {line?.soldOut && <SleepingBadge size={26} />}

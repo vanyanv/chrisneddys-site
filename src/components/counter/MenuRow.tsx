@@ -3,7 +3,6 @@
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
 import { Monster } from "@/components/mascots/Monster";
-import "@/styles/opart-hover.css";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -39,7 +38,7 @@ export function MenuRow({
       onClick={() => onOpen(item)}
       aria-haspopup="dialog"
     >
-      <span className="cne-row-thumb cne-opart-hover" style={{ position: "relative" }}>
+      <span className="cne-row-thumb" style={{ position: "relative" }}>
         {star && (
           <Monster
             species="classic"

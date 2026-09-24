@@ -21,15 +21,27 @@ export const dynamic = "force-static";
 const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 
 /** When the location set — addresses, hours, which locations are open — last moved. */
-const LOCATIONS_UPDATED = "2026-09-23";
-/** When the site's copy and structure last changed. */
-const SITE_UPDATED = "2026-09-23";
+const LOCATIONS_UPDATED = "2026-09-24";
+/**
+ * When each page's own copy or structure last changed. Bump the one you touch:
+ * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
+ */
+const HOME_UPDATED = "2026-09-24";
+const ORDER_UPDATED = "2026-09-23";
+const ABOUT_UPDATED = "2026-09-22";
+const CONTACT_UPDATED = "2026-09-24";
+/**
+ * The /menu/ page's own layout (the Sliders section, merch moved out), which
+ * can change without the prices in `MENU_UPDATED` being re-reconciled.
+ */
+const MENU_PAGE_UPDATED = "2026-09-23";
+const latest = (...isos: string[]): string => isos.sort().at(-1)!;
 /** When /returns and /terms were added. Both also carry the store settings
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
-/** When /careers was added. */
-const CAREERS_ADDED = "2026-09-19";
+/** When /careers last changed (the "Join the crew." redesign). */
+const CAREERS_UPDATED = "2026-09-20";
 
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(foodMenu) as MenuCategoryKey[])
@@ -57,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       path: "/",
       priority: 1.0,
-      updated: SITE_UPDATED,
+      updated: HOME_UPDATED,
       // The files the page actually serves, which is what an image result has
       // to be able to fetch: the `.jpg` originals listed here before are only
       // ever referenced from structured data, and one of them (`fries.jpg`) is
@@ -72,7 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         `${brand.siteUrl}/photos/double.webp`,
       ],
     },
-    { path: "/menu/", priority: 0.9, updated: MENU_UPDATED, images: uniqueMenuImages },
+    {
+      path: "/menu/",
+      priority: 0.9,
+      updated: latest(MENU_UPDATED, MENU_PAGE_UPDATED),
+      images: uniqueMenuImages,
+    },
     // The named-item landing pages. Below /menu/ itself, which is still the
     // page that should rank for "menu" and carries all 31 items.
     ...featuredItems.map((i) => ({
@@ -81,7 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       updated: MENU_UPDATED,
       images: i.photo ? [`${brand.siteUrl}/menu/${i.photo}.webp`] : undefined,
     })),
-    { path: "/order/", priority: 0.9, updated: SITE_UPDATED },
+    { path: "/order/", priority: 0.9, updated: ORDER_UPDATED },
     // The shop is its own funnel: /shop/ is the entry point and each product
     // page is what a search for the product itself should land on, so the
     // product ranks above the index it sits in.
@@ -101,12 +118,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
       updated: LOCATIONS_UPDATED,
     })),
-    { path: "/about/", priority: 0.5, updated: SITE_UPDATED },
-    { path: "/contact/", priority: 0.5, updated: SITE_UPDATED },
+    { path: "/about/", priority: 0.5, updated: ABOUT_UPDATED },
+    { path: "/contact/", priority: 0.5, updated: CONTACT_UPDATED },
     // A page for people, not customers — never the answer to a search someone
     // orders from, so it sits with /about/ and /contact/ rather than up with
     // the menu or the shop.
-    { path: "/careers/", priority: 0.4, updated: CAREERS_ADDED },
+    { path: "/careers/", priority: 0.4, updated: CAREERS_UPDATED },
     // Listed, but at the floor: it is a page that has to be findable and is
     // never the answer to a search. Its own `lastmod` comes from the policy
     // itself, so a crawler is told the terms moved only when they did.

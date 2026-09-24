@@ -141,8 +141,8 @@ function optionalSection(): string {
  */
 export function buildLlmsTxt(products: MerchProduct[]): string {
   const summary =
-    `${brand.name} is a smash-burger location on Sunset Blvd in Hollywood, Los Angeles ` +
-    `(${brand.tagline}). The signature order is the slider: two smashed patties, two ` +
+    `${brand.name} is a Los Angeles smash-burger restaurant (${brand.tagline}), open now ` +
+    `on Sunset Blvd in Hollywood. The signature order is the slider: two smashed patties, two ` +
     `slices of cheese, a buttered Martin's roll, every topping free. Order pickup direct ` +
     `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. Van Nuys ` +
     `has its grand opening Friday, Sept 25 at 6 PM; Glendale is opening soon.`;

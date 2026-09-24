@@ -5,7 +5,7 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
-import { ID } from "@/lib/seo";
+import { ID, SITE_DESCRIPTION } from "@/lib/seo";
 
 /** One `<script type="application/ld+json">`, escaped the way Next does it. */
 export function JsonLdScript({ data }: { data: object }): ReactElement {
@@ -196,8 +196,7 @@ export function JsonLd(): ReactElement {
       height: 512,
     },
     image: RESTAURANT_IMAGES,
-    description:
-      "Smash burger sliders from a Hollywood location — two patties, two slices of cheese, a buttered Martin's potato roll, every topping free.",
+    description: SITE_DESCRIPTION,
     slogan: brand.tagline,
     // The listings that already carry the reviews, photos and menus search
     // engines use to reconcile "Chris N Eddy's" into one entity. Without these

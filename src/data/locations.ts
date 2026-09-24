@@ -23,6 +23,13 @@ export type Location = {
   /** Public launch copy shown before a dated opening; absent for an undated store. */
   openingAnnouncement?: string;
   /**
+   * When a store that has not opened yet starts showing its hours on its own
+   * page (ISO time with the LA offset). Before then the page shows only the
+   * opening announcement. Owner's call 2026-09-24: Van Nuys shows its hours
+   * from the start of its opening day.
+   */
+  showHoursFrom?: string;
+  /**
    * Present once this store has its own Otter pickup storefront. The ORDER
    * button and structured OrderAction are still gated by `isOpen`, so a URL
    * can be staged before launch without inviting premature orders.
@@ -96,6 +103,7 @@ export const locations: Location[] = [
     status: "Grand opening Friday, Sept 25 at 6 PM",
     isOpen: false,
     openingAnnouncement: "Grand opening Friday, Sept 25 at 6 PM",
+    showHoursFrom: "2026-09-25T00:00:00-07:00",
     phone: "(818) 208-9315",
     phoneTel: "+18182089315",
     orderUrl:

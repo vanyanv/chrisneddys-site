@@ -6,6 +6,7 @@ import { withUtm } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { LiveOpenLabel } from "@/components/shared/LiveOpenLabel";
+import { FromDate } from "@/components/shared/FromDate";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 import { locationMonster } from "@/components/locations/locationArt";
@@ -36,6 +37,19 @@ const MURALS = [
     alt: "The blacklight hallway: a lime one-eyed monster painted over the door, walls covered in neon numbers, dots and starbursts.",
   },
 ];
+
+function HoursBox({ loc }: { loc: Location }) {
+  return (
+    <dl className="cne-lp-hrs">
+      {loc.hours.map(([day, hrs]) => (
+        <div key={day}>
+          <dt>{day}</dt>
+          <dd>{hrs}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
 /**
  * One store's page. Beyond ranking for the neighbourhood, this is the page
@@ -86,19 +100,20 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
           {!loc.isOpen && loc.openingAnnouncement && (
             <p className="cne-lp-ticket">{loc.openingAnnouncement}</p>
           )}
-          {/* A store with an opening date shows its hours already, the same
-              box as an open one, so the page is ready the day the doors open
-              (Van Nuys, owner's call 2026-09-24). An undated store's `hours`
-              is only a "Date to be announced" placeholder, so it waits. */}
-          {(loc.isOpen || loc.openingAnnouncement) && (
-            <dl className="cne-lp-hrs">
-              {loc.hours.map(([day, hrs]) => (
-                <div key={day}>
-                  <dt>{day}</dt>
-                  <dd>{hrs}</dd>
-                </div>
-              ))}
-            </dl>
+          {loc.isOpen ? (
+            <HoursBox loc={loc} />
+          ) : (
+            // A store opening on a set day shows its hours from that day
+            // (`showHoursFrom`), with no deploy needed. An undated store's
+            // `hours` is only a "Date to be announced" placeholder, so it waits.
+            loc.showHoursFrom && (
+              <FromDate
+                at={loc.showHoursFrom}
+                initial={Date.now() >= Date.parse(loc.showHoursFrom)}
+              >
+                <HoursBox loc={loc} />
+              </FromDate>
+            )
           )}
 
           <div className="cne-lp-btns">

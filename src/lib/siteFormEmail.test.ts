@@ -53,9 +53,28 @@ describe("contactEmail", () => {
       AT,
     );
     expect(html).not.toContain("<script>");
-    expect(html).not.toContain("<img");
+    expect(html).not.toContain("<img src=x");
     expect(html).toContain("&lt;script&gt;");
     expect(subject).not.toMatch(/[\r\n]/);
+  });
+});
+
+describe("the store art", () => {
+  it("shows a monster in the topic's colour, hosted on the site", () => {
+    expect(contactEmail(base, AT).html).toContain(
+      'src="https://www.chrisneddys.com/email/monster-yellow.png"',
+    );
+    expect(contactEmail({ ...base, topic: "Order issue" }, AT).html).toContain("monster-red.png");
+    expect(
+      openingListEmail({ email: "delivered@resend.dev", hood: "Van Nuys" }, AT).html,
+    ).toContain("monster-blue.png");
+  });
+
+  it("draws the checkerboard floor as table cells, so it shows with images off", () => {
+    const { html } = contactEmail(base, AT);
+    expect(html).toContain("table-layout:fixed");
+    // Two strips (under the header, at the foot), two rows of 26 squares each.
+    expect(html.match(/"height:9px;/g)?.length).toBe(26 * 2 * 2);
   });
 });
 

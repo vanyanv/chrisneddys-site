@@ -88,8 +88,47 @@ function link(href: string, text: string): string {
   return `<a href="${escapeHtml(href)}" style="color:${INK};text-decoration:underline">${escapeHtml(text)}</a>`;
 }
 
+/** The store's monster colours — the same four the murals, map pins and
+ * vortex use. Each has a PNG in `public/email/`, rendered from the tab-icon
+ * art by `scripts/render-email-monsters.mjs` (email clients don't draw SVG). */
+export type MonsterColour = "blue" | "red" | "yellow" | "lime";
+
+const TOPIC_MONSTER: Record<string, MonsterColour> = {
+  "Catering & events": "yellow",
+  "Press & media": "blue",
+  Partnerships: "lime",
+  "Order issue": "red",
+  "Something else": "blue",
+};
+
+/** Same colour as each location's pin on the map. */
+const HOOD_MONSTER: Record<string, MonsterColour> = {
+  Hollywood: "red",
+  Glendale: "yellow",
+  "Van Nuys": "blue",
+};
+
+function monsterImg(colour: MonsterColour): string {
+  // Decorative: empty alt, so a client that blocks images shows nothing
+  // rather than a broken-image box with a caption.
+  return `<img src="${brand.siteUrl}/email/monster-${colour}.png" width="72" height="72" alt="" style="display:block;width:72px;height:72px;border:0">`;
+}
+
+/** Two rows of ink-and-cream squares, the floor at the Hollywood location.
+ * Plain table cells rather than an image, so it shows even with images off. */
+function checkerStrip(): string {
+  const cells = (offset: number) =>
+    Array.from(
+      { length: 26 },
+      (_, i) =>
+        `<td style="height:9px;line-height:9px;font-size:0;background:${(i + offset) % 2 ? CREAM : INK}">&nbsp;</td>`,
+    ).join("");
+  return `<tr><td style="padding:0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed"><tr>${cells(0)}</tr><tr>${cells(1)}</tr></table></td></tr>`;
+}
+
 function shell(opts: {
   label: string;
+  monster: MonsterColour;
   urgent: boolean;
   heading: string;
   stamp: string;
@@ -116,16 +155,25 @@ function shell(opts: {
           <td align="right" style="font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${PAPER}">Website</td>
         </tr></table>
       </td></tr>
+      ${checkerStrip()}
       <tr><td style="padding:20px 18px 22px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr><td><span style="display:inline-block;${pill};font-family:${MONO_FONT};font-size:11px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px">${escapeHtml(opts.label)}</span></td></tr>
-          <tr><td style="padding-top:14px"><h1 style="margin:0;font-family:${DISPLAY_FONT};font-weight:bold;font-size:22px;line-height:1.2;color:${INK}">${escapeHtml(opts.heading)}</h1></td></tr>
-          <tr><td style="padding-top:6px;font-family:${MONO_FONT};font-size:11px;letter-spacing:.06em;color:${MUTED}">${escapeHtml(opts.stamp)}</td></tr>
+          <tr><td>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+              <td style="vertical-align:top">
+                <span style="display:inline-block;${pill};font-family:${MONO_FONT};font-size:11px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px">${escapeHtml(opts.label)}</span>
+                <h1 style="margin:14px 0 0;font-family:${DISPLAY_FONT};font-weight:bold;font-size:22px;line-height:1.2;color:${INK}">${escapeHtml(opts.heading)}</h1>
+                <div style="padding-top:6px;font-family:${MONO_FONT};font-size:11px;letter-spacing:.06em;color:${MUTED}">${escapeHtml(opts.stamp)}</div>
+              </td>
+              <td width="72" style="width:72px;vertical-align:top;padding-left:12px">${monsterImg(opts.monster)}</td>
+            </tr></table>
+          </td></tr>
           ${opts.bodyHtml}
           ${buttons}
           <tr><td style="padding-top:16px;font-family:${BODY_FONT};font-size:12px;line-height:1.6;color:${MUTED};text-align:center">${escapeHtml(opts.note)}</td></tr>
         </table>
       </td></tr>
+      ${checkerStrip()}
     </table>
   </td></tr></table>
 </body>
@@ -173,6 +221,7 @@ export function contactEmail(
 
   const html = shell({
     label: topic,
+    monster: TOPIC_MONSTER[topic] ?? "blue",
     urgent: topic === "Order issue",
     heading: `${name} wrote in.`,
     stamp,
@@ -211,6 +260,7 @@ export function openingListEmail(
 
   const html = shell({
     label: `Opening list · ${hood}`,
+    monster: HOOD_MONSTER[hood] ?? "blue",
     urgent: false,
     heading: `Someone wants to know when ${hood} opens.`,
     stamp,

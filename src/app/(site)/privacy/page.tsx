@@ -101,11 +101,12 @@ export default async function PrivacyPage() {
             <strong>which neighbourhood</strong> you asked about.
           </p>
           <p>
-            Both are delivered by <strong>Web3Forms</strong>, a form-relay service that turns the
-            submission into an email and sends it to us. It is a pass-through: the message lands in
-            our inbox at <a href={`mailto:${brand.email}`}>{brand.email}</a>, and we answer it from
-            there. We keep that correspondence for as long as it is useful to have answered you, and
-            you can ask us to delete it at any time.
+            Both are turned into an email by this site and sent to us through{" "}
+            <strong>Resend</strong>, the service that also sends our order emails. It is a
+            pass-through: the message lands in our inbox at{" "}
+            <a href={`mailto:${brand.email}`}>{brand.email}</a>, and we answer it from there. We
+            keep that correspondence for as long as it is useful to have answered you, and you can
+            ask us to delete it at any time.
           </p>
         </section>
 
@@ -148,7 +149,8 @@ export default async function PrivacyPage() {
               <strong>Neon</strong> — the Postgres database your order is stored in.
             </li>
             <li>
-              <strong>Resend</strong> — sends the order-confirmation and order-status emails.
+              <strong>Resend</strong> — sends the order-confirmation and order-status emails, and
+              delivers the two forms above to our inbox.
             </li>
           </ul>
           <p>

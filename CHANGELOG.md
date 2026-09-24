@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: the contact form and the "Know when Glendale / Van Nuys opens" sign-ups now send through Resend, the same service as the order emails, straight to chris@chrisneddys.com (the address shown on the site). Hitting Reply on one answers the visitor. They start working once Resend can send from the chrisneddys.com domain and the mailbox's email records are back in Vercel's DNS; until then they say so and point to email and phone, like before. One visitor can send five in a quarter hour, which keeps a bot from flooding the inbox. Picking "Order issue" on the contact form now asks for the order number. Web3Forms is no longer used, and the privacy page says Resend instead ([#136](https://github.com/vanyanv/chrisneddys-site/issues/136))
 - Site: Vercel Web Analytics now counts page views too, alongside Google Analytics (which stays exactly as it was). It sets no cookies, and the privacy page now names it. The page views show up under Analytics in the Vercel dashboard once Analytics is turned on for the project there ([#126](https://github.com/vanyanv/chrisneddys-site/issues/126))
 
 ### Changed

@@ -4,33 +4,40 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { track } from "@/lib/track";
-import { HttpError, emailLooksSendable, hasWeb3FormsKey, submitWeb3Form } from "@/lib/web3forms";
+import { sendContactMessage } from "@/lib/siteForms";
+import {
+  CONTACT_TOPICS as TOPICS,
+  EMAIL_MAX,
+  MESSAGE_MAX as MAX,
+  NAME_MAX,
+  PHONE_MAX,
+  emailLooksSendable,
+  type ContactTopic as Topic,
+} from "@/lib/siteFormFields";
 
 /**
  * The contact form, drawn as a diner guest check.
  *
- * The site is a static export, so there is no route on this origin that can
- * receive a POST. Submissions go to Web3Forms instead, which takes a JSON body
- * and mails it on — the access key is public by design and only ever routes to
- * the address it was registered against, so shipping it in the bundle costs
- * nothing. `NEXT_PUBLIC_` is what makes it survive `next build` into the
- * exported HTML; a bare env var would read as undefined in the browser.
+ * Submissions go to the `sendContactMessage` server action, which emails them
+ * through Resend to the address the site shows (`brand.email`) with the
+ * sender's address as reply-to. The fields, caps and topics live in
+ * `siteFormFields.ts` so the server checks exactly what this form offers.
  *
- * Every failure path ends somewhere the sender can still reach us: a missing
- * key, a rejected key and a dead network all fall through to the same mailto.
+ * Every failure path ends somewhere the sender can still reach us: email not
+ * set up, a rejected send and a dead network all fall through to the same
+ * mailto.
  */
 
-const MAX = 1200;
-
-const TOPICS = [
-  "Catering & events",
-  "Press & media",
-  "Partnerships",
-  "Order issue",
-  "Something else",
-] as const;
-
-type Topic = (typeof TOPICS)[number];
+/** The message box's hint follows the chosen topic, so "Order issue" asks for
+ * the one thing that lets us find the order. */
+const HINTS: Record<Topic, string> = {
+  "Catering & events":
+    "Tell us what you need. Dates, headcount and a neighbourhood help us answer in one go.",
+  "Press & media": "Tell us what you need.",
+  Partnerships: "Tell us what you need.",
+  "Order issue": "Your order number and what went wrong.",
+  "Something else": "Tell us what you need.",
+};
 
 type Sent = { ticket: string; stamp: string; name: string; email: string; topic: Topic };
 type Status = "idle" | "sending" | "sent" | "error";
@@ -118,48 +125,39 @@ export function GuestCheck(): ReactElement {
 
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
-    const phone = String(data.get("phone") ?? "").trim();
 
     setStatus("sending");
     setFailure("");
 
-    if (!hasWeb3FormsKey()) {
-      setStatus("error");
-      setFailure("The form isn't wired up yet.");
-      // A key that was never set looks exactly like a form nobody used. The
-      // reason is one of three fixed tokens — never the message, the name, the
-      // email or the phone number.
-      track("contact_error", { topic, reason: "no_key" });
-      return;
-    }
+    // The topic comes from state, not the radio group, so the server sees
+    // exactly what the chips show.
+    data.set("topic", topic);
 
     try {
-      await submitWeb3Form({
-        // What lands in the inbox subject line, pre-sorted by topic.
-        subject: `[${topic}] ${name} — chrisneddys.com`,
-        // Hitting reply in the inbox answers the sender, not the robot.
-        replyto: email,
-        botcheck: String(data.get("botcheck") ?? ""),
-        name,
-        email,
-        phone: phone || "—",
-        topic,
-        message: String(data.get("message") ?? "").trim(),
-      });
+      const result = await sendContactMessage(data);
+      if (!result.ok) {
+        setStatus("error");
+        setFailure(
+          result.reason === "not_configured"
+            ? "The form isn't wired up yet."
+            : result.reason === "throttled"
+              ? "That's a lot of messages in a row."
+              : "That didn't go through.",
+        );
+        // A fixed token, never the message, the name, the email or the phone.
+        track("contact_error", { topic, reason: result.reason });
+        return;
+      }
 
       setSent({ ticket, stamp, name, email, topic });
       setStatus("sent");
       // Fired only once the form is genuinely delivered, not on submit — a
       // conversion that counts attempts counts its own failures as successes.
       track("contact_submit", { topic });
-    } catch (err) {
+    } catch {
       setStatus("error");
       setFailure("That didn't go through.");
-      track("contact_error", {
-        topic,
-        reason:
-          err instanceof HttpError ? (err.rejected ? "rejected" : `http_${err.status}`) : "network",
-      });
+      track("contact_error", { topic, reason: "network" });
     }
   }
 
@@ -248,6 +246,7 @@ export function GuestCheck(): ReactElement {
           label="Name"
           type="text"
           autoComplete="name"
+          maxLength={NAME_MAX}
           placeholder="Who's asking?"
           error={errors.name}
         />
@@ -258,6 +257,7 @@ export function GuestCheck(): ReactElement {
           type="email"
           autoComplete="email"
           inputMode="email"
+          maxLength={EMAIL_MAX}
           placeholder="you@example.com"
           error={errors.email}
         />
@@ -268,6 +268,7 @@ export function GuestCheck(): ReactElement {
           optional
           type="tel"
           autoComplete="tel"
+          maxLength={PHONE_MAX}
           inputMode="tel"
           placeholder="(323) 000-0000"
         />
@@ -302,7 +303,7 @@ export function GuestCheck(): ReactElement {
               maxLength={MAX}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Tell us what you need. Dates, headcount and a neighbourhood help us answer in one go."
+              placeholder={HINTS[topic]}
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errors.message ? id("message-err") : id("message-count")}
             />
@@ -322,7 +323,7 @@ export function GuestCheck(): ReactElement {
           </p>
         </div>
 
-        {/* Web3Forms drops any submission that arrives with this filled in.
+        {/* The server drops any submission that arrives with this filled in.
             Hidden from sight and from the accessibility tree, and skipped by
             the tab order, so only something reading the DOM will fill it. */}
         <input

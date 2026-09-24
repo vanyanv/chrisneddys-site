@@ -5,7 +5,8 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { track } from "@/lib/track";
-import { HttpError, emailLooksSendable, hasWeb3FormsKey, submitWeb3Form } from "@/lib/web3forms";
+import { joinOpeningList } from "@/lib/siteForms";
+import { emailLooksSendable } from "@/lib/siteFormFields";
 
 /**
  * "Tell me when this one opens", on the Glendale and Van Nuys pages.
@@ -19,10 +20,10 @@ import { HttpError, emailLooksSendable, hasWeb3FormsKey, submitWeb3Form } from "
  * rival does: a list of its own customers, reachable without paying a platform
  * for the privilege.
  *
- * Same Web3Forms endpoint as the contact form, because the site is a static
- * export with no server of its own to post to. Without a key the field still
- * renders and validates, and falls through to email — the same failure path
- * the guest check uses.
+ * Sent the same way as the contact form: the `joinOpeningList` server action
+ * emails the signup through Resend to the address the site shows. When email
+ * isn't set up the field still renders and validates, and falls through to
+ * email — the same failure path the guest check uses.
  */
 
 /**
@@ -60,25 +61,21 @@ export function OpeningNotify({ hood }: { hood: string }) {
     setStatus("sending");
 
     const location = slugForHood(hood);
-
-    if (!hasWeb3FormsKey()) {
-      setStatus("error");
-      setError("Not wired up yet — email us instead.");
-      // A form that cannot send is indistinguishable from a form nobody used,
-      // unless it says so. The reason is a fixed token — never the address, and
-      // never the provider's message.
-      track("notify_error", { location, reason: "no_key" });
-      return;
-    }
+    data.set("location", hood);
 
     try {
-      await submitWeb3Form({
-        subject: `[Opening list — ${hood}] ${email}`,
-        replyto: email,
-        botcheck: String(data.get("botcheck") ?? ""),
-        email,
-        location: hood,
-      });
+      const result = await joinOpeningList(data);
+      if (!result.ok) {
+        setStatus("error");
+        setError(
+          result.reason === "not_configured"
+            ? "Not wired up yet — email us instead."
+            : "That didn't go through.",
+        );
+        // A fixed token — never the address, and never the provider's message.
+        track("notify_error", { location, reason: result.reason });
+        return;
+      }
 
       setStatus("sent");
       // Its own event, not `contact_submit`: pre-launch demand for a store that
@@ -86,14 +83,10 @@ export function OpeningNotify({ hood }: { hood: string }) {
       // folding the two together inflated the contact key event while hiding
       // the signup as a metric of its own.
       track("notify_signup", { location });
-    } catch (err) {
+    } catch {
       setStatus("error");
       setError("That didn't go through.");
-      track("notify_error", {
-        location,
-        reason:
-          err instanceof HttpError ? (err.rejected ? "rejected" : `http_${err.status}`) : "network",
-      });
+      track("notify_error", { location, reason: "network" });
     }
   }
 

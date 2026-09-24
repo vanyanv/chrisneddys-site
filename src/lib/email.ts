@@ -369,11 +369,14 @@ export async function sendEmail(
   text: string,
   html?: string,
   replyTo?: string,
+  /** Overrides `EMAIL_FROM` for this one message — it must still be on the
+   * same verified domain. Sending is still gated on `EMAIL_FROM` being set. */
+  fromOverride?: string,
 ): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
+  const configuredFrom = process.env.EMAIL_FROM;
 
-  if (!apiKey || !from) {
+  if (!apiKey || !configuredFrom) {
     console.log(
       `[email] Resend not configured — would have sent "${subject}" to ${to || "(no address)"}`,
     );
@@ -389,7 +392,7 @@ export async function sendEmail(
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from,
+        from: fromOverride || configuredFrom,
         to,
         subject,
         text,

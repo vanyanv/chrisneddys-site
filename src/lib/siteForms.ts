@@ -22,6 +22,7 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { resolveClientIp } from "@/lib/auth";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { contactEmail, openingListEmail, type BuiltEmail } from "@/lib/siteFormEmail";
 import { checkIpThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
 import {
   CONTACT_TOPICS,
@@ -48,10 +49,17 @@ function field(data: FormData, key: string): string {
   return String(data.get(key) ?? "").trim();
 }
 
-/** Subject lines are one line: a newline in a typed name must not reach a
- * mail header. */
-function oneLine(value: string): string {
-  return value.replace(/[\r\n]+/g, " ");
+/**
+ * Form mail comes from its own sender, `Chris N Eddy's Website
+ * <website@…>` on the same domain as `EMAIL_FROM`, so it stands apart from
+ * order mail in the inbox and one mail rule can file it. No mailbox has to
+ * exist at that address: every form email carries the visitor in `reply_to`,
+ * so a reply never goes to it. Falls back to `EMAIL_FROM` as-is when its
+ * domain can't be read off it.
+ */
+function formSender(): string | undefined {
+  const domain = process.env.EMAIL_FROM?.match(/@([^\s>]+)>?\s*$/)?.[1];
+  return domain ? `${brand.name} Website <website@${domain}>` : undefined;
 }
 
 /** True when this IP is already at the cap. Records this send against it
@@ -74,10 +82,17 @@ async function throttled(): Promise<boolean> {
   }
 }
 
-async function deliver(subject: string, text: string, replyTo: string): Promise<SiteFormResult> {
+async function deliver(built: BuiltEmail, replyTo: string): Promise<SiteFormResult> {
   if (!isEmailConfigured()) return { ok: false, reason: "not_configured" };
   if (await throttled()) return { ok: false, reason: "throttled" };
-  const result = await sendEmail(brand.email, subject, text, undefined, replyTo);
+  const result = await sendEmail(
+    brand.email,
+    built.subject,
+    built.text,
+    built.html,
+    replyTo,
+    formSender(),
+  );
   return result.sent ? { ok: true } : { ok: false, reason: "send_failed" };
 }
 
@@ -103,20 +118,7 @@ export async function sendContactMessage(data: FormData): Promise<SiteFormResult
     return { ok: false, reason: "invalid" };
   }
 
-  const text = [
-    "New message from the contact form on chrisneddys.com.",
-    "",
-    `Name:  ${name}`,
-    `Email: ${email}`,
-    `Phone: ${phone || "—"}`,
-    `Topic: ${topic}`,
-    "",
-    message,
-    "",
-    "Reply to this email to answer them.",
-  ].join("\n");
-
-  return deliver(`[${topic}] ${oneLine(name)} — chrisneddys.com`, text, email);
+  return deliver(contactEmail({ name, email, phone, topic, message }), email);
 }
 
 export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
@@ -129,13 +131,5 @@ export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
     return { ok: false, reason: "invalid" };
   }
 
-  const text = [
-    `Someone wants to know when ${hood} opens.`,
-    "",
-    `Email: ${email}`,
-    "",
-    "Reply to this email to reach them.",
-  ].join("\n");
-
-  return deliver(`[Opening list — ${hood}] ${email}`, text, email);
+  return deliver(openingListEmail({ email, hood }), email);
 }

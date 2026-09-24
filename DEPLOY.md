@@ -158,7 +158,9 @@ under **Environment variables** below.
 
 The contact form and the opening-list signups use the same Resend sender
 (`src/lib/siteForms.ts`): each submission is emailed to `brand.email` (the
-address the site shows) with the visitor as reply-to. Two sets of DNS records
+address the site shows) with the visitor as reply-to, from `Chris N Eddy's
+Website <website@…>` on `EMAIL_FROM`'s domain so it can be filtered apart
+from order mail (no mailbox needed at that address). Two sets of DNS records
 have to exist for that mail to arrive, both in Vercel's DNS tab since the
 nameservers moved there: Resend's domain records from resend.com/domains, so
 `EMAIL_FROM` on `@chrisneddys.com` can send at all, and the MX records of

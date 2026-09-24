@@ -12,6 +12,8 @@
  * every piece the visitor typed is escaped before it touches the HTML.
  */
 import { brand } from "@/data/brand";
+import type { Location } from "@/data/locations";
+import { googleDirections } from "@/lib/directions";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
 
@@ -127,6 +129,8 @@ function checkerStrip(): string {
 }
 
 function shell(opts: {
+  /** The small caps word at the right of the black header bar. */
+  tag?: string;
   label: string;
   monster: MonsterColour;
   urgent: boolean;
@@ -152,7 +156,7 @@ function shell(opts: {
       <tr><td style="background:${INK};padding:12px 18px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
           <td style="font-family:${DISPLAY_FONT};font-size:16px;color:${PAPER}">${escapeHtml(brand.name)}</td>
-          <td align="right" style="font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${PAPER}">Website</td>
+          <td align="right" style="font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${PAPER}">${escapeHtml(opts.tag ?? "Website")}</td>
         </tr></table>
       </td></tr>
       ${checkerStrip()}
@@ -267,6 +271,85 @@ export function openingListEmail(
     bodyHtml,
     buttonsHtml: [button(mailtoHref(email, `${brand.name} ${hood}`), "EMAIL THEM", true)],
     note: "Keep this address for the opening announcement.",
+  });
+
+  return { subject, text, html };
+}
+
+/** "Friday, Sept 25 · 6 PM" in Los Angeles time. */
+function laOpening(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).formatToParts(new Date(iso));
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  const month = get("month") === "Sep" ? "Sept" : get("month");
+  const minute = get("minute") === "00" ? "" : `:${get("minute")}`;
+  return `${get("weekday")}, ${month} ${get("day")} · ${get("hour")}${minute} ${get("dayPeriod")}`;
+}
+
+/**
+ * The one email a visitor gets straight back after joining a location's
+ * opening list: when it opens, where, and the hours. Facts from
+ * `src/data/locations.ts` only — a store with no date yet (Glendale) says
+ * the date is to be announced rather than guessing one.
+ */
+export function openingReplyEmail(location: Location): BuiltEmail {
+  const hood = location.neighbourhood;
+  const street = location.address;
+  const cityLine = `${location.city}, ${location.region} ${location.postal}`;
+  const when = location.opensAt ? laOpening(location.opensAt) : null;
+  const heading = when
+    ? `${hood} opens ${when.replace(" · ", " at ")}.`
+    : `You're on the ${hood} list.`;
+  const subject = when
+    ? `${brand.name} ${hood}: grand opening ${when.replace(" · ", " at ")}`
+    : `${brand.name} ${hood}: you're on the list`;
+  const directions = googleDirections(location);
+  const hoursKnown = location.opensAt !== undefined;
+  const note = `You got this because you signed up on chrisneddys.com. It's a one-off, not a newsletter.`;
+
+  const text = [
+    heading,
+    "",
+    `When: ${when ?? "Date to be announced. We'll email you when the doors open."}`,
+    `Where: ${street}, ${cityLine}`,
+    ...(hoursKnown ? ["", "Hours:", ...location.hours.map(([d, h]) => `  ${d}  ${h}`)] : []),
+    "",
+    `Directions: ${directions}`,
+    "",
+    note,
+  ].join("\n");
+
+  const hoursHtml = location.hours
+    .map(([d, h]) => `${escapeHtml(d)}&nbsp;&nbsp;${escapeHtml(h)}`)
+    .join("<br>");
+
+  const bodyHtml = `
+    <tr><td style="padding-top:14px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${detailRow("When", when ? `<strong>${escapeHtml(when)}</strong>` : "Date to be announced. We'll email you when the doors open.")}
+        ${detailRow("Where", `${escapeHtml(street)}<br>${escapeHtml(cityLine)}`)}
+        ${hoursKnown ? detailRow("Hours", hoursHtml) : ""}
+      </table>
+    </td></tr>`;
+
+  const html = shell({
+    tag: hood,
+    label: when ? "Grand opening" : "Opening list",
+    monster: HOOD_MONSTER[hood] ?? "blue",
+    urgent: false,
+    // Keep "6 PM" together when the heading wraps on a phone.
+    heading: heading.replace(/ (AM|PM)\b/, "\u00a0$1"),
+    stamp: `${street}, ${location.city}`,
+    bodyHtml,
+    buttonsHtml: [button(directions, "GET DIRECTIONS", true)],
+    note,
   });
 
   return { subject, text, html };

@@ -143,7 +143,8 @@ describe("sendContactMessage", () => {
       await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" })),
     ).toEqual({ ok: true });
     expect(await sendContactMessage(form(contact))).toEqual({ ok: false, reason: "throttled" });
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    // Five sends counted; the sign-up's reply to the visitor rides on its own.
+    expect(fetchMock).toHaveBeenCalledTimes(6);
 
     ipState.ip = "198.51.100.7";
     expect(await sendContactMessage(form(contact))).toEqual({ ok: true });
@@ -165,6 +166,45 @@ describe("joinOpeningList", () => {
     expect(payload.reply_to).toBe("delivered@resend.dev");
     expect(payload.subject).toBe("[Opening list — Van Nuys] delivered@resend.dev");
     vi.useRealTimers();
+  });
+
+  it("then emails the visitor the opening date, from the store with replies to the inbox", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
+    const fetchMock = mockResend();
+    await joinOpeningList(form({ email: "delivered@resend.dev", location: "Van Nuys" }));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const payload = JSON.parse(fetchMock.mock.calls[1]![1].body);
+    expect(payload.to).toBe("delivered@resend.dev");
+    expect(payload.from).toBe("Chris N Eddy's <hello@chrisneddys.com>");
+    expect(payload.reply_to).toBe(brand.email);
+    expect(payload.subject).toBe("Chris N Eddy's Van Nuys: grand opening Friday, Sept 25 at 6 PM");
+    expect(payload.text).toContain("14523 Sherman Way, Van Nuys, CA 91405");
+    vi.useRealTimers();
+  });
+
+  it("still says ok when only the visitor's copy fails", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("{}", { status: 200 }))
+      .mockResolvedValueOnce(new Response("{}", { status: 422 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(
+      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Van Nuys" })),
+    ).toEqual({ ok: true });
+    err.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("sends the visitor nothing when the owner's copy didn't go", async () => {
+    const fetchMock = mockResend(403);
+    expect(
+      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" })),
+    ).toEqual({ ok: false, reason: "send_failed" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("refuses a location that is already open or doesn't exist", async () => {

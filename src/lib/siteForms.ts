@@ -22,7 +22,12 @@ import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { resolveClientIp } from "@/lib/auth";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
-import { contactEmail, openingListEmail, type BuiltEmail } from "@/lib/siteFormEmail";
+import {
+  contactEmail,
+  openingListEmail,
+  openingReplyEmail,
+  type BuiltEmail,
+} from "@/lib/siteFormEmail";
 import { checkIpThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
 import {
   CONTACT_TOPICS,
@@ -45,8 +50,8 @@ const MAX_SENDS = 5;
  * signup this site asked for. */
 // Read at send time, not once at load: a store that opens stops taking
 // sign-ups at that moment (Van Nuys, `VAN_NUYS_OPENS_AT`).
-function isOpeningHood(hood: string): boolean {
-  return locations.some((l) => !l.isOpen && l.neighbourhood === hood);
+function openingLocation(hood: string) {
+  return locations.find((l) => !l.isOpen && l.neighbourhood === hood);
 }
 
 function field(data: FormData, key: string): string {
@@ -131,9 +136,21 @@ export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
   const email = field(data, "email");
   const hood = field(data, "location");
 
-  if (!emailLooksSendable(email) || email.length > EMAIL_MAX || !isOpeningHood(hood)) {
+  const location = openingLocation(hood);
+  if (!emailLooksSendable(email) || email.length > EMAIL_MAX || !location) {
     return { ok: false, reason: "invalid" };
   }
 
-  return deliver(openingListEmail({ email, hood }), email);
+  const result = await deliver(openingListEmail({ email, hood }), email);
+  if (!result.ok) return result;
+
+  // Then the visitor's own copy: the date, address and hours, straight back.
+  // From the store's usual `EMAIL_FROM` with replies going to the site's
+  // inbox. Only after the owner's copy went (so the throttle has counted
+  // this send), and a failure here is logged, not shown: the sign-up itself
+  // already reached the inbox.
+  const reply = openingReplyEmail(location);
+  const sent = await sendEmail(email, reply.subject, reply.text, reply.html, brand.email);
+  if (!sent.sent) console.error(`[site-form] opening reply to visitor failed: ${sent.reason}`);
+  return result;
 }

@@ -34,7 +34,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // effort 6 + quality ~50 measured at ~51 KB for the 1100w hero cut — the
 // target this ladder exists for (a 402px@3x phone's ~1100 device-px hero
 // slot, previously served the 173 KB 1400w WebP original).
-const AVIF = { quality: 50, effort: 6 };
+//
+// 4:2:0 chroma, as every JPEG and every lossy WebP (including the WebP cuts
+// below) already is: sharp's AVIF default is full 4:4:4 chroma, which a photo
+// does not show and which cost 9-10% more bytes on every hero cut (the 1000w
+// phone crop 44.6 -> 40.6 KB, the 1100w cut 50.6 -> 46.2 KB). Those bytes race
+// the page's fonts and scripts on a slow connection, and the hero photo is
+// the home page's Largest Contentful Paint.
+const AVIF = { quality: 50, effort: 6, chromaSubsampling: "4:2:0" };
 // Matches the quality the existing hero WebP cuts were built at.
 const WEBP = { quality: 82 };
 

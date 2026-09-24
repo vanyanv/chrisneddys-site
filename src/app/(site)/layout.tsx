@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
+import { Bowlby_One, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
@@ -34,10 +34,20 @@ const bowlby = Bowlby_One({
   variable: "--font-bowlby",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+/**
+ * The same latin Inter file next/font/google serves, with its weight axis
+ * pinned to the 400-800 the site actually uses instead of 100-900: 48 KB ->
+ * 37 KB, no visible change. It is preloaded on every page, and on a slow phone
+ * connection it downloads alongside the home hero photo, the page's Largest
+ * Contentful Paint. See scripts/instance-inter-font.sh.
+ */
+const inter = localFont({
+  src: "../../fonts/inter-latin-400-800.woff2",
+  weight: "400 800",
+  style: "normal",
   display: "optional",
+  preload: true,
+  adjustFontFallback: "Arial",
   variable: "--font-inter",
 });
 

@@ -79,6 +79,17 @@ export function BagDrawer({
     return () => cancelAnimationFrame(id);
   }, [open]);
 
+  // Safari (every iPhone browser) keeps the page alive in its back-forward
+  // cache when checkout leaves for Stripe, so Back restores it mid-"TAKING YOU
+  // TO CHECKOUT…" with the button disabled. Nothing is in flight by then.
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setCheckoutPending(false);
+    };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, []);
+
   const dismiss = useCallback(() => {
     closeBag();
     returnFocus.current?.focus?.();

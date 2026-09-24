@@ -1,8 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { orderUrl } from "@/lib/otter";
-import { statusLabel } from "@/lib/hours";
+import { orderUrl, withUtm } from "@/lib/otter";
+import { openingLabel, statusLabel } from "@/lib/hours";
+import { useViewedLocation } from "@/lib/useViewedLocation";
+import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { useStoreStatus } from "@/lib/useStoreStatus";
 import { BiteTeeth } from "@/components/storeart/BiteTeeth";
 
@@ -20,30 +22,46 @@ import { BiteTeeth } from "@/components/storeart/BiteTeeth";
  * price and ADD TO BAG, and two bars fighting over the bottom 60px of a phone
  * means neither gets pressed. Food is still one tap away in the header, which
  * is where it stays on every page — the dock is the extra, not the entry.
+ *
+ * On a store's own page it is that store's dock (issue #153): its name, its
+ * clock, its ORDER — or, before it opens, when it opens and DIRECTIONS.
  */
 export function OrderDock() {
   const pathname = usePathname() ?? "/";
-  const status = useStoreStatus("hollywood");
+  const { loc, onLocationPage } = useViewedLocation();
+  const status = useStoreStatus(loc.id);
 
   if (pathname.startsWith("/shop")) return null;
 
+  const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel(loc);
+
   return (
-    <div className="cne-dock">
+    <div className="cne-dock" data-location={onLocationPage ? loc.id : undefined}>
       <div className="cne-dock-msg">
-        <div className="t">Hollywood</div>
-        <div className="s">{status ? statusLabel(status) : " "}</div>
+        <div className="t">{loc.name}</div>
+        <div className="s">{message}</div>
       </div>
-      <a
-        className="cne-dockbtn"
-        data-surface="dock"
-        href={orderUrl("dock")}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <BiteTeeth position="top" />
-        ORDER →
-        <BiteTeeth position="bottom" />
-      </a>
+      {loc.isOpen ? (
+        <a
+          className="cne-dockbtn"
+          data-surface="dock"
+          href={onLocationPage && loc.orderUrl ? withUtm(loc.orderUrl, "dock") : orderUrl("dock")}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <BiteTeeth position="top" />
+          ORDER →
+          <BiteTeeth position="bottom" />
+        </a>
+      ) : (
+        <span data-surface="dock">
+          <DirectionsLink loc={loc} className="cne-dockbtn">
+            <BiteTeeth position="top" />
+            DIRECTIONS →
+            <BiteTeeth position="bottom" />
+          </DirectionsLink>
+        </span>
+      )}
     </div>
   );
 }

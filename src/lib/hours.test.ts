@@ -3,6 +3,8 @@ import {
   closingSummary,
   hoursSentence,
   losAngelesNow,
+  openingLabel,
+  openingParts,
   orderCtaSubline,
   statusLabel,
   statusParts,
@@ -165,5 +167,32 @@ describe("closingSummary / hoursSentence", () => {
     expect(closingSummary(vannuys)).toBe("");
     expect(hoursSentence(vannuys)).toBe("");
     vi.useRealTimers();
+  });
+});
+
+describe("openingParts / openingLabel", () => {
+  it("says when a dated store opens, in LA time, with the day kept in the value", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
+    expect(openingParts(vannuys)).toEqual({
+      state: { short: "OPENS", rest: "" },
+      time: { lead: "", value: "FRI 6 PM" },
+      aria: "Opens Fri at 6 PM",
+    });
+    expect(openingLabel(vannuys)).toBe("OPENS FRI 6 PM");
+    vi.useRealTimers();
+  });
+
+  it("drops the opening time once the store has opened", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-25T18:00:00-07:00"));
+    expect(vannuys.isOpen).toBe(true);
+    expect(vannuys.opensAt).toBeUndefined();
+    vi.useRealTimers();
+  });
+
+  it("says coming soon for an undated store", () => {
+    expect(openingLabel(glendale)).toBe("COMING SOON");
+    expect(openingParts(glendale).aria).toBe("Coming soon");
   });
 });

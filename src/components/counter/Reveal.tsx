@@ -59,12 +59,15 @@ export function RevealRoot() {
     let queued = false;
     const sweep = () => {
       queued = false;
-      nodes.forEach((n) => {
-        if (n.classList.contains("is-in")) return;
-        if (n.getBoundingClientRect().top < window.innerHeight) {
-          show(n);
-          io.unobserve(n);
-        }
+      // Read every position first, then reveal. Interleaving the two made the
+      // browser redo layout once per section, on every scrolled frame.
+      const fold = window.innerHeight;
+      const due = nodes.filter(
+        (n) => !n.classList.contains("is-in") && n.getBoundingClientRect().top < fold,
+      );
+      due.forEach((n) => {
+        show(n);
+        io.unobserve(n);
       });
     };
     const onScroll = () => {

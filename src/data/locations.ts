@@ -23,6 +23,12 @@ export type Location = {
   /** Public launch copy shown before a dated opening; absent for an undated store. */
   openingAnnouncement?: string;
   /**
+   * When a dated store opens its doors (ISO time with the LA offset). Present
+   * only until then, so the header tag and bottom bar can say "OPENS FRI 6 PM"
+   * on that store's page instead of borrowing Hollywood's clock.
+   */
+  opensAt?: string;
+  /**
    * When a store that has not opened yet starts showing its hours on its own
    * page (ISO time with the LA offset). Before then the page shows only the
    * opening announcement. Owner's call 2026-09-24: Van Nuys shows its hours
@@ -85,6 +91,9 @@ function vanNuys(): Location {
     },
     get openingAnnouncement() {
       return open() ? undefined : VAN_NUYS_ANNOUNCEMENT;
+    },
+    get opensAt() {
+      return open() ? undefined : VAN_NUYS_OPENS_AT;
     },
     // Opening day itself shows the hours from midnight, ahead of the 6 PM
     // doors (owner, 2026-09-24).

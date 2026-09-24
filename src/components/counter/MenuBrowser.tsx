@@ -71,11 +71,7 @@ export function MenuBrowser() {
             <span className="cne-only-phone">
               Every topping is free. Extra cheese +$1, halal +$2.
             </span>
-            <span className="cne-only-desk">
-              Live Hollywood pickup pricing.
-              <br />
-              Extra cheese +$1 · halal +$2.
-            </span>
+            <span className="cne-only-desk">Extra cheese +$1 · halal +$2.</span>
           </p>
         </aside>
 

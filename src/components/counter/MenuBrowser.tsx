@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-import { foodMenu, categoryTitles, featuredItems, type MenuCategoryKey } from "@/data/menu";
-import { formatPrice } from "@/lib/otter";
+import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuSectionChips } from "./MenuSectionChips";
 import { ItemSheet } from "./ItemSheet";
@@ -37,10 +35,14 @@ const CHIP_LABEL: Partial<Record<MenuCategoryKey, string>> = {
  * two-column grid of items. The category label is the same element in both, a
  * mono eyebrow on the phone and a display heading over a rule on desktop.
  *
- * The phone-only chip strip and compact "asked about most" list below are
- * hidden entirely above 901px (`.cne-menu-chipnav`'s own media query,
- * `.cne-only-phone`), so they cost the desktop grid nothing — it still only
- * ever lays out the aside and `.cne-menu-main`.
+ * The phone-only chip strip below is hidden entirely above 901px
+ * (`.cne-menu-chipnav`'s own media query), so it costs the desktop grid
+ * nothing — it still only ever lays out the aside and `.cne-menu-main`.
+ *
+ * A phone goes heading, one line of pricing, section chips, then photos
+ * (issue #155). It used to carry its own "Asked about most" list of six links
+ * here too, repeating rows a thumb-length below; the page's item links live
+ * in its desktop list, which stays in the HTML at every width.
  */
 export function MenuBrowser() {
   const { item, open, way, setWay, openItem, close } = useItemSheet();
@@ -49,14 +51,22 @@ export function MenuBrowser() {
     <>
       <div className="cne-menu">
         <aside className="cne-menu-side cne-sec">
-          <div className="cne-eyebrow" id="cne-way-label">
-            Pick a way — free
+          {/* The Ways lead the desktop rail. A phone gets them in each
+              slider's own sheet instead (issue #155): up here they stood
+              between the heading and the first photo, which started 763px
+              down a 390px-wide phone. */}
+          <div className="cne-only-desk">
+            <div className="cne-eyebrow" id="cne-way-label">
+              Pick a way — free
+            </div>
           </div>
           <h1>Everything we make.</h1>
           {/* The eyebrow above is the group's visible name, so it names the
               group programmatically too rather than being decoration a screen
               reader has to guess the relevance of. */}
-          <WayPicker way={way} onChange={setWay} labelledBy="cne-way-label" />
+          <div className="cne-only-desk">
+            <WayPicker way={way} onChange={setWay} labelledBy="cne-way-label" />
+          </div>
 
           {/* Desktop only — on a phone the chip strip below does this job. */}
           <nav className="cne-menu-jump" aria-label="Menu sections">
@@ -78,26 +88,6 @@ export function MenuBrowser() {
         <MenuSectionChips
           sections={ORDER.map((key) => ({ key, label: CHIP_LABEL[key] ?? categoryTitles[key] }))}
         />
-
-        {/* Compact and near the top on a phone — a scan of the whole menu used
-            to end with this list six screens down, after the thing most people
-            actually came to check. Desktop keeps its own copy at the foot of
-            the item grid, where it always lived. */}
-        <section className="cne-only-phone cne-sec" aria-labelledby="cne-named-top-h">
-          <div className="cne-eyebrow" id="cne-named-top-h">
-            Asked about most
-          </div>
-          <ul className="cne-menu-named">
-            {featuredItems.map((i) => (
-              <li key={i.id}>
-                <Link prefetch={false} href={`/menu/${i.id}/`}>
-                  <span className="n">{i.name}</span>
-                  <span className="p">{formatPrice(i.price)} &rsaquo;</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
 
         <div className="cne-menu-main">
           {ORDER.map((key) => (

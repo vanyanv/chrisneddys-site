@@ -1,6 +1,7 @@
 "use client";
 
-import { statusParts, type StatusParts } from "@/lib/hours";
+import { locations } from "@/data/locations";
+import { openingParts, statusParts, type StatusParts } from "@/lib/hours";
 import { useStoreStatus } from "@/lib/useStoreStatus";
 
 /**
@@ -29,11 +30,22 @@ export function OpenStatus({
   head?: boolean;
 }) {
   const status = useStoreStatus(locationId);
+  // A store that has not opened has no clock to read; it says when it opens.
+  const loc = locations.find((l) => l.id === locationId);
+  const unopened = status?.state === "unknown" && loc && !loc.isOpen;
 
   return (
     <StatusTag
-      parts={status ? statusParts(status) : null}
-      tone={status?.state === "closed" ? "shut" : status?.state === "last-call" ? "last" : "open"}
+      parts={!status ? null : unopened ? openingParts(loc) : statusParts(status)}
+      tone={
+        unopened
+          ? "soon"
+          : status?.state === "closed"
+            ? "shut"
+            : status?.state === "last-call"
+              ? "last"
+              : "open"
+      }
       head={head}
     />
   );
@@ -55,13 +67,20 @@ export function StatusTag({
 }: {
   /** Null until the clock is known. The tag holds its space and stays silent. */
   parts: StatusParts | null;
-  tone?: "open" | "last" | "shut";
+  /** "soon" is a store that has not opened: shut, but its word never drops. */
+  tone?: "open" | "last" | "shut" | "soon";
   head?: boolean;
 }) {
   const cls = [
     "cne-stat",
     head ? "is-head" : "",
-    tone === "shut" ? "is-shut" : tone === "last" ? "is-last" : "",
+    tone === "shut"
+      ? "is-shut"
+      : tone === "soon"
+        ? "is-shut is-soon"
+        : tone === "last"
+          ? "is-last"
+          : "",
   ]
     .filter(Boolean)
     .join(" ");

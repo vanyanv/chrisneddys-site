@@ -37,9 +37,10 @@ export default function MenuPage() {
 
       {/* Crawlable links to the named-item pages. The rows above are buttons
           that open a sheet, so without these the item pages would be in the
-          sitemap and linked from nowhere. Desktop-only: `MenuBrowser` shows
-          its own copy of this list near the top of the page on a phone, so
-          the most-asked-about items aren't the last thing in the scroll. */}
+          sitemap and linked from nowhere. Shown on desktop only; a phone
+          used to get its own copy at the top of the menu, which pushed the
+          first photo below the fold (issue #155). The links stay in the HTML
+          at every width. */}
       <section className="cne-sec cne-rv cne-only-desk" style={{ paddingBottom: 40 }}>
         <div className="cne-eyebrow">Asked about most</div>
         <h2>The ones people name.</h2>

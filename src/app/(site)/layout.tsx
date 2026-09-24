@@ -128,8 +128,15 @@ export function generateMetadata(): Metadata {
   };
 }
 
-/** Mirrors the stagger RevealRoot applies, so the two agree on the first frame. */
-const REVEAL_ABOVE_FOLD = `(function(){try{var n=document.querySelectorAll('.cne-rv'),h=window.innerHeight,i,e;for(i=0;i<n.length;i++){e=n[i];if(e.getBoundingClientRect().top<h){e.style.transitionDelay=(i%4)*60+'ms';e.classList.add('is-in')}}}catch(_){}})()`;
+/**
+ * Mirrors the stagger RevealRoot applies, so the two agree on the first frame.
+ *
+ * Every position is read before any section is touched. Reading one, then
+ * adding `is-in`, then reading the next made the browser lay the whole page
+ * out again for each section: about a quarter of a second of a throttled
+ * phone's main thread, spent while the page was still being parsed.
+ */
+const REVEAL_ABOVE_FOLD = `(function(){try{var n=document.querySelectorAll('.cne-rv'),h=window.innerHeight,t=[],i;for(i=0;i<n.length;i++)t.push(n[i].getBoundingClientRect().top);for(i=0;i<n.length;i++){if(t[i]<h){n[i].style.transitionDelay=(i%4)*60+'ms';n[i].classList.add('is-in')}}}catch(_){}})()`;
 
 export const viewport: Viewport = {
   themeColor: "#E63027",

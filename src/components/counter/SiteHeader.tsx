@@ -6,7 +6,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { brand } from "@/data/brand";
-import { orderUrl } from "@/lib/otter";
+import { orderUrl, withUtm } from "@/lib/otter";
+import { useViewedLocation } from "@/lib/useViewedLocation";
+import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpenStatus } from "@/components/shared/OpenStatus";
 import { BagButton } from "@/components/shop/BagButton";
 import { BiteTeeth } from "@/components/storeart/BiteTeeth";
@@ -60,6 +62,7 @@ export function SiteHeader() {
   const isShop = path.startsWith("/shop/");
   const mobileActiveIndex = MOBILE_TABS.findIndex((t) => t.href === path);
   const [lifted, setLifted] = useState(false);
+  const { loc, onLocationPage } = useViewedLocation();
 
   useEffect(() => {
     const onScroll = () => setLifted(window.scrollY > 8);
@@ -77,25 +80,45 @@ export function SiteHeader() {
               beside it, on the admin's cream (`.cne-header.is-shop`). */}
           {isShop && <span className="cne-logo-tag">STORE</span>}
         </Link>
-        <div className="cne-nav-right">
-          <OpenStatus head />
+        {/* On a store's own page the tag and the button are that store's
+            (issue #153): its clock or its opening, its ORDER or, before it
+            opens, directions to it. Everywhere else they are Hollywood's. */}
+        <div className="cne-nav-right" data-location={onLocationPage ? loc.id : undefined}>
+          <OpenStatus head locationId={loc.id} />
           {/* The bag is additive: it renders nothing at all until there is
               something in it, and it never replaces ORDER ONLINE — that button
               is the food business's front door and it points at Otter. A nav
               control that means different things on different pages is one
               people stop trusting. */}
           <BagButton />
-          <a
-            className="cne-orderbtn"
-            data-surface="header"
-            href={orderUrl("header")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <BiteTeeth position="top" />
-            ORDER<span className="cne-only-desk-i"> ONLINE →</span>
-            <BiteTeeth position="bottom" />
-          </a>
+          {loc.isOpen ? (
+            <a
+              className="cne-orderbtn"
+              data-surface="header"
+              href={
+                onLocationPage && loc.orderUrl
+                  ? withUtm(loc.orderUrl, "header")
+                  : orderUrl("header")
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <BiteTeeth position="top" />
+              ORDER<span className="cne-only-desk-i"> ONLINE →</span>
+              <BiteTeeth position="bottom" />
+            </a>
+          ) : (
+            <span data-surface="header">
+              <DirectionsLink loc={loc} className="cne-orderbtn">
+                <BiteTeeth position="top" />
+                {/* "MAP" on a phone: the header has the width of ORDER to give. */}
+                <span className="cne-only-phone">MAP</span>
+                <span className="cne-dir-word">DIRECTIONS</span>
+                <span className="cne-only-desk-i"> →</span>
+                <BiteTeeth position="bottom" />
+              </DirectionsLink>
+            </span>
+          )}
         </div>
       </div>
 

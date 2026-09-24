@@ -489,7 +489,9 @@ body {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--a-yel-ink);
+  /* Cream, not yellow: yellow on this red is 3.7:1, under the 4.5:1 that
+     text this small needs (issue #154). Cream is the sub-copy's colour. */
+  color: #fff2c9;
 }
 .cne-hero-open-dot {
   width: 6px;
@@ -605,6 +607,12 @@ body {
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
   flex: none;
+  /* A 44px-tall tap area around a 12px link (issue #154). The padding is
+     paid back by an equal negative margin, so the link draws exactly where
+     it did; only the part that takes the tap grows. */
+  display: inline-block;
+  padding: 13px 10px;
+  margin: -13px -10px;
 }
 
 /* The checkerboard seam between the panel and the photo — the store floor,
@@ -2199,6 +2207,29 @@ body {
      so the word it gives up is bought back here. */
   .cne-stat.is-head.is-shut .cne-stat-lead {
     display: inline;
+  }
+  /* A store that has not opened keeps "OPENS": "FRI 6 PM" on its own could
+     be a closing time too (issue #153). The word says what the dot would, so
+     the dot gives up its room instead. */
+  .cne-stat.is-head.is-soon .cne-stat-word {
+    display: inline;
+  }
+  .cne-stat.is-head.is-soon .cne-dot {
+    display: none;
+  }
+  .cne-stat.is-head.is-soon .cne-stat-a {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .cne-stat.is-head.is-soon .cne-stat-b {
+    letter-spacing: 0;
+  }
+}
+@media (max-width: 330px) {
+  .cne-stat.is-head.is-soon .cne-stat-a,
+  .cne-stat.is-head.is-soon .cne-stat-b {
+    padding-left: 3px;
+    padding-right: 3px;
   }
 }
 
@@ -3798,6 +3829,16 @@ h3 {
   }
   .cne-orderbtn .cne-only-desk-i {
     display: none;
+  }
+}
+/* The header's DIRECTIONS on a store that has not opened (issue #153): the
+   whole word from the desktop header up, MAP below it (SiteHeader.tsx). */
+.cne-dir-word {
+  display: none;
+}
+@media (min-width: 901px) {
+  .cne-dir-word {
+    display: inline;
   }
 }
 

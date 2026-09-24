@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Site: the shop pages now have a cream header, the same cream as the admin's top bar, instead of the red one, and the logo in the middle reads with STORE beside it (under it on a phone) like the admin's logo. The tab names are black, with SHOP still marked. The rest of the site keeps the red header ([#132](https://github.com/vanyanv/chrisneddys-site/issues/132))
 - Site: the colored middle of the monsters' eye no longer has a thin black ring around it (the thick ring around the white of the eye stays), everywhere they appear, including the browser-tab icon and the link preview picture. Pointing at a menu photo or a shop photo on a computer no longer spins black-and-cream rings up over the picture; the photo still lifts a little like before ([#130](https://github.com/vanyanv/chrisneddys-site/issues/130))
 - Site: "SMASH" in the home page headline is now the same yellow as the ORDER ONLINE button, instead of a brighter yellow ([#124](https://github.com/vanyanv/chrisneddys-site/issues/124))
 - Site: the red panel in the home page hero is now plain red, without the small black dots that were printed over it. Nothing else in the hero changed ([#121](https://github.com/vanyanv/chrisneddys-site/issues/121))

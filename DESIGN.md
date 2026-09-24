@@ -284,6 +284,7 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 
 - **Style:** a two-row sticky header. The top row is Counter Red with a 3px ink bottom rule, the status tag hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the tag's label changes.
 - **Tab Strip:** below it, on Signal Red, full-width equal tabs in Bowlby One at 10px with 0.11em tracking. State is carried twice: a 4px Marquee Yellow indicator that slides on a `cubic-bezier(0.35, 1.3, 0.4, 1)` overshoot, and full opacity on the current label.
+- **Shop pages:** on `/shop/` and everything under it both rows run on the admin's cream (`#fff8e7`) instead of red, with ink tab labels, the current tab in red (a yellow box on desktop), and the wordmark set as the admin's lockup: the mark without its drop shadow and STORE in JetBrains Mono, centred as a pair. STORE sits beside the mark where the row has room and under it below 481px and from 901px to 1439px, so the pair never costs the status tag its width. The rest of the site keeps the red header.
 - **Focus:** 3px Griddle Ink outline at 2px offset globally, switching to Marquee Yellow on dark surfaces.
 - **Mobile:** identical structure. This system is phone-first and the desktop layout is the variant, not the reverse.
 

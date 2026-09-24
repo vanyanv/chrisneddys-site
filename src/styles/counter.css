@@ -325,6 +325,117 @@ body {
   }
 }
 
+/* ---- the shop's header --------------------------------------------------
+   On /shop/ and everything under it the header takes the admin's look
+   (issue #132): the admin top bar's cream (`--a-bg`, the same #fff8e7 as The
+   Rack's `--rack-paper`) in place of red, and the wordmark set as the admin's
+   lockup, the mark with STORE in the mono, centred as a pair. The ink rules
+   under both rows stay, which is what still separates the bar from the page,
+   which is the same cream. The mark loses its drop shadow, as it has none in
+   the admin.
+
+   STORE sits beside the mark, as in the admin, wherever the row has room for
+   the wider pair, and under it where it does not: below 481px and from 901px
+   to 1439px. Beside the mark it widens the wordmark by ~45px, and in those
+   two bands that pushed it into the status tag once the tag reads CLOSED
+   (and into the bag button once there is one), where the plain wordmark has
+   its 91-127px each side to spare (DESIGN.md, "How the tag narrows"). Under
+   the mark it costs no width at all.
+
+   Every rule here is `.cne-header.is-shop ...`, which outranks the plain
+   header rules at any breakpoint, so each size tier the header has is
+   restated here rather than inherited. */
+.cne-header.is-shop .cne-nav,
+.cne-header.is-shop .cne-tabs {
+  background: var(--a-bg);
+}
+.cne-header.is-shop .cne-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  line-height: 1;
+}
+.cne-header.is-shop .cne-nav img {
+  height: 26px;
+  filter: none;
+}
+/* The admin's `.rack-wordmark-tag`: JetBrains Mono, tracked, in The Rack's
+   muted brown (#7a6f5e, 4.65:1 on the cream). */
+.cne-logo-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: #7a6f5e;
+  white-space: nowrap;
+}
+.cne-header.is-shop .cne-tab {
+  color: var(--a-ink);
+}
+.cne-header.is-shop .cne-tab[aria-current="page"] {
+  color: var(--a-red-cta);
+}
+/* The yellow focus ring is for the red; on cream it is ink. */
+.cne-header.is-shop .cne-tab:focus-visible {
+  outline-color: var(--a-ink);
+}
+/* STORE under the mark. The tracking trails the last letter, so the same
+   amount of indent on the left keeps the word on the mark's centre. */
+@media (max-width: 480px), (min-width: 901px) and (max-width: 1439px) {
+  .cne-header.is-shop .cne-logo {
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .cne-header.is-shop .cne-logo-tag {
+    text-indent: 0.14em;
+  }
+}
+@media (max-width: 480px) {
+  .cne-header.is-shop .cne-nav img {
+    height: 27px;
+  }
+  .cne-logo-tag {
+    font-size: 9px;
+  }
+}
+@media (max-width: 900px) and (max-height: 500px) {
+  .cne-header.is-shop .cne-nav img {
+    height: 20px;
+  }
+  .cne-logo-tag {
+    font-size: 9px;
+  }
+}
+@media (min-width: 901px) {
+  .cne-header.is-shop {
+    background: var(--a-bg);
+  }
+  .cne-header.is-shop .cne-logo {
+    gap: 12px;
+  }
+  .cne-header.is-shop .cne-nav img {
+    height: 40px;
+  }
+  .cne-logo-tag {
+    font-size: 12px;
+  }
+  /* The current tab's cream box would vanish into a cream bar, so on the
+     shop it is the order button's yellow instead. */
+  .cne-header.is-shop .cne-tab[aria-current="page"] {
+    background: var(--a-yel);
+    color: var(--a-ink);
+  }
+}
+@media (min-width: 901px) and (max-width: 1339px) {
+  .cne-header.is-shop .cne-nav img {
+    height: 29px;
+  }
+  .cne-logo-tag {
+    font-size: 10px;
+  }
+}
+
 /* ---- hero --------------------------------------------------------------- */
 /* "3A The Peek" (issue #112): a red copy panel and an edge-to-edge photo,
    split by a checkerboard seam borrowed from the store floor

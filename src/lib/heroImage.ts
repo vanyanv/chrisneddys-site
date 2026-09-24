@@ -44,7 +44,19 @@ export const HERO = {
   // Hero.tsx); the 100vw clause is a defensive fallback for a browser old
   // enough to support neither AVIF nor WebP nor the phone sources' media
   // matching, not the common case below 600px.
-  sizes: "(min-width: 600px) 50vw, 100vw",
+  //
+  // The first clause is a phone held sideways (the short-landscape tier in
+  // counter.css) on a 3x screen. There the photo column is ~453px wide, so
+  // the honest 50vw asks for ~1360 device px and the browser takes the 80 KB
+  // 1400w original, which on a slow line arrives last of everything the page
+  // loads: 2.7s to the home page's Largest Contentful Paint (issue #160).
+  // 36vw lands that pick on the 1100w cut instead (~2.4 device px per CSS px,
+  // the same density a portrait 3x phone already gets from the 1000w crop),
+  // which is where the extra pixels stop being visible on a photo. 2x screens
+  // and every other width keep the 50vw pick. A browser that ignores the
+  // `resolution` feature in `sizes` just falls through to 50vw, as before.
+  sizes:
+    "(min-width: 600px) and (max-width: 900px) and (max-height: 500px) and (min-resolution: 2.5dppx) 36vw, (min-width: 600px) 50vw, 100vw",
   width: 1400,
   height: 1480,
   alt: "A basket of Chris N Eddy's smashed cheeseburger sliders",

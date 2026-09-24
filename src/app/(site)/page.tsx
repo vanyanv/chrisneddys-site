@@ -87,11 +87,7 @@ export default function HomePage() {
             <div className="cne-eyebrow">★ The three we sell most</div>
             <h2>Start here.</h2>
           </div>
-          <div className="cne-sec-note">
-            Live Hollywood pickup pricing.
-            <br />
-            Every topping free.
-          </div>
+          <div className="cne-sec-note">Every topping free.</div>
         </div>
         {/* Idea 6: squiggly tethers behind the three cards, desktop only. */}
         <div className="cne-tether-wrap">

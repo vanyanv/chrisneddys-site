@@ -1712,3 +1712,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ---- iPhone / iPad text boxes ---------------------------------------------
+   iOS zooms the whole page into any text box under 16px on tap and leaves it
+   zoomed, in every iPhone browser (they all run Safari's engine). The
+   `-webkit-touch-callout` test matches iOS and iPadOS only, so everywhere
+   else keeps the sizes above. `:root` lifts these past the later
+   `.adm-mono-field` rule in admin-settings.css. */
+@supports (-webkit-touch-callout: none) {
+  :root .adm-field input,
+  :root .adm-input,
+  :root .adm-textarea,
+  :root .adm-search input,
+  :root .adm-cell-input {
+    font-size: 16px;
+  }
+}

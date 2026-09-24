@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   bagCount,
   bagSubtotal,
@@ -6,6 +6,7 @@ import {
   bumpBagLine,
   refreshedBagLine,
   clean,
+  reloadBag,
 } from "@/components/shop/bagStore";
 import { MAX_PER_ORDER, merch, firstView, type MerchProduct } from "@/data/merch";
 
@@ -236,5 +237,27 @@ describe("bagSubtotal", () => {
 
   it("is 0 for an empty bag", () => {
     expect(bagSubtotal([])).toBe(0);
+  });
+});
+
+describe("reloadBag", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function stubStorage(saved: string | null) {
+    vi.stubGlobal("window", {
+      localStorage: { getItem: () => saved, setItem: () => {}, removeItem: () => {} },
+    });
+  }
+
+  it("picks up the saved bag, so a page restored from Safari's cache shows what is saved now", () => {
+    stubStorage(JSON.stringify({ lines: [line({ qty: 3 })] }));
+    expect(reloadBag().map((l) => [l.slug, l.qty])).toEqual([[trucker.slug, 3]]);
+  });
+
+  it("empties the in-memory bag when the thanks page already cleared the saved one", () => {
+    stubStorage(JSON.stringify({ lines: [line()] }));
+    reloadBag();
+    stubStorage(JSON.stringify({ lines: [] }));
+    expect(reloadBag()).toEqual([]);
   });
 });

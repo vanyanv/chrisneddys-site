@@ -130,11 +130,11 @@ export function OpeningNotify({ hood }: { hood: string }) {
           placeholder="you@email.com"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `notify-err-${hood}` : undefined}
+          className="cne-notify-email"
           style={{
             flex: "1 1 190px",
             minWidth: 0,
             padding: "10px 12px",
-            fontSize: 14,
             fontFamily: "inherit",
             border: "2px solid var(--a-ink, #1a1612)",
             background: "var(--a-paper, #fff8e7)",

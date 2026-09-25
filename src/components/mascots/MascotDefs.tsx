@@ -17,7 +17,8 @@ import { MONSTER_INK, MONSTER_WHITE } from "./monsterColors";
  * grid, so the chomp in `mascots.css` moves 20 units, 4 of the 200-unit
  * grid every monster `<svg>` uses); the `-eye` clip is the eye white, for the
  * monsters that move their own iris (`MonsterEye`), which also reuses the
- * `-white`, `-iris` and `-pupil` shapes rather than carrying its own copy.
+ * `-ring`, `-white`, `-iris` and `-pupil` shapes rather than carrying its own
+ * copy.
  *
  * A client component on purpose: a server component's markup is sent twice
  * (the HTML and the page data that hydrates it), and these paths are most of
@@ -28,6 +29,7 @@ function MonsterSymbol({ id, d }: { id: string; d: MonsterDrawing }) {
   return (
     <>
       <path id={`${id}-mouth-shape`} d={d.mouth} />
+      <path id={`${id}-ring`} d={d.eye} />
       <path id={`${id}-white`} d={d.eyeWhite} />
       <path id={`${id}-iris`} d={d.iris} />
       <path id={`${id}-pupil`} d={d.pupil} />
@@ -46,7 +48,7 @@ function MonsterSymbol({ id, d }: { id: string; d: MonsterDrawing }) {
           <path className="cne-teeth-bottom" d={d.teethBottom} fill={MONSTER_WHITE} />
         </g>
         <g className="cne-eye">
-          <path d={d.eye} fill={MONSTER_INK} />
+          <use href={`#${id}-ring`} fill={MONSTER_INK} />
           <use href={`#${id}-white`} fill={MONSTER_WHITE} />
           <use href={`#${id}-iris`} style={{ fill: "var(--m-iris,#20b1ed)" }} />
           <use href={`#${id}-pupil`} style={{ fill: `var(--m-pupil,${MONSTER_INK})` }} />

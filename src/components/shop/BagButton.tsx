@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { bagCount, hydrateBag, openBag, useBag } from "./bagStore";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import "@/styles/shop-art.css";
 
-/** The custom property `cne-classic` (`MascotDefs`) reads. */
+/** The custom properties `cne-classic-red` (`MascotDefs`) reads. */
 type MonStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
-const MON_STYLE: MonStyle = { "--m-body": "#e63027", "--m-iris": "#2e5fd9" };
+const MON_STYLE: MonStyle = {
+  "--m-body": MONSTER_COLORS.red.body,
+  "--m-iris": MONSTER_COLORS.red.iris,
+};
 
 /**
  * The bag button in the site header.
@@ -81,7 +85,7 @@ export function BagButton() {
             style={MON_STYLE}
             aria-hidden="true"
           >
-            <use href="#cne-classic" />
+            <use href="#cne-classic-red" />
           </svg>
           <span className="cne-bagbtn-t">BAG</span>
           {/* Keyed on the count so React remounts the digit and the roll replays. */}

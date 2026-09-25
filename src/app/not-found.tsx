@@ -1,21 +1,7 @@
 import Link from "next/link";
-import { Bowlby_One, Inter } from "next/font/google";
+import { bowlby, inter } from "@/lib/fonts";
 import "@/styles/globals.css";
 import { brand } from "@/data/brand";
-
-const bowlby = Bowlby_One({
-  subsets: ["latin"],
-  weight: "400",
-  display: "optional",
-  variable: "--font-bowlby",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  display: "optional",
-  variable: "--font-inter",
-});
 
 /**
  * The true root `not-found.tsx` — the one Next.js falls back to for a URL

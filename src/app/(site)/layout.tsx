@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Bowlby_One, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import { bowlby, inter, jetbrains } from "@/lib/fonts";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
 import "@/styles/mascots.css";
@@ -26,37 +26,6 @@ import { hasPaymentKeys, isShopOpenFor } from "@/lib/shopStatus";
 import { getPublicStoreSettings } from "@/lib/orders";
 import { shippingReturnsNote } from "@/lib/shopCopy";
 import { TERMS_PENDING } from "@/data/merch";
-
-const bowlby = Bowlby_One({
-  subsets: ["latin"],
-  weight: "400",
-  display: "optional",
-  variable: "--font-bowlby",
-});
-
-/**
- * The same latin Inter file next/font/google serves, with its weight axis
- * pinned to the 400-800 the site actually uses instead of 100-900: 48 KB ->
- * 37 KB, no visible change. It is preloaded on every page, and on a slow phone
- * connection it downloads alongside the home hero photo, the page's Largest
- * Contentful Paint. See scripts/instance-inter-font.sh.
- */
-const inter = localFont({
-  src: "../../fonts/inter-latin-400-800.woff2",
-  weight: "400 800",
-  style: "normal",
-  display: "optional",
-  preload: true,
-  adjustFontFallback: "Arial",
-  variable: "--font-inter",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "optional",
-  variable: "--font-mono-jb",
-});
 
 /**
  * Not part of DESIGN.md's three-typeface system — used only for the graffiti

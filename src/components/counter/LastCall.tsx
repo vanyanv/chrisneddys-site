@@ -1,7 +1,11 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+import { MonsterEye } from "@/components/mascots/MonsterEye";
 import { useStoreStatus } from "@/lib/useStoreStatus";
+
+const { body: BODY, iris: IRIS } = MONSTER_COLORS.red;
 
 /**
  * The yellow banner that drops in for the last 45 minutes of service. It is
@@ -24,16 +28,11 @@ export function LastCall() {
         width={30}
         height={30}
         viewBox="0 0 200 200"
-        style={{ "--m-body": "#e63027" } as CSSProperties}
+        style={{ "--m-body": BODY, "--m-iris": IRIS } as CSSProperties}
         aria-hidden="true"
       >
-        <use href="#cne-classic" />
-        <circle cx={100} cy={76} r={30} fill="#fff8e7" />
-        <g className="cne-lc-dart">
-          <circle cx={100} cy={76} r={16} fill="#2e5fd9" />
-          <circle cx={100} cy={76} r={7} fill="#14110d" />
-        </g>
-        <circle cx={100} cy={76} r={33} fill="none" stroke="#14110d" strokeWidth={6} />
+        <use href="#cne-classic-red" />
+        <MonsterEye body={BODY} iris={IRIS} className="cne-lc-dart" />
       </svg>
       <i aria-hidden="true" />
       Last call — kitchen closes in {status.minutesLeft} min

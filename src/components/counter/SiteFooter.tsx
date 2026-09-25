@@ -54,7 +54,7 @@ export function SiteFooter() {
     // the per-store phone numbers, and every one of them belongs to "footer".
     <footer className="cne-foot" data-surface="footer">
       <Monster
-        species="blacklight"
+        species="classic"
         bodyColor="#3ee06a"
         irisColor="#2fb8ff"
         pupilColor="#ff3b3b"

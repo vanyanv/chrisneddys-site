@@ -1,28 +1,7 @@
 import type { Metadata } from "next";
-import { Bowlby_One, Inter, JetBrains_Mono } from "next/font/google";
+import { bowlby, inter, jetbrains } from "@/lib/fonts";
 import "@/styles/admin.css";
 import { OfflineIndicator } from "@/app/(admin)/admin/OfflineIndicator";
-
-const bowlby = Bowlby_One({
-  subsets: ["latin"],
-  weight: "400",
-  display: "optional",
-  variable: "--font-bowlby",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "optional",
-  variable: "--font-inter",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "optional",
-  variable: "--font-mono-jb",
-});
 
 export const metadata: Metadata = {
   title: "Store admin — Chris N Eddy's",

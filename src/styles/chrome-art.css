@@ -65,24 +65,26 @@
 .cne-lc-mon {
   flex: none;
 }
+/* In the monster art's 1000-unit grid (`MonsterEye`): 20 units is 4 of the
+   monster's 200-unit box. */
 .cne-lc-dart {
   animation: cneLcDart 2.2s steps(1) infinite;
 }
 @keyframes cneLcDart {
   0% {
-    transform: translate(-4px, 1px);
+    transform: translate(-20px, 5px);
   }
   25% {
-    transform: translate(4px, 1px);
+    transform: translate(20px, 5px);
   }
   50% {
-    transform: translate(-4px, 1px);
+    transform: translate(-20px, 5px);
   }
   62% {
-    transform: translate(0, -3px);
+    transform: translate(0, -15px);
   }
   80% {
-    transform: translate(4px, 1.5px);
+    transform: translate(20px, 7.5px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

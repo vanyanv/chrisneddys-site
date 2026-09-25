@@ -7,6 +7,7 @@ import { canShowFullOrderDetails } from "@/lib/orderVisibility";
 import { ClearBagOnce } from "@/components/shop/ClearBagOnce";
 import { PurchaseOnce } from "@/components/shop/PurchaseOnce";
 import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
 
 /**
@@ -175,7 +176,12 @@ export default async function ThanksPage({
         }}
       />
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-        <Monster species="classic" bodyColor="#f5b82e" irisColor="#e63027" size={52} />
+        <Monster
+          species="classic"
+          bodyColor={MONSTER_COLORS.yellow.body}
+          irisColor={MONSTER_COLORS.yellow.iris}
+          size={52}
+        />
         <MascotDecor kind="drip" colorA="#e63027" size={14} />
       </div>
       <h1>

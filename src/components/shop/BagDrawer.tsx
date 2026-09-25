@@ -16,6 +16,10 @@ import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 import { getGaIdentity } from "@/lib/gaIdentity";
 import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+
+const RED = { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.iris };
+const YELLOW = { bodyColor: MONSTER_COLORS.yellow.body, irisColor: MONSTER_COLORS.yellow.iris };
 
 /** How long the remove animation runs before the line actually leaves the store. */
 const REMOVE_MS = 280;
@@ -243,9 +247,9 @@ export function BagDrawer({
                   alignItems: "flex-end",
                 }}
               >
-                <Monster species="bubble" bodyColor="#e63027" irisColor="#2e5fd9" size={30} />
+                <Monster species="classic" {...RED} size={30} />
                 <span style={{ marginLeft: "-6px", marginBottom: "-4px" }}>
-                  <Monster species="bubble" bodyColor="#f5b82e" irisColor="#e63027" size={22} />
+                  <Monster species="classic" {...YELLOW} size={22} />
                 </span>
               </div>
               <p className="cne-dr-note">Nothing in the bag yet.</p>
@@ -335,7 +339,7 @@ export function BagDrawer({
                 {checkoutPending ? (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                     TAKING YOU TO CHECKOUT…
-                    <Monster species="classic" bodyColor="#e63027" irisColor="#2e5fd9" size={40} />
+                    <Monster species="classic" {...RED} size={40} />
                   </span>
                 ) : (
                   "CHECKOUT"

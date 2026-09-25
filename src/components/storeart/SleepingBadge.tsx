@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
 /** The custom property `cne-classic-sleep` (`MascotDefs`) reads. */
 type SleepStyle = CSSProperties & { "--m-body"?: string };
@@ -10,7 +11,7 @@ type SleepStyle = CSSProperties & { "--m-body"?: string };
  * species union — this is the only place that needs it.
  */
 export function SleepingBadge({ size = 26 }: { size?: number }) {
-  const style: SleepStyle = { "--m-body": "#2e5fd9" };
+  const style: SleepStyle = { "--m-body": MONSTER_COLORS.blue.body };
   return (
     <span className="cne-badge-corner is-tr cne-sleep-badge" aria-hidden="true">
       <svg width={size} height={size} viewBox="0 0 200 200" style={style}>

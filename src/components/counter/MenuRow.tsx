@@ -3,6 +3,7 @@
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
 import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -42,8 +43,8 @@ export function MenuRow({
         {star && (
           <Monster
             species="classic"
-            bodyColor="#f5b82e"
-            irisColor="#e63027"
+            bodyColor={MONSTER_COLORS.yellow.body}
+            irisColor={MONSTER_COLORS.yellow.iris}
             size={20}
             className="cne-badge-corner is-tl"
           />

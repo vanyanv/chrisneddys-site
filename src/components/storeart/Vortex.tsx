@@ -10,6 +10,8 @@ import {
   type VortexGeometryParams,
 } from "./vortexGeometry";
 import "@/styles/vortex.css";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+import { monsterHref } from "@/components/mascots/Monster";
 
 /** `band` is the decorative strip above the footer. `screen` is a
  * full-viewport overlay (see the SLIDE secret code in `SlideCode.tsx`) —
@@ -91,10 +93,10 @@ const VARIANTS: Record<VortexVariant, VortexVariantConfig> = {
       ry: 470,
     },
     monsters: [
-      { a0: 200, size: 190, dur: 3.2, delay: -0.4, body: "#2e5fd9", iris: "#e63027" },
-      { a0: -20, size: 170, dur: 3.2, delay: -1.2, body: "#e63027", iris: "#2e5fd9" },
-      { a0: 110, size: 160, dur: 3.2, delay: -2, body: "#f5d20e", iris: "#e63027" },
-      { a0: 290, size: 150, dur: 3.2, delay: -2.7, body: "#c6ff2b", iris: "#e63027" },
+      { a0: 200, size: 190, dur: 3.2, delay: -0.4, ...MONSTER_COLORS.blue },
+      { a0: -20, size: 170, dur: 3.2, delay: -1.2, ...MONSTER_COLORS.red },
+      { a0: 110, size: 160, dur: 3.2, delay: -2, ...MONSTER_COLORS.yellow },
+      { a0: 290, size: 150, dur: 3.2, delay: -2.7, ...MONSTER_COLORS.lime },
     ],
     spinSeconds: 10,
   },
@@ -274,7 +276,7 @@ export function Vortex({
                 return (
                   <div key={i} className={`${uid}-m ${uid}-m${i}`} style={style}>
                     <svg viewBox="0 0 200 200" focusable="false">
-                      <use href="#cne-classic" />
+                      <use href={monsterHref(m.body)} />
                     </svg>
                   </div>
                 );

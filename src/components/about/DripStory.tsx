@@ -4,6 +4,10 @@ import { useEffect, useRef } from "react";
 import type { CSSProperties, ReactElement } from "react";
 import Link from "next/link";
 import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+
+const RED = { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.iris };
+const YELLOW = { bodyColor: MONSTER_COLORS.yellow.body, irisColor: MONSTER_COLORS.yellow.iris };
 import { brand } from "@/data/brand";
 import { flagship } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
@@ -128,10 +132,10 @@ export function DripStory(): ReactElement {
           <div className="cne-drip-med">
             <div className="cne-drip-pair">
               <span className="cne-drip-pair-mon">
-                <Monster species="classic" bodyColor="#e63027" irisColor="#2e5fd9" size={200} />
+                <Monster species="classic" {...RED} size={200} />
               </span>
               <span className="cne-drip-pair-mon">
-                <Monster species="classic" bodyColor="#f5b82e" irisColor="#e63027" size={200} />
+                <Monster species="classic" {...YELLOW} size={200} />
               </span>
             </div>
           </div>

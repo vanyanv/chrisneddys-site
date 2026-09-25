@@ -1,18 +1,27 @@
 /**
- * Builds `src/app/favicon.ico` (16, 32 and 48px) from `src/app/icon.svg`.
+ * Writes `src/app/icon.svg` from the monster art (`MONSTER_ICON_SVG` in
+ * `src/lib/monsterIcon.ts`), then builds `src/app/favicon.ico` (16, 32 and
+ * 48px) from it.
  *
  * Browsers that take SVG favicons use `icon.svg` directly. The .ico covers
  * the rest, plus the default `/favicon.ico` request and the manifest's entry
- * for it. Run after any change to `icon.svg`, and commit both files.
+ * for it. Run after any change to the monster art, and commit both files.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import sharp from "sharp";
+import { MONSTER_ICON_SVG } from "../src/lib/monsterIcon.ts";
 
 const SRC = new URL("../src/app/icon.svg", import.meta.url);
 const OUT = new URL("../src/app/favicon.ico", import.meta.url);
 const SIZES = [16, 32, 48];
 
-const svg = await readFile(SRC);
+const COMMENT = `<!--
+  Browser-tab icon: the artist's blue monster, written from MONSTER_ICON_SVG
+  (src/lib/monsterIcon.ts) by scripts/build-favicon.mjs. Don't edit by hand.
+-->
+`;
+const svg = Buffer.from(MONSTER_ICON_SVG);
+await writeFile(SRC, MONSTER_ICON_SVG.replace(/^(<svg[^>]*>)/, `$1${COMMENT}`) + "\n");
 const pngs = await Promise.all(
   SIZES.map((size) => sharp(svg, { density: 600 }).resize(size, size).png().toBuffer()),
 );

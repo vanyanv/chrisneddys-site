@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
 /** Bars pinned to the bottom of a phone screen that the button sits above. */
 const BOTTOM_BARS = [".cne-dock", ".cne-pdp-sticky"];
@@ -109,7 +110,12 @@ export function BackToTop() {
       <span className="cne-backtop-label">Scroll up</span>
       <svg
         viewBox="0 0 200 200"
-        style={{ "--m-body": "#c6ff2b", "--m-iris": "#e63027" } as CSSProperties}
+        style={
+          {
+            "--m-body": MONSTER_COLORS.lime.body,
+            "--m-iris": MONSTER_COLORS.lime.iris,
+          } as CSSProperties
+        }
         aria-hidden="true"
       >
         <use href="#cne-classic" />

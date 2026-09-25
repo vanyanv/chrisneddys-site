@@ -7,6 +7,8 @@
   transform-origin: center;
   animation: cne-blink 4.8s ease-in-out infinite;
 }
+/* The teeth sit on the monster art's 1000-unit grid, so 20px here is 4 units
+   of the 200-unit box every monster is drawn in. */
 .cne-teeth-top {
   transform-box: fill-box;
   transform-origin: center;
@@ -33,7 +35,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(4px);
+    transform: translateY(20px);
   }
 }
 @keyframes cne-chomp-down {
@@ -42,7 +44,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-20px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

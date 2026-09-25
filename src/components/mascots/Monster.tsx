@@ -1,15 +1,15 @@
 import type { CSSProperties } from "react";
+import { monsterDrawing } from "./monsterColors";
 
 /** `classic-sleep` is the classic body with its eye shut: a store or product
  * that is not ready yet (see `MascotDefs`). */
-export type MonsterSpecies = "classic" | "classic-sleep" | "blacklight" | "bubble";
+export type MonsterSpecies = "classic" | "classic-sleep";
 
-const VIEW_BOX: Record<MonsterSpecies, string> = {
-  classic: "0 0 200 200",
-  "classic-sleep": "0 0 200 200",
-  blacklight: "0 0 200 200",
-  bubble: "0 0 100 100",
-};
+/** The shared symbol for a body colour: the artist drew the red monster
+ * separately, so red gets its own drawing. */
+export function monsterHref(body: string): string {
+  return monsterDrawing(body) === "red" ? "#cne-classic-red" : "#cne-classic";
+}
 
 /** The custom properties `MascotDefs`' symbols read, plus the glow's `--glow`. */
 type MonsterStyle = CSSProperties & {
@@ -60,7 +60,7 @@ export function Monster({
 
   return (
     <svg
-      viewBox={VIEW_BOX[species]}
+      viewBox="0 0 200 200"
       width={size}
       height={size}
       className={classes}
@@ -68,7 +68,7 @@ export function Monster({
       aria-hidden="true"
       focusable="false"
     >
-      <use href={`#cne-${species}`} />
+      <use href={species === "classic" ? monsterHref(bodyColor) : "#cne-classic-sleep"} />
     </svg>
   );
 }

@@ -11,6 +11,7 @@ import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 import { locationMonster } from "@/components/locations/locationArt";
 import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import { Tunnel } from "@/components/storeart/Tunnel";
 import { ArtPhoto } from "@/components/art/ArtPhoto";
 
@@ -238,10 +239,10 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         <section className="cne-sec cne-lp-night cne-rv" aria-labelledby="lp-late">
           <div className="cne-lp-night-in">
             <Monster
-              species="blacklight"
-              bodyColor="#c6ff2b"
-              irisColor="#2e5fd9"
-              glowColor="#c6ff2b"
+              species="classic"
+              bodyColor={MONSTER_COLORS.lime.body}
+              irisColor={MONSTER_COLORS.lime.iris}
+              glowColor={MONSTER_COLORS.lime.body}
               size={96}
               className="cne-lp-night-mon"
             />

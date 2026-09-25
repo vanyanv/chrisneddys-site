@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+import { MonsterEye } from "@/components/mascots/MonsterEye";
 
 /**
  * Idea 2. The hero's corner monster — same body/iris/size/class as before —
@@ -14,9 +16,12 @@ import { useEffect, useRef, type CSSProperties } from "react";
  */
 
 const SIZE = 46;
-const EYE_CX = 100;
-const EYE_CY = 76;
-const MAX_SHIFT = 11;
+/** How far the iris may travel, in the art's 1000-unit grid (`MonsterEye`):
+ * the artist's eye is a wide oval, so it has more room sideways than up and
+ * down. */
+const MAX_SHIFT_X = 60;
+const MAX_SHIFT_Y = 35;
+const { body: BODY, iris: IRIS } = MONSTER_COLORS.blue;
 
 type WatcherStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
 
@@ -39,10 +44,13 @@ export function Watcher({ className }: { className?: string }) {
       if (!pointer) return;
       const r = svg.getBoundingClientRect();
       const dx = pointer.x - (r.left + r.width / 2);
-      const dy = pointer.y - (r.top + r.height * 0.38);
+      const dy = pointer.y - (r.top + r.height * 0.32);
       const d = Math.hypot(dx, dy) || 1;
-      const k = Math.min(1, d / 160) * MAX_SHIFT;
-      iris.setAttribute("transform", `translate(${(dx / d) * k} ${(dy / d) * k})`);
+      const k = Math.min(1, d / 160);
+      iris.setAttribute(
+        "transform",
+        `translate(${(dx / d) * k * MAX_SHIFT_X} ${(dy / d) * k * MAX_SHIFT_Y})`,
+      );
     };
 
     const onMove = (e: PointerEvent) => {
@@ -57,7 +65,7 @@ export function Watcher({ className }: { className?: string }) {
     };
   }, []);
 
-  const style: WatcherStyle = { "--m-body": "#2e5fd9", "--m-iris": "#e63027" };
+  const style: WatcherStyle = { "--m-body": BODY, "--m-iris": IRIS };
 
   return (
     <svg
@@ -71,12 +79,7 @@ export function Watcher({ className }: { className?: string }) {
       focusable="false"
     >
       <use href="#cne-classic" />
-      <circle cx={EYE_CX} cy={EYE_CY} r={30} fill="#fff8e7" />
-      <g ref={irisRef}>
-        <circle cx={EYE_CX} cy={EYE_CY} r={17} fill="#e63027" />
-        <circle cx={EYE_CX} cy={EYE_CY} r={7} fill="#14110d" />
-      </g>
-      <circle cx={EYE_CX} cy={EYE_CY} r={33} fill="none" stroke="#14110d" strokeWidth={6} />
+      <MonsterEye body={BODY} iris={IRIS} irisRef={irisRef} />
     </svg>
   );
 }

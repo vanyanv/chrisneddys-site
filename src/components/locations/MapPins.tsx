@@ -4,6 +4,7 @@ import { locations, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import { PIN, SOON_SUFFIX, capWidth } from "@/components/locations/mapLayout";
 import { locationMonster } from "@/components/locations/locationArt";
+import { monsterHref } from "@/components/mascots/Monster";
 
 export const mapOverlayStyle = {
   position: "absolute" as const,
@@ -42,7 +43,7 @@ export function MapPinArt({ loc }: { loc: Location }) {
     <>
       <path className="cne-pin-point" d="M-5,-8 L0,0 L5,-8 Z" />
       <use
-        href={loc.isOpen ? "#cne-classic" : "#cne-classic-sleep"}
+        href={loc.isOpen ? monsterHref(locationMonster(loc.id).body) : "#cne-classic-sleep"}
         className="cne-pin-mon"
         x={-12}
         y={PIN.headTop}

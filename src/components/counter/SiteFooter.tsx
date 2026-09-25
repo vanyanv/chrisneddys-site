@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { brand } from "@/data/brand";
+import { LOGO } from "@/lib/logoImage";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
@@ -71,12 +71,13 @@ export function SiteFooter() {
               aria-label={`${brand.name} — Home`}
               className="cne-foot-mark"
             >
-              <Image
-                src="/cne-logo-2x.webp"
+              <img
+                src={LOGO.src}
+                srcSet={LOGO.srcSet}
+                sizes="(min-width: 901px) 135px, 120px"
                 alt={brand.name}
-                width={309}
-                height={87}
-                loading="eager"
+                width={LOGO.width}
+                height={LOGO.height}
                 style={{ aspectRatio: "309 / 87" }}
               />
             </Link>

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { brand } from "@/data/brand";
+import { LOGO } from "@/lib/logoImage";
 import { orderUrl, withUtm } from "@/lib/otter";
 import { useViewedLocation } from "@/lib/useViewedLocation";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
@@ -75,7 +75,14 @@ export function SiteHeader() {
     <header className={`cne-header${lifted ? " is-lifted" : ""}${isShop ? " is-shop" : ""}`}>
       <div className="cne-nav">
         <Link prefetch={false} href="/" aria-label={`${brand.name} — Home`} className="cne-logo">
-          <Image src="/cne-logo-2x.webp" alt={brand.name} width={309} height={87} priority />
+          <img
+            src={LOGO.src}
+            srcSet={LOGO.srcSet}
+            sizes="(min-width: 901px) 156px, 107px"
+            alt={brand.name}
+            width={LOGO.width}
+            height={LOGO.height}
+          />
           {/* The shop wears the admin's lockup: the same mark with STORE
               beside it, on the admin's cream (`.cne-header.is-shop`). */}
           {isShop && <span className="cne-logo-tag">STORE</span>}

@@ -72,7 +72,10 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
   return (
     <>
       <section className="cne-lp-hero" aria-labelledby="lp-h1">
-        <div className="cne-lp-panel">
+        {/* Labelled for analytics like every other button group, so this
+            page's address, ORDER, directions and CALL report the store and
+            where the tap came from (src/components/shared/TrackEvents.tsx). */}
+        <div className="cne-lp-panel" data-surface="location-page" data-location={slugFor(loc)}>
           <nav className="cne-lp-crumb" aria-label="Breadcrumb">
             <Link prefetch={false} href="/locations/">
               Locations

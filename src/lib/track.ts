@@ -70,7 +70,9 @@ export type TrackEvent =
   /** Tapped CHECKOUT in the bag and a Stripe Checkout Session was requested. */
   | "begin_checkout"
   /** A paid order loaded on /shop/thanks/. */
-  | "purchase";
+  | "purchase"
+  /** A visitor landed on a 404. Carries the missing path and its referrer. */
+  | "page_not_found";
 
 declare global {
   interface Window {

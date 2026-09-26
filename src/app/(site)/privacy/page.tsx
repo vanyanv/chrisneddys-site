@@ -13,7 +13,7 @@ const description =
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/privacy/" });
 
-const UPDATED_HUMAN = "24 September 2026";
+const UPDATED_HUMAN = "26 September 2026";
 
 /** Re-checked at most once a minute, like the rest of the shop — the support
  * email in the Contact section comes from the same `store_settings` row
@@ -83,9 +83,9 @@ export default async function PrivacyPage() {
           <p>
             Placing an order gives us your name, email, shipping address and what you bought; your
             card details go straight to Stripe and never reach our servers. Two contact forms send
-            us what you type into them. Two analytics tools count pages and taps. A hat in the shop
-            bag stays in your own browser until you check out. There is no customer account, and we
-            don&rsquo;t sell any of it.
+            us what you type into them. Three analytics tools count pages and taps. A hat in the
+            shop bag stays in your own browser until you check out. There is no customer account,
+            and we don&rsquo;t sell any of it.
           </p>
         </div>
 
@@ -171,8 +171,8 @@ export default async function PrivacyPage() {
         <section className="cne-lg-sec" aria-labelledby="p-auto">
           <h2 id="p-auto">What gets measured automatically</h2>
           <p>
-            We use two analytics tools to understand which pages people read and which buttons they
-            press — how many, not who.
+            We use three analytics tools to understand which pages people read, which buttons they
+            press and how fast pages load — how many, not who.
           </p>
           <ul>
             <li>
@@ -185,16 +185,23 @@ export default async function PrivacyPage() {
               sets no cookies and counts page views, the country you are in, and the kind of device
               and browser you used.
             </li>
+            <li>
+              <strong>Vercel Speed Insights</strong>, from the same company, which sets no cookies
+              and measures how quickly each page loads and responds on your device, along with the
+              page, the country you are in, and the kind of device and browser you used.
+            </li>
           </ul>
           <p>
             Alongside page views, Google Analytics receives a named event when you do one of a fixed
             set of things: tap an order, delivery, catering, phone or directions link; open an item
             on the menu; view a product, add one to the bag, or open the bag; send the contact form;
-            or join an opening list. When a shop payment is confirmed, Google Analytics also
-            receives the order number, products bought, and the amounts for merchandise, shipping
-            and tax. To connect a payment to the earlier visit, we pass Google Analytics browser and
-            session identifiers through checkout. Events can carry what was tapped and which part of
-            the page it was tapped from.
+            join an opening list; or land on a page that doesn&rsquo;t exist. When a shop payment is
+            confirmed, Google Analytics also receives the order number, products bought, and the
+            amounts for merchandise, shipping and tax. To connect a payment to the earlier visit, we
+            pass Google Analytics browser and session identifiers through checkout. Events can carry
+            what was tapped, which part of the page it was tapped from, and which of our locations
+            it was for. A missing-page event carries the address that was missing and the page that
+            linked to it.
           </p>
           <p className="cne-lg-note">
             An analytics event never carries your name, email address, phone number or message. When

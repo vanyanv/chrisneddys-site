@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { track, type TrackEvent } from "@/lib/track";
 import { platformByHost } from "@/data/delivery";
+import { clickLocation } from "@/lib/clickLocation";
 
 /**
  * One delegated listener for every commercial outbound click on the site.
@@ -44,12 +45,14 @@ export function TrackEvents() {
       // already records the path as `page_location`.
       const surface =
         (anchor.closest("[data-surface]") as HTMLElement | null)?.dataset.surface || undefined;
-      // Which store this link belongs to, declared the same way. All three
-      // locations share one phone number today, so `call_click` cannot say
-      // which counter was rung — and each store gets its own number as it
-      // opens, at which point the answer has to already be in the history.
-      const locationId =
+      // Which store this link belongs to. The link answers first — an Otter
+      // URL carries its store's ID and each open store has its own number —
+      // so an ORDER or CALL button anywhere reports its store without being
+      // labelled. An ancestor's `data-location` covers the rest (directions,
+      // delivery apps). See src/lib/clickLocation.ts.
+      const declared =
         (anchor.closest("[data-location]") as HTMLElement | null)?.dataset.location || undefined;
+      const locationId = clickLocation(anchor.href || raw, declared);
       const itemId = anchor.dataset.item || undefined;
 
       let event: TrackEvent | null = null;

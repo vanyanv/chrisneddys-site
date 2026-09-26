@@ -1,3 +1,4 @@
+import { brand } from "@/data/brand";
 import type { Location } from "@/data/locations";
 
 /**
@@ -5,18 +6,24 @@ import type { Location } from "@/data/locations";
  * another map widget. Hand the visitor off to the app they were always going
  * to finish in — Apple Maps on Apple hardware, Google Maps everywhere else.
  */
+/**
+ * What a maps app is asked to find for one store. The brand name goes in only
+ * for a store the maps apps already list under it (`listedOnMaps`): for any
+ * other, "Chris N Eddy's, 14523 Sherman Way, ..." matches the name to the
+ * Hollywood listing and the route ends on Sunset Blvd. The bare street address
+ * always lands on the right door.
+ */
+export function mapsQuery(loc: Location): string {
+  const address = `${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim();
+  return loc.listedOnMaps ? `${brand.name}, ${address}` : address;
+}
+
 export function googleDirections(loc: Location): string {
-  const q = encodeURIComponent(
-    `Chris N Eddy's, ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
-  );
-  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapsQuery(loc))}`;
 }
 
 export function appleDirections(loc: Location): string {
-  const q = encodeURIComponent(
-    `Chris N Eddy's, ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
-  );
-  return `https://maps.apple.com/?daddr=${q}`;
+  return `https://maps.apple.com/?daddr=${encodeURIComponent(mapsQuery(loc))}`;
 }
 
 /**

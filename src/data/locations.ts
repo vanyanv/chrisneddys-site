@@ -42,6 +42,15 @@ export type Location = {
    */
   /** This location's direct pickup storefront. Only rendered as an order action once open. */
   orderUrl?: string;
+  /**
+   * True once Google and Apple Maps list this store under the brand name.
+   * Until then a maps search for "Chris N Eddy's, <address>" matches the name
+   * to the Hollywood listing and routes the visitor there, so directions and
+   * map links search the bare address instead (`mapsQuery` in
+   * src/lib/directions.ts). Set it when the store's Google Business Profile is
+   * live.
+   */
+  listedOnMaps?: boolean;
   lat: number;
   lng: number;
   hours: Array<[string, string]>;
@@ -137,6 +146,7 @@ export const locations: Location[] = [
     status: "Open daily",
     isOpen: true,
     orderUrl: brand.orderUrl,
+    listedOnMaps: true,
     phone: brand.phone,
     phoneTel: brand.phoneTel,
     lat: 34.098,

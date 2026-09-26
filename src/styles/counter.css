@@ -1202,6 +1202,22 @@ body {
   line-height: 1.45;
   margin-top: 7px;
 }
+/* A store's address opens directions when tapped (`AddressLink`). It keeps the
+   address's own colour and type; the dotted underline is the only hint. */
+.cne-addr-link {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.cne-addr-link:hover {
+  text-decoration-style: solid;
+}
+/* The footer paints every link yellow; an address stays an address. */
+.cne-foot a.cne-addr-link {
+  color: inherit;
+  text-decoration-style: dotted;
+}
 .cne-loc-hrs {
   font-family: var(--font-mono);
   font-size: 10px;

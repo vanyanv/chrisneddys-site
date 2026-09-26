@@ -6,7 +6,7 @@ import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { LiveOpenLabel } from "@/components/shared/LiveOpenLabel";
 import { FromDate } from "@/components/shared/FromDate";
-import { DirectionsLink } from "@/components/locations/DirectionsLink";
+import { AddressLink, DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 import { locationMonster } from "@/components/locations/locationArt";
 import { Monster } from "@/components/mascots/Monster";
@@ -86,9 +86,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
 
           <div className="cne-lp-facts">
             <address className="cne-lp-addr">
-              {loc.address}
-              <br />
-              {loc.city}, {loc.region} {loc.postal}
+              <AddressLink loc={loc} />
             </address>
             {/* A dated store's ticket below already says it is coming. */}
             {(loc.isOpen || !loc.openingAnnouncement) && (

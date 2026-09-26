@@ -163,6 +163,7 @@ describe("sendOrderConfirmation", () => {
     expect(html).toContain(`NUMBER ${editionNumber} OF 50`);
     expect(html).toContain("$48.00");
     expect(html).toContain("Pickup at 5539 W. Sunset Blvd, Los Angeles, CA 90028");
+    expect(html).toContain('src="https://www.chrisneddys.com/email/logo.png"');
   });
 
   it("includes the returns policy when the store has one set", async () => {

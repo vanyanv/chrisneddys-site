@@ -71,6 +71,17 @@ describe("the store art", () => {
     ).toContain("monster-blue.png");
   });
 
+  it("puts the logo top left, with the name as its alt text", () => {
+    for (const { html } of [
+      contactEmail(base, AT),
+      openingListEmail({ email: "delivered@resend.dev", hood: "Van Nuys" }, AT),
+      openingReplyEmail(locations[0]!),
+    ]) {
+      expect(html).toContain('src="https://www.chrisneddys.com/email/logo.png"');
+      expect(html).toContain('alt="Chris N Eddy&#39;s"');
+    }
+  });
+
   it("draws the checkerboard floor as table cells, so it shows with images off", () => {
     const { html } = contactEmail(base, AT);
     expect(html).toContain("table-layout:fixed");

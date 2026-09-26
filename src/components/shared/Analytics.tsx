@@ -43,7 +43,7 @@ const GA_ID = GA_MEASUREMENT_ID;
 // `shouldTrack` (see src/lib/analytics.ts) is serialised into the inline
 // snippet below by `toString()`, so there is exactly one copy of the gating
 // rule and no way for the tested version and the shipped one to drift.
-const GA_INIT = `(function(){
+export const GA_INIT = `(function(){
 var gate=${shouldTrack.toString()};
 if(!gate(location.hostname,location.search)){return}
 var dbg=location.search.indexOf('ga_debug=1')>-1;

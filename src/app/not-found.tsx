@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import { brand } from "@/data/brand";
 import { MascotDefs } from "@/components/mascots/MascotDefs";
 import { StaffDoor } from "@/components/notfound/StaffDoor";
+import { Analytics } from "@/components/shared/Analytics";
+import { NotFoundEvent } from "@/components/shared/NotFoundEvent";
 
 /**
  * The true root `not-found.tsx` — the one Next.js falls back to for a URL
@@ -20,11 +22,19 @@ import { StaffDoor } from "@/components/notfound/StaffDoor";
  * `<html>`/`<body>`. It intentionally does not pull in the full storefront
  * layout (header, footer, analytics, the bag drawer): those assume a page
  * rendered inside a route group's providers, which this one is not.
+ *
+ * The GA4 tag is the exception: it is one self-contained inline script, and
+ * without it every dead link — including old addresses from the previous
+ * site — went unreported. `NotFoundEvent` names the missing path.
  */
 export default function RootNotFound() {
   return (
     <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body style={{ margin: 0 }}>
+        {/* React hoists this into <head>; the page has no layout to set one. */}
+        <title>{`Page not found · ${brand.name}`}</title>
+        <Analytics />
+        <NotFoundEvent />
         <MascotDefs />
         <section
           style={{

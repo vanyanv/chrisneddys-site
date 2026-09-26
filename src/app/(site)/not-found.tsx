@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { StaffDoor } from "@/components/notfound/StaffDoor";
+import { NotFoundEvent } from "@/components/shared/NotFoundEvent";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -31,6 +32,7 @@ export default function NotFound() {
     >
       <div className="cne-halftone" />
       <div style={{ position: "relative", zIndex: 2, textAlign: "center", maxWidth: 640 }}>
+        <NotFoundEvent />
         <StaffDoor />
         <div
           style={{

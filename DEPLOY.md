@@ -638,14 +638,22 @@ route change is a `history.pushState` this setting is what turns into a
 `page_view` — turn it off and every SPA navigation after the first stops
 being counted.
 
-In GA4, exclude `checkout.stripe.com` from unwanted referrals. Register the
-event-scoped custom dimensions `surface`, `location`, `platform`, and `topic`
-to use them in standard reports. Mark `purchase` and `generate_lead` as key
-events. Keep `order_click`, `delivery_click`, `catering_click`, and `call_click`
-as intent metrics: each measures a handoff, not a completed food sale or call.
-For completed food orders, use Otter's order reporting by the `utm_source=site`
-and `utm_campaign` values on outbound links; joining those orders to GA4
-sessions would require an Otter data integration.
+In GA4, exclude `checkout.stripe.com` and `order.tryotter.com` from unwanted
+referrals. Register the event-scoped custom dimensions `surface`, `location`,
+`platform`, `topic`, `item_id`, `reason`, `missing_path` and `came_from` to use
+them in standard reports. `location` is always a location's URL slug
+(`van-nuys`), read from the Otter store ID or the store's own phone number in
+the link when it has one (`src/lib/clickLocation.ts`). Mark `purchase`,
+`generate_lead`, `notify_signup`, `order_click`, `call_click`,
+`directions_click`, `delivery_click` and `catering_click` as key events (owner's
+call, 2026-09-26): Otter cannot report where its orders came from or take a GA4
+tag, so the order tap is the closest measure of a food sale the site has. The
+names keep their `_click` suffix so nobody reads them as revenue. For completed
+food orders, compare Otter's order totals with `order_click`.
+
+Both 404 pages send `page_not_found` with `missing_path` and `came_from`, so
+dead links (old addresses from the previous Fisherman site included) show up
+in GA4 and can be redirected.
 
 ---
 

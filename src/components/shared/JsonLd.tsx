@@ -5,7 +5,7 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { mapsQuery } from "@/lib/directions";
-import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
+import { deliveryPlatforms, deliveryFor, cateringPlatform } from "@/data/delivery";
 import { ID, siteDescription } from "@/lib/seo";
 
 /** "+13235443600" -> "+1 323-544-3600", the form `brand.phoneIntl` uses. */
@@ -147,7 +147,7 @@ export function restaurantNode(loc: Location) {
               },
               deliveryMethod: "http://purl.org/goodrelations/v1#DirectPickup",
             },
-            ...deliveryPlatforms.map((platform) => ({
+            ...deliveryFor(loc.id).map((platform) => ({
               "@type": "OrderAction",
               name: `Order delivery on ${platform.name}`,
               target: {
@@ -169,14 +169,6 @@ export function restaurantNode(loc: Location) {
 /** The same node, ready to be dropped into a page's own `<script>`. */
 export function restaurantLd(loc: Location) {
   return { "@context": "https://schema.org", ...restaurantNode(loc) };
-}
-
-/**
- * Hollywood, for the pages that are about the store that is open — the home
- * page, the menu and the order page all describe it by name.
- */
-export function flagshipRestaurantLd() {
-  return restaurantLd(flagship);
 }
 
 /**

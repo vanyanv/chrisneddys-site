@@ -56,9 +56,9 @@ body {
   color: var(--a-ink);
 }
 
-/* Recolors the underline that `.cne-foot a, .cne-sec p a, .cne-menu-foot a,
-   .cne-quote a` already draw (counter.css) to hot pink, but only on the three
-   prose selectors — `.cne-foot a` (the sitewide footer) is deliberately left
+/* Recolors the underline that `.cne-foot a, .cne-sec p a, .cne-quote a`
+   already draw (counter.css) to hot pink, but only on the two prose
+   selectors — `.cne-foot a` (the sitewide footer) is deliberately left
    out, so nav, buttons, cards and the footer keep their ink underline. The
    extra `body` ancestor selector isn't scope, it's specificity: counter.css's
    `text-decoration: underline` is a shorthand, so it also sets
@@ -66,8 +66,7 @@ body {
    same (0,1,2) specificity as its own selectors, and counter.css loads after
    this file — without the bump these two declarations would lose that tie. */
 body .cne-sec p a,
-body .cne-quote a,
-body .cne-menu-foot a {
+body .cne-quote a {
   text-decoration-color: var(--a-pink);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;

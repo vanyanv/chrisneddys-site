@@ -29,6 +29,22 @@ type NumStyle = CSSProperties & { "--i"?: number };
  * does every other section — `location-page.css` keys the numbers'
  * animation off `.cne-lp-night.is-in`.
  */
+/**
+ * Who is still out at that hour, in each store's own streets. Hollywood's line
+ * is the owner's original; the band shows on every open store's page, so a
+ * store without its own line gets one that names no landmark (issue #178).
+ */
+const LATE_LINE: Record<string, string> = {
+  hollywood:
+    "Most places around Hollywood are dark by ten, which is why so much of what we smash goes out after midnight — to people coming off a shift, out of a show on Sunset, or off the 101 with nowhere else still cooking.",
+  vannuys:
+    "Most of the Valley is dark by ten, which is why so much of what we smash goes out after midnight — to people coming off a late shift, heading home up Sherman Way, or off the 405 with nowhere else still cooking.",
+};
+
+function defaultLateLine(hood: string): string {
+  return `Most places around ${hood} are dark by ten, which is why so much of what we smash goes out after midnight — to people coming off a shift or heading home with nowhere else still cooking.`;
+}
+
 export function OpenLateNight({ loc, hood }: { loc: Location; hood: string }) {
   const state = useLateHour(loc.id);
   const blacklight = state?.blacklight ?? false;
@@ -63,9 +79,7 @@ export function OpenLateNight({ loc, hood }: { loc: Location; hood: string }) {
         <div className="cne-eyebrow">After everyone else has closed</div>
         <h2 id="lp-late">Open late.</h2>
         <p className="cne-lede">
-          We serve until {closingSummary(loc)}. Most places around {hood} are dark by ten, which is
-          why so much of what we smash goes out after midnight — to people coming off a shift, out
-          of a show on Sunset, or off the 101 with nowhere else still cooking.
+          We serve until {closingSummary(loc)}. {LATE_LINE[loc.id] ?? defaultLateLine(hood)}
         </p>
         <p className="cne-lede">
           The full menu runs the whole time. Nothing is pulled at midnight, and the fries are cut

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuSectionChips } from "./MenuSectionChips";
@@ -130,14 +129,6 @@ export function MenuBrowser() {
               </div>
             </section>
           ))}
-
-          <p className="cne-menu-foot">
-            Live prices from our{" "}
-            <Link prefetch={false} href="/order/" style={{ color: "inherit" }}>
-              Hollywood ordering page
-            </Link>
-            . Delivery apps price higher.
-          </p>
         </div>
       </div>
 

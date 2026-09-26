@@ -14,7 +14,7 @@ import { flagship } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { ways } from "@/data/menu";
 import { press } from "@/data/press";
-import { orderUrl } from "@/lib/otter";
+import { OrderLink } from "@/components/order/OrderLink";
 
 /** A `<svg style>` that also carries the nine-grid's stamp-in stagger index. */
 type NineStyle = CSSProperties & { "--i"?: number };
@@ -319,9 +319,7 @@ export function DripStory(): ReactElement {
           </Link>
         </div>
         <p className="cne-drip-quiet" data-surface="about">
-          <a href={orderUrl("about")} target="_blank" rel="noopener noreferrer">
-            ORDER ONLINE
-          </a>
+          <OrderLink surface="about">ORDER ONLINE</OrderLink>
           <span aria-hidden="true">&middot;</span>
           <Link prefetch={false} href={hollywoodHref}>
             {flagship.address}

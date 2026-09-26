@@ -10,6 +10,7 @@ import { MascotDefs } from "@/components/mascots/MascotDefs";
 import { SiteHeader } from "@/components/counter/SiteHeader";
 import { SiteFooter } from "@/components/counter/SiteFooter";
 import { OrderDock } from "@/components/counter/OrderDock";
+import { OrderPicker } from "@/components/order/OrderPicker";
 import { LastCall } from "@/components/counter/LastCall";
 import { RevealRoot } from "@/components/counter/Reveal";
 import { BagDrawer } from "@/components/shop/BagDrawer";
@@ -211,6 +212,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             no DOM at all until it is opened. */}
         <BagDrawer shopOpen={shopOpen} pickupEnabled={pickupEnabled} shippingNote={shippingNote} />
         <OrderDock />
+        {/* "Which location?" for every ORDER button off a store's own page. */}
+        <OrderPicker />
         {/* Bottom-corner back-to-top monster (idea 15); renders hidden until
             scrolled past ~1.5 screens. */}
         <BackToTop />

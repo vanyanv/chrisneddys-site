@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { locations, flagship } from "@/data/locations";
+import { locations } from "@/data/locations";
 import { SLIDER_PRICE, COMBO_FROM_PRICE } from "@/data/menu";
-import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
+import { deliveryFor, cateringPlatform } from "@/data/delivery";
 import { sharedFaq, type FaqEntry } from "@/data/faq";
-import { storeUrl, orderUrl, formatPrice } from "@/lib/otter";
+import { formatPrice } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
-import { closingSummary } from "@/lib/hours";
+import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
-import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
+import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
-const title = "Order Now — Hollywood Pickup, Open Late";
-const description = `Order ${brand.name} smash burgers online for pickup in Hollywood, or call ${brand.phone}. Live menu prices, open until ${closingSummary(flagship)}.`;
+const title = "Order Now — Pickup, Open Late";
+// Built per request of the metadata rather than at import, so a store that
+// opens later joins the description by itself.
+function description(): string {
+  return `Order ${brand.name} smash burgers online for pickup in ${openNames("or")}. Live menu prices. ${closingLine()}.`;
+}
 
-export const metadata: Metadata = pageMetadata({ title, description, path: "/order/" });
+export function generateMetadata(): Metadata {
+  return pageMetadata({ title, description: description(), path: "/order/" });
+}
 
 /**
  * The answers people actually type before they order, in their words. Written
@@ -25,7 +31,9 @@ export const metadata: Metadata = pageMetadata({ title, description, path: "/ord
 const FAQ: FaqEntry[] = [
   {
     q: "How do I order from Chris N Eddy's?",
-    a: "Order online from our Hollywood location at 5539 W. Sunset Blvd through our ordering page, or call (323) 544-3600. Every item on this site links straight to its page on the storefront with the add-to-cart sheet already open.",
+    get a() {
+      return `Order online from the location you are picking up at — ${openNames()} each have their own ORDER button on this page — or call that location: ${phoneList()}.`;
+    },
   },
   // Shared with /contact/'s "Answered already" card — one answer, defined once,
   // in src/data/faq.ts.
@@ -36,7 +44,9 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "How late are you open?",
-    a: `Late. The Hollywood location serves until ${closingSummary(flagship)} — the kitchen is still smashing patties long after most places in Hollywood have closed for the night.`,
+    get a() {
+      return `Late. ${closingLine()} — the kitchen is still smashing patties long after most places around us have closed for the night.`;
+    },
   },
   {
     q: "Do the toppings cost extra?",
@@ -44,11 +54,14 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do you cater?",
-    a: "Yes. Office and event catering runs through ezCater, linked on this page. For anything it does not cover — a large order, a private event, a press or partnership question — use the form on our contact page or call (323) 544-3600.",
+    get a() {
+      return `Yes. Office and event catering runs through ezCater, linked on this page. For anything it does not cover — a large order, a private event, a press or partnership question — use the form on our contact page or call us: ${phoneList()}.`;
+    },
   },
   {
     q: "Is there parking?",
-    a: "There is street parking along W. Sunset Blvd and the residential streets just off it. We're a walk-up on Sunset between Western and Normandie, so a pickup order is usually quicker to collect than it is to find a space for a sit-down meal.",
+    // Owner, 2026-09-26.
+    a: "Yes, at both. In Hollywood there is parking behind the store, and more in the WSS parking lot next door. In Van Nuys there is a parking lot right in front of the store.",
   },
   {
     q: "Do you have anything vegetarian?",
@@ -60,7 +73,7 @@ export default function OrderPage() {
   // Split so a location that hasn't opened yet doesn't cost a phone the
   // same full card — address, hours placeholder, footer link — that an
   // actual pickup spot earns. See the compact row below (issue #108).
-  const openLocations = locations.filter((loc) => loc.isOpen);
+  const open = openLocations();
   const comingSoonLocations = locations.filter((loc) => !loc.isOpen);
 
   const faqLd = {
@@ -76,8 +89,10 @@ export default function OrderPage() {
   return (
     <>
       <JsonLdScript data={breadcrumbLd([{ name: "Order", path: "/order/" }])} />
-      {/* The store this page orders from. */}
-      <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* The stores this page orders from. */}
+      {open.map((loc) => (
+        <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
+      ))}
       <JsonLdScript data={faqLd} />
       <JsonLdScript
         data={{
@@ -86,19 +101,19 @@ export default function OrderPage() {
           "@id": `${brand.siteUrl}/order/#page`,
           url: `${brand.siteUrl}/order/`,
           name: `Order ${brand.name}`,
-          description,
+          description: description(),
           isPartOf: { "@id": ID.website },
           about: { "@id": ID.org },
-          significantLink: storeUrl,
+          significantLink: open.flatMap((loc) => (loc.orderUrl ? [loc.orderUrl] : [])),
         }}
       />
 
       <section className="cne-sec cne-rv">
-        <div className="cne-eyebrow">Pickup from Hollywood</div>
+        <div className="cne-eyebrow">Pickup from {openNames("or")}</div>
         <h1>Order now.</h1>
         <p className="cne-lede">
-          Online ordering runs through our ordering page for the Hollywood location, 5539 W. Sunset
-          Blvd. Prices there are the pickup prices you see on{" "}
+          Order online for pickup from {openNames("or")}. Pick your location below and it opens that
+          location&rsquo;s ordering page. Prices are the pickup prices you see on{" "}
           <Link
             prefetch={false}
             href="/menu/"
@@ -107,27 +122,15 @@ export default function OrderPage() {
             our menu
           </Link>{" "}
           — sliders from {formatPrice(SLIDER_PRICE)}, combos from {formatPrice(COMBO_FROM_PRICE)},
-          and every topping free. Rather talk to someone? Call {brand.phone}.
+          and every topping free, at every location. Rather talk to someone? Call the location
+          you&rsquo;re picking up from.
         </p>
-        <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
-          <a
-            className="cne-mini is-red"
-            href={orderUrl("order-page")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ORDER ONLINE
-          </a>
-          <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
-            CALL {brand.phone}
-          </a>
-        </div>
       </section>
 
       <section className="cne-sec cne-rv">
         <div className="cne-eyebrow">Where it comes from</div>
         <h2>Pick your location.</h2>
-        {openLocations.map((loc) => (
+        {open.map((loc) => (
           <div
             key={loc.id}
             className="cne-loc is-live"
@@ -214,23 +217,32 @@ export default function OrderPage() {
         <div className="cne-eyebrow">If you would rather not move</div>
         <h2>Delivery.</h2>
         <p className="cne-lede">
-          Three apps deliver from the Hollywood location. They set their own prices and add their
-          own fees, so ordering direct above is the cheaper way to eat the same food — but long
-          after midnight, in the rain, this is why we are on all three.
+          The delivery apps set their own prices and add their own fees, so ordering direct above is
+          the cheaper way to eat the same food — but long after midnight, in the rain, this is why
+          we are on them. Pick the location closest to you.
         </p>
-        <div className="cne-loc-btns" style={{ marginTop: 16 }} data-surface="order-page">
-          {deliveryPlatforms.map((platform) => (
-            <a
-              key={platform.id}
-              className="cne-mini is-plain"
-              href={platform.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {platform.name.toUpperCase()}
-            </a>
-          ))}
-        </div>
+        {open.map((loc) => {
+          const apps = deliveryFor(loc.id);
+          if (apps.length === 0) return null;
+          return (
+            <div key={loc.id} style={{ marginTop: 16 }}>
+              <h3 style={{ fontSize: 14, margin: "0 0 8px" }}>{loc.neighbourhood}</h3>
+              <div className="cne-loc-btns" data-surface="order-page" data-location={slugFor(loc)}>
+                {apps.map((platform) => (
+                  <a
+                    key={platform.id}
+                    className="cne-mini is-plain"
+                    href={platform.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {platform.name.toUpperCase()}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        })}
 
         <h3 style={{ marginTop: 28, fontSize: 14 }}>Catering and large orders</h3>
         <p className="cne-lede">

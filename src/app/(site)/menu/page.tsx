@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MenuBrowser } from "@/components/counter/MenuBrowser";
-import { JsonLdScript, menuNode, flagshipRestaurantLd } from "@/components/shared/JsonLd";
+import { JsonLdScript, menuNode, restaurantLd } from "@/components/shared/JsonLd";
+import { flagship } from "@/data/locations";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { SLIDER_PRICE, COMBO_FROM_PRICE, featuredItems } from "@/data/menu";
 import Link from "next/link";
@@ -32,8 +33,11 @@ export default function MenuPage() {
           price. Elsewhere the Restaurant nodes point at the stub. */}
       <JsonLdScript data={{ "@context": "https://schema.org", ...menuNode() }} />
       <JsonLdScript data={breadcrumbLd([{ name: "Menu", path: "/menu/" }])} />
-      {/* The store the menu is served at, so `hasMenu` has both ends on one page. */}
-      <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* A store the menu is served at, so `hasMenu` has both ends on one page.
+          Hollywood's only: every store serves the same menu, each store's node
+          lives on its own page, and a second copy here tipped /menu/ over its
+          document budget (issue #178). */}
+      <JsonLdScript data={restaurantLd(flagship)} />
       <MenuBrowser />
 
       {/* Crawlable links to the named-item pages. The rows above are buttons

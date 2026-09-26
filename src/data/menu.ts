@@ -9,7 +9,7 @@
  * or recreated in Otter its UUID changes and the deep link 404s, so treat this
  * file as a mirror of Otter, never as an independent source of truth.
  *
- * Last reconciled with the storefront: 2026-09-08.
+ * Last reconciled with the storefront: 2026-09-25.
  */
 
 export type MenuItem = {
@@ -51,7 +51,7 @@ export type MenuCategoryKey = "sliders" | "combos" | "fries" | "secret" | "drink
  * changed rather than when the site happened to be rebuilt, and shown on the
  * menu itself so a guest can see the prices are current.
  */
-export const MENU_UPDATED = "2026-09-08";
+export const MENU_UPDATED = "2026-09-25";
 
 export const categoryTitles: Record<MenuCategoryKey, string> = {
   sliders: "Sliders",
@@ -69,7 +69,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "fe9754fa-6f48-423a-a833-b52f0a9c2f89",
       name: "Chris N Eddy's Slider",
       desc: "Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.",
-      price: 7.49,
+      price: 8.49,
       signature: true,
       takesToppings: true,
     },
@@ -88,7 +88,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "cb39bdad-a744-46f1-b004-f78ac93596ff",
       name: "Triple Patty Slider",
       desc: "Three smashed patties on three slices of cheese.",
-      price: 8.49,
+      price: 9.49,
       takesToppings: true,
     },
     {
@@ -107,7 +107,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "5f336391-8daf-4d23-929a-cb78c125ce0d",
       name: "1 Slider and Fries",
       desc: "One slider and a side of chris-cut fries. A slider is two smashed patties on two slices of cheese, buttered Martin’s roll.",
-      price: 11.49,
+      price: 12.49,
       takesToppings: true,
     },
     {
@@ -116,7 +116,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "6dcd14a3-7032-489a-9e66-5f4718e96af1",
       name: "2 Sliders and Fries",
       desc: "Two sliders and a side of chris-cut fries. The order most people are actually here for.",
-      price: 16.49,
+      price: 17.49,
       signature: true,
       takesToppings: true,
     },
@@ -251,7 +251,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "42b6ff6c-9e02-43da-bdeb-dd181e8ec348",
       name: "Vanilla Shake (20 oz cup)",
       desc: "20oz. Classic.",
-      price: 5.04,
+      price: 4.49,
     },
     {
       id: "coca-cola-20-oz-cup",
@@ -417,7 +417,7 @@ export const extras = [
 const signatureSlider = menu.sliders.find((i) => i.id === "chris-n-eddy-s-slider");
 
 /** The signature slider's price. Every "sliders from" figure on the site. */
-export const SLIDER_PRICE = signatureSlider ? signatureSlider.price : 7.49;
+export const SLIDER_PRICE = signatureSlider ? signatureSlider.price : 8.49;
 
 /** The cheapest slider-and-fries combo. */
 export const COMBO_FROM_PRICE = Math.min(...menu.combos.map((i) => i.price));

@@ -1,0 +1,278 @@
+/* /catering/ — see src/app/(site)/catering/page.tsx. Phone first; the
+   desktop tier starts at 901px like the rest of the storefront. */
+
+/* ---- hero: the red panel and the crowd --------------------------------- */
+.cne-cat-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--a-red-cta);
+  color: var(--a-cream);
+  padding: 34px 15px 0;
+}
+.cne-cat-stamp {
+  position: absolute;
+  top: 8px;
+  right: -16px;
+  width: 64px;
+  height: 64px;
+}
+.cne-cat-k {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--a-yel);
+}
+.cne-cat-hero h1 {
+  position: relative;
+  z-index: 2;
+  margin: 10px 0 14px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(46px, 9vw, 112px);
+  line-height: 0.86;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+/* The ORDER ONLINE button's own yellow, so the page has one yellow. */
+.cne-cat-hero h1 .y {
+  color: var(--a-yel);
+}
+.cne-cat-lede {
+  position: relative;
+  z-index: 2;
+  max-width: 40ch;
+  margin: 0;
+  font-size: clamp(15px, 1.6vw, 20px);
+  line-height: 1.45;
+}
+.cne-cat-cta {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  max-width: 480px;
+  margin-top: 22px;
+}
+.cne-cat-cta .cne-big {
+  flex: 1.4;
+  font-size: 14px;
+  padding: 15px 12px;
+}
+/* The monsters stand along the bottom edge with their chins below the floor,
+   so the crowd reads as people waiting at the front rather than stickers. */
+.cne-cat-crowd {
+  position: relative;
+  z-index: 1;
+  height: 118px;
+  margin: 22px -15px 0;
+  padding: 0;
+  list-style: none;
+}
+.cne-cat-crowd li {
+  position: absolute;
+  bottom: 0;
+  left: var(--l);
+  width: var(--w);
+  transform: translateY(26%);
+}
+.cne-cat-crowd li.is-desk {
+  display: none;
+}
+.cne-cat-crowd svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* The store's checkerboard floor, as on the home hero's seam. */
+.cne-cat-floor {
+  position: relative;
+  z-index: 3;
+  height: 18px;
+  background-image: repeating-conic-gradient(var(--a-ink) 0% 25%, var(--a-cream) 0% 50%);
+  background-size: 18px 18px;
+  border-top: 2px solid var(--a-ink);
+  border-bottom: 2px solid var(--a-ink);
+}
+
+/* ---- the food ---------------------------------------------------------- */
+.cne-cat-food .cne-cardgrid {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* The cards show the food, not a price or a button: catering is ordered and
+   priced on ezCater. */
+.cne-cat-food .cne-card {
+  cursor: default;
+}
+.cne-cat-food .cne-card:hover .cne-card-img {
+  transform: none;
+}
+
+/* ---- three steps, on the artist's blue ---------------------------------- */
+.cne-cat-blue {
+  background: var(--a-blue);
+  color: var(--a-cream);
+  padding: 44px 15px 30px;
+}
+.cne-cat-blue .cne-eyebrow {
+  color: var(--a-yel);
+}
+.cne-cat-blue h2 {
+  margin: 6px 0 22px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 0.95;
+}
+.cne-cat-steps {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cne-cat-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--a-cream);
+  color: var(--a-ink);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 5px 5px 0 var(--a-ink);
+}
+.cne-cat-steps .n {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  background: var(--a-yel);
+  border: 2.5px solid var(--a-ink);
+  border-radius: 50%;
+}
+.cne-cat-steps b {
+  display: block;
+  margin-bottom: 3px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.05;
+}
+.cne-cat-steps b + span {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--a-sub);
+}
+
+/* ---- last card ---------------------------------------------------------- */
+.cne-cat-end {
+  padding: 40px 15px 56px;
+}
+.cne-cat-endcard {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  align-items: center;
+  padding: 30px 20px 26px 44px;
+  background: var(--a-card);
+  border: 3px solid var(--a-ink);
+  box-shadow: 7px 7px 0 var(--a-ink);
+}
+/* A checkerboard edge down the left, like the mural's pillars. */
+.cne-cat-endcard::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 22px;
+  background-image: repeating-conic-gradient(var(--a-ink) 0% 25%, var(--a-cream) 0% 50%);
+  background-size: 22px 22px;
+  border-right: 2px solid var(--a-ink);
+}
+.cne-cat-endcard h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 4.4vw, 56px);
+  line-height: 0.95;
+}
+.cne-cat-endcard .scr {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-marker), var(--font-display);
+  font-size: 0.62em;
+  line-height: 1.3;
+  color: var(--a-red-cta);
+  transform: rotate(-3deg);
+  transform-origin: left;
+}
+.cne-cat-endcard .cne-big {
+  font-size: 14px;
+  padding: 15px 22px;
+}
+.cne-cat-peek {
+  position: absolute;
+  top: -30px;
+  right: 18px;
+}
+
+@media (min-width: 901px) {
+  .cne-cat-hero {
+    padding: 60px 44px 0;
+  }
+  .cne-cat-stamp {
+    top: 40px;
+    right: -30px;
+    width: 190px;
+    height: 190px;
+  }
+  .cne-cat-crowd {
+    height: 170px;
+    margin: 4px -44px 0;
+  }
+  .cne-cat-blue {
+    padding: 64px 44px 40px;
+  }
+  .cne-cat-steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+  }
+  .cne-cat-end {
+    padding: 44px 44px 80px;
+  }
+  .cne-cat-endcard {
+    grid-template-columns: 1fr auto;
+    padding: 40px 40px 40px 66px;
+  }
+  .cne-cat-endcard .cne-big {
+    min-width: 250px;
+  }
+}
+
+/* From tablet up the whole crowd fits: nine across, placed by width. */
+@media (min-width: 600px) {
+  .cne-cat-crowd li {
+    left: var(--ld);
+    width: var(--wd);
+  }
+  .cne-cat-crowd li.is-desk {
+    display: block;
+  }
+}
+@media (min-width: 600px) and (max-width: 900px) {
+  .cne-cat-hero {
+    padding-inline: 30px;
+  }
+  .cne-cat-crowd {
+    height: 110px;
+    margin-inline: -30px;
+  }
+}

@@ -27,19 +27,21 @@ const LOCATIONS_UPDATED = "2026-09-24";
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
  */
 const HOME_UPDATED = "2026-09-24";
-const ORDER_UPDATED = "2026-09-23";
+const ORDER_UPDATED = "2026-09-26";
 const ABOUT_UPDATED = "2026-09-22";
-const CONTACT_UPDATED = "2026-09-24";
+const CONTACT_UPDATED = "2026-09-26";
 /**
  * The /menu/ page's own layout (the Sliders section, merch moved out), which
  * can change without the prices in `MENU_UPDATED` being re-reconciled.
  */
-const MENU_PAGE_UPDATED = "2026-09-23";
+const MENU_PAGE_UPDATED = "2026-09-26";
 const latest = (...isos: string[]): string => isos.sort().at(-1)!;
 /** When /returns and /terms were added. Both also carry the store settings
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
+/** When /catering was added. */
+const CATERING_UPDATED = "2026-09-26";
 /** When /careers last changed (the store-art pass, issue #146). */
 const CAREERS_UPDATED = "2026-09-24";
 
@@ -99,6 +101,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       images: i.photo ? [`${brand.siteUrl}/menu/${i.photo}.webp`] : undefined,
     })),
     { path: "/order/", priority: 0.9, updated: ORDER_UPDATED },
+    // The page a "catering" search should land on; the ordering itself is on
+    // ezCater, so it sits under /order/ rather than beside it.
+    { path: "/catering/", priority: 0.7, updated: CATERING_UPDATED },
     // The shop is its own funnel: /shop/ is the entry point and each product
     // page is what a search for the product itself should land on, so the
     // product ranks above the index it sits in.

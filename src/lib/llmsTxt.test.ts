@@ -11,6 +11,11 @@ const flagship = locations.find((l) => l.id === "hollywood")!;
 describe("buildLlmsTxt", () => {
   const text = buildLlmsTxt(merch);
 
+  it("points AI search at the catering page and ezCater", () => {
+    expect(text).toContain(`${brand.siteUrl}/catering/`);
+    expect(text).toContain("ezcater.com/catering/chris-n-eddys-3");
+  });
+
   it("states the open location's address, phone and hours", () => {
     expect(text).toContain(flagship.address);
     expect(text).toContain(flagship.phone!);

@@ -60,7 +60,8 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Is there parking?",
-    a: "In Hollywood, there is street parking along W. Sunset Blvd and the residential streets just off it. We're a walk-up on Sunset between Western and Normandie, so a pickup order is usually quicker to collect than it is to find a space for a sit-down meal.",
+    // Owner, 2026-09-26.
+    a: "Yes, at both. In Hollywood there is parking behind the store, and more in the WSS parking lot next door. In Van Nuys there is a parking lot right in front of the store.",
   },
   {
     q: "Do you have anything vegetarian?",

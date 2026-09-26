@@ -8,12 +8,14 @@
  * label; who wrote and when; the message itself in a box; then big tap
  * targets to answer by email or phone. Same paper-and-ink look and the same
  * table-based, web-safe-font construction as the order emails in
- * `src/lib/email.ts` (no image, no webfont, nothing that has to load), and
+ * `src/lib/email.ts` (no webfont; the only images are the logo and the
+ * monster, both with fallbacks), and
  * every piece the visitor typed is escaped before it touches the HTML.
  */
 import { brand } from "@/data/brand";
 import type { Location } from "@/data/locations";
 import { googleDirections } from "@/lib/directions";
+import { emailLogoImg } from "@/lib/emailLogo";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
 
@@ -155,8 +157,8 @@ function shell(opts: {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:${CARD};border:2px solid ${INK}">
       <tr><td style="background:${INK};padding:12px 18px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td style="font-family:${DISPLAY_FONT};font-size:16px;color:${PAPER}">${escapeHtml(brand.name)}</td>
-          <td align="right" style="font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${PAPER}">${escapeHtml(opts.tag ?? "Website")}</td>
+          <td style="vertical-align:middle">${emailLogoImg(PAPER)}</td>
+          <td align="right" style="vertical-align:middle;font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${PAPER}">${escapeHtml(opts.tag ?? "Website")}</td>
         </tr></table>
       </td></tr>
       ${checkerStrip()}

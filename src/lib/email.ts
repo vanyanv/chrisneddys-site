@@ -11,7 +11,7 @@
  * Transactional only, in the brand's plain, direct voice: what was bought,
  * what it cost, what happens next, who to ask. No marketing content, no
  * unsubscribe footer, no tracking pixel, no image that has to load for the
- * message to make sense — these are receipts, not a list.
+ * message to make sense (the header logo has the name as its alt text) — these are receipts, not a list.
  *
  * Every order email ships both a plain-text body (`text`) and a hand-written
  * table-based HTML body (`html`) built from the same order data, so either
@@ -21,6 +21,7 @@ import "server-only";
 import { getDb, type Db } from "@/db/client";
 import { brand } from "@/data/brand";
 import { absoluteUrl } from "@/lib/siteOrigin";
+import { emailLogoImg } from "@/lib/emailLogo";
 import { getEditionSizes, getStoreSettings, type OrderWithItems } from "@/lib/orders";
 
 export type EmailResult = { sent: true } | { sent: false; reason: string };
@@ -326,7 +327,7 @@ function htmlShell(opts: {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${CARD};border:1px solid ${RULE}">
       <tr><td style="background:${headBg};padding:14px 20px">
         ${pair(
-          `<span style="font-family:${DISPLAY_FONT};font-size:17px;color:${headColor}">${escapeHtml(brand.name)}</span>`,
+          emailLogoImg(headColor),
           `<span style="font-family:${MONO_FONT};font-size:10px;font-weight:bold;letter-spacing:.14em;text-transform:uppercase;color:${headColor}">${escapeHtml(opts.badgeLabel)}</span>`,
         )}
       </td></tr>

@@ -110,6 +110,10 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
+              // Only a key pressed on the card itself selects it. Enter on a
+              // link inside (ORDER, DIRECTIONS, CALL, details) bubbles up here,
+              // and cancelling it would stop that link from opening.
+              if (e.target !== e.currentTarget) return;
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 setSel(loc.id);

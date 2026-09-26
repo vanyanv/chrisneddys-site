@@ -4,6 +4,7 @@ import { locations, flagship, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
+import { mapsQuery } from "@/lib/directions";
 import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { ID, siteDescription } from "@/lib/seo";
 
@@ -117,9 +118,7 @@ export function restaurantNode(loc: Location) {
       addressCountry: "US",
     },
     geo: { "@type": "GeoCoordinates", latitude: loc.lat, longitude: loc.lng },
-    hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      `${brand.name}, ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
-    )}`,
+    hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(loc))}`,
     openingHoursSpecification:
       loc.openingSpec?.map((spec) => ({
         "@type": "OpeningHoursSpecification",

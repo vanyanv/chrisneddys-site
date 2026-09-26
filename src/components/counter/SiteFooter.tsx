@@ -4,6 +4,7 @@ import { brand } from "@/data/brand";
 import { LOGO } from "@/lib/logoImage";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
+import { AddressLink } from "@/components/locations/DirectionsLink";
 import { FooterMonster } from "@/components/counter/FooterMonster";
 import { FooterTag } from "@/components/storeart/FooterTag";
 
@@ -121,9 +122,7 @@ export function SiteFooter() {
                 padded rather than as a map. */}
               <p className="cne-foot-h">{loc.neighbourhood}</p>
               <address>
-                {loc.address}
-                <br />
-                {loc.city}, {loc.region} {loc.postal}
+                <AddressLink loc={loc} />
                 {loc.phone && loc.phoneTel ? (
                   <>
                     <br />

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Location } from "@/data/locations";
 import { withUtm, type OrderSurface } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
-import { DirectionsLink } from "@/components/locations/DirectionsLink";
+import { AddressLink, DirectionsLink } from "@/components/locations/DirectionsLink";
 
 /**
  * One store's card: name, address, hours and the button row every hand-copied
@@ -66,9 +66,7 @@ export function LocationCard({
       </div>
 
       <Address className="cne-loc-addr" style={addressStyle}>
-        {loc.address}
-        <br />
-        {loc.city}, {loc.region} {loc.postal}
+        <AddressLink loc={loc} />
       </Address>
 
       {loc.isOpen && (

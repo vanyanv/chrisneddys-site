@@ -504,6 +504,30 @@
   gap: calc(var(--u) * 1.2);
 }
 
+/* Chris's (red) and Eddy's (blue) monster, perched at the inner corner of
+   their own link and facing each other across the gap — idea 20, the same
+   corner-peek technique as the Way cards' `.cne-way-mon`
+   (`src/styles/way-monsters.css`). Decorative only. */
+.cne-drip-btn {
+  position: relative;
+}
+.cne-drip-way-mon {
+  position: absolute;
+  top: -12px;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 1;
+}
+.cne-drip-way-mon.is-chris {
+  right: -10px;
+}
+.cne-drip-way-mon.is-eddy {
+  left: -10px;
+  /* Mirrors the drawing, never its paths — same technique as CapArt.tsx. */
+  transform: scaleX(-1);
+}
+
 @media (min-width: 700px) {
   .cne-drip-btn {
     font-size: min(1.2vw, 17.28px);

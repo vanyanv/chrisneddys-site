@@ -66,4 +66,10 @@
   --sp-b-bg: #f5b82e;
   --sp-b-fg: #1a1612;
   --sp-b-accent: #e63027;
+  /* The mural artist's own palette, in the small places: text selection, the
+     keyboard focus ring, and body-copy link underlines. See DESIGN.md /
+     idea 31, "his colors in the small places" — light-only, no glow. */
+  --a-lime: #c6ff2b;
+  --a-blue: #007fee;
+  --a-pink: #ff4fa3;
 }

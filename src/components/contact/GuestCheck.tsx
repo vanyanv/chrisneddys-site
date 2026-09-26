@@ -4,6 +4,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactElement } from "react";
 import { brand } from "@/data/brand";
 import { track } from "@/lib/track";
+import { cateringPlatform } from "@/data/delivery";
+import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+import "@/styles/catering-card.css";
 import { sendContactMessage } from "@/lib/siteForms";
 import {
   CONTACT_TOPICS as TOPICS,
@@ -293,6 +297,28 @@ export function GuestCheck(): ReactElement {
             ))}
           </div>
         </fieldset>
+
+        {/* Catering itself is booked on ezCater, so a lunch order doesn't wait
+            in the inbox. The form stays for anything else. No events at the
+            store (owner, 2026-09-26). */}
+        {topic === "Catering & events" && (
+          <p className="cne-catnote" data-surface="contact-catering">
+            <Monster
+              species="classic"
+              bodyColor={MONSTER_COLORS.yellow.body}
+              irisColor={MONSTER_COLORS.yellow.iris}
+              size={36}
+            />
+            <span>
+              Catering for an office or a party? Order it on {cateringPlatform.name}.{" "}
+              <a href={cateringPlatform.url} target="_blank" rel="noopener noreferrer">
+                ORDER CATERING &rarr;
+              </a>
+              <br />
+              For anything else, write to us here.
+            </span>
+          </p>
+        )}
 
         <div className={`cne-ck-field${errors.message ? " is-bad" : ""}`}>
           <label className="cne-ck-label" htmlFor={id("message")}>

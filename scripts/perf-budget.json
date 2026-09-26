@@ -18,14 +18,14 @@
   },
   "/menu/": {
     "iphone": {
-      "document": 69.0,
+      "document": 70.5,
       "font": 125,
       "image": 117.5,
       "script": 189.5,
       "fetch": 184.0
     },
     "desktop": {
-      "document": 69.0,
+      "document": 70.5,
       "font": 125,
       "image": 117.5,
       "script": 189.5,
@@ -132,6 +132,22 @@
       "image": 26.0,
       "script": 189.5,
       "fetch": 184.5
+    }
+  },
+  "/catering/": {
+    "iphone": {
+      "document": 66.0,
+      "font": 125,
+      "image": 40.0,
+      "script": 189.5,
+      "fetch": 221.5
+    },
+    "desktop": {
+      "document": 66.0,
+      "font": 125,
+      "image": 70.0,
+      "script": 189.5,
+      "fetch": 221.5
     }
   }
 }

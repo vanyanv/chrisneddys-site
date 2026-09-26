@@ -1,4 +1,5 @@
 import { locations, type Location } from "@/data/locations";
+import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
 import { slugFor } from "@/lib/locationSlug";
 
 /**
@@ -11,8 +12,9 @@ import { slugFor } from "@/lib/locationSlug";
  * store has its own phone number, so an ORDER or CALL link says where it goes
  * whichever button, picker or page it sits in — including buttons added later
  * that nobody remembers to label. A `data-location` declared on an ancestor is
- * the fallback for links that don't identify a store on their own (directions,
- * delivery apps).
+ * the fallback for links that don't identify a store on their own (directions).
+ * Delivery and catering listings each belong to one store, so they answer from
+ * the link too.
  */
 
 const digits = (tel: string) => tel.replace(/\D/g, "");
@@ -44,6 +46,18 @@ for (const [d, n] of phoneCounts) if (n > 1) byPhone.delete(d);
 
 const slugById = new Map<string, string>(locations.map((l) => [l.id, slugFor(l)]));
 
+/** A listing URL without its query, hash or trailing slash, so a tagged or
+ * re-typed copy of the same link still matches. */
+const listingKey = (url: URL) => `${url.hostname}${url.pathname.replace(/\/+$/, "")}`;
+
+// Each delivery and catering listing belongs to one store, so the link says
+// where it goes the way an Otter link does.
+const byListing = new Map<string, string>();
+for (const p of [...deliveryPlatforms, cateringPlatform]) {
+  const slug = slugById.get(p.locationId as Location["id"]);
+  if (slug) byListing.set(listingKey(new URL(p.url)), slug);
+}
+
 /** A declared `data-location`, in slug form whichever spelling was used. */
 export function normaliseLocation(value: string | undefined): string | undefined {
   if (!value) return undefined;
@@ -60,8 +74,9 @@ export function clickLocation(href: string, declared?: string): string | undefin
   }
   let fromLink: string | undefined;
   try {
-    const id = otterStoreId(new URL(href));
-    if (id) fromLink = byOtterStore.get(id);
+    const url = new URL(href);
+    const id = otterStoreId(url);
+    fromLink = id ? byOtterStore.get(id) : byListing.get(listingKey(url));
   } catch {
     /* relative or malformed: nothing to read */
   }

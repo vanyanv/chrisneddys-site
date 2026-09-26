@@ -3,12 +3,13 @@ import Link from "next/link";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
 import { SLIDER_PRICE, COMBO_FROM_PRICE } from "@/data/menu";
-import { deliveryFor, cateringPlatform } from "@/data/delivery";
+import { deliveryFor } from "@/data/delivery";
 import { sharedFaq, type FaqEntry } from "@/data/faq";
 import { formatPrice } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { CateringCard } from "@/components/catering/CateringCard";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
@@ -54,9 +55,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do you cater?",
-    get a() {
-      return `Yes. Office and event catering runs through ezCater, linked on this page. For anything it does not cover — a large order, a private event, a press or partnership question — use the form on our contact page or call us: ${phoneList()}.`;
-    },
+    a: "Yes. Catering for offices, sets and parties is booked on ezCater — the button on this page and our catering page at chrisneddys.com/catering/ both go there.",
   },
   {
     q: "Is there parking?",
@@ -125,6 +124,13 @@ export default function OrderPage() {
           and every topping free, at every location. Rather talk to someone? Call the location
           you&rsquo;re picking up from.
         </p>
+        <CateringCard
+          eyebrow="Feeding a group?"
+          title="Catering."
+          text="Office lunches, sets and parties, booked on ezCater."
+          surface="order-catering"
+          monster="yellow"
+        />
       </section>
 
       <section className="cne-sec cne-rv">
@@ -243,30 +249,6 @@ export default function OrderPage() {
             </div>
           );
         })}
-
-        <h3 style={{ marginTop: 28, fontSize: 14 }}>Catering and large orders</h3>
-        <p className="cne-lede">
-          Office lunches and events run through {cateringPlatform.name}. For anything it does not
-          cover — a private event, a press or partnership question — the{" "}
-          <Link
-            prefetch={false}
-            href="/contact/"
-            style={{ textDecoration: "underline", color: "inherit" }}
-          >
-            contact page
-          </Link>{" "}
-          reaches a real person.
-        </p>
-        <div className="cne-loc-btns" style={{ marginTop: 12 }} data-surface="order-page">
-          <a
-            className="cne-mini is-plain"
-            href={cateringPlatform.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            CATERING ON {cateringPlatform.name.toUpperCase()}
-          </a>
-        </div>
       </section>
 
       <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>

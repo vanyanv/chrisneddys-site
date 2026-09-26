@@ -1,20 +1,14 @@
 "use client";
 
 import { allItems, type MenuItem } from "@/data/menu";
+import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice, itemPhotoAlt } from "@/lib/otter";
 import { ItemSheet } from "./ItemSheet";
 import { useItemSheet } from "./useItemSheet";
 
-/** The three the prototype leads with. */
-const FEATURED = [
-  "7bbcdf64-0e6f-489f-8ca4-0bee1e835bb0", // 2 Sliders and Fries — most ordered
-  "de38e42c-7600-473f-913f-acb6b2a45aa8", // Chris N Eddy's Slider — the signature
-  "43d72be5-d38f-459d-9306-4c45f512715a", // The Quad — the secret-menu hook
-];
-
 export function FeaturedCards() {
   const { item, open, way, setWay, openItem, close } = useItemSheet();
-  const items = FEATURED.map((id) => allItems.find((i) => i.otterId === id)).filter(
+  const items = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
 

@@ -92,7 +92,7 @@ function orderingSection(): string {
         ([l, apps]) =>
           `Delivery from ${l.name}: ${apps.map((p) => `${p.name} (${p.url})`).join(", ")}.`,
       ),
-    `Catering: ${cateringPlatform.name} (${cateringPlatform.url}).`,
+    `Catering: for offices, sets and parties, booked and delivered through ${cateringPlatform.name} (${cateringPlatform.url}). Menu, hours and fees for catering are on that page. Catering page: ${siteUrl("/catering/")}`,
     `Order page: ${siteUrl("/order/")}`,
   ];
   return lines.join("\n");
@@ -131,6 +131,7 @@ function optionalSection(): string {
     ["Home", siteUrl("/")],
     ["Menu", siteUrl("/menu/")],
     ["Order", siteUrl("/order/")],
+    ["Catering", siteUrl("/catering/")],
     ["Locations", siteUrl("/locations/")],
     ["Shop", siteUrl("/shop/")],
     ["About", siteUrl("/about/")],

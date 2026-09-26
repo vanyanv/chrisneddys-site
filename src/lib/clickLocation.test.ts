@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { clickLocation, normaliseLocation, otterStoreId } from "@/lib/clickLocation";
 import { itemOrderUrl, orderUrl, withUtm } from "@/lib/otter";
 import { locations } from "@/data/locations";
+import { cateringPlatform, deliveryFor } from "@/data/delivery";
 
 const vanNuys = locations.find((l) => l.id === "vannuys")!;
 const hollywood = locations.find((l) => l.id === "hollywood")!;
@@ -28,6 +29,13 @@ describe("clickLocation", () => {
       "van-nuys",
     );
     expect(clickLocation("https://www.doordash.com/store/x/")).toBeUndefined();
+  });
+
+  it("reads the store from a delivery or catering listing, whatever the button declares", () => {
+    expect(clickLocation(cateringPlatform.url)).toBe("hollywood");
+    expect(clickLocation(`${cateringPlatform.url}/?utm_source=site`, "van-nuys")).toBe("hollywood");
+    const [vanNuysApp] = deliveryFor("vannuys");
+    expect(clickLocation(vanNuysApp!.url, "hollywood")).toBe("van-nuys");
   });
 
   it("spells a declared store id as its URL slug, so one store is one row", () => {

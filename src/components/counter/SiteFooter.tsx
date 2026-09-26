@@ -20,6 +20,7 @@ import { FooterTag } from "@/components/storeart/FooterTag";
 const EAT = [
   { href: "/menu/", label: "Menu" },
   { href: "/order/", label: "Order online" },
+  { href: "/catering/", label: "Catering" },
   { href: "/shop/", label: "Shop" },
   { href: "/about/", label: "Our story" },
   { href: "/contact/", label: "Contact" },

@@ -78,13 +78,34 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       }
     };
     document.addEventListener("keydown", onKey);
-    // The page behind a modal shouldn't scroll under it.
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // On iOS, hiding body overflow alone can still let a touch scroll the
+    // document behind a fixed sheet. Pin the page at its current position on
+    // phone-sized viewports, then put it back exactly where it was on close.
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const compact = window.matchMedia("(max-width: 900px)").matches;
+    const previous = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+    body.style.overflow = "hidden";
+    if (compact) {
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.width = "100%";
+    }
     return () => {
       cancelAnimationFrame(id);
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      body.style.overflow = previous.overflow;
+      if (compact) {
+        body.style.position = previous.position;
+        body.style.top = previous.top;
+        body.style.width = previous.width;
+        window.scrollTo(0, scrollY);
+      }
       restoreRef.current?.focus?.({ preventScroll: true });
     };
   }, [open, onClose]);

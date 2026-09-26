@@ -6,6 +6,7 @@ import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
+import { lockBodyScroll } from "@/lib/bodyScrollLock";
 import { WayPicker } from "./WayPicker";
 
 type Props = {
@@ -78,34 +79,11 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       }
     };
     document.addEventListener("keydown", onKey);
-    // On iOS, hiding body overflow alone can still let a touch scroll the
-    // document behind a fixed sheet. Pin the page at its current position on
-    // phone-sized viewports, then put it back exactly where it was on close.
-    const body = document.body;
-    const scrollY = window.scrollY;
-    const compact = window.matchMedia("(max-width: 900px)").matches;
-    const previous = {
-      overflow: body.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      width: body.style.width,
-    };
-    body.style.overflow = "hidden";
-    if (compact) {
-      body.style.position = "fixed";
-      body.style.top = `-${scrollY}px`;
-      body.style.width = "100%";
-    }
+    const releaseScroll = lockBodyScroll();
     return () => {
       cancelAnimationFrame(id);
       document.removeEventListener("keydown", onKey);
-      body.style.overflow = previous.overflow;
-      if (compact) {
-        body.style.position = previous.position;
-        body.style.top = previous.top;
-        body.style.width = previous.width;
-        window.scrollTo(0, scrollY);
-      }
+      releaseScroll();
       restoreRef.current?.focus?.({ preventScroll: true });
     };
   }, [open, onClose]);

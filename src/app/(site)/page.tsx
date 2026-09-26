@@ -5,6 +5,7 @@ import { Marquee } from "@/components/counter/Marquee";
 import { FeaturedCards } from "@/components/counter/FeaturedCards";
 import { OpenLocationCards } from "@/components/locations/OpenLocationCards";
 import { openLocations } from "@/lib/openLocations";
+import { flagship } from "@/data/locations";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
@@ -71,12 +72,11 @@ const GRAM = [
 export default function HomePage() {
   return (
     <>
-      {/* The home page carries every open store's hours, address and order
-          button, so it states each one's Restaurant node. A location that
-          has not opened states nothing anywhere until it does. */}
-      {openLocations().map((loc) => (
-        <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
-      ))}
+      {/* Hollywood's Restaurant node, as before. The home page now shows
+          every open store's card, but each store's node already lives on its
+          own /locations/ page, and a second copy here tipped the page over
+          its document budget (issue #178). */}
+      <JsonLdScript data={restaurantLd(flagship)} />
       {/* First-time desktop visitors only (issue #81) — see WelcomeIntro for
           the no-flash gate. Renders an inert curtain div for everyone else. */}
       <WelcomeIntro />

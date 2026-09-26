@@ -18,14 +18,14 @@
   },
   "/menu/": {
     "iphone": {
-      "document": 69.0,
+      "document": 70.5,
       "font": 125,
       "image": 117.5,
       "script": 189.5,
       "fetch": 184.0
     },
     "desktop": {
-      "document": 69.0,
+      "document": 70.5,
       "font": 125,
       "image": 117.5,
       "script": 189.5,

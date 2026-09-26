@@ -247,6 +247,8 @@ Blurred shadows exist in exactly three places, all of them genuinely floating la
 
 **The No-Glow Rule.** Nothing on this site emits light. No neon, no bloom, no colored `box-shadow` with a blur radius. Depth is ink on paper.
 
+_Exception: the blacklight hallway._ The Open late section is printed in the hallway mural's own ink, and its monster keeps a neon pupil there, on that one dark band, at every hour. From 10 PM Los Angeles time until that store's close, the section's number scrawl is also allowed to show through brighter, and, only where the footer's own background is already dark, the footer (whose monster already keeps its pupil glow at every hour) gets the same number scrawl behind its content. Nothing else on the site dims, glows, or switches with the clock — this is one clock read on two already-exempt surfaces, not a second palette.
+
 ## 5. Components
 
 ### Buttons

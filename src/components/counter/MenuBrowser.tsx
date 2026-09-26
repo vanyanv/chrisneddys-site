@@ -7,6 +7,7 @@ import { MenuSectionChips } from "./MenuSectionChips";
 import { ItemSheet } from "./ItemSheet";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
+import { GlyphRow, OpStamp, MenuPillar, type StampKind } from "@/components/storeart/SectionOpener";
 import "@/styles/menu-art.css";
 
 /**
@@ -24,6 +25,16 @@ const ORDER: MenuCategoryKey[] = ["sliders", "combos", "fries", "secret", "drink
  */
 const CHIP_LABEL: Partial<Record<MenuCategoryKey, string>> = {
   combos: "Combos",
+};
+
+/** Idea 4: each category heading ends in its own op-art stamp, cycling the
+ * five kinds in the order the categories are shown. */
+const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
+  sliders: "bullseye",
+  combos: "stripe",
+  fries: "checker",
+  secret: "square",
+  drinks: "pink",
 };
 
 /**
@@ -56,6 +67,7 @@ export function MenuBrowser() {
               between the heading and the first photo, which started 763px
               down a 390px-wide phone. */}
           <div className="cne-only-desk">
+            <GlyphRow />
             <div className="cne-eyebrow" id="cne-way-label">
               Pick a way — free
             </div>
@@ -83,6 +95,7 @@ export function MenuBrowser() {
             </span>
             <span className="cne-only-desk">Extra cheese +$1 · halal +$2.</span>
           </p>
+          <MenuPillar />
         </aside>
 
         <MenuSectionChips
@@ -92,7 +105,10 @@ export function MenuBrowser() {
         <div className="cne-menu-main">
           {ORDER.map((key) => (
             <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
-              <h2 className="cne-cat-h">{categoryTitles[key]}</h2>
+              <h2 className="cne-cat-h">
+                {categoryTitles[key]}
+                <OpStamp kind={CAT_STAMP[key]} size={40} className="cne-cat-stamp" />
+              </h2>
               <div className="cne-cat-rule" aria-hidden="true" />
               <div className="cne-menu-grid">
                 {foodMenu[key].map((it, i) => (

@@ -18,6 +18,7 @@ import { shopListLd } from "@/lib/merchLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { productMetadataName } from "@/lib/productSeo";
 import type { MerchProduct } from "@/data/merch";
+import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
 
 // No single location: this lede fronts every shop snippet, and there is more than one.
 const LEDE = `Merch from ${brand.name}, the Los Angeles smash-burger restaurant.`;
@@ -117,7 +118,8 @@ export default async function ShopPage() {
       {/* Not `cne-rv`: this is the top of the page, and a section that starts
           at opacity 0 and fades in is the element the browser then reports as
           LCP. The reveal belongs to what is below the fold. */}
-      <section className="cne-sec">
+      <section className="cne-sec cne-op-glyph">
+        <GlyphRow />
         <div className="cne-eyebrow">Merch</div>
         <h1>The shop.</h1>
         <p className="cne-shop-lede">
@@ -203,11 +205,14 @@ export default async function ShopPage() {
         )}
       </section>
 
-      <section className="cne-sec cne-rv">
+      <section className="cne-sec cne-rv cne-op-stamp">
         <div className="cne-eyebrow">Before you buy</div>
         {note ? (
           <>
-            <h2>Shipping &amp; returns.</h2>
+            <h2>
+              Shipping &amp; returns.
+              <OpStamp kind="checker" size={44} />
+            </h2>
             <p className="cne-shop-lede">
               {note.line} See{" "}
               <Link prefetch={false} href="/returns/">
@@ -227,7 +232,10 @@ export default async function ShopPage() {
           </>
         ) : (
           <>
-            <h2>Still being sorted.</h2>
+            <h2>
+              Still being sorted.
+              <OpStamp kind="checker" size={44} />
+            </h2>
             <p className="cne-shop-lede">
               {TERMS_PENDING} Want to know when it opens?{" "}
               <Link prefetch={false} href="/contact/">

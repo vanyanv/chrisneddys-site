@@ -6,6 +6,7 @@ import { SLIDER_PRICE, COMBO_FROM_PRICE, featuredItems } from "@/data/menu";
 import Link from "next/link";
 import { formatPrice } from "@/lib/otter";
 import { ScrollChecker } from "@/components/storeart/ScrollChecker";
+import { GlyphRow } from "@/components/storeart/SectionOpener";
 
 const title = "Menu & Prices — Sliders, Combos & Fries";
 /**
@@ -41,7 +42,8 @@ export default function MenuPage() {
           used to get its own copy at the top of the menu, which pushed the
           first photo below the fold (issue #155). The links stay in the HTML
           at every width. */}
-      <section className="cne-sec cne-rv cne-only-desk" style={{ paddingBottom: 40 }}>
+      <section className="cne-sec cne-rv cne-only-desk cne-op-glyph" style={{ paddingBottom: 40 }}>
+        <GlyphRow />
         <div className="cne-eyebrow">Asked about most</div>
         <h2>The ones people name.</h2>
         <ul className="cne-menu-named">

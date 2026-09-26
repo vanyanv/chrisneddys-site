@@ -44,8 +44,33 @@ body {
 
 /* Smooth focus ring for keyboard navigation */
 :focus-visible {
-  outline: 3px solid var(--color-cne-ink);
-  outline-offset: 2px;
+  outline: 3px solid var(--a-blue);
+  outline-offset: 3px;
+}
+
+/* The mural artist's colors in the small places: a lime highlight and a hot
+   pink underline on body-copy links, text itself stays ink. See DESIGN.md /
+   idea 31. */
+::selection {
+  background: var(--a-lime);
+  color: var(--a-ink);
+}
+
+/* Recolors the underline that `.cne-foot a, .cne-sec p a, .cne-menu-foot a,
+   .cne-quote a` already draw (counter.css) to hot pink, but only on the three
+   prose selectors — `.cne-foot a` (the sitewide footer) is deliberately left
+   out, so nav, buttons, cards and the footer keep their ink underline. The
+   extra `body` ancestor selector isn't scope, it's specificity: counter.css's
+   `text-decoration: underline` is a shorthand, so it also sets
+   `text-decoration-color: currentcolor` and `text-underline-offset` at the
+   same (0,1,2) specificity as its own selectors, and counter.css loads after
+   this file — without the bump these two declarations would lose that tie. */
+body .cne-sec p a,
+body .cne-quote a,
+body .cne-menu-foot a {
+  text-decoration-color: var(--a-pink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 /* --- Animations (ported from Round 2 Variations.html lines 14-38) --- */

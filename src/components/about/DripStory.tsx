@@ -8,6 +8,7 @@ import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
 const RED = { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.iris };
 const YELLOW = { bodyColor: MONSTER_COLORS.yellow.body, irisColor: MONSTER_COLORS.yellow.iris };
+const BLUE = { bodyColor: MONSTER_COLORS.blue.body, irisColor: MONSTER_COLORS.blue.iris };
 import { brand } from "@/data/brand";
 import { flagship } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
@@ -305,9 +306,15 @@ export function DripStory(): ReactElement {
         </p>
         <div className="cne-drip-cta">
           <Link prefetch={false} className="cne-drip-btn is-sec" href={`/menu/?way=${chris.id}`}>
+            <span className="cne-drip-way-mon is-chris" aria-hidden="true">
+              <Monster species="classic" {...RED} size={30} />
+            </span>
             {chris.name.toUpperCase()} &rarr;
           </Link>
           <Link prefetch={false} className="cne-drip-btn is-pri" href={`/menu/?way=${eddy.id}`}>
+            <span className="cne-drip-way-mon is-eddy" aria-hidden="true">
+              <Monster species="classic" {...BLUE} size={30} />
+            </span>
             {eddy.name.toUpperCase()} &rarr;
           </Link>
         </div>

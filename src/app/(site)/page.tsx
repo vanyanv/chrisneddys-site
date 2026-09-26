@@ -12,6 +12,7 @@ import { Vortex } from "@/components/storeart/Vortex";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
 import { WelcomeIntro } from "@/components/storeart/WelcomeIntro";
+import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -81,9 +82,10 @@ export default function HomePage() {
       <Marquee />
       <div className="cne-divider-band" />
 
-      <section className="cne-sec is-band cne-rv">
+      <section className="cne-sec is-band cne-rv cne-op-glyph">
         <div className="cne-sec-hd">
           <div>
+            <GlyphRow />
             <div className="cne-eyebrow">★ The three we sell most</div>
             <h2>Start here.</h2>
           </div>
@@ -99,7 +101,7 @@ export default function HomePage() {
       <DripEdge color="var(--color-cne-cream)" seed={1} />
 
       <section className="cne-split">
-        <div className="cne-split-l cne-sec cne-rv">
+        <div className="cne-split-l cne-sec cne-rv cne-op-tag">
           <div className="cne-eyebrow">Where to find us</div>
           <h2>Where we are.</h2>
           <HollywoodCard />
@@ -124,12 +126,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="cne-sec cne-rv">
+      <section className="cne-sec cne-rv cne-op-stamp">
         <div className="cne-sec-hd">
           <div>
             <div className="cne-eyebrow">What they’re saying</div>
             <h2>
               Press<span className="cne-only-desk-i"> &amp; reviews</span>.
+              <OpStamp kind="stripe" size={44} />
             </h2>
           </div>
         </div>
@@ -143,7 +146,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="cne-sec cne-rv">
+      <section className="cne-sec cne-rv cne-op-stamp">
         <div className="cne-sec-hd">
           <div>
             <div className="cne-eyebrow">From the gram</div>
@@ -159,6 +162,7 @@ export default function HomePage() {
               >
                 {brand.ig}
               </a>
+              <OpStamp kind="bullseye" size={44} />
             </h2>
           </div>
         </div>

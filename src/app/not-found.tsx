@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { bowlby, inter } from "@/lib/fonts";
+import { bowlby, inter, jetbrains } from "@/lib/fonts";
 import "@/styles/globals.css";
 import { brand } from "@/data/brand";
+import { MascotDefs } from "@/components/mascots/MascotDefs";
+import { StaffDoor } from "@/components/notfound/StaffDoor";
 
 /**
  * The true root `not-found.tsx` — the one Next.js falls back to for a URL
@@ -21,8 +23,9 @@ import { brand } from "@/data/brand";
  */
 export default function RootNotFound() {
   return (
-    <html lang="en" className={`${bowlby.variable} ${inter.variable}`}>
+    <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body style={{ margin: 0 }}>
+        <MascotDefs />
         <section
           style={{
             background: "var(--color-cne-red)",
@@ -35,6 +38,7 @@ export default function RootNotFound() {
           }}
         >
           <div style={{ textAlign: "center", maxWidth: 640 }}>
+            <StaffDoor />
             <div
               style={{
                 fontFamily: "var(--font-display)",

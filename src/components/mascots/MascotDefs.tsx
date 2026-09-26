@@ -111,6 +111,62 @@ export function MascotDefs() {
           </g>
         </symbol>
 
+        {/* Op-art stamps for section openers, menu headings and the wall
+            pillar (`storeart/SectionOpener.tsx`). Same --op-a/--op-b
+            convention as the bullseye and diamond above; "pink" reuses this
+            circle with --op-b overridden to hot pink rather than shipping a
+            fifth symbol. */}
+        <pattern
+          id="cne-stripe-p"
+          width={26}
+          height={26}
+          patternTransform="rotate(35)"
+          patternUnits="userSpaceOnUse"
+        >
+          <rect width={26} height={26} style={{ fill: "var(--op-b,#fff8e7)" }} />
+          <rect width={13} height={26} style={{ fill: "var(--op-a,#14110d)" }} />
+        </pattern>
+        <symbol id="cne-stripe" viewBox="0 0 200 200">
+          <circle cx={100} cy={100} r={96} fill="url(#cne-stripe-p)" />
+          <circle
+            cx={100}
+            cy={100}
+            r={96}
+            fill="none"
+            style={{ stroke: "var(--op-a,#14110d)" }}
+            strokeWidth={8}
+          />
+        </symbol>
+
+        <pattern id="cne-checker-p" width={44} height={44} patternUnits="userSpaceOnUse">
+          <rect width={44} height={44} style={{ fill: "var(--op-b,#fff8e7)" }} />
+          <rect width={22} height={22} style={{ fill: "var(--op-a,#14110d)" }} />
+          <rect x={22} y={22} width={22} height={22} style={{ fill: "var(--op-a,#14110d)" }} />
+        </pattern>
+        <symbol id="cne-checker" viewBox="0 0 200 200">
+          <g transform="rotate(45 100 100)">
+            <rect x={16} y={16} width={168} height={168} fill="url(#cne-checker-p)" />
+            <rect
+              x={16}
+              y={16}
+              width={168}
+              height={168}
+              fill="none"
+              style={{ stroke: "var(--op-a,#14110d)" }}
+              strokeWidth={8}
+            />
+          </g>
+        </symbol>
+
+        <symbol id="cne-square" viewBox="0 0 200 200">
+          <g transform="rotate(10 100 100)">
+            <rect x={8} y={8} width={184} height={184} style={{ fill: "var(--op-a,#14110d)" }} />
+            <rect x={34} y={34} width={132} height={132} style={{ fill: "var(--op-b,#fff8e7)" }} />
+            <rect x={60} y={60} width={80} height={80} style={{ fill: "var(--op-a,#14110d)" }} />
+            <rect x={86} y={86} width={28} height={28} style={{ fill: "var(--op-b,#fff8e7)" }} />
+          </g>
+        </symbol>
+
         <symbol id="cne-drip" viewBox="0 0 40 60">
           <path
             d="M20,2 C28,20 34,32 34,42 A14,14 0 1 1 6,42 C6,32 12,20 20,2 Z"

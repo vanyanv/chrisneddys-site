@@ -11,6 +11,7 @@ import { ArtPhoto } from "@/components/art/ArtPhoto";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
 import { locationMonster } from "@/components/locations/locationArt";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
 
 const title = "Careers";
 const description =
@@ -56,6 +57,7 @@ export default function CareersPage() {
       <section className="cne-cr-hero" aria-labelledby="cr-h1">
         <div className="cne-halftone" aria-hidden="true" />
         <div className="cne-cr-hero-in">
+          <GlyphRow />
           <p className="cne-cr-eyebrow">Careers</p>
           <h1 id="cr-h1">Join the crew.</h1>
           <p className="cne-cr-lede">
@@ -163,7 +165,10 @@ export default function CareersPage() {
               className="cne-cr-card-eye"
             />
             <p className="cne-cr-card-eyebrow">Open roles &middot; live on Indeed</p>
-            <h2 id="cr-roles">See what&rsquo;s hiring right now.</h2>
+            <h2 id="cr-roles">
+              See what&rsquo;s hiring right now.
+              <OpStamp kind="square" size={44} />
+            </h2>
             <p>
               Pay and how to apply are kept current there, not copied here where they&rsquo;d go
               stale.

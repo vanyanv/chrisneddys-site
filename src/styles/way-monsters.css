@@ -1,0 +1,29 @@
+/**
+ * Chris's and Eddy's monster, perched at the inner corner of each Way card
+ * (menu rail and the item sheet both render `WayPicker`), facing each other
+ * across the gap between the two cards. Purely decorative — the card's own
+ * text already says whose Way it is — so the monster is an absolutely
+ * positioned child of the existing `.cne-way` button, never shifting its
+ * text, and `aria-hidden` (`Monster` itself already carries it; the wrapper
+ * repeats it in case that ever changes). See idea 20 and
+ * src/components/counter/WayPicker.tsx.
+ */
+.cne-way {
+  position: relative;
+}
+.cne-way-mon {
+  position: absolute;
+  top: -9px;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 1;
+}
+.cne-way-mon.is-chris {
+  right: -9px;
+}
+.cne-way-mon.is-eddy {
+  left: -9px;
+  /* Mirrors the drawing, never its paths — same technique as CapArt.tsx. */
+  transform: scaleX(-1);
+}

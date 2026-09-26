@@ -4,7 +4,7 @@ import { brand } from "@/data/brand";
 import { LOGO } from "@/lib/logoImage";
 import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
-import { Monster } from "@/components/mascots/Monster";
+import { FooterMonster } from "@/components/counter/FooterMonster";
 import { FooterTag } from "@/components/storeart/FooterTag";
 
 /**
@@ -53,15 +53,7 @@ export function SiteFooter() {
     // Declared once on the whole footer: the only tracked links down here are
     // the per-store phone numbers, and every one of them belongs to "footer".
     <footer className="cne-foot" data-surface="footer">
-      <Monster
-        species="classic"
-        bodyColor="#3ee06a"
-        irisColor="#2fb8ff"
-        pupilColor="#ff3b3b"
-        glowColor="#ff3b3b"
-        size={52}
-        className="cne-foot-monster"
-      />
+      <FooterMonster />
       <div className="cne-foot-content">
         <div className="cne-foot-top">
           <div className="cne-foot-brand">

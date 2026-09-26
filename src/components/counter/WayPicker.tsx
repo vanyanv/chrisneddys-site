@@ -2,6 +2,14 @@
 
 import { useRef } from "react";
 import { ways, type WayId } from "@/data/menu";
+import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+
+/** Chris's Way gets the red monster, Eddy's Way gets the blue one — idea 20. */
+const WAY_MONSTER: Partial<Record<WayId, { bodyColor: string; irisColor: string }>> = {
+  chris: { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.iris },
+  eddy: { bodyColor: MONSTER_COLORS.blue.body, irisColor: MONSTER_COLORS.blue.iris },
+};
 
 /**
  * The two Ways, as a radio group.
@@ -70,6 +78,7 @@ export function WayPicker({
     >
       {ways.map((w) => {
         const on = w.id === way;
+        const mon = WAY_MONSTER[w.id];
         return (
           <button
             key={w.id}
@@ -80,6 +89,16 @@ export function WayPicker({
             tabIndex={on ? 0 : -1}
             onClick={() => onChange(w.id)}
           >
+            {mon ? (
+              <span className={`cne-way-mon is-${w.id}`} aria-hidden="true">
+                <Monster
+                  species="classic"
+                  bodyColor={mon.bodyColor}
+                  irisColor={mon.irisColor}
+                  size={30}
+                />
+              </span>
+            ) : null}
             <span className="t">{w.name.toUpperCase()}</span>
             <span className="s">{w.summary}</span>
           </button>

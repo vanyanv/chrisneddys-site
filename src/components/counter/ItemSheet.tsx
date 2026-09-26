@@ -6,6 +6,7 @@ import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
+import { lockBodyScroll } from "@/lib/bodyScrollLock";
 import { WayPicker } from "./WayPicker";
 
 type Props = {
@@ -78,13 +79,11 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
       }
     };
     document.addEventListener("keydown", onKey);
-    // The page behind a modal shouldn't scroll under it.
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseScroll = lockBodyScroll();
     return () => {
       cancelAnimationFrame(id);
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      releaseScroll();
       restoreRef.current?.focus?.({ preventScroll: true });
     };
   }, [open, onClose]);

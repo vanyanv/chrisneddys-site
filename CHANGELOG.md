@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: sections no longer all open the same way. The first section on each page opens with a row of the sign's op-art marks, sections about places open with the label sprayed on a lime tag, list sections carry one of Slider's op-art stamps beside the heading, and the rest keep the plain rule. The words are unchanged ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+- Site: every menu category heading ends in one of the mural's op-art marks (bullseye, striped circle, checker, nested square, pink bullseye), and on desktop the empty space under the menu's side rail is painted with a strip of the checkerboard wall, three monsters and a striped circle ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+- Site: a small red monster rolls across the yellow ticker under the home hero once every nine seconds. It pauses when the strip is hovered and stays put for visitors who prefer reduced motion ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+
 - Site: the monsters sleep when the store does. After close, the footer monster and the map pin of each open location switch to the sleeping face, and wake up at opening, following the same clock as the header ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
 - Site: the back hallway's scrawl of numbers now runs behind the "Open late" band on each open location's page, faint and lime, flickering on like a tube warming up the first time it scrolls into view ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
 - Site: the blacklight hour. From 10 PM until close, the "Open late" band's numbers show through brighter and the footer gets the same scrawl behind it, so a visitor at midnight sees the site the way the hallway looks at midnight. Nothing else changes with the clock, and DESIGN.md now records this as the one exception ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))

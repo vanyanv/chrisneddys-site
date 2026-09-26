@@ -1,3 +1,6 @@
+import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+
 /* We sell sliders, not burgers, and the reel says "fries" rather than the
    prototype's "chris-cut fries" — the long form crowded the loop. */
 const PHONE = [
@@ -32,6 +35,14 @@ export function Marquee() {
           <span key={i}>{w}</span>
         ))}
       </div>
+      {/* Idea 14: a rider that rolls across the strip once every 9s. */}
+      <Monster
+        species="classic"
+        bodyColor={MONSTER_COLORS.red.body}
+        irisColor={MONSTER_COLORS.red.iris}
+        size={26}
+        className="cne-mq-rider"
+      />
     </div>
   );
 }

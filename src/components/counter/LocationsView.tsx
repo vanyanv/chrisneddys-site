@@ -10,6 +10,7 @@ import { PIN } from "@/components/locations/mapLayout";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { slugFor } from "@/lib/locationSlug";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { GlyphRow } from "@/components/storeart/SectionOpener";
 
 type LocationId = Location["id"];
 
@@ -90,7 +91,8 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
         </div>
       </div>
 
-      <div className="cne-locs-list cne-sec">
+      <div className="cne-locs-list cne-sec cne-op-glyph">
+        <GlyphRow />
         <div className="cne-eyebrow">Three locations</div>
         <h1>Find us.</h1>
         {locations.map((loc) => (

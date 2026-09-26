@@ -12,6 +12,7 @@ import { locationMonster } from "@/components/locations/locationArt";
 import { Monster } from "@/components/mascots/Monster";
 import { OpenLateNight } from "@/components/counter/OpenLateNight";
 import { Tunnel } from "@/components/storeart/Tunnel";
+import { OpStamp } from "@/components/storeart/SectionOpener";
 import { ArtPhoto } from "@/components/art/ArtPhoto";
 
 /**
@@ -236,9 +237,12 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
 
       {loc.isOpen && <OpenLateNight loc={loc} hood={hood} />}
 
-      <section className="cne-sec cne-locd cne-lp-menu cne-rv">
+      <section className="cne-sec cne-locd cne-lp-menu cne-rv cne-op-stamp">
         <div className="cne-eyebrow">What we serve in {hood}</div>
-        <h2>Same menu everywhere.</h2>
+        <h2>
+          Same menu everywhere.
+          <OpStamp kind="checker" size={44} />
+        </h2>
         <p className="cne-lp-prose">
           Every Chris N Eddy&rsquo;s runs the same short menu: a slider is two smashed patties on
           two slices of cheese in a buttered, toasted Martin&rsquo;s potato roll. Order it
@@ -259,7 +263,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         </div>
       </section>
 
-      <section className="cne-sec cne-locd cne-rv" style={{ paddingBottom: 30 }}>
+      <section className="cne-sec cne-locd cne-rv cne-op-tag" style={{ paddingBottom: 30 }}>
         <div className="cne-eyebrow">Also nearby</div>
         <h2>Our other locations.</h2>
         <div className="cne-lp-others">

@@ -36,23 +36,16 @@ export function FooterMonster() {
   return (
     <>
       {blacklight && (
-        <svg
-          className="cne-foot-numbers"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-          focusable="false"
-        >
+        <svg className="cne-foot-numbers" aria-hidden="true" focusable="false">
           {numbers.map((n, idx) => (
-            <text
-              key={idx}
-              x={n.x}
-              y={n.y}
-              transform={`rotate(${n.rot} ${n.x} ${n.y})`}
-              style={{ fontSize: `${n.scale}em` }}
-            >
-              {n.text}
-            </text>
+            <svg key={idx} x={`${n.x}%`} y={`${n.y}%`} overflow="visible">
+              <text
+                transform={`rotate(${n.rot})`}
+                style={{ fontSize: `${Math.round(n.scale * 22)}px` }}
+              >
+                {n.text}
+              </text>
+            </svg>
           ))}
         </svg>
       )}

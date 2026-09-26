@@ -821,6 +821,7 @@ body {
 
 /* ---- marquee ------------------------------------------------------------ */
 .cne-mq {
+  position: relative;
   background: #1a1612;
   color: var(--a-yel);
   border-top: 3px solid #1a1612;
@@ -854,6 +855,32 @@ body {
 .cne-mq-track span {
   padding: 0 14px;
   white-space: nowrap;
+}
+/* Idea 14: a rider that rolls across the ticker once every 9s — a wait, then
+   a ~2.6s roll (71% to 100% of the cycle), transform-only. */
+.cne-mq-rider {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  margin-top: -13px;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-mq-rider {
+    animation: cne-mq-roll 9s linear infinite;
+  }
+}
+.cne-mq:hover .cne-mq-rider {
+  animation-play-state: paused;
+}
+@keyframes cne-mq-roll {
+  0%,
+  71% {
+    transform: translateX(-40px) rotate(0deg);
+  }
+  100% {
+    transform: translateX(calc(100vw + 40px)) rotate(720deg);
+  }
 }
 
 /* ---- sections ----------------------------------------------------------- */
@@ -892,6 +919,54 @@ body {
 .cne-sec.is-in h1::after,
 .cne-sec.is-in h2::after {
   width: 46px;
+}
+
+/* ---- idea 15: four ways to open a section --------------------------------
+   Three modifier classes for `.cne-sec` (a fourth, plain, is just today's
+   eyebrow/heading/underline pattern with nothing added). All three drop the
+   yellow underline — each opener already carries its own mark. */
+.cne-sec.cne-op-glyph h1::after,
+.cne-sec.cne-op-glyph h2::after,
+.cne-sec.cne-op-stamp h1::after,
+.cne-sec.cne-op-stamp h2::after {
+  content: none;
+}
+.cne-op-glyphrow {
+  display: block;
+  width: 162px;
+  height: 18px;
+  margin: 0 0 6px;
+}
+@media (max-width: 900px) {
+  .cne-op-glyphrow {
+    width: 126px;
+    height: 14px;
+  }
+}
+/* (b) a spray-tag eyebrow: the marker font on a lime slab, tilted, instead
+   of idea 13's red-tag treatment. */
+.cne-op-tag .cne-eyebrow {
+  display: inline-block;
+  font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: normal;
+  text-transform: none;
+  color: #1a1612;
+  background: #c6ff2b;
+  padding: 3px 10px 5px;
+  border-radius: 3px;
+  transform: rotate(-3deg);
+}
+.cne-op-tag .cne-eyebrow::after {
+  content: none;
+}
+/* (c) a stamp at the end of the heading line. */
+.cne-op-stamp-svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex: none;
+  margin-left: 8px;
 }
 
 /* ---- menu rows ---------------------------------------------------------- */
@@ -3423,9 +3498,63 @@ body {
   color: var(--a-red-cta);
   margin: 0 0 5px;
   line-height: 1.6;
+  /* Idea 4: each category ends in an op-art stamp, right after its name. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 .cne-cat-h::after {
   content: none;
+}
+.cne-cat-stamp {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: 0;
+}
+@media (min-width: 901px) {
+  .cne-cat-stamp {
+    width: 44px;
+    height: 44px;
+  }
+}
+/* Desktop only: the wall pillar under the rail's jump nav and fine print. */
+.cne-op-pillar {
+  display: none;
+}
+@media (min-width: 901px) {
+  .cne-op-pillar {
+    display: block;
+    position: relative;
+    width: 220px;
+    max-width: 100%;
+    height: 260px;
+    margin-top: 16px;
+    border: 3px solid var(--a-ink);
+    background:
+      linear-gradient(45deg, var(--a-ink) 25%, transparent 25%, transparent 75%, var(--a-ink) 75%) 0
+        0 / 32px 32px,
+      linear-gradient(45deg, var(--a-ink) 25%, transparent 25%, transparent 75%, var(--a-ink) 75%)
+        16px 16px / 32px 32px,
+      var(--a-cream);
+  }
+  .cne-op-pillar-stamp {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+  }
+  .cne-op-pillar-mon {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    display: flex;
+    align-items: flex-end;
+  }
+  .cne-op-pillar-mon svg:not(:first-child) {
+    margin-left: -10px;
+  }
 }
 .cne-menu-fine {
   font-family: var(--font-mono);

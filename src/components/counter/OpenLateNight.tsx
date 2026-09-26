@@ -39,23 +39,16 @@ export function OpenLateNight({ loc, hood }: { loc: Location; hood: string }) {
       className={`cne-sec cne-lp-night cne-rv${blacklight ? " is-blacklight" : ""}`}
       aria-labelledby="lp-late"
     >
-      <svg
-        className="cne-lp-night-numbers"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-        focusable="false"
-      >
+      <svg className="cne-lp-night-numbers" aria-hidden="true" focusable="false">
         {numbers.map((n, idx) => (
-          <text
-            key={idx}
-            x={n.x}
-            y={n.y}
-            transform={`rotate(${n.rot} ${n.x} ${n.y})`}
-            style={{ fontSize: `${n.scale}em`, "--i": n.i } as NumStyle}
-          >
-            {n.text}
-          </text>
+          <svg key={idx} x={`${n.x}%`} y={`${n.y}%`} overflow="visible">
+            <text
+              transform={`rotate(${n.rot})`}
+              style={{ fontSize: `${Math.round(n.scale * 26)}px`, "--i": n.i } as NumStyle}
+            >
+              {n.text}
+            </text>
+          </svg>
         ))}
       </svg>
       <div className="cne-lp-night-in">

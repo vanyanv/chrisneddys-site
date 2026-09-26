@@ -1,7 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { orderUrl, withUtm } from "@/lib/otter";
+import { withUtm } from "@/lib/otter";
+import { hasOrderChoice, openOrderPicker, useOrderChoice } from "@/lib/orderChoice";
+import { OrderLink } from "@/components/order/OrderLink";
 import { openingLabel, statusLabel } from "@/lib/hours";
 import { useViewedLocation } from "@/lib/useViewedLocation";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
@@ -9,7 +11,7 @@ import { useStoreStatus } from "@/lib/useStoreStatus";
 import { BiteTeeth } from "@/components/storeart/BiteTeeth";
 
 /**
- * The sticky bottom dock from the prototype: what Hollywood's clock is doing,
+ * The sticky bottom dock from the prototype: what the store's clock is doing,
  * and one button to order. Phone only — desktop keeps ORDER in the header.
  *
  * The store's name rides in the small line and the clock in the big one, which
@@ -28,7 +30,14 @@ import { BiteTeeth } from "@/components/storeart/BiteTeeth";
  */
 export function OrderDock() {
   const pathname = usePathname() ?? "/";
-  const { loc, onLocationPage } = useViewedLocation();
+  const { loc: viewed, onLocationPage } = useViewedLocation();
+  const chosen = useOrderChoice();
+  // Off a store's own page with more than one store open, the bar is about
+  // ordering, not about Hollywood: it names the remembered store, or just
+  // "Order pickup" until there is one, and tapping it opens the picker to
+  // choose or switch (issue #178).
+  const choosing = !onLocationPage && hasOrderChoice();
+  const loc = !onLocationPage && chosen ? chosen : viewed;
   const status = useStoreStatus(loc.id);
 
   if (pathname.startsWith("/shop")) return null;
@@ -37,15 +46,33 @@ export function OrderDock() {
 
   return (
     <div className="cne-dock" data-location={onLocationPage ? loc.id : undefined}>
-      <div className="cne-dock-msg">
-        <div className="t">{loc.name}</div>
-        <div className="s">{message}</div>
-      </div>
-      {loc.isOpen ? (
+      {choosing ? (
+        <button
+          type="button"
+          className="cne-dock-msg is-switch"
+          aria-haspopup="dialog"
+          aria-label={
+            chosen ? `Ordering from ${chosen.name}. Change location` : "Choose a location"
+          }
+          onClick={() => openOrderPicker({ surface: "dock" })}
+        >
+          <span className="t">
+            {chosen ? chosen.name : "Order pickup"}
+            {chosen && <span aria-hidden="true"> ▾</span>}
+          </span>
+          <span className="s">{message}</span>
+        </button>
+      ) : (
+        <div className="cne-dock-msg">
+          <div className="t">{loc.name}</div>
+          <div className="s">{message}</div>
+        </div>
+      )}
+      {loc.isOpen && onLocationPage && loc.orderUrl ? (
         <a
           className="cne-dockbtn"
           data-surface="dock"
-          href={onLocationPage && loc.orderUrl ? withUtm(loc.orderUrl, "dock") : orderUrl("dock")}
+          href={withUtm(loc.orderUrl, "dock")}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -53,6 +80,12 @@ export function OrderDock() {
           ORDER →
           <BiteTeeth position="bottom" />
         </a>
+      ) : loc.isOpen ? (
+        <OrderLink surface="dock" className="cne-dockbtn">
+          <BiteTeeth position="top" />
+          ORDER →
+          <BiteTeeth position="bottom" />
+        </OrderLink>
       ) : (
         <span data-surface="dock">
           <DirectionsLink loc={loc} className="cne-dockbtn">

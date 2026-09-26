@@ -1160,6 +1160,44 @@ body {
 .cne-loc.is-live {
   background: var(--a-cream);
 }
+/* Every open store's card in a row (`OpenLocationCards`). Phones swipe
+   between them with the next card peeking in; wider columns fit as many side
+   by side as there is room for, so the home page's half-width column stacks
+   them and a full-width section lays them out in a row. */
+.cne-loc-rail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+  gap: 14px;
+  margin-bottom: 13px;
+}
+.cne-loc-rail > .cne-loc {
+  margin-bottom: 0;
+}
+@media (max-width: 599px) {
+  .cne-loc-rail.is-multi {
+    /* The scroller's width comes from its column, never from the cards in
+       it; without this the home page's grid cell grew to fit both cards. */
+    contain: inline-size;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* Bleed to the screen edge so the peeking card is cut by the glass, not
+       by the section's padding, and leave room for the cards' shadow. */
+    margin-inline: -15px;
+    padding: 0 15px 6px;
+    scroll-padding-inline: 15px;
+  }
+  .cne-loc-rail.is-multi::-webkit-scrollbar {
+    display: none;
+  }
+  .cne-loc-rail.is-multi > .cne-loc {
+    scroll-snap-align: start;
+  }
+}
 .cne-loc.is-selected {
   transform: translate(-2px, -2px);
   box-shadow: 7px 7px 0 var(--a-red);
@@ -3441,7 +3479,6 @@ body {
    they read as controls from their shape. */
 .cne-foot a,
 .cne-sec p a,
-.cne-menu-foot a,
 .cne-quote a {
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -3580,14 +3617,6 @@ body {
   margin: 0;
   line-height: 1.6;
 }
-.cne-menu-foot {
-  padding: 6px 15px 18px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--a-sub);
-  margin: 0;
-}
 
 /* The crawlable list of named items under the browser. It was eight inline
    styles and a hairline in `var(--a-rule, #e2d8c7)` — a token that is defined
@@ -3705,10 +3734,6 @@ body {
     height: 4px;
     background: var(--a-ink);
     margin-bottom: 12px;
-  }
-  .cne-menu-foot {
-    padding: 0;
-    font-size: 12px;
   }
 }
 
@@ -4768,4 +4793,181 @@ h3 {
   .cne-dr-foot {
     padding: 15px 18px 18px;
   }
+}
+
+/* ---- "Which location?" picker (issue #178) ------------------------------- */
+/* `OrderPicker.tsx`. A native <dialog>: a sheet rising from the bottom on a
+   phone, a small card in the middle on anything wider. Printed like every
+   other card here: ink rule, hard offset shadow, cream paper. */
+.cne-pick {
+  margin: auto auto 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  border: 0;
+  border-top: 3px solid var(--a-ink);
+  background: var(--a-cream);
+  color: var(--a-ink);
+}
+.cne-pick::backdrop {
+  background: rgba(20, 16, 12, 0.55);
+}
+.cne-pick[open] {
+  animation: cne-pick-up 0.18s ease-out;
+}
+@keyframes cne-pick-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-pick[open] {
+    animation: none;
+  }
+}
+.cne-pick-in {
+  padding: 16px 15px calc(16px + env(safe-area-inset-bottom));
+}
+.cne-pick-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.cne-pick-hd h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.cne-pick-x {
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px -8px 0;
+  border: 0;
+  background: none;
+  color: var(--a-ink);
+  font-size: 18px;
+  cursor: pointer;
+}
+.cne-pick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.cne-pick-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "name go"
+    "stat go"
+    "addr go";
+  align-items: center;
+  column-gap: 12px;
+  padding: 12px 14px;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-yel);
+  color: #1a1612;
+  box-shadow: 4px 4px 0 var(--a-ink);
+  text-decoration: none;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.cne-pick-row:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--a-ink);
+}
+.cne-pick-row:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--a-ink);
+}
+.cne-pick-name {
+  grid-area: name;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.05;
+}
+.cne-pick-stat {
+  grid-area: stat;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-height: 1.4em;
+}
+.cne-pick-stat.is-shut {
+  opacity: 0.75;
+}
+.cne-pick-addr {
+  grid-area: addr;
+  font-size: 13px;
+}
+.cne-pick-go {
+  grid-area: go;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+.cne-pick-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--a-sub);
+}
+@media (min-width: 600px) {
+  .cne-pick {
+    margin: auto;
+    width: min(440px, calc(100% - 32px));
+    border: 3px solid var(--a-ink);
+    box-shadow: 8px 8px 0 var(--a-ink);
+  }
+  .cne-pick-in {
+    padding: 20px;
+  }
+}
+
+/* The remembered store's name beside the header tag; reopens the picker.
+   Desktop only: on a phone the bottom bar does this job. */
+.cne-pick-switch {
+  display: none;
+}
+@media (min-width: 901px) {
+  .cne-pick-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 32px;
+    padding: 0 2px;
+    border: 0;
+    background: none;
+    color: var(--a-cream);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 4px;
+  }
+}
+
+/* The bottom bar's store line as a button, when there is a store to choose. */
+button.cne-dock-msg {
+  display: block;
+  text-align: left;
+  border: 0;
+  padding: 4px 0;
+  margin: -4px 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+button.cne-dock-msg .t,
+button.cne-dock-msg .s {
+  display: block;
 }

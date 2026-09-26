@@ -21,7 +21,7 @@ import { brand } from "@/data/brand";
 import { hasPassed, locations, VAN_NUYS_OPENS_AT, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
-import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
+import { deliveryFor, cateringPlatform } from "@/data/delivery";
 import { hoursSentence } from "@/lib/hours";
 import { slugFor } from "@/lib/locationSlug";
 import { storeUrl, formatPrice } from "@/lib/otter";
@@ -81,11 +81,17 @@ function orderingSection(): string {
   const openLocations = locations.filter((l) => l.isOpen);
   const lines = [
     "## How To Order",
-    `Order direct on our own storefront for pickup — it's the cheaper way to buy, since the delivery apps set their own prices and add their own fees: ${storeUrl}`,
+    `Order direct on our own storefront for pickup — it's the cheaper way to buy, since the delivery apps set their own prices and add their own fees${openLocations.length === 1 ? `: ${storeUrl}` : "."}`,
     openLocations.length === 1
       ? `Every online order runs through the ${openLocations[0]!.name} location today — the other locations have not opened yet.`
       : `Pickup orders go to the location you choose: ${openLocations.map((l) => l.name).join(" and ")} each have their own order link under Locations above.`,
-    `Delivery: ${deliveryPlatforms.map((p) => `${p.name} (${p.url})`).join(", ")}.`,
+    ...openLocations
+      .map((l) => [l, deliveryFor(l.id)] as const)
+      .filter(([, apps]) => apps.length > 0)
+      .map(
+        ([l, apps]) =>
+          `Delivery from ${l.name}: ${apps.map((p) => `${p.name} (${p.url})`).join(", ")}.`,
+      ),
     `Catering: ${cateringPlatform.name} (${cateringPlatform.url}).`,
     `Order page: ${siteUrl("/order/")}`,
   ];

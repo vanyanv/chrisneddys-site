@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { flagship } from "@/data/locations";
+import { openLocations, openNames } from "@/lib/openLocations";
 import { featuredItems, itemById, ways, toppings, extras } from "@/data/menu";
 import { itemOrderUrl, itemPhotoAlt, formatPrice, priceString } from "@/lib/otter";
-import { googleDirections } from "@/lib/directions";
-import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
+import { slugFor } from "@/lib/locationSlug";
+import { OpenLocationCards } from "@/components/locations/OpenLocationCards";
+import { OrderLink } from "@/components/order/OrderLink";
+import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { clampToWord } from "@/lib/text";
 
@@ -41,7 +43,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!item) return {};
 
   const title = `${item.name} — ${formatPrice(item.price)}`;
-  const tail = `${formatPrice(item.price)}, pickup on Sunset Blvd, Hollywood. Every topping free.`;
+  const tail = `${formatPrice(item.price)}, pickup in ${openNames()}. Every topping free.`;
   const description = `${clampToWord(item.desc, DESC_LIMIT - tail.length - 1)} ${tail}`;
 
   return pageMetadata({ title, description, path: `/menu/${item.id}/` });
@@ -52,8 +54,7 @@ export default async function MenuItemPage({ params }: Params) {
   const item = itemById(slug);
   if (!item) notFound();
 
-  const hollywood = flagship;
-  const orderHref = itemOrderUrl(item, "menu-item");
+  const open = openLocations();
 
   /**
    * A `MenuItem` rather than a `Product`: this is a dish on a restaurant's
@@ -74,7 +75,9 @@ export default async function MenuItemPage({ params }: Params) {
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: itemOrderUrl(item),
-      availableAtOrFrom: { "@id": `${brand.siteUrl}/locations/hollywood/#restaurant` },
+      availableAtOrFrom: open.map((loc) => ({
+        "@id": `${brand.siteUrl}/locations/${slugFor(loc)}/#restaurant`,
+      })),
     },
     isPartOf: { "@id": ID.menu },
   };
@@ -88,10 +91,12 @@ export default async function MenuItemPage({ params }: Params) {
         ])}
       />
       <JsonLdScript data={itemLd} />
-      {/* The Offer above references the Hollywood Restaurant node by @id; this
-          page is not otherwise about a store, so the node has to be emitted
-          here too or the reference resolves to nothing. */}
-      <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* The Offer above references each open store's Restaurant node by @id;
+          this page is not otherwise about a store, so the nodes have to be
+          emitted here too or the references resolve to nothing. */}
+      {open.map((loc) => (
+        <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
+      ))}
 
       <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
         <div className="cne-eyebrow">
@@ -142,23 +147,14 @@ export default async function MenuItemPage({ params }: Params) {
         )}
 
         <div className="cne-loc-btns" style={{ marginTop: 18 }} data-surface="menu-item">
-          <a
-            className="cne-mini is-red"
-            href={orderHref}
-            data-item={item.id}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <OrderLink className="cne-mini is-red" surface="menu-item" item={item}>
             ADD TO ORDER · {formatPrice(item.price)}
-          </a>
-          <a className="cne-mini is-plain" href={`tel:${brand.phoneTel}`}>
-            CALL {brand.phone}
-          </a>
+          </OrderLink>
         </div>
         <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8 }}>
           {item.takesToppings
-            ? "Opens this item on our ordering page. Tick your Way's toppings there — all free."
-            : "Opens this exact item on our ordering page, ready to add."}
+            ? "Opens your location's ordering page. Tick your Way's toppings there — all free."
+            : "Opens your location's ordering page."}
         </p>
       </section>
 
@@ -185,38 +181,18 @@ export default async function MenuItemPage({ params }: Params) {
         </section>
       )}
 
-      {hollywood && (
-        <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>
-          <div className="cne-eyebrow">Where to get it</div>
-          <h2>Hollywood location.</h2>
-          <address className="cne-loc-addr" style={{ fontStyle: "normal", marginTop: 8 }}>
-            {hollywood.address}
-            <br />
-            {hollywood.city}, {hollywood.region} {hollywood.postal}
-          </address>
-          <div className="cne-loc-hrs" style={{ marginTop: 10, maxWidth: "42ch" }}>
-            {hollywood.hours.map(([day, hrs]) => (
-              <div className="r" key={day}>
-                <span>{day.toUpperCase()}</span>
-                <b>{hrs}</b>
-              </div>
-            ))}
-          </div>
-          <div className="cne-loc-btns" style={{ marginTop: 14 }} data-surface="menu-item">
-            <a
-              className="cne-mini is-plain"
-              href={googleDirections(hollywood)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              DIRECTIONS
-            </a>
-            <Link prefetch={false} className="cne-mini is-plain" href="/menu/">
-              THE FULL MENU
-            </Link>
-          </div>
-        </section>
-      )}
+      <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>
+        <div className="cne-eyebrow">Where to get it</div>
+        <h2>Pick your location.</h2>
+        <div style={{ marginTop: 12 }}>
+          <OpenLocationCards surface="menu-item" />
+        </div>
+        <div className="cne-loc-btns" data-surface="menu-item">
+          <Link prefetch={false} className="cne-mini is-plain" href="/menu/">
+            THE FULL MENU
+          </Link>
+        </div>
+      </section>
     </>
   );
 }

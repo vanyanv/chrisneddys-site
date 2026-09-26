@@ -122,9 +122,7 @@ export default async function ShopPage() {
         <GlyphRow />
         <div className="cne-eyebrow">Merch</div>
         <h1>The shop.</h1>
-        <p className="cne-shop-lede">
-          Small runs from 5539 W. Sunset Blvd. When they’re gone they’re gone.
-        </p>
+        <p className="cne-shop-lede">Small runs. When they’re gone they’re gone.</p>
 
         <ShopIndexTracking products={merch}>
           {merch.map((product, i) => {

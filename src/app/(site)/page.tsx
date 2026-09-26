@@ -3,11 +3,12 @@ import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
 import { Marquee } from "@/components/counter/Marquee";
 import { FeaturedCards } from "@/components/counter/FeaturedCards";
-import { HollywoodCard } from "@/components/counter/HollywoodCard";
+import { OpenLocationCards } from "@/components/locations/OpenLocationCards";
+import { openLocations } from "@/lib/openLocations";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
-import { JsonLdScript, flagshipRestaurantLd } from "@/components/shared/JsonLd";
+import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { Vortex } from "@/components/storeart/Vortex";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
@@ -70,11 +71,12 @@ const GRAM = [
 export default function HomePage() {
   return (
     <>
-      {/* The home page is about the Hollywood store — it carries its hours, its
-          address and its order buttons — so it is one of the four pages that
-          states the Restaurant node. The two locations that have not opened
-          state nothing anywhere until they do. */}
-      <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* The home page carries every open store's hours, address and order
+          button, so it states each one's Restaurant node. A location that
+          has not opened states nothing anywhere until it does. */}
+      {openLocations().map((loc) => (
+        <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
+      ))}
       {/* First-time desktop visitors only (issue #81) — see WelcomeIntro for
           the no-flash gate. Renders an inert curtain div for everyone else. */}
       <WelcomeIntro />
@@ -104,7 +106,7 @@ export default function HomePage() {
         <div className="cne-split-l cne-sec cne-rv cne-op-tag">
           <div className="cne-eyebrow">Where to find us</div>
           <h2>Where we are.</h2>
-          <HollywoodCard />
+          <OpenLocationCards surface="location-card" />
         </div>
         {/* The pins are what make this read as our map rather than a map of
             LA, so the home page draws the same three the prototype does. It is
@@ -120,7 +122,9 @@ export default function HomePage() {
             >
               <LocationsMapCanvas />
               <MapPins />
-              <MapCallout />
+              {openLocations().map((loc) => (
+                <MapCallout key={loc.id} locationId={loc.id} />
+              ))}
             </Link>
           </div>
         </div>

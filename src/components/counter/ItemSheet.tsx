@@ -5,7 +5,8 @@ import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
-import { itemOrderUrl, formatPrice, itemPhotoAlt } from "@/lib/otter";
+import { formatPrice, itemPhotoAlt } from "@/lib/otter";
+import { OrderLink } from "@/components/order/OrderLink";
 import { WayPicker } from "./WayPicker";
 
 type Props = {
@@ -246,10 +247,9 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
               </div>
 
               <div className="cne-sheet-hd">
-                {/* Every price in `menu.ts` is the Hollywood pickup price, so
-                    the sheet says which counter it is quoting rather than
-                    letting a number stand on its own. */}
-                <span className="w">Pickup · Hollywood</span>
+                {/* Every location charges the same pickup price (owner,
+                    2026-09-26), so the label names the price, not a store. */}
+                <span className="w">Pickup</span>
                 <span className="p">{formatPrice(item.price)}</span>
               </div>
               {item.desc && <p className="cne-sheet-desc">{item.desc}</p>}
@@ -272,19 +272,13 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
         <div className="cne-sheet-foot" data-surface="item-sheet">
           {item && (
             <>
-              <a
-                className="cne-otter"
-                href={itemOrderUrl(item, "item-sheet")}
-                data-item={item.id}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <OrderLink className="cne-otter" surface="item-sheet" item={item}>
                 ADD TO ORDER · {formatPrice(item.price)} →
-              </a>
+              </OrderLink>
               <p className="cne-fine">
                 {item.takesToppings
-                  ? "Opens this item on our ordering page. Tick your Way's toppings there — all free."
-                  : "Opens this exact item on our ordering page, ready to add."}
+                  ? "Opens your location's ordering page. Tick your Way's toppings there — all free."
+                  : "Opens your location's ordering page."}
               </p>
             </>
           )}

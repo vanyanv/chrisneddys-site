@@ -1,11 +1,12 @@
 "use client";
 
-import { orderUrl } from "@/lib/otter";
+import { OrderLink } from "@/components/order/OrderLink";
 import { orderCtaSubline } from "@/lib/hours";
 import { useStoreStatus } from "@/lib/useStoreStatus";
 
 /**
- * The hero's primary CTA. Same button, same link, every time — the only
+ * The hero's primary CTA. Same button every time — it asks which store the
+ * first time and then remembers (`OrderLink`, issue #178) — and the only
  * thing that ever changes is whether a second, smaller line names the
  * Hollywood store's opening time, which it only does while the store is
  * actually closed. Splitting it onto its own line (rather than running it
@@ -24,13 +25,7 @@ export function HeroOrderButton() {
   const subline = orderCtaSubline(status);
 
   return (
-    <a
-      className="cne-big is-primary"
-      data-surface="hero"
-      href={orderUrl("hero")}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <OrderLink surface="hero" className="cne-big is-primary">
       {subline ? (
         <span className="cne-cta-lines">
           <span>ORDER ONLINE →</span>
@@ -39,6 +34,6 @@ export function HeroOrderButton() {
       ) : (
         "ORDER ONLINE →"
       )}
-    </a>
+    </OrderLink>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MenuBrowser } from "@/components/counter/MenuBrowser";
-import { JsonLdScript, menuNode, flagshipRestaurantLd } from "@/components/shared/JsonLd";
+import { JsonLdScript, menuNode, restaurantLd } from "@/components/shared/JsonLd";
+import { openLocations } from "@/lib/openLocations";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { SLIDER_PRICE, COMBO_FROM_PRICE, featuredItems } from "@/data/menu";
 import Link from "next/link";
@@ -32,8 +33,10 @@ export default function MenuPage() {
           price. Elsewhere the Restaurant nodes point at the stub. */}
       <JsonLdScript data={{ "@context": "https://schema.org", ...menuNode() }} />
       <JsonLdScript data={breadcrumbLd([{ name: "Menu", path: "/menu/" }])} />
-      {/* The store the menu is served at, so `hasMenu` has both ends on one page. */}
-      <JsonLdScript data={flagshipRestaurantLd()} />
+      {/* The stores the menu is served at, so `hasMenu` has both ends on one page. */}
+      {openLocations().map((loc) => (
+        <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
+      ))}
       <MenuBrowser />
 
       {/* Crawlable links to the named-item pages. The rows above are buttons

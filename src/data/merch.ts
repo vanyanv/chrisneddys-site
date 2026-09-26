@@ -229,7 +229,7 @@ export const merch: MerchProduct[] = [
     price: 48,
     eyebrow: "CNE Merch Capsule 01",
     description:
-      "A royal-blue five-panel foam trucker from Chris N Eddy's, the smash-burger location on Sunset in Hollywood. Capsule 01 is limited to 50, each cap individually numbered. One size fits most.",
+      "A royal-blue five-panel foam trucker from Chris N Eddy's, the LA smash-burger spot. Capsule 01 is limited to 50, each cap individually numbered. One size fits most.",
     metaDescription:
       "Chris N Eddy’s Foam Trucker — Blue, $48. Capsule 01, only 50 made, individually numbered /50. Royal-blue foam trucker with 3D puff embroidery. One size fits most.",
     limitedNote: "Only 50 made. Individually numbered /50. No restock, no second run.",

@@ -5,7 +5,7 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${brand.name} — Smashed sliders in Hollywood`,
+    name: `${brand.name} — Smashed sliders in LA`,
     short_name: brand.name,
     description:
       "Smashed sliders on buttered Martin's potato rolls. Hollywood, Glendale, Van Nuys.",

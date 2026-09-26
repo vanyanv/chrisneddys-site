@@ -116,7 +116,7 @@ export default function CareersPage() {
         <div className="cne-cr-pitch cne-rv">
           <p>
             {vanNuysOpen
-              ? "We’re a Hollywood smash-burger spot that has just opened in Van Nuys, with Glendale next — that means more shifts, more kitchens and more people needed to run them."
+              ? "We’re an LA smash-burger spot, open in Hollywood and Van Nuys with Glendale next — that means more shifts, more kitchens and more people needed to run them."
               : "We’re a Hollywood smash-burger spot opening two more locations, in Glendale and Van Nuys — that means more shifts, more kitchens and more people needed to run them."}
           </p>
           <p>

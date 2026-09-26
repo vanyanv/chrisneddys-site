@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { brand } from "@/data/brand";
 import { LOGO } from "@/lib/logoImage";
-import { orderUrl, withUtm } from "@/lib/otter";
+import { withUtm } from "@/lib/otter";
+import { hasOrderChoice, openOrderPicker, useOrderChoice } from "@/lib/orderChoice";
+import { OrderLink } from "@/components/order/OrderLink";
 import { useViewedLocation } from "@/lib/useViewedLocation";
 import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpenStatus } from "@/components/shared/OpenStatus";
@@ -63,6 +65,10 @@ export function SiteHeader() {
   const mobileActiveIndex = MOBILE_TABS.findIndex((t) => t.href === path);
   const [lifted, setLifted] = useState(false);
   const { loc, onLocationPage } = useViewedLocation();
+  const chosen = useOrderChoice();
+  // Off a store's own page, the remembered store names itself beside the tag
+  // and reopens the picker to switch (issue #178).
+  const showSwitch = !onLocationPage && chosen && hasOrderChoice();
 
   useEffect(() => {
     const onScroll = () => setLifted(window.scrollY > 8);
@@ -89,24 +95,33 @@ export function SiteHeader() {
         </Link>
         {/* On a store's own page the tag and the button are that store's
             (issue #153): its clock or its opening, its ORDER or, before it
-            opens, directions to it. Everywhere else they are Hollywood's. */}
+            opens, directions to it. Everywhere else ORDER asks which store
+            once and then remembers (issue #178), and the tag follows the
+            remembered store. */}
         <div className="cne-nav-right" data-location={onLocationPage ? loc.id : undefined}>
-          <OpenStatus head locationId={loc.id} />
+          {showSwitch && (
+            <button
+              type="button"
+              className="cne-pick-switch"
+              aria-haspopup="dialog"
+              aria-label={`Ordering from ${chosen.name}. Change location`}
+              onClick={() => openOrderPicker({ surface: "header" })}
+            >
+              {chosen.name.toUpperCase()} <span aria-hidden="true">▾</span>
+            </button>
+          )}
+          <OpenStatus head locationId={!onLocationPage && chosen ? chosen.id : loc.id} />
           {/* The bag is additive: it renders nothing at all until there is
               something in it, and it never replaces ORDER ONLINE — that button
               is the food business's front door and it points at Otter. A nav
               control that means different things on different pages is one
               people stop trusting. */}
           <BagButton />
-          {loc.isOpen ? (
+          {loc.isOpen && onLocationPage && loc.orderUrl ? (
             <a
               className="cne-orderbtn"
               data-surface="header"
-              href={
-                onLocationPage && loc.orderUrl
-                  ? withUtm(loc.orderUrl, "header")
-                  : orderUrl("header")
-              }
+              href={withUtm(loc.orderUrl, "header")}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -114,6 +129,12 @@ export function SiteHeader() {
               ORDER<span className="cne-only-desk-i"> ONLINE →</span>
               <BiteTeeth position="bottom" />
             </a>
+          ) : loc.isOpen ? (
+            <OrderLink surface="header" className="cne-orderbtn">
+              <BiteTeeth position="top" />
+              ORDER<span className="cne-only-desk-i"> ONLINE →</span>
+              <BiteTeeth position="bottom" />
+            </OrderLink>
           ) : (
             <span data-surface="header">
               <DirectionsLink loc={loc} className="cne-orderbtn">

@@ -27,7 +27,7 @@ export type MenuItem = {
   /** Exactly as Otter names it — the name is part of the deep link path. */
   name: string;
   desc: string;
-  /** US dollars, pickup price from the Hollywood storefront. */
+  /** US dollars, the pickup price on the storefront. Every location charges the same. */
   price: number;
   signature?: boolean;
   /** True when the item accepts the free topping modifiers (the Ways). */

@@ -4,7 +4,7 @@ import { locations, type Location } from "@/data/locations";
 import { mapBox, projectX, projectY } from "@/data/laGeo";
 import { PIN, SOON_SUFFIX, capWidth } from "@/components/locations/mapLayout";
 import { locationMonster } from "@/components/locations/locationArt";
-import { monsterHref } from "@/components/mascots/Monster";
+import { PinMonster } from "@/components/locations/PinMonster";
 
 export const mapOverlayStyle = {
   position: "absolute" as const,
@@ -15,7 +15,7 @@ export const mapOverlayStyle = {
 };
 
 /** The custom properties `cne-classic`/`cne-classic-sleep` (`MascotDefs`) read. */
-type PinStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
+export type PinStyle = CSSProperties & { "--m-body"?: string; "--m-iris"?: string };
 
 /** Idea 9: each store's own colour, from `locationArt.ts`. */
 function pinStyle(id: Location["id"]): PinStyle {
@@ -42,15 +42,19 @@ export function MapPinArt({ loc }: { loc: Location }) {
   return (
     <>
       <path className="cne-pin-point" d="M-5,-8 L0,0 L5,-8 Z" />
-      <use
-        href={loc.isOpen ? monsterHref(locationMonster(loc.id).body) : "#cne-classic-sleep"}
-        className="cne-pin-mon"
-        x={-12}
-        y={PIN.headTop}
-        width={24}
-        height={24}
-        style={style}
-      />
+      {loc.isOpen ? (
+        <PinMonster loc={loc} style={style} />
+      ) : (
+        <use
+          href="#cne-classic-sleep"
+          className="cne-pin-mon"
+          x={-12}
+          y={PIN.headTop}
+          width={24}
+          height={24}
+          style={style}
+        />
+      )}
       <rect
         className="cne-pin-plate"
         x={-plateW / 2}

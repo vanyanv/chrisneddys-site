@@ -271,6 +271,8 @@
 /* The one dark band on the page, which is what lets its monster keep the
    neon pupil (DESIGN.md's agreed exception to the No-Glow Rule). */
 .cne-sec.cne-lp-night {
+  position: relative;
+  overflow: hidden;
   background: var(--a-ink);
   color: #fff2c9;
   border-top: 3px solid var(--a-ink);
@@ -279,6 +281,7 @@
 }
 .cne-lp-night-in {
   position: relative;
+  z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
 }
@@ -301,6 +304,62 @@
   right: 0;
   width: 72px;
   height: 72px;
+}
+
+/* Idea 18: the back hallway's number scrawl, behind the section's text.
+   Idea 44: from 10 PM until close (`.is-blacklight`, from `useLateHour`) it
+   brightens the same way the hallway does under blacklight — flat, no glow,
+   never over the monster or the copy. */
+.cne-lp-night-numbers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.cne-lp-night-numbers text {
+  font-family: var(--font-marker), var(--font-bowlby), cursive;
+  font-size: 13px;
+  fill: #c6ff2b;
+  --num-op: 0.18;
+  opacity: var(--num-op);
+}
+.cne-lp-night.is-blacklight .cne-lp-night-numbers text {
+  --num-op: 0.45;
+}
+.js .cne-lp-night-numbers text {
+  opacity: 0;
+}
+.js .cne-lp-night.is-in .cne-lp-night-numbers text {
+  animation: cne-num-flicker 0.45s ease-in-out both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes cne-num-flicker {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--num-op);
+  }
+  40% {
+    opacity: 0;
+  }
+  60% {
+    opacity: var(--num-op);
+  }
+  75% {
+    opacity: 0.04;
+  }
+  100% {
+    opacity: var(--num-op);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .cne-lp-night-numbers text {
+    animation: none !important;
+    opacity: var(--num-op) !important;
+  }
 }
 
 /* ---- menu + notify -------------------------------------------------------- */

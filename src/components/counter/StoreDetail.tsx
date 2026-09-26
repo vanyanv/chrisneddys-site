@@ -1,7 +1,6 @@
 import Link from "next/link";
 import "@/styles/location-page.css";
 import { locations, type Location } from "@/data/locations";
-import { closingSummary } from "@/lib/hours";
 import { withUtm } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
@@ -11,7 +10,7 @@ import { DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 import { locationMonster } from "@/components/locations/locationArt";
 import { Monster } from "@/components/mascots/Monster";
-import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
+import { OpenLateNight } from "@/components/counter/OpenLateNight";
 import { Tunnel } from "@/components/storeart/Tunnel";
 import { ArtPhoto } from "@/components/art/ArtPhoto";
 
@@ -235,31 +234,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         </section>
       )}
 
-      {loc.isOpen && (
-        <section className="cne-sec cne-lp-night cne-rv" aria-labelledby="lp-late">
-          <div className="cne-lp-night-in">
-            <Monster
-              species="classic"
-              bodyColor={MONSTER_COLORS.lime.body}
-              irisColor={MONSTER_COLORS.lime.iris}
-              glowColor={MONSTER_COLORS.lime.body}
-              size={96}
-              className="cne-lp-night-mon"
-            />
-            <div className="cne-eyebrow">After everyone else has closed</div>
-            <h2 id="lp-late">Open late.</h2>
-            <p className="cne-lede">
-              We serve until {closingSummary(loc)}. Most places around {hood} are dark by ten, which
-              is why so much of what we smash goes out after midnight — to people coming off a
-              shift, out of a show on Sunset, or off the 101 with nowhere else still cooking.
-            </p>
-            <p className="cne-lede">
-              The full menu runs the whole time. Nothing is pulled at midnight, and the fries are
-              cut the same right up to close — {closingSummary(loc)} — as they are at noon.
-            </p>
-          </div>
-        </section>
-      )}
+      {loc.isOpen && <OpenLateNight loc={loc} hood={hood} />}
 
       <section className="cne-sec cne-locd cne-lp-menu cne-rv">
         <div className="cne-eyebrow">What we serve in {hood}</div>

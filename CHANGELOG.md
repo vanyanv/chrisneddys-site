@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: the monsters sleep when the store does. After close, the footer monster and the map pin of each open location switch to the sleeping face, and wake up at opening, following the same clock as the header ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+- Site: the back hallway's scrawl of numbers now runs behind the "Open late" band on each open location's page, faint and lime, flickering on like a tube warming up the first time it scrolls into view ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+- Site: the blacklight hour. From 10 PM until close, the "Open late" band's numbers show through brighter and the footer gets the same scrawl behind it, so a visitor at midnight sees the site the way the hallway looks at midnight. Nothing else changes with the clock, and DESIGN.md now records this as the one exception ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
+
 - Site: three of the mural's colours now live in the small places a template never touches: selecting text highlights it in the hallway's lime, tabbing to a button or link draws an electric-blue ring around it, and links inside body copy underline in hot pink. Nothing else changes colour ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
 - Site: Chris's Way and Eddy's Way now have their own monsters. The red one sits on Chris's card and the blue one on Eddy's, facing each other, on the menu, in the item sheet and in the "Whose side are you on?" panel on Our Story ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))
 - Site: a wrong address now opens the wrong door. The 404 page shows the numbered staff door from the hallway with a lime monster peeking over the top, in the site's own fonts, which the page did not have before ([#171](https://github.com/vanyanv/chrisneddys-site/issues/171))

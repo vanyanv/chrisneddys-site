@@ -164,8 +164,8 @@ describe("sendOrderConfirmation", () => {
     expect(html).toContain("$48.00");
     expect(html).toContain("Pickup at 5539 W. Sunset Blvd, Los Angeles, CA 90028");
     expect(html).toContain('src="https://www.chrisneddys.com/email/logo.png"');
-    expect(html).toContain('<meta name="color-scheme" content="light only">');
-    expect(html).toContain("[data-ogsc] .cf-1a1612");
+    expect(html).toContain('<meta name="color-scheme" content="light dark">');
+    expect(html).toContain("[data-ogsc] .cf-1a1612,.cf-1a1612[data-ogsc]{color:#fff8e7!important}");
   });
 
   it("includes the returns policy when the store has one set", async () => {

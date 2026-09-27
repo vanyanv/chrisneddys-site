@@ -47,7 +47,8 @@
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1",
     "sharp": "^0.35.4",
-    "stripe": "^22.6.2"
+    "stripe": "^22.6.2",
+    "zipcodes": "^8.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
@@ -57,6 +58,7 @@
     "@types/node": "^22.9.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/zipcodes": "^8.0.5",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.15.0",
     "eslint-config-next": "^15.0.3",

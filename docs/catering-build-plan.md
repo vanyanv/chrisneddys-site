@@ -102,3 +102,51 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
    with fake payments: pickup order, delivery order with named lines,
    too far, too soon, 50+ lead time, closed day, approve, decline, expire,
    cancel tiers, change, find my orders, admin settings, print pages.
+
+## Contracts between phases 3, 4 and 5
+
+Already built: `src/lib/catering/` pure library (index.ts barrel) and
+`orders.ts` / `settings.ts` data layer. Note two hours shapes exist: the
+database stores `CateringHours` from `src/db/schema.ts` (store → weekday
+string → windows, empty = closed); the library uses `CateringHours` from
+`types.ts`. `hours.ts` converts.
+
+Phase 3 (server) owns and exports:
+
+- `src/lib/catering/hours.ts`: `toScheduleHours(dbHours)`, `toScheduleDaysOff(dbDaysOff)`.
+- `src/lib/catering/public.ts`: `getPublicCateringConfig(db)` →
+  `{ orderingOn, stores: {id, name, address, city, zip, phone}[], hours, daysOff,
+deliveryFeeCents, rangeMiles, replyHours, leadHours, bigLeadHours, bigHeadcount }`
+  (hours/daysOff in the library shape). Safe to pass to client components.
+- `POST /api/catering/range` `{store, zip}` → `{miles: number|null, inRange: boolean, unknown: boolean}`.
+- `POST /api/catering/checkout` body
+  `{store, fulfilment, date:"YYYY-MM-DD", time:"HH:MM", headcount, lines: CartLine[],
+tip: {percent}|{cents}, plateSets, contact:{name,email,phone}, company?, poNumber?,
+onsite?:{name,phone}, address?:{line1,line2?,city,state,zip,instructions?}, customerNote?}`
+  → `200 {url}` (Stripe Checkout, or `/catering/order/sent/?o=<token>` in fake mode) |
+  `409 {error:"too-soon"|"closed"|"out-of-range"|"price-changed"}` |
+  `400 {error:"invalid", fields: Record<string,string>}` | `503 {error:"off"}`.
+  Stripe cancel URL: `/catering/order/?step=review&canceled=1`.
+- `src/lib/catering/service.ts` (server-only, takes `db`):
+  `getOrderView(db, token)` (lazily expires overdue requests; returns order, items,
+  events, cancellation quote, whether change/cancel allowed) ·
+  `cancelByCustomer(db, token)` · `requestChange(db, token, {lines, headcount, time?, tip?})` ·
+  `findMyOrders(db, email)` (emails links; always resolves) ·
+  `approveOrder(db, id)` · `declineOrder(db, id, reason)` · `approveChange(db, id)` ·
+  `declineChange(db, id, reason?)` · `markCompleted(db, id)` · `expireDue(db, now)` ·
+  `addNote(db, id, text)`. Each returns `{ok:true} | {ok:false, error}` and
+  records a `catering_events` row and sends its email.
+- `src/lib/catering/emails.ts`: one builder per email returning `{subject, html, text}`
+  plus senders; `renderCateringEmailPreviews()` returning every email for a
+  sample order (for the admin preview page).
+- `GET /api/catering/cron` (Vercel cron, `CRON_SECRET` bearer): `expireDue`, and the
+  day-after thank-you email for completed orders.
+
+Phase 4 (customer UI) owns `src/app/(site)/catering/order/**`,
+`src/app/(site)/catering/o/**`, `src/components/catering-order/**`,
+`src/styles/catering-order.css`, and the catering buttons switching to
+`/catering/order/` when ordering is on. Its server actions call `service.ts`.
+
+Phase 5 (admin) owns `src/app/(admin)/admin/catering/**`, the Catering nav
+entry, the settings section, the overview card, and
+`/admin/catering/emails/` (preview of every catering email for the owner's OK).

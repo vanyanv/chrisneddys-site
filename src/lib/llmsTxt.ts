@@ -21,7 +21,7 @@ import { brand } from "@/data/brand";
 import { hasPassed, locations, VAN_NUYS_OPENS_AT, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
-import { deliveryFor, cateringPlatform } from "@/data/delivery";
+import { deliveryFor } from "@/data/delivery";
 import { hoursSentence } from "@/lib/hours";
 import { slugFor } from "@/lib/locationSlug";
 import { storeUrl, formatPrice } from "@/lib/otter";
@@ -92,7 +92,7 @@ function orderingSection(): string {
         ([l, apps]) =>
           `Delivery from ${l.name}: ${apps.map((p) => `${p.name} (${p.url})`).join(", ")}.`,
       ),
-    `Catering: for offices, sets and parties, booked and delivered through ${cateringPlatform.name} (${cateringPlatform.url}). Menu, hours and fees for catering are on that page. Catering page: ${siteUrl("/catering/")}`,
+    `Catering: for offices, sets and parties, arranged with us directly: send a message through the contact form (${siteUrl("/contact/")}) with the date, headcount and neighbourhood. Catering page: ${siteUrl("/catering/")}`,
     `Order page: ${siteUrl("/order/")}`,
   ];
   return lines.join("\n");

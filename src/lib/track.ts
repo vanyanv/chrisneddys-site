@@ -36,7 +36,7 @@ export type TrackEvent =
   | "order_click"
   /** Left for a third-party delivery platform. */
   | "delivery_click"
-  /** Left for the catering platform, distinct from individual delivery. */
+  /** A catering button (to the contact form), distinct from any other contact link. */
   | "catering_click"
   /** Tapped the phone number. */
   | "call_click"

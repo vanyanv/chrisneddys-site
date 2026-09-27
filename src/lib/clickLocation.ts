@@ -1,5 +1,5 @@
 import { locations, type Location } from "@/data/locations";
-import { deliveryPlatforms, cateringPlatform } from "@/data/delivery";
+import { deliveryPlatforms } from "@/data/delivery";
 import { slugFor } from "@/lib/locationSlug";
 
 /**
@@ -50,10 +50,10 @@ const slugById = new Map<string, string>(locations.map((l) => [l.id, slugFor(l)]
  * re-typed copy of the same link still matches. */
 const listingKey = (url: URL) => `${url.hostname}${url.pathname.replace(/\/+$/, "")}`;
 
-// Each delivery and catering listing belongs to one store, so the link says
-// where it goes the way an Otter link does.
+// Each delivery listing belongs to one store, so the link says where it goes
+// the way an Otter link does.
 const byListing = new Map<string, string>();
-for (const p of [...deliveryPlatforms, cateringPlatform]) {
+for (const p of deliveryPlatforms) {
   const slug = slugById.get(p.locationId as Location["id"]);
   if (slug) byListing.set(listingKey(new URL(p.url)), slug);
 }

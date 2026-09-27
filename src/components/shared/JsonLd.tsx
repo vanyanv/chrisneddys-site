@@ -5,7 +5,7 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { itemOrderUrl, storeUrl, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { mapsQuery } from "@/lib/directions";
-import { deliveryPlatforms, deliveryFor, cateringPlatform } from "@/data/delivery";
+import { deliveryPlatforms, deliveryFor } from "@/data/delivery";
 import { ID, siteDescription } from "@/lib/seo";
 
 /** "+13235443600" -> "+1 323-544-3600", the form `brand.phoneIntl` uses. */
@@ -205,7 +205,6 @@ export function JsonLd(): ReactElement {
       "https://www.yelp.com/biz/chris-n-eddy-s-los-angeles",
       "https://www.tripadvisor.com/Restaurant_Review-g32655-d27967767-Reviews-Chris_N_Eddy_s-Los_Angeles_California.html",
       ...deliveryPlatforms.map((p) => p.url),
-      cateringPlatform.url,
     ],
     foundingDate: String(brand.founded),
     telephone: brand.phoneIntl,

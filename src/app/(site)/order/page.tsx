@@ -55,7 +55,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do you cater?",
-    a: "Yes. Catering for offices, sets and parties is booked on ezCater — the button on this page and our catering page at chrisneddys.com/catering/ both go there.",
+    a: "Yes, for offices, sets and parties. Send us a message through our contact page at chrisneddys.com/contact/ with the date, headcount and neighbourhood, and we'll get back to you.",
   },
   {
     q: "Is there parking?",
@@ -127,7 +127,7 @@ export default function OrderPage() {
         <CateringCard
           eyebrow="Feeding a group?"
           title="Catering."
-          text="Office lunches, sets and parties, booked on ezCater."
+          text="Office lunches, sets and parties. Tell us what you need."
           surface="order-catering"
           monster="yellow"
         />

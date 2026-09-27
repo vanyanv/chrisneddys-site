@@ -241,10 +241,10 @@ export default async function PrivacyPage() {
             Food ordering, delivery and our social links hand you to companies that are not us, each
             with its own privacy policy and none of which we control: <strong>Otter</strong> for
             pickup orders, <strong>DoorDash</strong>, <strong>Uber Eats</strong> and{" "}
-            <strong>Grubhub</strong> for delivery, <strong>ezCater</strong> for catering, and{" "}
-            <strong>Instagram</strong>, <strong>Yelp</strong> and <strong>Tripadvisor</strong>{" "}
-            elsewhere. Anything you type once you are there — an address, a card number, a tip — you
-            are giving to them, not to us. We never see it. Checking out through the{" "}
+            <strong>Grubhub</strong> for delivery, and <strong>Instagram</strong>,{" "}
+            <strong>Yelp</strong> and <strong>Tripadvisor</strong> elsewhere. Anything you type once
+            you are there — an address, a card number, a tip — you are giving to them, not to us. We
+            never see it. Checking out through the{" "}
             <Link prefetch={false} href="/shop/">
               shop
             </Link>{" "}

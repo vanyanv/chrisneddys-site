@@ -464,6 +464,8 @@ export async function applyPendingChange(orderId: string, db?: Db): Promise<Orde
         taxCents: change.taxCents,
         tipCents: change.tipCents,
         totalCents: change.totalCents,
+        ...(change.headcount !== undefined ? { headcount: change.headcount } : {}),
+        ...(change.eventAt !== undefined ? { eventAt: new Date(change.eventAt) } : {}),
         pendingChange: null,
         updatedAt: new Date(),
       })

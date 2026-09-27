@@ -532,6 +532,13 @@ export type CateringPendingChange = {
   tipCents: number;
   totalCents: number;
   requestedAt: string;
+  /** Set only when the change also asks for a different headcount or time
+   * of day (same calendar date — the change request never offers a new
+   * date) — `jsonb`, so adding these optional fields needed no migration.
+   * `applyPendingChange` (`src/lib/catering/orders.ts`) patches the order's
+   * own `headcount`/`eventAt` from these when present. */
+  headcount?: number;
+  eventAt?: string;
 };
 
 export const cateringOrders = pgTable(

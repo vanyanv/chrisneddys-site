@@ -88,6 +88,18 @@ describe("the store art", () => {
     // Two strips (under the header, at the foot), two rows of 26 squares each.
     expect(html.match(/"height:9px;/g)?.length).toBe(26 * 2 * 2);
   });
+
+  it("has its own black-and-cream dark version", () => {
+    const { html } = contactEmail({ ...base, topic: "Order issue" }, AT);
+    expect(html).toContain('<meta name="color-scheme" content="light dark">');
+    // The card goes black, the red pill keeps its red and its cream text.
+    expect(html).toContain(".cb-fffdf6{background-color:#1a1612!important}");
+    expect(html).toContain(".cb-d0281c{background-color:#d0281c!important}");
+    expect(html).toContain(".cb-d0281c.cf-fff2c9{color:#fff2c9!important}");
+    expect(html).toContain('bgcolor="#fffdf6"');
+    // The cream floor squares survive the phone apps that recolour backgrounds.
+    expect(html).toContain("background-image:linear-gradient(#fff2c9,#fff2c9)");
+  });
 });
 
 describe("openingListEmail", () => {

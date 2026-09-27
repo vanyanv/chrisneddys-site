@@ -17,6 +17,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgSequence,
   pgTable,
@@ -455,4 +456,241 @@ export const variantsRelations = relations(variants, ({ one, many }) => ({
 
 export const editionsRelations = relations(editions, ({ one }) => ({
   variant: one(variants, { fields: [editions.variantId], references: [variants.id] }),
+}));
+
+// ---------------------------------------------------------------------------
+// Catering (docs/catering-build-plan.md, phase 2)
+//
+// A separate table family from `orders`/`order_items` above rather than a
+// reuse of them: catering orders are quoted from `src/data/menu.ts` (not
+// `products`/`variants`), go through a hold → owner-approval → capture flow
+// instead of pay-then-fulfil, and carry event, note and pending-change data
+// the merch flow has no use for. `src/lib/catering/orders.ts` is the data
+// layer; `src/lib/catering/settings.ts` reads/writes `catering_settings`.
+// ---------------------------------------------------------------------------
+
+export const cateringOrderStatusEnum = pgEnum("catering_order_status", [
+  /** Checkout started; no card action has happened yet. */
+  "draft",
+  /** Checkout completed — the card is held (authorized, not captured). */
+  "requested",
+  /** Owner approved — the hold was captured. */
+  "booked",
+  "declined",
+  "expired",
+  "cancelled",
+  "completed",
+]);
+export const cateringFulfilmentEnum = pgEnum("catering_fulfilment", ["pickup", "delivery"]);
+
+/**
+ * Backs `catering_orders.number` (`CAT-1001`, `CAT-1002`, …) — its own
+ * sequence, independent of `order_number_seq`, the same way the merch and
+ * catering order tables are otherwise kept apart. See `orderNumberSeq` above
+ * for why a Postgres sequence rather than a max()+1 read.
+ */
+export const cateringOrderNumberSeq = pgSequence("catering_order_number_seq", {
+  startWith: 1001,
+  increment: 1,
+});
+
+/** A pickup/delivery address snapshot on a catering order. */
+export type CateringAddress = {
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  zip: string;
+  instructions: string | null;
+};
+
+/** A proposed replacement for a `requested`/`booked` order's lines and
+ * totals, awaiting the owner's approve/decline — see `setPendingChange` /
+ * `applyPendingChange` / `clearPendingChange` in `src/lib/catering/orders.ts`. */
+export type CateringPendingChangeLine = {
+  itemId: string;
+  itemName: string;
+  qty: number;
+  wayId: string | null;
+  wayLabel: string | null;
+  toppings: string[];
+  toppingLabels: string[];
+  extras: string[];
+  extraLabels: string[];
+  unitCents: number;
+  amountCents: number;
+  forName: string | null;
+  note: string | null;
+};
+
+export type CateringPendingChange = {
+  lines: CateringPendingChangeLine[];
+  plateSets: number;
+  foodCents: number;
+  deliveryCents: number;
+  taxCents: number;
+  tipCents: number;
+  totalCents: number;
+  requestedAt: string;
+};
+
+export const cateringOrders = pgTable(
+  "catering_orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** `CAT-1001`, … — see `cateringOrderNumberSeq`. */
+    number: text("number").notNull().unique(),
+    /** Unguessable (32+ url-safe chars) — backs the customer order link
+     * `/catering/o/<token>/`. Never derived from the order id. */
+    token: text("token").notNull().unique(),
+    status: cateringOrderStatusEnum("status").notNull().default("draft"),
+    store: text("store").notNull(),
+    fulfilment: cateringFulfilmentEnum("fulfilment").notNull(),
+    /** The pickup/delivery time the customer chose. */
+    eventAt: timestamp("event_at", { withTimezone: true }).notNull(),
+    headcount: integer("headcount").notNull(),
+    contactName: text("contact_name").notNull(),
+    contactEmail: text("contact_email").notNull(),
+    contactPhone: text("contact_phone").notNull(),
+    company: text("company"),
+    poNumber: text("po_number"),
+    onsiteContactName: text("onsite_contact_name"),
+    onsiteContactPhone: text("onsite_contact_phone"),
+    /** Delivery only; null for pickup. */
+    address: jsonb("address").$type<CateringAddress>(),
+    /** Estimated driving miles (ZIP centroid × 1.25) — null when the ZIP
+     * wasn't recognized (see `rangeUnknown`) or the order is pickup. */
+    distanceMiles: numeric("distance_miles", { precision: 5, scale: 1 }),
+    /** Set when the customer's ZIP wasn't in the `zipcodes` table — the
+     * order is accepted and flagged for the owner rather than blocked. */
+    rangeUnknown: boolean("range_unknown").notNull().default(false),
+    plateSets: integer("plate_sets").notNull().default(0),
+    foodCents: integer("food_cents").notNull(),
+    deliveryCents: integer("delivery_cents").notNull().default(0),
+    taxCents: integer("tax_cents").notNull(),
+    tipCents: integer("tip_cents").notNull().default(0),
+    totalCents: integer("total_cents").notNull(),
+    refundedCents: integer("refunded_cents").notNull().default(0),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    stripeCustomerId: text("stripe_customer_id"),
+    stripePaymentMethodId: text("stripe_payment_method_id"),
+    requestedAt: timestamp("requested_at", { withTimezone: true }),
+    /** `requestedAt` + the settings' reply-hours window — past this with no
+     * owner action, the order is fair game for `findExpirable`. */
+    respondBy: timestamp("respond_by", { withTimezone: true }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    declinedAt: timestamp("declined_at", { withTimezone: true }),
+    declineReason: text("decline_reason"),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    customerNote: text("customer_note"),
+    ownerNote: text("owner_note"),
+    /** A customer-submitted change awaiting the owner's approve/decline. */
+    pendingChange: jsonb("pending_change").$type<CateringPendingChange>(),
+    ...timestamps,
+  },
+  (t) => [
+    index("catering_orders_status_idx").on(t.status),
+    index("catering_orders_event_at_idx").on(t.eventAt),
+    index("catering_orders_email_idx").on(t.contactEmail),
+  ],
+);
+
+export const cateringOrderItems = pgTable(
+  "catering_order_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => cateringOrders.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    /** `src/data/menu.ts` item id — not a foreign key, so a later menu edit
+     * never rewrites history (see the snapshot fields below). */
+    itemId: text("item_id").notNull(),
+    itemName: text("item_name").notNull(),
+    qty: integer("qty").notNull(),
+    /** A free preset (e.g. "Chris's Way"); null when none was chosen. */
+    wayId: text("way_id"),
+    wayLabel: text("way_label"),
+    /** Free topping ids/labels, in the order the customer picked them. */
+    toppings: jsonb("toppings").$type<string[]>().notNull().default([]),
+    toppingLabels: jsonb("topping_labels").$type<string[]>().notNull().default([]),
+    /** Paid extra ids/labels (e.g. Extra Cheese, Make it Halal). */
+    extras: jsonb("extras").$type<string[]>().notNull().default([]),
+    extraLabels: jsonb("extra_labels").$type<string[]>().notNull().default([]),
+    unitCents: integer("unit_cents").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    forName: text("for_name"),
+    note: text("note"),
+    ...timestamps,
+  },
+  (t) => [index("catering_order_items_order_id_idx").on(t.orderId)],
+);
+
+export const cateringEvents = pgTable(
+  "catering_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => cateringOrders.id, { onDelete: "cascade" }),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    /** "requested" | "approved" | "declined" | "expired" | "cancelled" |
+     * "change_requested" | "change_approved" | "change_declined" | "note" |
+     * "email_sent" | "refunded" | "charged" — free text (not an enum) so a
+     * new kind never needs a migration. */
+    kind: text("kind").notNull(),
+    actor: text("actor").notNull(),
+    detail: jsonb("detail").$type<Record<string, unknown>>(),
+  },
+  (t) => [index("catering_events_order_id_idx").on(t.orderId)],
+);
+
+/** One `{open, close}` ("HH:MM", 24h) slot per weekday a store takes
+ * catering orders; `hours[store][weekday]` is an array so a store could in
+ * principle have more than one slot in a day, though every default is one. */
+export type CateringDayHours = { open: string; close: string };
+export type CateringStoreHours = Record<string, CateringDayHours[]>;
+export type CateringHours = Record<string, CateringStoreHours>;
+
+export type CateringDayOff = { date: string; store: string };
+
+function defaultCateringHours(): CateringHours {
+  const week: CateringStoreHours = {};
+  for (let day = 0; day <= 6; day++) week[String(day)] = [{ open: "10:00", close: "20:00" }];
+  return { hollywood: week, vannuys: { ...week } };
+}
+
+/** Single-row (`id = 'default'`) catering-wide configuration — see
+ * `src/lib/catering/settings.ts`. */
+export const cateringSettings = pgTable("catering_settings", {
+  id: text("id").primaryKey().default("default"),
+  orderingOn: boolean("ordering_on").notNull().default(false),
+  hours: jsonb("hours").$type<CateringHours>().notNull().default(defaultCateringHours()),
+  daysOff: jsonb("days_off").$type<CateringDayOff[]>().notNull().default([]),
+  deliveryFeeCents: integer("delivery_fee_cents").notNull().default(2500),
+  rangeMiles: integer("range_miles").notNull().default(10),
+  replyHours: integer("reply_hours").notNull().default(24),
+  leadHours: integer("lead_hours").notNull().default(48),
+  bigLeadHours: integer("big_lead_hours").notNull().default(72),
+  bigHeadcount: integer("big_headcount").notNull().default(50),
+  ownerEmail: text("owner_email").notNull().default("chris@chrisneddys.com"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const cateringOrdersRelations = relations(cateringOrders, ({ many }) => ({
+  items: many(cateringOrderItems),
+  events: many(cateringEvents),
+}));
+
+export const cateringOrderItemsRelations = relations(cateringOrderItems, ({ one }) => ({
+  order: one(cateringOrders, {
+    fields: [cateringOrderItems.orderId],
+    references: [cateringOrders.id],
+  }),
+}));
+
+export const cateringEventsRelations = relations(cateringEvents, ({ one }) => ({
+  order: one(cateringOrders, { fields: [cateringEvents.orderId], references: [cateringOrders.id] }),
 }));

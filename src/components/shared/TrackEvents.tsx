@@ -62,7 +62,12 @@ export function TrackEvents() {
         item_id: itemId,
       };
 
-      if (raw.startsWith("tel:")) {
+      if (anchor.hasAttribute("data-catering")) {
+        // Catering is a link to our own contact form, so where it points
+        // can't tell it apart from any other /contact/ link; the button says
+        // so itself. See src/data/catering.ts.
+        event = "catering_click";
+      } else if (raw.startsWith("tel:")) {
         event = "call_click";
       } else {
         let url: URL | null = null;
@@ -80,7 +85,7 @@ export function TrackEvents() {
           // `data-surface` the two were the same column twice. Otter's own
           // report still shows it, which is what it was for.
         } else if (host in platformByHost) {
-          event = platformByHost[host] === "ezcater" ? "catering_click" : "delivery_click";
+          event = "delivery_click";
           props.platform = platformByHost[host];
         } else if (
           host === "www.google.com" ||

@@ -5,7 +5,7 @@ import "@/styles/catering.css";
 import { brand } from "@/data/brand";
 import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
-import { cateringPlatform } from "@/data/delivery";
+import { CATERING_HREF } from "@/data/catering";
 import { itemPhotoAlt } from "@/lib/otter";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -16,7 +16,7 @@ import { GlyphRow } from "@/components/storeart/SectionOpener";
 
 const title = "Catering — Sliders for Offices & Parties";
 const description =
-  "Chris N Eddy's catering in Los Angeles: smash burger sliders, chris-cut fries and shakes for offices, sets and parties, booked and delivered through ezCater.";
+  "Chris N Eddy's catering in Los Angeles: smash burger sliders, chris-cut fries and shakes for offices, sets and parties. Send us a message and we'll set it up.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/catering/" });
 
@@ -41,7 +41,7 @@ const CROWD: Array<{ c: Color; l: number; w: number; ld: number; wd: number; des
 
 const STEPS = [
   {
-    title: "Pick on ezCater",
+    title: "Send us a message",
     text: "Sliders, fries and shakes for however many people are coming.",
   },
   { title: "Set the time and place", text: "Your office, your set, your party." },
@@ -49,11 +49,11 @@ const STEPS = [
 ];
 
 /**
- * Catering runs on ezCater, which is the system of record for everything a
- * catering customer needs to know — menu, prices, hours, fees, changes. The
- * owner asked for none of that to be copied here, so this page is a pitch and
- * a link, the same shape as /careers/ is for Indeed: the food, three steps and
- * the ezCater button. No prices on the food cards for the same reason.
+ * Catering is arranged with the owners through the contact form (owner,
+ * 2026-09-27: not ezCater), and the owner wants no hours, minimums or fees on
+ * the site, so this page is a pitch and a button, the same shape as /careers/
+ * is for Indeed: the food, three steps and a button to the contact form. No
+ * prices on the food cards for the same reason.
  *
  * The art: a crowd of the artist's monsters along the bottom of the red panel
  * (the "whole room"), the checkerboard floor under them, an op-art bullseye in
@@ -61,8 +61,8 @@ const STEPS = [
  * peeking over the last card. All of it is the shared symbol set `MascotDefs`
  * already puts on every page, so none of it is a download.
  *
- * Every ezCater button carries a `data-surface` so Analytics shows catering
- * clicks by spot; the store comes from the ezCater link (`clickLocation`).
+ * Every catering button carries `data-catering` (so the click is a
+ * `catering_click`) inside a `data-surface`, so Analytics shows them by spot.
  */
 export default function CateringPage() {
   const food = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
@@ -83,7 +83,7 @@ export default function CateringPage() {
           inLanguage: "en-US",
           isPartOf: { "@id": ID.website },
           about: { "@id": ID.org },
-          significantLink: [cateringPlatform.url],
+          significantLink: [`${brand.siteUrl}${CATERING_HREF}`],
         }}
       />
       <JsonLdScript
@@ -98,8 +98,8 @@ export default function CateringPage() {
           areaServed: { "@type": "City", name: "Los Angeles" },
           availableChannel: {
             "@type": "ServiceChannel",
-            serviceUrl: cateringPlatform.url,
-            name: cateringPlatform.name,
+            serviceUrl: `${brand.siteUrl}${CATERING_HREF}`,
+            name: `Contact ${brand.name}`,
           },
         }}
       />
@@ -120,19 +120,19 @@ export default function CateringPage() {
           <br /> <span className="y">the whole room.</span>
         </h1>
         <p className="cne-cat-lede">
-          {brand.name} catering, booked on {cateringPlatform.name} and delivered hot.
+          {brand.name} catering for offices, sets and parties. Tell us about yours.
         </p>
         <div className="cne-cat-cta">
-          <a
+          <Link
+            prefetch={false}
             className="cne-big is-primary"
-            href={cateringPlatform.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={CATERING_HREF}
+            data-catering=""
           >
-            ORDER CATERING &rarr;
-          </a>
-          <Link prefetch={false} className="cne-hero-menu" href="/contact/">
-            QUESTIONS? ASK US
+            ASK ABOUT CATERING &rarr;
+          </Link>
+          <Link prefetch={false} className="cne-hero-menu" href="/menu/">
+            SEE THE MENU
           </Link>
         </div>
         <ul className="cne-cat-crowd" aria-hidden="true">
@@ -228,14 +228,14 @@ export default function CateringPage() {
             <span className="scr">Feeding a crowd?</span>
             We&rsquo;ll bring the sliders.
           </h2>
-          <a
+          <Link
+            prefetch={false}
             className="cne-big is-primary"
-            href={cateringPlatform.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={CATERING_HREF}
+            data-catering=""
           >
-            ORDER CATERING &rarr;
-          </a>
+            ASK ABOUT CATERING &rarr;
+          </Link>
         </div>
       </section>
     </div>

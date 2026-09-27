@@ -60,38 +60,6 @@
   background: var(--a-cream);
   color: var(--a-ink);
 }
-.cne-catcard-on {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: var(--a-sub);
-  text-align: center;
-}
-
-/* The contact form's catering note (GuestCheck.tsx). */
-.cne-catnote {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  margin: 4px 0 14px;
-  padding: 12px 14px;
-  background: var(--a-cream);
-  border: 2px solid var(--a-ink);
-  font-size: 14px;
-  line-height: 1.5;
-}
-.cne-catnote svg {
-  flex: none;
-}
-.cne-catnote a {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  color: var(--a-ink);
-  display: inline-block;
-  padding: 6px 0;
-}
-
 /* Side by side on a wide card, the button would sit under the peeking
    monster; drop it clear. */
 @media (min-width: 901px) {

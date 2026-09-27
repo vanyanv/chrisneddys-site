@@ -1,19 +1,20 @@
-import { cateringPlatform } from "@/data/delivery";
+import Link from "next/link";
+import { CATERING_HREF } from "@/data/catering";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import "@/styles/catering-card.css";
 
 /**
  * The small "we cater" card that sits on the order page and under the menu.
- * Its button goes straight to ezCater, which holds everything a catering
- * customer needs to know (menu, hours, fees, changes): the owner asked for none
- * of that to be copied onto the site. The footer's "Catering" link is what
- * points at /catering/ itself.
+ * Its button opens the contact form, where catering is arranged with the
+ * owners (see src/data/catering.ts). No hours, minimums or fees on the site
+ * (owner, 2026-09-26). The footer's "Catering" link is what points at
+ * /catering/ itself.
  *
  * The button is cream, never the ORDER yellow, so ORDER stays the loudest
  * thing on the pages this sits on. A monster peeks over the top corner.
- * `surface` names the spot in Analytics; the store comes from the ezCater link
- * itself (`clickLocation`).
+ * `surface` names the spot in Analytics; `data-catering` makes the click a
+ * `catering_click`.
  */
 export function CateringCard({
   eyebrow,
@@ -44,15 +45,9 @@ export function CateringCard({
         <p className="cne-catcard-p">{text}</p>
       </div>
       <div className="cne-catcard-act">
-        <a
-          className="cne-big"
-          href={cateringPlatform.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ORDER CATERING &rarr;
-        </a>
-        <span className="cne-catcard-on">ON {cateringPlatform.name.toUpperCase()}</span>
+        <Link prefetch={false} className="cne-big" href={CATERING_HREF} data-catering="">
+          ASK ABOUT CATERING &rarr;
+        </Link>
       </div>
     </aside>
   );

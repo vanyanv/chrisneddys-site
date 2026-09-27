@@ -81,7 +81,7 @@ for (const item of items) {
   console.log(`  ${pad(status, 6)} ${ok ? "" : "BROKEN  "}${item.name}`);
 }
 
-console.log(`\nDelivery and catering platforms\n`);
+console.log(`\nDelivery platforms\n`);
 for (const url of deliveryUrls) {
   const status = await check(url);
   const host = new URL(url).hostname;

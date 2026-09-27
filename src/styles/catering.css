@@ -104,8 +104,8 @@
   padding: 0;
   list-style: none;
 }
-/* The cards show the food, not a price or a button: catering is ordered and
-   priced on ezCater. */
+/* The cards show the food, not a price or a button: catering is arranged and
+   priced with the owners through the contact form. */
 .cne-cat-food .cne-card {
   cursor: default;
 }

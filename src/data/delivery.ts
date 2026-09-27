@@ -5,7 +5,7 @@
  * to the 5539 W. Sunset Blvd store on 2026-09-09. The Van Nuys DoorDash and
  * Uber Eats links came from the owner on 2026-09-26; Van Nuys has no Grubhub
  * listing yet. They are hard to check from a
- * script — DoorDash, Uber Eats and ezCater all answer a plain `curl` with 403 —
+ * script — DoorDash and Uber Eats both answer a plain `curl` with 403 —
  * so `scripts/check-order-links.mjs` reports them as NEEDS-EYES rather than
  * pretending a bot block is a broken link.
  *
@@ -68,15 +68,6 @@ export function deliveryFor(locationId: string): DeliveryPlatform[] {
   return deliveryPlatforms.filter((p) => p.locationId === locationId);
 }
 
-/** Large orders and events. A different job from a slider at midnight. */
-export const cateringPlatform: DeliveryPlatform = {
-  id: "ezcater",
-  locationId: "hollywood",
-  name: "ezCater",
-  url: "https://www.ezcater.com/catering/chris-n-eddys-3",
-  note: "Office and event catering",
-};
-
 /** The hosts the click tracker recognises, mapped to the platform they belong to. */
 export const platformByHost: Record<string, string> = {
   "www.doordash.com": "doordash",
@@ -85,6 +76,4 @@ export const platformByHost: Record<string, string> = {
   "ubereats.com": "ubereats",
   "www.grubhub.com": "grubhub",
   "grubhub.com": "grubhub",
-  "www.ezcater.com": "ezcater",
-  "ezcater.com": "ezcater",
 };

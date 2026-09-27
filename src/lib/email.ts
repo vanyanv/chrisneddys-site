@@ -21,6 +21,7 @@ import "server-only";
 import { getDb, type Db } from "@/db/client";
 import { brand } from "@/data/brand";
 import { absoluteUrl } from "@/lib/siteOrigin";
+import { holdColors } from "@/lib/emailColor";
 import { emailLogoImg } from "@/lib/emailLogo";
 import { getEditionSizes, getStoreSettings, type OrderWithItems } from "@/lib/orders";
 
@@ -319,7 +320,7 @@ function htmlShell(opts: {
   const headColor = opts.dark ? PAPER : INK;
   const headingHtml = escapeHtml(opts.heading).replace(/\n/g, "<br>");
 
-  return `<!doctype html>
+  return holdColors(`<!doctype html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:${PAPER}">
@@ -348,7 +349,7 @@ function htmlShell(opts: {
     </table>
   </td></tr></table>
 </body>
-</html>`;
+</html>`);
 }
 
 // ---------------------------------------------------------------------------

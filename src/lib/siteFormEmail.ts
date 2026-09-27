@@ -15,6 +15,7 @@
 import { brand } from "@/data/brand";
 import type { Location } from "@/data/locations";
 import { googleDirections } from "@/lib/directions";
+import { holdColors, solidFill } from "@/lib/emailColor";
 import { emailLogoImg } from "@/lib/emailLogo";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
@@ -119,13 +120,14 @@ function monsterImg(colour: MonsterColour): string {
 }
 
 /** Two rows of ink-and-cream squares, the floor at the Hollywood location.
- * Plain table cells rather than an image, so it shows even with images off. */
+ * Plain table cells rather than an image, so it shows even with images off;
+ * painted with `solidFill` so dark-mode phone apps keep the cream squares. */
 function checkerStrip(): string {
   const cells = (offset: number) =>
     Array.from(
       { length: 26 },
       (_, i) =>
-        `<td style="height:9px;line-height:9px;font-size:0;background:${(i + offset) % 2 ? CREAM : INK}">&nbsp;</td>`,
+        `<td style="height:9px;line-height:9px;font-size:0;${solidFill((i + offset) % 2 ? CREAM : INK)}">&nbsp;</td>`,
     ).join("");
   return `<tr><td style="padding:0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed"><tr>${cells(0)}</tr><tr>${cells(1)}</tr></table></td></tr>`;
 }
@@ -149,7 +151,7 @@ function shell(opts: {
     .map((b) => `<tr><td style="padding-top:10px">${b}</td></tr>`)
     .join("");
 
-  return `<!doctype html>
+  return holdColors(`<!doctype html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:${PAPER}">
@@ -183,7 +185,7 @@ function shell(opts: {
     </table>
   </td></tr></table>
 </body>
-</html>`;
+</html>`);
 }
 
 export function contactEmail(

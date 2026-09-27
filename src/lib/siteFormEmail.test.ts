@@ -88,6 +88,15 @@ describe("the store art", () => {
     // Two strips (under the header, at the foot), two rows of 26 squares each.
     expect(html.match(/"height:9px;/g)?.length).toBe(26 * 2 * 2);
   });
+
+  it("holds its colours in dark mode", () => {
+    const { html } = contactEmail({ ...base, topic: "Order issue" }, AT);
+    expect(html).toContain('<meta name="color-scheme" content="light only">');
+    expect(html).toContain("[data-ogsb] .cb-d0281c");
+    expect(html).toContain('bgcolor="#fffdf6"');
+    // The cream floor squares survive the phone apps that recolour backgrounds.
+    expect(html).toContain("background-image:linear-gradient(#fff2c9,#fff2c9)");
+  });
 });
 
 describe("openingListEmail", () => {

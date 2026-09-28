@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MenuItem, WayId } from "@/data/menu";
 import { track } from "@/lib/track";
 
@@ -42,8 +42,13 @@ export function useItemSheet() {
    * (App Router history support), so the entry carries its own state and a
    * Back into it is a same-URL navigation, not a reload.
    */
+  // Set while our own history.back() is in flight, so a second tap on close
+  // before popstate lands doesn't step back past the menu page too.
+  const leaving = useRef(false);
+
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
+      leaving.current = false;
       if (!(e.state as { cneSheet?: boolean } | null)?.cneSheet) setOpen(false);
     };
     window.addEventListener("popstate", onPop);
@@ -69,7 +74,9 @@ export function useItemSheet() {
   }, []);
 
   const close = useCallback(() => {
+    if (leaving.current) return;
     if ((window.history.state as { cneSheet?: boolean } | null)?.cneSheet) {
+      leaving.current = true;
       window.history.back();
     } else {
       setOpen(false);

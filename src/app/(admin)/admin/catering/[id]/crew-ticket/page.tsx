@@ -124,7 +124,7 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
                 {order.company || order.contactName} &middot; {order.headcount} people
               </div>
               <div>
-                {order.contactName} ({order.contactPhone})
+                {order.contactName} · {order.contactPhone}
               </div>
             </div>
             <div>
@@ -213,10 +213,14 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
                         <td>{item.forName}</td>
                         <td>{item.itemName}</td>
                         <td>
-                          {way}
-                          {item.toppingLabels.length > 0 && <> · {item.toppingLabels.join(", ")}</>}
-                          {item.extraLabels.length > 0 && <> · {item.extraLabels.join(", ")}</>}
-                          {item.note && <> · {item.note}</>}
+                          {[
+                            way,
+                            item.toppingLabels.join(", "),
+                            item.extraLabels.join(", "),
+                            item.note,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </td>
                       </tr>
                     );

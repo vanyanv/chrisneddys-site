@@ -120,7 +120,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], launchOptions: PW_LAUNCH_OPTIONS },
       testIgnore: /e2e\/catering\//,
     },
     // Catering (issue #190) walks every flow at both a phone and a desktop

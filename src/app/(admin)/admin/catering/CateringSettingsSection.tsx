@@ -499,7 +499,7 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
       </form>
 
       <div className={`adm-savebar${dirty ? " is-visible" : ""}`}>
-        <span className="adm-savebar-count">Unsaved changes</span>
+        <span className="adm-savebar-count">Catering: Unsaved changes</span>
         <button type="button" className="adm-savebar-discard" onClick={discard}>
           Discard
         </button>

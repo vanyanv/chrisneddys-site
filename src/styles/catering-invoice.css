@@ -133,6 +133,8 @@
   margin-top: 16px;
   padding-top: 10px;
   border-top: 2px solid #111;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .cinv-totals p {
   display: flex;

@@ -308,6 +308,20 @@
 .cor-note.is-checking {
   color: var(--a-sub);
 }
+.cor-note.is-info {
+  background: #dbe8fb;
+  border-color: #3b6fc9;
+  color: #1c3f7a;
+}
+.cor-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .cor-fine {
   font-size: 12px;
   color: var(--a-sub);

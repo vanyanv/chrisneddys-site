@@ -231,7 +231,14 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
           </div>
 
           <div className="cat-ticket-footer">
-            Printed {formatDateTime(new Date())} &middot; {order.number} &middot; page 1 of 1
+            {/* Chrome's print stylesheet has no running header/footer or page-count
+                API for ordinary printed HTML (only `page.pdf()`'s own
+                header/footer templates get that, which isn't the path the owner
+                prints through — they use the browser's own Print dialog), so an
+                honest footer can name the order but not a page count or repeat
+                itself on every physical page; see the crew-ticket ground rule's
+                "page x of y" ask in docs/catering-build-plan.md. */}
+            Printed {formatDateTime(new Date())} &middot; {order.number}
           </div>
         </div>
       </div>

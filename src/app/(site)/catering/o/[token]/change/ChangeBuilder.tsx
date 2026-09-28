@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { itemById } from "@/data/menu";
 import type { MenuItem } from "@/data/menu";
-import { quote } from "@/lib/catering/pricing";
+import { quote, lineKey, describeLine } from "@/lib/catering/pricing";
 import { slotsForDate, dayStatus } from "@/lib/catering/schedule";
 import { laDateString } from "@/lib/catering/timezone";
 import type { CartLine, Fulfilment } from "@/lib/catering/types";
@@ -13,9 +13,38 @@ import { addOrMergeLine, removeLineAt, updateLineAt } from "@/components/caterin
 import { StepFood } from "@/components/catering-order/StepFood";
 import { ItemSheet } from "@/components/catering-order/ItemSheet";
 import { OrderSheet } from "@/components/catering-order/OrderSheet";
+import { OrderBar } from "@/components/catering-order/OrderBar";
 import { formatTime } from "@/components/catering-order/SummaryStrip";
 import { money } from "@/components/catering-order/money";
 import { requestChangeAction } from "../actions";
+
+/** Per-line quantity diffs between the original order and the edited draft,
+ * keyed the same way the cart merges lines (item + way + toppings + extras +
+ * name + note) — see o2-change-order-review-a-change.png: only lines whose
+ * quantity actually changed are listed, old → new. */
+function changedLines(
+  originalLines: CartLine[],
+  currentLines: CartLine[],
+): { key: string; label: string; oldQty: number; newQty: number }[] {
+  const oldByKey = new Map(originalLines.map((l) => [lineKey(l), l]));
+  const newByKey = new Map(currentLines.map((l) => [lineKey(l), l]));
+  const keys = [...new Set([...oldByKey.keys(), ...newByKey.keys()])];
+  return keys
+    .map((k) => {
+      const oldLine = oldByKey.get(k);
+      const newLine = newByKey.get(k);
+      const line = newLine ?? oldLine;
+      const item = line ? itemById(line.itemId) : undefined;
+      const { wayLabel } = line ? describeLine(line) : { wayLabel: null };
+      return {
+        key: k,
+        label: `${item?.name ?? line?.itemId ?? ""}${wayLabel ? ` · ${wayLabel}` : ""}`,
+        oldQty: oldLine?.qty ?? 0,
+        newQty: newLine?.qty ?? 0,
+      };
+    })
+    .filter((c) => c.oldQty !== c.newQty);
+}
 
 /** O2: a small builder over the existing order — headcount, time (same
  * date), and the same food step/sheets the new-order flow uses — followed by
@@ -93,47 +122,66 @@ export function ChangeBuilder({
 
   if (reviewing) {
     const diff = newQuote.totalCents - originalTotalCents;
+    const lineDiffs = changedLines(initialLines, lines);
     return (
-      <section className="cor-link-hero">
-        <p className="cor-link-tag">Change {number}</p>
-        <h1>What&rsquo;s changing?</h1>
-        {headcount !== initialHeadcount && (
-          <p className="cor-diff-row">
-            <span>People</span>
-            <span>
-              {initialHeadcount} &rarr; {headcount}
-            </span>
-          </p>
-        )}
-        {time !== originalTime && (
+      <>
+        <section className="cor-link-hero">
+          <p className="cor-link-tag">Change {number}</p>
+          <h1>What&rsquo;s changing?</h1>
+          {headcount !== initialHeadcount && (
+            <p className="cor-diff-row">
+              <span>People</span>
+              <span>
+                {initialHeadcount} &rarr; {headcount}
+              </span>
+            </p>
+          )}
+          {lineDiffs.map((line) => (
+            <p className="cor-diff-row" key={line.key}>
+              <span>{line.label}</span>
+              <span>
+                {line.oldQty} &rarr; {line.newQty}
+              </span>
+            </p>
+          ))}
           <p className="cor-diff-row">
             <span>Time</span>
-            <span>{formatTime(time)}</span>
-          </p>
-        )}
-        <p className="cor-note">
-          Changes go back to us to confirm, within 24 hours. Until then your order stays as it was.
-        </p>
-        <p className="cor-review-total">
-          <span>New total</span>
-          <span>{money(newQuote.totalCents)}</span>
-        </p>
-        {diff !== 0 && (
-          <p className="cor-diff-row">
             <span>
-              {diff > 0 ? "Extra on your card when we confirm" : "Refund when we confirm"}
+              {time !== originalTime
+                ? `${formatTime(originalTime)} → ${formatTime(time)}`
+                : `${formatTime(time)} (same)`}
             </span>
-            <span>{money(Math.abs(diff))}</span>
           </p>
-        )}
-        {error && <p className="cor-note is-error">{error}</p>}
-        <button type="button" className="cor-btn is-primary" onClick={send} disabled={busy}>
-          {busy ? "Sending…" : "Send change"}
-        </button>
-        <button type="button" className="cor-btn is-secondary" onClick={() => setReviewing(false)}>
-          Back
-        </button>
-      </section>
+          <p className="cor-note is-info">
+            Changes go back to us to confirm, within 24 hours. Until then your order stays as it
+            was.
+          </p>
+          <div className="cor-review-totals">
+            <p className="cor-review-total">
+              <span>New total</span>
+              <span>{money(newQuote.totalCents)}</span>
+            </p>
+            {diff !== 0 && (
+              <p>
+                <span>
+                  {diff > 0 ? "Extra on your card when we confirm" : "Refund when we confirm"}
+                </span>
+                <span>{money(Math.abs(diff))}</span>
+              </p>
+            )}
+          </div>
+          {error && <p className="cor-note is-error">{error}</p>}
+          {/* Clears the fixed OrderBar below so the last note isn't hidden behind it. */}
+          <div aria-hidden="true" style={{ height: 90 }} />
+        </section>
+        <OrderBar
+          totalCents={newQuote.totalCents}
+          caption={diff !== 0 ? `${diff > 0 ? "+" : "-"}${money(Math.abs(diff))}` : undefined}
+          actionLabel={busy ? "Sending…" : "Send change"}
+          onAction={send}
+          disabled={busy}
+        />
+      </>
     );
   }
 

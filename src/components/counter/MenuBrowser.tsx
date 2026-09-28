@@ -55,7 +55,7 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
  * here too, repeating rows a thumb-length below; the page's item links live
  * in its desktop list, which stays in the HTML at every width.
  */
-export function MenuBrowser() {
+export function MenuBrowser({ cateringHref }: { cateringHref?: string } = {}) {
   const { item, open, way, setWay, openItem, close } = useItemSheet();
 
   return (
@@ -137,6 +137,7 @@ export function MenuBrowser() {
               text="The sliders, fries and shakes on this page, for the whole office."
               surface="menu-catering"
               monster="blue"
+              href={cateringHref}
             />
           </div>
         </div>

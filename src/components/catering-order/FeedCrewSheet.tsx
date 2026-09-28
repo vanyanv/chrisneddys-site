@@ -42,7 +42,9 @@ export function FeedCrewSheet({
 }) {
   const [tier, setTier] = useState<(typeof TIERS)[number]["id"]>("classic");
   const [wayId, setWayId] = useState<WayId>("chris");
-  const [shakes, setShakes] = useState(headcount);
+  // Default to about a third of the crew wanting a shake (60 people -> 20),
+  // matching c7-feed-my-crew-sheet.png; sodas start at 0. Both stay editable.
+  const [shakes, setShakes] = useState(Math.round(headcount / 3));
   const [sodas, setSodas] = useState(0);
 
   const chosen = TIERS.find((t) => t.id === tier) ?? TIERS[1];

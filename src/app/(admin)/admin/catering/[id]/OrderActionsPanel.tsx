@@ -7,7 +7,7 @@
  * the timeline already says what happened. */
 import { useActionState, useState } from "react";
 import type { CateringOrderStatus } from "@/lib/catering/orders";
-import { formatCents, formatDateTime } from "../format";
+import { formatCents, formatCountdown, formatDateTime } from "../format";
 import {
   DECLINE_REASONS,
   approveOrderAction,
@@ -20,12 +20,16 @@ const initial: CateringActionState = {};
 
 function ApproveDecline({
   orderId,
+  orderNumber,
   totalCents,
   respondBy,
+  firstName,
 }: {
   orderId: string;
+  orderNumber: string;
   totalCents: number;
   respondBy: Date | null;
+  firstName: string;
 }) {
   const [declining, setDeclining] = useState(false);
   const [reasonKind, setReasonKind] = useState<(typeof DECLINE_REASONS)[number]>(
@@ -41,7 +45,7 @@ function ApproveDecline({
     return (
       <div className="cat-next-card">
         <p className="rack-eyebrow" style={{ marginBottom: 6 }}>
-          Decline this order
+          Decline {orderNumber}
         </p>
         {declineState?.error && (
           <p className="adm-error" role="alert">
@@ -52,7 +56,7 @@ function ApproveDecline({
           <input type="hidden" name="orderId" value={orderId} />
           <input type="hidden" name="reasonKind" value={reasonKind} />
           <p className="rack-eyebrow" style={{ marginBottom: 6 }}>
-            Reason (the customer sees it)
+            Reason ({firstName} sees it)
           </p>
           <div className="cat-decline-reasons">
             {DECLINE_REASONS.map((reason) => (
@@ -67,7 +71,7 @@ function ApproveDecline({
             ))}
           </div>
           <label className="adm-label" htmlFor="message">
-            Message to the customer (optional)
+            Message to {firstName} (optional)
           </label>
           <textarea id="message" name="message" className="adm-textarea" rows={3} />
           <button type="submit" className="cat-btn-danger" disabled={declinePending}>
@@ -92,9 +96,14 @@ function ApproveDecline({
       <p className="cat-next-heading">
         {respondBy ? `Approve by ${formatDateTime(respondBy)}` : "Awaiting your reply"}
       </p>
+      {respondBy && (
+        <p className="cat-next-sub">
+          Expires in {formatCountdown(respondBy)}. Then the hold drops and {firstName} is told.
+        </p>
+      )}
       <p className="cat-next-sub">
-        Approve charges the card on file and emails the invoice. Decline cancels the hold and tells
-        the customer why.
+        Approve charges the card on file and emails {firstName} the invoice. Decline cancels the
+        hold and tells {firstName} why.
       </p>
       {approveState?.error && (
         <p className="adm-error" role="alert">
@@ -137,19 +146,32 @@ function MarkCompleted({ orderId }: { orderId: string }) {
 
 export function OrderActionsPanel({
   orderId,
+  orderNumber,
   status,
   hasPendingChange,
   totalCents,
   respondBy,
+  contactName,
 }: {
   orderId: string;
+  orderNumber: string;
   status: CateringOrderStatus;
   hasPendingChange: boolean;
   totalCents: number;
   respondBy: Date | null;
+  contactName: string;
 }) {
+  const firstName = contactName.trim().split(" ")[0] || "the customer";
   if (status === "requested" && !hasPendingChange) {
-    return <ApproveDecline orderId={orderId} totalCents={totalCents} respondBy={respondBy} />;
+    return (
+      <ApproveDecline
+        orderId={orderId}
+        orderNumber={orderNumber}
+        totalCents={totalCents}
+        respondBy={respondBy}
+        firstName={firstName}
+      />
+    );
   }
   if (status === "booked" && !hasPendingChange) {
     return <MarkCompleted orderId={orderId} />;

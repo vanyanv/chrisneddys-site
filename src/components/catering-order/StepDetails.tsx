@@ -15,6 +15,7 @@ export function StepDetails({
   fulfilment,
   address,
   returning,
+  onNotReturning,
   errors,
   onChange,
 }: {
@@ -26,6 +27,8 @@ export function StepDetails({
   fulfilment: Fulfilment | null;
   address: Address | null;
   returning: boolean;
+  /** C8's "Not you?" link — clears the prefill back to a blank form. */
+  onNotReturning?: () => void;
   errors: DetailsErrors;
   onChange: (patch: {
     contact?: Partial<Contact>;
@@ -39,7 +42,15 @@ export function StepDetails({
     <div className="cor-step">
       <h1>Your details</h1>
       {returning && (
-        <p className="cor-note is-ok">Welcome back — we filled in what we have on file.</p>
+        <p className="cor-note is-ok">
+          Welcome back{contact.name ? `, ${contact.name.split(" ")[0]}` : ""}. We filled this in
+          from your last order.{" "}
+          {onNotReturning && (
+            <button type="button" className="cor-link-btn" onClick={onNotReturning}>
+              Not you?
+            </button>
+          )}
+        </p>
       )}
 
       <label className="cor-field">
@@ -67,7 +78,7 @@ export function StepDetails({
       </label>
 
       <label className="cor-field">
-        <span className="cor-label">Phone</span>
+        <span className="cor-label">Mobile</span>
         <input
           type="tel"
           autoComplete="tel"
@@ -91,7 +102,7 @@ export function StepDetails({
 
       <label className="cor-field">
         <span className="cor-label">
-          PO number <span className="cor-optional">optional</span>
+          PO or reference number <span className="cor-optional">optional</span>
         </span>
         <input
           type="text"
@@ -102,13 +113,17 @@ export function StepDetails({
 
       {fulfilment === "delivery" && (
         <>
+          <p className="cor-label" style={{ marginTop: 20 }}>
+            On the day
+          </p>
           <label className="cor-field">
             <span className="cor-label">
-              Onsite contact name <span className="cor-optional">optional</span>
+              On-site contact <span className="cor-optional">optional</span>
             </span>
             <input
               type="text"
               value={onsite?.name ?? ""}
+              placeholder="Name"
               onChange={(e) =>
                 onChange({ onsite: { name: e.target.value, phone: onsite?.phone ?? "" } })
               }
@@ -116,7 +131,7 @@ export function StepDetails({
           </label>
           <label className="cor-field">
             <span className="cor-label">
-              Onsite contact phone <span className="cor-optional">optional</span>
+              On-site contact phone <span className="cor-optional">optional</span>
             </span>
             <input
               type="tel"

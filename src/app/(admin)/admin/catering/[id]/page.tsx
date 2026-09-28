@@ -305,10 +305,12 @@ export default async function AdminCateringOrderDetailPage({
 
           <OrderActionsPanel
             orderId={order.id}
+            orderNumber={order.number}
             status={order.status}
             hasPendingChange={order.pendingChange !== null}
             totalCents={order.totalCents}
             respondBy={order.respondBy}
+            contactName={order.contactName}
           />
 
           <section className="rack-order-card">

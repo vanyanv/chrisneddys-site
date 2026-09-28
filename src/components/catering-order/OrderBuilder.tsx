@@ -258,6 +258,14 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
           fulfilment={draft.fulfilment}
           address={draft.address}
           returning={returning}
+          onNotReturning={() => {
+            setReturning(false);
+            setDraft((d) => ({
+              ...d,
+              contact: { name: "", email: "", phone: "" },
+              company: "",
+            }));
+          }}
           errors={detailsErrors}
           onChange={(patch) =>
             setDraft((d) => ({

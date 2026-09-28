@@ -8,6 +8,8 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/otter";
 import { ScrollChecker } from "@/components/storeart/ScrollChecker";
 import { GlyphRow } from "@/components/storeart/SectionOpener";
+import { getPublicCateringConfig } from "@/lib/catering/public";
+import { getDb } from "@/db/client";
 
 const title = "Menu & Prices — Sliders, Combos & Fries";
 /**
@@ -24,7 +26,10 @@ const description = `The full Chris N Eddy's menu and pickup prices: sliders fro
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/menu/" });
 
-export default function MenuPage() {
+export default async function MenuPage() {
+  const cateringConfig = await getPublicCateringConfig(await getDb());
+  const cateringHref = cateringConfig.orderingOn ? "/catering/order/" : undefined;
+
   return (
     <>
       {/* Idea 12: checkerboard scroll progress, /menu only. */}
@@ -38,7 +43,7 @@ export default function MenuPage() {
           lives on its own page, and a second copy here tipped /menu/ over its
           document budget (issue #178). */}
       <JsonLdScript data={restaurantLd(flagship)} />
-      <MenuBrowser />
+      <MenuBrowser cateringHref={cateringHref} />
 
       {/* Crawlable links to the named-item pages. The rows above are buttons
           that open a sheet, so without these the item pages would be in the

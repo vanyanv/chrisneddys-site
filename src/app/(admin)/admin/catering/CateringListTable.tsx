@@ -66,6 +66,15 @@ export function CateringListTable({ rows }: { rows: CateringListRow[] }) {
         <p className="adm-empty">No catering orders match &ldquo;{query}&rdquo;.</p>
       ) : (
         <div className="ord-sheet">
+          <div className="cat-row cat-row-head" aria-hidden="true">
+            <span className="cat-row-num">Order</span>
+            <span className="cat-row-when">For</span>
+            <span className="cat-row-customer">Customer</span>
+            <span className="cat-row-store">Location</span>
+            <span className="cat-row-headcount">People</span>
+            <span className="cat-row-total">Total</span>
+            <span className="cat-row-status">Status</span>
+          </div>
           {filtered.map((row) => {
             const pill = cateringStatusPill(row.status, row.hasPendingChange);
             const respondBy = row.respondBy ? new Date(row.respondBy) : null;
@@ -76,12 +85,12 @@ export function CateringListTable({ rows }: { rows: CateringListRow[] }) {
                 <span className="cat-row-num rack-mono" style={{ fontWeight: 700, fontSize: 13 }}>
                   {row.number}
                 </span>
+                <span className="cat-row-when rack-mono">
+                  {formatDateTime(new Date(row.eventAt))}
+                </span>
                 <span className="cat-row-customer">
                   <span className="cat-row-customer-name">{customerHeadline(row)}</span>
                   <span className="cat-row-customer-email">{row.contactEmail}</span>
-                </span>
-                <span className="cat-row-when rack-mono">
-                  {formatDateTime(new Date(row.eventAt))}
                 </span>
                 <span className="cat-row-store">
                   {storeName(row.store)} &middot; {fulfilmentLabel(row.fulfilment)}

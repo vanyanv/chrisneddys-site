@@ -182,7 +182,7 @@ export default async function CateringInvoicePage({ params }: { params: Promise<
           </table>
         </div>
 
-        <div className="rack-slip-grid" style={{ borderBottom: "none" }}>
+        <div className="rack-slip-grid cat-invoice-totals-grid" style={{ borderBottom: "none" }}>
           <div>
             <div className="rack-eyebrow" style={{ marginBottom: 7 }}>
               Cancellation

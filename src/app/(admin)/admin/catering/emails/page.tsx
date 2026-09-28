@@ -1,21 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
-import { getRunForAdmin } from "@/lib/runAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
-import { RunBoard } from "./RunBoard";
-import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
-import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
+import { renderCateringEmailPreviews } from "@/lib/catering/emails";
+import { CateringNavBadge } from "../CateringNavBadge";
+import { getCateringNeedsYouCount } from "../navCount";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
-
-type Params = { id: string };
 
 const NAV = [
   { href: "/admin", label: "Overview" },
@@ -27,24 +23,21 @@ const NAV = [
 ];
 
 /**
- * `/admin/products/[id]/run` — "All fifty numbers" (issue #36 phase 3).
- * Every number in a numbered run, who owns it, and what's held in an open
- * checkout right now. Read-only: no recovery email, no nudge button
- * anywhere here — a hold lapses on its own and the number goes back on the
- * shelf with nobody notified (issue #36's decisions comment). Own shell,
- * same as every other signed-in admin route now that `admin/layout.tsx`
- * draws none itself.
+ * `/admin/catering/emails/` — every catering email rendered against a
+ * sample order, for the owner to OK before ordering goes live (customer
+ * emails are drafts until then — see `docs/catering-build-plan.md`'s
+ * "Emails" ground rule). Each preview renders in a sandboxed `<iframe
+ * srcdoc>` rather than injected into the page: the HTML is our own
+ * template output, but it's still full email markup (`<html>`/`<body>` of
+ * its own), not a fragment meant to share this page's styles or scripts.
  */
-export default async function AdminRunPage({ params }: { params: Promise<Params> }) {
+export default async function AdminCateringEmailsPage() {
   const session = await requireOwner();
-  const { id } = await params;
-
-  const [run, settings, cateringCount] = await Promise.all([
-    getRunForAdmin(id),
+  const [settings, cateringCount] = await Promise.all([
     getStoreSettings(),
     getCateringNeedsYouCount(),
   ]);
-  if (!run) notFound();
+  const previews = renderCateringEmailPreviews();
 
   const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
@@ -69,7 +62,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
               key={item.href}
               href={item.href}
               className="rack-tab"
-              aria-current={item.href === "/admin/products" ? "page" : undefined}
+              aria-current={item.href === "/admin/catering" ? "page" : undefined}
             >
               {item.label}
               {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
@@ -95,27 +88,46 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
       </nav>
 
       <div style={{ padding: "18px 22px 0" }}>
-        <Link href={`/admin/products/${run.productId}`} className="ord-back-link">
+        <Link href="/admin/catering" className="ord-back-link">
           <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
             <path d="M10 3L5 8l5 5" />
           </svg>
-          {run.productTitle || "This product"}
+          All catering
         </Link>
       </div>
 
       <div className="rack-page-header" style={{ paddingTop: 11 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 13, flexWrap: "wrap" }}>
-          <h1 className="rack-page-title rack-bow" style={{ fontSize: 40 }}>
-            The run
+        <div>
+          <h1 className="rack-page-title rack-bow" style={{ fontSize: 32 }}>
+            Catering emails
           </h1>
-          <span className="rack-page-count rack-mono">
-            {run.productEyebrow ? `${run.productEyebrow.toUpperCase()} · ` : ""}
-            {run.editionSize} MADE &middot; {run.locked ? "LOCKED" : "OPEN"}
-          </span>
+          <p className="adm-settings-lede">
+            Every catering email, rendered against a sample order — OK the copy before turning
+            ordering on.
+          </p>
         </div>
       </div>
 
-      <RunBoard run={run} serverNow={Date.now()} />
+      <div style={{ padding: "0 22px 40px" }}>
+        <div className="cat-email-list">
+          {previews.map((preview) => (
+            <div key={preview.id} className="cat-email-card">
+              <div className="cat-email-card-head">
+                <div>
+                  <div className="cat-email-subject">{preview.content.subject}</div>
+                  <div className="cat-email-key">{preview.label}</div>
+                </div>
+              </div>
+              <iframe
+                className="cat-email-frame"
+                title={preview.label}
+                srcDoc={preview.content.html}
+                sandbox=""
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

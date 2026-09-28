@@ -19,9 +19,12 @@ import {
   orderStatusPill,
   statusLabel,
 } from "../format";
+import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
+import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-customers.css";
 import "@/styles/admin-orders.css";
+import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +34,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -128,9 +132,10 @@ function NumbersCard({
 export default async function AdminCustomerDetailPage({ params }: { params: Promise<Params> }) {
   const session = await requireOwner();
   const { email } = await params;
-  const [customer, settings] = await Promise.all([
+  const [customer, settings, cateringCount] = await Promise.all([
     getCustomerForAdmin(decodeURIComponent(email)),
     getStoreSettings(),
+    getCateringNeedsYouCount(),
   ]);
   if (!customer) notFound();
 
@@ -161,6 +166,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
               aria-current={item.href === "/admin/customers" ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

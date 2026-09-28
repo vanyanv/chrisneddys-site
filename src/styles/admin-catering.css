@@ -1,0 +1,766 @@
+/**
+ * `/admin/catering/**` — The Rack, extended for catering (issue #190 phase
+ * 5). Reuses the shared `.adm-*`/`.rack-*`/`.ord-*` primitives from
+ * `admin.css`, `admin-rack.css`, `admin-orders.css` and `admin-settings.css`
+ * wherever the shape already matches (status pills, the filter-chip tabs,
+ * search box, order-detail three-column grid, timeline, settings fields and
+ * save bar) — this file only adds what catering needs that nothing else
+ * already provides: the nav tab's count badge, the list's status tones, the
+ * respond-by countdown, the crew ticket and labels print sheets, and the
+ * settings hours/days-off grids.
+ */
+
+/* ---- nav count badge (every admin page's top bar) ------------------------ */
+.cat-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--rack-red);
+  color: #fff;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  vertical-align: middle;
+}
+
+/* ---- overview card (A1) --------------------------------------------------- */
+.cat-stat-highlight {
+  border: 1px dashed var(--rack-yellow-deep);
+}
+
+/* ---- list (A2) ------------------------------------------------------------- */
+.cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 15px;
+}
+.cat-list-empty {
+  border: 1px dashed var(--rack-rule);
+  padding: 48px 22px;
+  text-align: center;
+  color: var(--rack-muted);
+}
+.cat-list-empty p {
+  margin: 6px 0 0;
+}
+.cat-list-empty-icon {
+  font-size: 40px;
+  line-height: 1;
+}
+.cat-row {
+  display: grid;
+  grid-template-columns: 88px 1.3fr 1fr 1fr 60px 88px 110px;
+  column-gap: 14px;
+  align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rack-rule);
+  text-decoration: none;
+  color: inherit;
+  background: var(--rack-card);
+  transition: background-color 0.15s ease-out;
+}
+.cat-row:hover {
+  background: rgba(26, 22, 18, 0.03);
+}
+.cat-row-when {
+  font-size: 13px;
+}
+.cat-row-customer {
+  min-width: 0;
+}
+.cat-row-customer-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  display: block;
+}
+.cat-row-customer-email {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rack-muted);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cat-row-store {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cat-row-headcount {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  text-align: right;
+}
+.cat-row-total {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  text-align: right;
+}
+.cat-row-status {
+  justify-self: end;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.adm-pill.is-attention {
+  color: var(--rack-red);
+  border-color: var(--rack-red);
+}
+.adm-pill.is-attention::before {
+  background: var(--rack-red);
+}
+.cat-respond-note {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--rack-red);
+}
+@media (max-width: 760px) {
+  .cat-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "num status"
+      "customer customer"
+      "meta total";
+    row-gap: 6px;
+  }
+  .cat-row-num {
+    grid-area: num;
+  }
+  .cat-row-status {
+    grid-area: status;
+  }
+  .cat-row-customer {
+    grid-area: customer;
+  }
+  .cat-row-when,
+  .cat-row-store {
+    grid-area: meta;
+    font-size: 11.5px;
+    color: var(--rack-muted);
+  }
+  .cat-row-headcount {
+    display: none;
+  }
+  .cat-row-total {
+    grid-area: total;
+    justify-self: end;
+  }
+}
+
+/* ---- order detail (A3) ----------------------------------------------------- */
+.cat-item-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rack-rule);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.cat-item-row:last-child {
+  border-bottom: 0;
+}
+.cat-item-body {
+  flex: 1;
+  min-width: 0;
+}
+.cat-item-name-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cat-item-name {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.cat-item-amount {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  flex: none;
+}
+.cat-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 5px 0 4px;
+}
+.cat-tag {
+  display: inline-block;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  background: var(--rack-yellow);
+  color: var(--rack-ink);
+}
+.cat-tag.is-halal {
+  background: var(--rack-ink);
+  color: #fff;
+}
+.cat-item-meta {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+}
+.cat-item-note {
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--rack-muted);
+  margin-top: 3px;
+}
+.cat-item-qty {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--rack-muted);
+  margin-top: 3px;
+}
+
+.cat-next-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: var(--rack-space-lg);
+  margin-bottom: var(--rack-space-lg);
+}
+.cat-next-heading {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 4px 0 6px;
+}
+.cat-next-sub {
+  font-size: 12.5px;
+  color: var(--rack-muted);
+  margin-bottom: 12px;
+}
+.cat-btn-approve {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--rack-yellow);
+  border: 2px solid var(--rack-ink);
+  color: var(--rack-ink);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.cat-btn-approve:hover {
+  background: var(--rack-yellow-deep);
+}
+.cat-btn-approve:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.cat-btn-decline {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--rack-card);
+  border: var(--rack-border);
+  color: var(--rack-ink);
+  font-size: 14px;
+  padding: 11px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.cat-btn-decline:hover {
+  border-color: var(--rack-muted);
+}
+.cat-fulfil-status-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.cat-fulfil-status-btn {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 4px;
+  border: var(--rack-border);
+  background: var(--rack-card);
+  color: var(--rack-muted);
+}
+.cat-fulfil-status-btn.is-current {
+  background: var(--rack-ink);
+  color: #fff;
+  border-color: var(--rack-ink);
+}
+.cat-fulfil-status-btn.is-done {
+  color: var(--rack-green);
+  border-color: var(--rack-green);
+}
+
+.cat-decline-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.cat-decline-reason {
+  font-size: 12.5px;
+  padding: 7px 12px;
+  border: var(--rack-border);
+  background: var(--rack-card);
+  cursor: pointer;
+  color: var(--rack-ink);
+}
+.cat-decline-reason.is-selected {
+  background: var(--rack-ink);
+  color: #fff;
+  border-color: var(--rack-ink);
+}
+.cat-btn-danger {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--rack-red-cta);
+  border: 2px solid var(--rack-red-deep);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 11px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.cat-btn-danger:hover {
+  background: var(--rack-red-deep);
+}
+.cat-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cat-change-card {
+  border: 1px solid var(--rack-red);
+  background: var(--rack-card);
+  padding: var(--rack-space-lg);
+  margin-bottom: var(--rack-space-lg);
+}
+.cat-change-diff {
+  font-size: 12.5px;
+  line-height: 1.7;
+  margin: 8px 0 12px;
+}
+.cat-change-actions {
+  display: flex;
+  gap: 8px;
+}
+.cat-change-actions button {
+  flex: 1;
+}
+
+.cat-range-flag {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--rack-red);
+}
+
+.cat-note-form {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cat-note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.cat-note-item {
+  font-size: 12.5px;
+  padding: 8px 10px;
+  background: var(--rack-paper);
+  border: 1px solid var(--rack-rule);
+  white-space: pre-wrap;
+}
+
+.cat-print-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---- print sheets: crew ticket & labels ------------------------------------ */
+.cat-ticket-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--rack-ink);
+  color: #fff;
+  padding: 12px 20px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.cat-times-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 2px solid var(--rack-ink);
+  border-top: 0;
+}
+.cat-times-cell {
+  padding: 10px 14px;
+  border-right: 1px solid var(--rack-rule);
+}
+.cat-times-cell:last-child {
+  border-right: 0;
+}
+.cat-times-cell.is-highlight {
+  background: var(--rack-yellow);
+}
+.cat-times-label {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rack-muted);
+}
+.cat-times-value {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.cat-who-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rack-rule);
+  font-size: 13px;
+}
+.cat-make-list-group {
+  margin-top: 16px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.cat-make-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--rack-ink);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+.cat-make-list-heading h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.cat-make-list-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-weight: 700;
+}
+.cat-build-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--rack-rule);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.cat-build-row.is-halal {
+  background: var(--rack-ink);
+  color: #fff;
+}
+.cat-build-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  flex: none;
+  margin-top: 2px;
+}
+.cat-build-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 20px;
+  font-weight: 700;
+  flex: none;
+  width: 34px;
+}
+.cat-build-body {
+  flex: 1;
+}
+.cat-build-line {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.cat-build-detail {
+  font-size: 12px;
+  margin-top: 2px;
+}
+.cat-build-detail.is-halal-label {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cat-build-names {
+  font-size: 11.5px;
+  margin-top: 3px;
+  opacity: 0.85;
+}
+.cat-named-orders {
+  margin-top: 18px;
+}
+.cat-named-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.cat-named-table th {
+  text-align: left;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rack-muted);
+  border-bottom: 1px solid var(--rack-ink);
+  padding: 4px 8px;
+}
+.cat-named-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--rack-rule);
+  vertical-align: top;
+}
+.cat-named-table tr.is-halal td {
+  background: var(--rack-ink);
+  color: #fff;
+}
+.cat-station-box {
+  margin-top: 22px;
+  border: 1px solid var(--rack-rule);
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px 16px;
+  font-size: 11.5px;
+  color: var(--rack-muted);
+}
+.cat-station-box strong {
+  color: var(--rack-ink);
+}
+.cat-signoff {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rack-rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-size: 12px;
+}
+.cat-ticket-footer {
+  margin-top: 10px;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--rack-muted);
+}
+
+/* ---- labels (A7, Avery 5163: 2 x 5 per letter sheet) ----------------------- */
+.cat-labels-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--rack-ink);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+.cat-labels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.cat-label {
+  border: 1px dashed var(--rack-rule);
+  padding: 12px 14px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cat-label.is-halal {
+  background: var(--rack-ink);
+  color: #fff;
+  border-style: solid;
+}
+.cat-label-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+.cat-label-item {
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.cat-label-detail {
+  font-size: 11.5px;
+  margin-top: 4px;
+}
+.cat-label-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10px;
+  margin-top: 8px;
+}
+.cat-label-halal-badge {
+  display: inline-block;
+  background: #fff;
+  color: var(--rack-ink);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+}
+@media print {
+  .cat-labels-grid {
+    gap: 0;
+  }
+  .cat-label {
+    break-inside: avoid;
+  }
+}
+
+/* ---- settings: catering section -------------------------------------------- */
+.cat-settings-section {
+  border-top: 1px solid var(--rack-rule);
+  margin-top: 22px;
+  padding-top: 22px;
+}
+.cat-store-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cat-hours-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rack-rule);
+}
+.cat-hours-day {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.cat-hours-closed-label {
+  color: var(--rack-muted);
+  font-size: 13px;
+}
+.cat-windows-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cat-window-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cat-window-remove {
+  border: none;
+  background: none;
+  color: var(--rack-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px;
+}
+.cat-window-remove:hover {
+  color: var(--rack-red);
+}
+.cat-add-window {
+  align-self: flex-start;
+  font-size: 12px;
+  background: none;
+  border: 1px dashed var(--rack-rule);
+  padding: 5px 10px;
+  cursor: pointer;
+  color: var(--rack-ink);
+}
+.cat-days-off-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cat-day-off-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 6px 10px;
+  border: 1px solid var(--rack-rule);
+  background: var(--rack-paper);
+}
+.cat-day-off-row button {
+  margin-left: auto;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--rack-muted);
+  font-size: 15px;
+  line-height: 1;
+}
+.cat-add-day-off {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ---- email preview page ----------------------------------------------------- */
+.cat-email-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.cat-email-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+}
+.cat-email-card-head {
+  padding: 12px 16px;
+  border-bottom: var(--rack-border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cat-email-subject {
+  font-weight: 700;
+  font-size: 14px;
+}
+.cat-email-key {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--rack-muted);
+}
+.cat-email-frame {
+  width: 100%;
+  height: 640px;
+  border: none;
+  background: #fff;
+}

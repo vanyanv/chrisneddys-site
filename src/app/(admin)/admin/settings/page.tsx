@@ -12,8 +12,13 @@ import { ConnectionsCard } from "./ConnectionsCard";
 import { ChangePasswordCard } from "./ChangePasswordCard";
 import { OwnersCard } from "./OwnersCard";
 import { PasskeysCard } from "./PasskeysCard";
+import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
+import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
+import { CateringSettingsSection } from "@/app/(admin)/admin/catering/CateringSettingsSection";
+import { getCateringSettings } from "@/lib/catering/settings";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-settings.css";
+import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +26,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -33,6 +39,7 @@ const NAV = [
  * highlight as an owner scrolls, so it stays the default the design shows. */
 const SETTINGS_NAV = [
   { href: "#settings-shop", label: "The shop" },
+  { href: "#settings-catering", label: "Catering" },
   { href: "#settings-shipping", label: "Shipping" },
   { href: "#settings-policies", label: "Policies" },
   { href: "#settings-connections", label: "Connections" },
@@ -46,10 +53,12 @@ export default async function AdminSettingsPage() {
   // `isShopOpenFor` needs — a separate `getStoreSettings()` call here would
   // just be the identical query run twice against PGlite's one serialized
   // connection (issue #38).
-  const [settings, owners, passkeys] = await Promise.all([
+  const [settings, owners, passkeys, cateringSettings, cateringCount] = await Promise.all([
     getSettingsForAdmin(),
     listOwners(session.email),
     listPasskeysForEmail(session.email),
+    getCateringSettings(),
+    getCateringNeedsYouCount(),
   ]);
 
   const shopOpen = isShopOpenFor(settings);
@@ -79,6 +88,7 @@ export default async function AdminSettingsPage() {
               aria-current={item.href === "/admin/settings" ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>
@@ -119,6 +129,10 @@ export default async function AdminSettingsPage() {
             passkeys={<PasskeysCard passkeys={passkeys} />}
             owners={<OwnersCard owners={owners} />}
           />
+
+          <div id="settings-catering" className="cat-settings-section">
+            <CateringSettingsSection settings={cateringSettings} />
+          </div>
         </div>
       </div>
     </div>

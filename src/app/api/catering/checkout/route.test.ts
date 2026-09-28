@@ -263,6 +263,14 @@ describe("POST /api/catering/checkout — fake payments mode", () => {
     expect(sendOwnerNewRequestMock).toHaveBeenCalledTimes(1);
   });
 
+  it("uses fake payments on Vercel Preview", async () => {
+    process.env.CATERING_FAKE_PAYMENTS = "1";
+    process.env.VERCEL_ENV = "preview";
+    const res = await post(baseBody());
+    expect(res.status).toBe(200);
+    expect(createSessionMock).not.toHaveBeenCalled();
+  });
+
   it("throws rather than faking payments when VERCEL_ENV is also set", async () => {
     process.env.CATERING_FAKE_PAYMENTS = "1";
     process.env.VERCEL_ENV = "production";

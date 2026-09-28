@@ -40,10 +40,11 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
   Owner Approve → capture → `booked`. Decline → cancel the PaymentIntent →
   `declined`. No owner action within 24 h of the request → cancel →
   `expired` (a Vercel cron route plus a lazy check on every read).
-- Test mode: when `CATERING_FAKE_PAYMENTS=1` and `VERCEL_ENV` is unset, the
+- Test mode: when `CATERING_FAKE_PAYMENTS=1` locally or on Vercel Preview, the
   payment adapter skips Stripe: checkout redirects straight to the success
   page and marks the order held; capture/cancel/refund are no-ops that
-  record fake ids. Playwright sets it. It must be impossible in Vercel.
+  record fake ids. Playwright sets it. Preview requires an isolated test
+  database. Production and other Vercel environments reject the flag.
 - Cancellation (customer, from the order link): free until 48 h before the
   time, 50% back from 48 h to 24 h, nothing inside 24 h. Before approval,
   cancelling releases the hold. After capture, refund the tier's share.

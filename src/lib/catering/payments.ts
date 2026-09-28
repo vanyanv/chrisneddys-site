@@ -10,9 +10,8 @@
  * looks like a fake one is never consulted — only whether fake mode is on
  * *right now*, matching the build plan ("no Stripe calls" while the flag is
  * set). `isFakePaymentsMode()` is also where the safety rail lives: fake
- * mode requested while `VERCEL_ENV` is set is a thrown error, not a quiet
- * fallback to real Stripe or a quiet no-op — it must be impossible to end up
- * faking payments in a real Vercel environment.
+ * mode is permitted on local and Vercel Preview deployments only. Production
+ * and other Vercel environments throw instead of silently faking a payment.
  */
 import "server-only";
 import { randomBytes } from "node:crypto";
@@ -25,17 +24,14 @@ export type AdapterResult<T extends object = object> =
 
 /**
  * Whether the fake-payments test double is active. Throws when
- * `CATERING_FAKE_PAYMENTS=1` is set alongside `VERCEL_ENV` (any value Vercel
- * sets it to — production, preview or development) — that combination must
- * never be reachable, so this throws on every call rather than only once at
- * startup.
+ * `CATERING_FAKE_PAYMENTS=1` is set on a Vercel environment other than
+ * Preview. Check on every call so Production cannot fake a payment even if
+ * the variable is accidentally added there later.
  */
 export function isFakePaymentsMode(): boolean {
   const requested = process.env.CATERING_FAKE_PAYMENTS === "1";
-  if (requested && process.env.VERCEL_ENV) {
-    throw new Error(
-      "CATERING_FAKE_PAYMENTS=1 with VERCEL_ENV set — fake catering payments must never run on Vercel.",
-    );
+  if (requested && process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "preview") {
+    throw new Error("CATERING_FAKE_PAYMENTS=1 is allowed locally and on Vercel Preview only.");
   }
   return requested;
 }

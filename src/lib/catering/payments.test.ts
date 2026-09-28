@@ -48,9 +48,21 @@ describe("isFakePaymentsMode", () => {
     expect(isFakePaymentsMode()).toBe(true);
   });
 
-  it("throws rather than faking payments once VERCEL_ENV is set", () => {
+  it("permits fake payments on Vercel Preview", () => {
     process.env.CATERING_FAKE_PAYMENTS = "1";
     process.env.VERCEL_ENV = "preview";
+    expect(isFakePaymentsMode()).toBe(true);
+  });
+
+  it("throws rather than faking payments on Vercel Production", () => {
+    process.env.CATERING_FAKE_PAYMENTS = "1";
+    process.env.VERCEL_ENV = "production";
+    expect(() => isFakePaymentsMode()).toThrow();
+  });
+
+  it("throws in other Vercel environments", () => {
+    process.env.CATERING_FAKE_PAYMENTS = "1";
+    process.env.VERCEL_ENV = "development";
     expect(() => isFakePaymentsMode()).toThrow();
   });
 });

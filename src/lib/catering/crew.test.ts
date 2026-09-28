@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupForCrew, stationCounts } from "./crew";
+import { formatCrewNames, groupForCrew, stationCounts } from "./crew";
 import type { CartLine } from "./types";
 
 function line(overrides: Partial<CartLine>): CartLine {
@@ -86,15 +86,16 @@ describe("groupForCrew", () => {
     expect(halalBuild.wayId).toBe("custom");
     expect(halalBuild.notes).toEqual(["Separate tray, label it"]);
     // The named "Halal table" line still contributes its name, alongside
-    // being counted like any other build.
-    expect(halalBuild.names).toEqual(Array(6).fill("Halal table"));
+    // being counted like any other build — collapsed into one entry with a
+    // count rather than repeated six times.
+    expect(halalBuild.names).toEqual([{ name: "Halal table", count: 6 }]);
   });
 
   it("gives a named single-item line its own build with its name attached", () => {
     const groups = groupForCrew(CREW_TICKET_LINES);
     const slider = groups.find((g) => g.itemId === "chris-n-eddy-s-slider")!;
     expect(slider.builds).toHaveLength(1);
-    expect(slider.builds[0]!.names).toEqual(["Marcus L."]);
+    expect(slider.builds[0]!.names).toEqual([{ name: "Marcus L.", count: 1 }]);
     expect(slider.builds[0]!.halal).toBe(true);
     expect(slider.builds[0]!.notes).toEqual(["No sauce, no onion"]);
   });
@@ -110,7 +111,7 @@ describe("groupForCrew", () => {
       }),
     ];
     const groups = groupForCrew(lines);
-    expect(groups[0]!.builds[0]!.names).toEqual(["Chris", "Chris", "Chris"]);
+    expect(groups[0]!.builds[0]!.names).toEqual([{ name: "Chris", count: 3 }]);
     expect(groups[0]!.builds[0]!.count).toBe(3);
   });
 
@@ -132,12 +133,30 @@ describe("groupForCrew", () => {
     const groups = groupForCrew(lines);
     expect(groups[0]!.builds).toHaveLength(1);
     expect(groups[0]!.builds[0]!.count).toBe(2);
-    expect(groups[0]!.builds[0]!.names.sort()).toEqual(["A", "B"]);
+    expect(groups[0]!.builds[0]!.names.sort((a, b) => a.name.localeCompare(b.name))).toEqual([
+      { name: "A", count: 1 },
+      { name: "B", count: 1 },
+    ]);
   });
 
   it("skips lines for items that no longer exist on the menu", () => {
     const groups = groupForCrew([line({ itemId: "does-not-exist" })]);
     expect(groups).toEqual([]);
+  });
+});
+
+describe("formatCrewNames", () => {
+  it("collapses a repeated name into one entry with a count", () => {
+    expect(formatCrewNames([{ name: "Halal table", count: 6 }])).toBe("Halal table ×6");
+  });
+
+  it("omits the count for names that appear once, and keeps it for those that don't", () => {
+    expect(
+      formatCrewNames([
+        { name: "Dev Patel", count: 1 },
+        { name: "Priya S.", count: 2 },
+      ]),
+    ).toBe("Dev Patel, Priya S. ×2");
   });
 });
 

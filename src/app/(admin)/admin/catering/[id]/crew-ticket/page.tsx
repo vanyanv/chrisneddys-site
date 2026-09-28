@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import { itemById } from "@/data/menu";
 import { getOrderById } from "@/lib/catering/orders";
 import {
   driverLeavesMs,
+  formatCrewNames,
   groupForCrew,
   readyByMs,
   stationCounts,
@@ -19,7 +21,11 @@ export const dynamic = "force-dynamic";
 
 type Params = { id: string };
 
-function buildLabel(build: CrewBuild): string {
+/** The build's way/"Custom" label, or `null` for an item that doesn't take
+ * toppings (Grilled Cheese, shakes, extra sauce) — those have no build to
+ * label at all, so no "Custom" noise on the crew ticket. */
+function buildLabel(itemId: string, build: CrewBuild): string | null {
+  if (!itemById(itemId)?.takesToppings) return null;
   if (!build.wayId || build.wayId === "custom") return "Custom";
   return wayLabel(build.wayId);
 }
@@ -153,29 +159,34 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
                 <h3>{group.itemName}</h3>
                 <span className="cat-make-list-count">× {group.totalCount}</span>
               </div>
-              {group.builds.map((build, i) => (
-                <div key={i} className={`cat-build-row${build.halal ? " is-halal" : ""}`}>
-                  <span className="cat-build-checkbox" aria-hidden="true" />
-                  <span className="cat-build-count">{build.count}</span>
-                  <div className="cat-build-body">
-                    <div className="cat-build-line">{buildLabel(build)}</div>
-                    {build.toppingLabels.length > 0 && (
-                      <div className="cat-build-detail">{build.toppingLabels.join(", ")}</div>
-                    )}
-                    {build.extraLabels.length > 0 && (
-                      <div className="cat-build-detail is-halal-label">
-                        {build.extraLabels.join(" · ")}
-                      </div>
-                    )}
-                    {build.names.length > 0 && (
-                      <div className="cat-build-names">For {build.names.join(", ")}</div>
-                    )}
-                    {build.notes.length > 0 && (
-                      <div className="cat-build-names">&ldquo;{build.notes.join("; ")}&rdquo;</div>
-                    )}
+              {group.builds.map((build, i) => {
+                const label = buildLabel(group.itemId, build);
+                return (
+                  <div key={i} className={`cat-build-row${build.halal ? " is-halal" : ""}`}>
+                    <span className="cat-build-checkbox" aria-hidden="true" />
+                    <span className="cat-build-count">{build.count}</span>
+                    <div className="cat-build-body">
+                      {label && <div className="cat-build-line">{label}</div>}
+                      {build.toppingLabels.length > 0 && (
+                        <div className="cat-build-detail">{build.toppingLabels.join(", ")}</div>
+                      )}
+                      {build.extraLabels.length > 0 && (
+                        <div className="cat-build-detail is-halal-label">
+                          {build.extraLabels.join(" · ")}
+                        </div>
+                      )}
+                      {build.names.length > 0 && (
+                        <div className="cat-build-names">For {formatCrewNames(build.names)}</div>
+                      )}
+                      {build.notes.length > 0 && (
+                        <div className="cat-build-names">
+                          &ldquo;{build.notes.join("; ")}&rdquo;
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ))}
 
@@ -195,12 +206,14 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
                 <tbody>
                   {namedItems.map((item) => {
                     const halal = item.extraLabels.some((l) => /halal/i.test(l));
+                    const takesToppings = itemById(item.itemId)?.takesToppings ?? false;
+                    const way = item.wayLabel ?? (takesToppings ? "Custom" : null);
                     return (
                       <tr key={item.id} className={halal ? "is-halal" : ""}>
                         <td>{item.forName}</td>
                         <td>{item.itemName}</td>
                         <td>
-                          {item.wayLabel ?? "Custom"}
+                          {way}
                           {item.toppingLabels.length > 0 && <> · {item.toppingLabels.join(", ")}</>}
                           {item.extraLabels.length > 0 && <> · {item.extraLabels.join(", ")}</>}
                           {item.note && <> · {item.note}</>}

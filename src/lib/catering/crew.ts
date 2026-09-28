@@ -61,7 +61,8 @@ type BuildAccumulator = {
   extraIds: string[];
   halal: boolean;
   count: number;
-  names: string[];
+  /** Insertion-ordered name -> running count, collapsed into `CrewBuild.names`. */
+  names: Map<string, number>;
   notes: string[];
 };
 
@@ -84,7 +85,7 @@ export function groupForCrew(lines: CartLine[]): CrewItemGroup[] {
       extraIds: line.extras,
       halal: false,
       count: 0,
-      names: [],
+      names: new Map<string, number>(),
       notes: [],
     };
     acc.count += line.qty;
@@ -92,7 +93,7 @@ export function groupForCrew(lines: CartLine[]): CrewItemGroup[] {
 
     const name = line.forName?.trim();
     if (name) {
-      for (let i = 0; i < line.qty; i += 1) acc.names.push(name);
+      acc.names.set(name, (acc.names.get(name) ?? 0) + line.qty);
     }
     const note = line.note?.trim();
     if (note) acc.notes.push(note);
@@ -112,7 +113,7 @@ export function groupForCrew(lines: CartLine[]): CrewItemGroup[] {
         wayId,
         toppingLabels: desc.toppingLabels,
         extraLabels: desc.extraLabels,
-        names: acc.names,
+        names: [...acc.names.entries()].map(([name, count]) => ({ name, count })),
         notes: acc.notes,
         halal: acc.halal,
         count: acc.count,
@@ -122,6 +123,13 @@ export function groupForCrew(lines: CartLine[]): CrewItemGroup[] {
     groups.push({ itemId: item.id, itemName: item.name, totalCount, builds });
   }
   return groups;
+}
+
+/** A build's collapsed names for display, e.g. `[{name: "Halal table", count:
+ * 6}]` -> "Halal table ×6", or several names each getting their own count
+ * only when it's more than one: "Dev Patel, Priya S. ×2". */
+export function formatCrewNames(names: CrewBuild["names"]): string {
+  return names.map(({ name, count }) => (count > 1 ? `${name} ×${count}` : name)).join(", ");
 }
 
 /** How many slider "parts" one unit of an item is, for per-slider topping counts. */

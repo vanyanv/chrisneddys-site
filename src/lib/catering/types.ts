@@ -90,8 +90,10 @@ export type CrewBuild = {
   wayId: WayId | "custom" | null;
   toppingLabels: string[];
   extraLabels: string[];
-  /** Names of everyone who ordered this exact build, one entry per named line's qty. */
-  names: string[];
+  /** Everyone who ordered this exact build, collapsed by name with a count
+   * (e.g. six "Halal table" lines become one `{ name: "Halal table", count: 6
+   * }` entry), in first-seen order. */
+  names: { name: string; count: number }[];
   /** Free-text notes carried by any line folded into this build. */
   notes: string[];
   halal: boolean;

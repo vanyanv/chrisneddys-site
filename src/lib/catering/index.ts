@@ -46,5 +46,5 @@ export {
   inRange,
 } from "./range";
 export { cancellationTier, refundForCancel } from "./cancellation";
-export { groupForCrew, stationCounts } from "./crew";
+export { groupForCrew, stationCounts, formatCrewNames } from "./crew";
 export { formatCateringNumber } from "./order-number";

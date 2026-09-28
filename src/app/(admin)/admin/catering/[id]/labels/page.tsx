@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { itemById } from "@/data/menu";
 import { getOrderById } from "@/lib/catering/orders";
 import { groupForCrew, wayLabel, type CartLine, type CrewBuild } from "@/lib/catering";
 import { formatDate } from "../../format";
@@ -10,7 +11,10 @@ export const dynamic = "force-dynamic";
 
 type Params = { id: string };
 
-function buildLabel(build: CrewBuild): string {
+/** Same rule as the crew ticket's `buildLabel`: an item that doesn't take
+ * toppings (Grilled Cheese, shakes, extra sauce) gets no way/"Custom" label. */
+function buildLabel(itemId: string, build: CrewBuild): string {
+  if (!itemById(itemId)?.takesToppings) return "";
   if (!build.wayId || build.wayId === "custom") return "Custom";
   return wayLabel(build.wayId);
 }
@@ -65,7 +69,7 @@ export default async function LabelsPage({ params }: { params: Promise<Params> }
       .filter((build) => build.names.length === 0)
       .map((build, i) => ({
         key: `${group.itemId}-${i}`,
-        title: buildLabel(build),
+        title: buildLabel(group.itemId, build),
         itemLine: `${build.count} × ${group.itemName}`,
         detail: build.toppingLabels.concat(build.extraLabels).join(", "),
         halal: build.halal,

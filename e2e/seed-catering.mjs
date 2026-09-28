@@ -180,17 +180,68 @@ function roundHalfUpTax(foodCents) {
   return Math.floor((foodCents * TAX_RATE_BPS + 5000) / 10000);
 }
 
-/** The next Friday at `hour:minute`, at least `daysOutMin` days out — safely
- * past the 72h big-order lead time no matter when this runs. */
+const LA_ZONE = "America/Los_Angeles";
+
+const LA_PARTS_FORMAT = new Intl.DateTimeFormat("en-US", {
+  timeZone: LA_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  weekday: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+function laParts(atMs) {
+  const parts = Object.fromEntries(
+    LA_PARTS_FORMAT.formatToParts(new Date(atMs)).map((p) => [p.type, p.value]),
+  );
+  const WEEKDAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return {
+    year: Number(parts.year),
+    month: Number(parts.month),
+    day: Number(parts.day),
+    weekday: WEEKDAYS[parts.weekday],
+    hour: Number(parts.hour) % 24,
+    minute: Number(parts.minute),
+  };
+}
+
+/** The LA UTC offset in effect at `atMs`, in milliseconds (west of UTC is negative). */
+function laOffsetMs(atMs) {
+  const { year, month, day, hour, minute } = laParts(atMs);
+  const asIfUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
+  return asIfUtc - atMs;
+}
+
+/** The UTC instant for wall-clock `year-month-day` + `hour:minute` in Los
+ * Angeles, correct across the DST transitions (same two-pass trick as
+ * `zonedTimeToUtcMs` in `src/lib/catering/timezone.ts` — duplicated here
+ * since this script can't import that module's relative imports, per the
+ * header comment above). */
+function laDateToUtc(year, month, day, hour, minute) {
+  const naiveUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
+  const offset = laOffsetMs(naiveUtc);
+  let utc = naiveUtc - offset;
+  const offset2 = laOffsetMs(utc);
+  if (offset2 !== offset) utc = naiveUtc - offset2;
+  return new Date(utc);
+}
+
+/** The next Friday at `hour:minute` America/Los_Angeles wall-clock time, at
+ * least `daysOutMin` days out — safely past the 72h big-order lead time no
+ * matter what time zone this script runs in (the sandbox runs UTC). */
 function nextFridayAt(hour, minute, daysOutMin) {
   const now = new Date();
-  const date = new Date(now);
-  date.setHours(hour, minute, 0, 0);
+  const today = laParts(now.getTime());
   const FRIDAY = 5;
-  let daysUntilFriday = (FRIDAY - date.getDay() + 7) % 7 || 7;
-  date.setDate(date.getDate() + daysUntilFriday);
+  let daysUntilFriday = (FRIDAY - today.weekday + 7) % 7 || 7;
+  let date = laDateToUtc(today.year, today.month, today.day + daysUntilFriday, hour, minute);
   while ((date.getTime() - now.getTime()) / (24 * 60 * 60 * 1000) < daysOutMin) {
-    date.setDate(date.getDate() + 7);
+    daysUntilFriday += 7;
+    date = laDateToUtc(today.year, today.month, today.day + daysUntilFriday, hour, minute);
   }
   return date;
 }

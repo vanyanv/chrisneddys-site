@@ -1,0 +1,632 @@
+/**
+ * The item sheet, drawn as the menu board.
+ *
+ * The owner picked this direction on 2026-09-27 after two rounds of research
+ * (design and research in the "menu item panel" thread): the red board over
+ * the store's order window, cream lettering, dotted leaders out to the price,
+ * the artist's monsters peeking over the photo, and a black bar under the one
+ * yellow button.
+ *
+ * Contrast is measured, not eyeballed. Cream on the board red (--a-red-cta) is
+ * 4.7:1, so every line of text on the board is full cream — no faded cream.
+ * ORDER yellow on that red is only 2.9:1, under even the 3:1 large-text floor,
+ * so yellow never sits on red here: the price is yellow on an ink tag (10:1)
+ * and "FREE" is ink on a yellow chip.
+ *
+ * Phone: bottom sheet. Desktop, and a tall tablet: a right-hand side panel,
+ * which is what Material and the delivery apps use at that size instead of a
+ * sheet that rises from the bottom of a wide screen.
+ */
+
+/* ---- scrim and frame ---------------------------------------------------- */
+.cne-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 50;
+}
+.cne-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cne-sheet {
+  --board: var(--a-red-cta);
+  --board-deep: var(--a-red-deep);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 55;
+  background: var(--board);
+  color: var(--a-cream);
+  border-top: 3px solid var(--a-ink);
+  /* Square, per DESIGN.md: a soft rectangle is the delivery app's shape. */
+  border-radius: 0;
+  transform: translateY(102%);
+  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.25, 1);
+  max-height: 88vh;
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+}
+/* While a finger is on the grab bar the sheet follows it, so the transition
+   has to be off — otherwise every move is chasing a 0.42s tail. */
+.cne-sheet.is-dragging {
+  transition: none;
+}
+.cne-sheet.is-open {
+  transform: translateY(var(--cne-drag, 0px));
+}
+
+/* The board's trim: the store's checkerboard, one row deep. */
+.cne-board-trim {
+  flex: none;
+  height: 12px;
+  background: repeating-conic-gradient(var(--a-ink) 0 25%, var(--a-cream) 0 50%) 0 0 / 12px 12px;
+  border-bottom: 3px solid var(--a-ink);
+}
+
+/* The grab bar is a real handle: press it and the sheet follows your finger,
+   release past a third of its height and it goes. */
+.cne-sheet-grab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  width: 100%;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cne-sheet.is-dragging .cne-sheet-grab {
+  cursor: grabbing;
+}
+.cne-sheet-grab::before {
+  content: "";
+  width: 42px;
+  height: 4.5px;
+  border-radius: 4px;
+  background: var(--a-cream);
+  transition: width 0.2s;
+}
+.cne-sheet-grab:hover::before,
+.cne-sheet.is-dragging .cne-sheet-grab::before {
+  width: 54px;
+}
+
+/* A printed object with its own ground, so its contrast never depends on
+   what is behind it. 44px, the comfortable target. */
+.cne-xbtn {
+  position: absolute;
+  right: 11px;
+  top: 24px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--a-cream);
+  color: var(--a-ink);
+  border: 2px solid var(--a-ink);
+  box-shadow: 2px 2px 0 var(--a-ink);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.cne-xbtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
+.cne-xbtn:focus-visible {
+  outline: 3px solid var(--a-yel);
+  outline-offset: 2px;
+}
+
+/* The body scrolls; the trim, the handle and the foot stay put. */
+.cne-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px 20px;
+}
+
+/* ---- the photo ---------------------------------------------------------- */
+/* Right margin keeps the frame clear of the ✕. The top padding is the room the
+   monsters peek up into. */
+.cne-board-pic {
+  position: relative;
+  padding-top: 30px;
+  margin: 0 48px 0 0;
+}
+.cne-board-peek {
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 140px;
+  height: 64px;
+  pointer-events: none;
+}
+.cne-board-peek svg {
+  position: absolute;
+  top: 0;
+}
+.cne-board-peek .is-front {
+  left: 0;
+}
+.cne-board-peek .is-back {
+  left: 58px;
+  top: 10px;
+}
+/* Mirrors the drawing, never its paths — same technique as way-monsters.css. */
+.cne-board-peek .is-flip {
+  transform: scaleX(-1);
+}
+.cne-board-frame {
+  position: relative;
+  z-index: 1;
+  background: var(--a-bg);
+  border: 3px solid var(--a-ink);
+  box-shadow: 6px 6px 0 var(--a-ink);
+}
+/* Every shot in /public/menu is 720x479 on a white sweep. 16:10 crops a little
+   of that sweep; `photoFocus.ts` places the food inside what is left. */
+.cne-sheet-shot {
+  aspect-ratio: 16 / 10;
+  max-height: 30vh;
+  width: 100%;
+  background: var(--a-line) center / cover no-repeat;
+}
+/* The white sweep becomes paper by multiplying against it. Only when there is
+   a photograph — paper on paper would leave nothing to look at. */
+.cne-sheet-shot.is-photo {
+  background-color: var(--a-bg);
+  background-blend-mode: multiply;
+  background-size: var(--cne-shot-zoom, 132%) auto;
+  background-position: center var(--cne-shot-focus, 62%);
+}
+/* The home page's MOST ORDERED label, slapped on as a sticker. */
+.cne-board-most {
+  position: absolute;
+  left: -6px;
+  bottom: 12px;
+  z-index: 2;
+  background: var(--a-yel);
+  color: var(--a-ink);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 3px 3px 0 var(--a-ink);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 5px 9px 6px;
+  transform: rotate(-4deg);
+}
+
+/* ---- name, leader, price ------------------------------------------------ */
+.cne-board-hd {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.cne-sheet-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--a-cream);
+  text-wrap: balance;
+}
+.cne-board-hd > i {
+  flex: 1;
+  min-width: 14px;
+  border-bottom: 3px dotted var(--a-cream);
+  transform: translateY(-8px);
+}
+.cne-board-price {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: var(--a-ink);
+  color: var(--a-yel);
+  box-shadow: 3px 3px 0 var(--a-cream);
+  padding: 5px 10px 7px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cne-board-price small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a-cream);
+  margin-bottom: 3px;
+}
+.cne-sheet-desc {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 46ch;
+}
+.cne-board-lbl {
+  margin: 22px 0 9px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---- the Ways, as cream tickets on the board ---------------------------- */
+.cne-ways.cne-ways-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+}
+.cne-ways-board .cne-way {
+  position: relative;
+  min-height: 66px;
+  padding: 10px 10px 11px 52px;
+  text-align: left;
+  background: transparent;
+  color: var(--a-cream);
+  border: 2.5px dashed var(--a-cream);
+}
+.cne-ways-board .cne-way .t {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+.cne-ways-board .cne-way .s {
+  font-size: 12px;
+  color: inherit;
+  margin-top: 3px;
+}
+/* The Way's monster moves from the card's corner to the start of the ticket. */
+.cne-ways-board .cne-way-mon,
+.cne-ways-board .cne-way-mon.is-chris,
+.cne-ways-board .cne-way-mon.is-eddy {
+  top: 12px;
+  left: 8px;
+  right: auto;
+  width: 38px;
+  height: 38px;
+}
+.cne-ways-board .cne-way-mon svg {
+  width: 38px;
+  height: 38px;
+}
+.cne-ways-board .cne-way[aria-checked="true"] {
+  background: var(--a-cream);
+  color: var(--a-ink);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-ink);
+}
+.cne-ways-board .cne-way[aria-checked="true"] .s {
+  color: var(--a-ink);
+}
+/* A check on the picked ticket, so the state is not carried by fill alone. */
+.cne-ways-board .cne-way[aria-checked="true"]::after {
+  content: "✓";
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--a-yel);
+  color: var(--a-ink);
+  border: 2.5px solid var(--a-ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+.cne-ways-board .cne-way:focus-visible,
+.cne-ways-board .cne-way[aria-checked="true"]:focus-visible {
+  outline: 3px solid var(--a-yel);
+  outline-offset: 3px;
+}
+
+/* ---- what lands in the bag ---------------------------------------------- */
+.cne-board-list {
+  background: var(--board-deep);
+  border: 2.5px solid var(--a-ink);
+  /* A cream pinstripe inside the edge, like the board's painted border. */
+  box-shadow:
+    inset 0 0 0 3px var(--board-deep),
+    inset 0 0 0 4.5px rgba(255, 242, 201, 0.55);
+  padding: 10px 12px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cne-board-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cne-board-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 0;
+}
+.cne-board-list li > i {
+  flex: 1;
+  min-width: 10px;
+  border-bottom: 2px dotted rgba(255, 242, 201, 0.7);
+}
+.cne-board-list .v {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cne-board-list .is-free .v {
+  background: var(--a-yel);
+  color: var(--a-ink);
+  padding: 1px 5px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+.cne-board-list .is-total {
+  margin-top: 6px;
+  padding-top: 7px;
+  border-top: 2px solid var(--a-cream);
+  font-weight: 800;
+  font-size: 13.5px;
+}
+.cne-board-list .is-extra {
+  font-size: 11.5px;
+}
+.cne-board-sub {
+  margin: 12px 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+/* Changing the Way prints its toppings in order, like a ticket printer.
+   Ease-out only, and gone under reduced motion. */
+@keyframes cne-print {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cne-sheet.is-open .cne-board-list .is-free {
+  animation: cne-print 0.26s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* ---- the combo suggestion ----------------------------------------------- */
+.cne-board-combo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 10px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 9px 12px 10px;
+  text-align: left;
+  font: inherit;
+  background: var(--a-cream);
+  color: var(--a-ink);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-ink);
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.cne-board-combo:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--a-ink);
+}
+.cne-board-combo:focus-visible {
+  outline: 3px solid var(--a-yel);
+  outline-offset: 3px;
+}
+/* Signal red on cream (5.6:1), the site's small-red-text colour. */
+.cne-board-combo .k {
+  grid-column: 1 / -1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--a-red-deep);
+}
+.cne-board-combo .c {
+  font-family: var(--font-display);
+  font-size: 15px;
+}
+.cne-board-combo .p {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the foot ----------------------------------------------------------- */
+.cne-sheet-foot {
+  flex: none;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--a-ink);
+  border-top: 3px solid var(--a-ink);
+}
+/* The one yellow thing in the sheet: DESIGN.md keeps ORDER yellow for price and
+   the primary action, and this is the only primary action here. */
+.cne-otter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 15px 10px;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  background: var(--a-yel);
+  color: var(--a-ink);
+  border: 3px solid var(--a-yel);
+  transition: transform 0.12s;
+}
+.cne-otter:active {
+  transform: translateY(2px);
+}
+.cne-otter:focus-visible {
+  outline: 3px solid var(--a-cream);
+  outline-offset: 3px;
+}
+.cne-fine {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--a-cream);
+}
+
+/* ---- landscape phones ---------------------------------------------------
+   Height is what runs out, so the photo goes left and stays while the board
+   scrolls on the right. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .cne-sheet {
+    max-height: calc(100dvh - 40px);
+  }
+  .cne-sheet-body {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    column-gap: 18px;
+    align-content: start;
+  }
+  .cne-board-pic {
+    grid-row: 1 / span 20;
+    margin: 0;
+    align-self: start;
+    position: sticky;
+    top: 0;
+  }
+  .cne-sheet-shot {
+    max-height: none;
+  }
+  .cne-board-hd {
+    margin-top: 14px;
+    padding-right: 56px;
+  }
+  .cne-sheet-name {
+    font-size: 21px;
+  }
+  .cne-board-price {
+    font-size: 22px;
+  }
+  .cne-board-hd,
+  .cne-sheet-desc,
+  .cne-board-lbl,
+  .cne-ways-board,
+  .cne-board-list,
+  .cne-board-combo {
+    grid-column: 2;
+  }
+  .cne-sheet-foot {
+    padding-top: 9px;
+    padding-bottom: calc(9px + env(safe-area-inset-bottom));
+  }
+  .cne-otter {
+    min-height: 44px;
+    padding: 10px;
+  }
+  .cne-fine {
+    display: none;
+  }
+}
+
+/* ---- desktop, and tablets tall enough for it: the side panel ------------ */
+@media (min-width: 901px) and (min-height: 501px), (min-width: 700px) and (min-height: 900px) {
+  .cne-sheet {
+    top: 0;
+    left: auto;
+    width: 540px;
+    max-height: none;
+    border-top: none;
+    border-left: 3px solid var(--a-ink);
+    transform: translateX(103%);
+    transition: transform 0.44s cubic-bezier(0.2, 0.85, 0.25, 1);
+    box-shadow: -16px 0 44px rgba(0, 0, 0, 0.22);
+  }
+  .cne-sheet.is-open {
+    transform: none;
+  }
+  .cne-sheet-grab {
+    display: none;
+  }
+  .cne-xbtn {
+    top: 26px;
+  }
+  .cne-sheet-body {
+    padding: 14px 24px 24px;
+  }
+  .cne-board-pic {
+    margin-right: 52px;
+  }
+  .cne-sheet-shot {
+    max-height: none;
+  }
+  .cne-sheet-name {
+    font-size: 27px;
+  }
+  .cne-board-price {
+    font-size: 32px;
+  }
+  .cne-sheet-desc {
+    font-size: 15px;
+  }
+  .cne-board-list {
+    font-size: 13px;
+  }
+  .cne-sheet-foot {
+    padding: 16px 24px 20px;
+  }
+  .cne-fine {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* A full-height panel sliding in and lines printing on a stagger are the
+     motion this query exists to suppress. The scrim keeps its fade. */
+  .cne-sheet,
+  .cne-sheet-grab::before,
+  .cne-xbtn,
+  .cne-otter,
+  .cne-board-combo {
+    transition: none !important;
+  }
+  .cne-sheet.is-open .cne-board-list .is-free {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

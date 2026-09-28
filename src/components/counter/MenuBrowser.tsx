@@ -56,7 +56,7 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
  * in its desktop list, which stays in the HTML at every width.
  */
 export function MenuBrowser() {
-  const { item, open, way, setWay, openItem, close } = useItemSheet();
+  const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
 
   return (
     <>
@@ -142,7 +142,14 @@ export function MenuBrowser() {
         </div>
       </div>
 
-      <ItemSheet item={item} open={open} way={way} onWayChange={setWay} onClose={close} />
+      <ItemSheet
+        item={item}
+        open={open}
+        way={way}
+        onWayChange={setWay}
+        onClose={close}
+        onSwitch={switchItem}
+      />
     </>
   );
 }

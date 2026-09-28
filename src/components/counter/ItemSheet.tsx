@@ -5,9 +5,14 @@ import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
-import { formatPrice, itemPhotoAlt } from "@/lib/otter";
+import { FEATURED_OTTER_IDS } from "@/data/featured";
+import { comboFor } from "@/data/upsell";
+import { formatPrice, itemPhotoAlt, priceString } from "@/lib/otter";
+import { Monster } from "@/components/mascots/Monster";
+import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import { OrderLink } from "@/components/order/OrderLink";
 import { WayPicker } from "./WayPicker";
+import "@/styles/item-sheet.css";
 
 type Props = {
   item: MenuItem | null;
@@ -19,6 +24,8 @@ type Props = {
   way: WayId;
   onWayChange: (id: WayId) => void;
   onClose: () => void;
+  /** Swap the sheet to another item (the combo suggestion). */
+  onSwitch?: (item: MenuItem) => void;
 };
 
 /**
@@ -37,14 +44,14 @@ const DISMISS_RATIO = 0.33;
 const FLICK_VELOCITY = 0.5;
 
 /**
- * Bottom sheet on a phone, right-hand drawer on desktop — same component, the
- * breakpoint does the rest.
+ * The menu board: bottom sheet on a phone, right-hand panel on desktop — same
+ * component, the breakpoint does the rest. Styles in `item-sheet.css`.
  *
  * The sheet exists because Otter can't take preselected modifiers through a
  * link. Rather than make someone choose toppings twice, it names the exact
  * checkboxes waiting on the next screen, then hands off to that one item.
  */
-export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
+export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: Props) {
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
@@ -162,33 +169,18 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
 
   const selected = ways.find((w) => w.id === way) ?? ways[0];
   const build = item ? buildFor(item.id) : undefined;
+  const combo = item ? comboFor(item) : undefined;
+  /* The home page's "MOST ORDERED" card, not a second opinion: the same item
+     wears the same label in both places. */
+  const mostOrdered = item?.otterId === FEATURED_OTTER_IDS[0];
   /* `taps` are the Otter checkbox labels verbatim, which is right when the copy
-     is telling you what to press. The ticket is listing what is in the bag, so
+     is telling you what to press. The board is listing what is in the bag, so
      it wants the thing rather than the instruction: "Add Lettuce" → "Lettuce". */
   const freeToppings = selected.taps.map((t) => t.replace(/^Add /, ""));
-
-  /**
-   * The ticket, open or shut.
-   *
-   * Shut is a phone compromise, not the intent: the photo plus the price, the
-   * Ways and the button is already the whole screen, and the evidence that a
-   * big photograph sells the item is stronger than the evidence that an
-   * itemised list does.
-   *
-   * Open needs width *and* height. A 460px drawer on a 900px-tall laptop has
-   * about 78px left after the hero, the price, the Ways and the button, which
-   * buys one clipped line and looks like a bug rather than a choice. Measured,
-   * not guessed: at 940px the ticket clears its header and three lines.
-   *
-   * Matched after mount rather than during render. The site is a static export,
-   * so the HTML is built with no viewport to measure and reading one at render
-   * time would be a hydration mismatch — same reason `useItemSheet` reads its
-   * `?way=` parameter in an effect.
-   */
-  const [ticketOpen, setTicketOpen] = useState(false);
-  useEffect(() => {
-    setTicketOpen(window.matchMedia("(min-width: 901px) and (min-height: 940px)").matches);
-  }, []);
+  /* The front monster is the Way's own (Chris red, Eddy blue); an item with no
+     Way gets the yellow one up front instead. */
+  const front = item?.takesToppings ? (way === "eddy" ? "blue" : "red") : "yellow";
+  const back = front === "yellow" ? "blue" : "yellow";
 
   return (
     <>
@@ -201,6 +193,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
         aria-label={item ? item.name : "Item"}
         inert={!open}
       >
+        {/* The checkerboard trim along the top of the menu board. */}
+        <div className="cne-board-trim" aria-hidden="true" />
         <div
           className="cne-sheet-grab"
           aria-hidden="true"
@@ -210,9 +204,9 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
           onPointerCancel={endGrab}
         >
           {/* The bar itself is drawn by ::before, so this element can be the
-              26px-tall hit area a thumb actually needs. Not focusable: the
-              keyboard route out is Escape and the ✕, and a tab stop that only
-              works with a pointer is a tab stop that does nothing. */}
+              tall hit area a thumb actually needs. Not focusable: the keyboard
+              route out is Escape and the ✕, and a tab stop that only works
+              with a pointer is a tab stop that does nothing. */}
         </div>
         <button ref={closeRef} className="cne-xbtn" onClick={onClose} aria-label="Close">
           ✕
@@ -222,45 +216,151 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
           {item && (
             <>
               {/* The shot stays a bare `role="img"` element and the name sits
-                  beside it rather than inside it: a `role="img"` subtree is not
-                  exposed to a screen reader, so an `<h3>` nested in there would
-                  be the item's name, silently. */}
-              <div className="cne-sheet-hero">
-                <div
-                  className={`cne-sheet-shot${item.photo ? " is-photo" : ""}`}
-                  style={
-                    item.photo
-                      ? ({
-                          backgroundImage: `url(/menu/${item.photo}.webp)`,
-                          /* Per-photo framing — see photoFocus.ts. The CSS
-                             carries a fallback for both, so a photo missing
-                             from that map still renders sensibly. */
-                          "--cne-shot-focus": `${framingFor(item.photo)[0]}%`,
-                          "--cne-shot-zoom": `${framingFor(item.photo)[1]}%`,
-                        } as React.CSSProperties)
-                      : undefined
-                  }
-                  role="img"
-                  aria-label={itemPhotoAlt(item)}
-                />
-                <h3 className="cne-sheet-name">{item.name}</h3>
+                  outside it: a `role="img"` subtree is not exposed to a screen
+                  reader, so text nested in there would be lost. */}
+              <div className="cne-board-pic">
+                <span className="cne-board-peek" aria-hidden="true">
+                  <Monster
+                    species="classic"
+                    bodyColor={MONSTER_COLORS[front].body}
+                    irisColor={MONSTER_COLORS[front].iris}
+                    size={64}
+                    className={`is-front${front === "blue" ? " is-flip" : ""}`}
+                  />
+                  <Monster
+                    species="classic"
+                    bodyColor={MONSTER_COLORS[back].body}
+                    irisColor={MONSTER_COLORS[back].iris}
+                    size={50}
+                    className={`is-back${back === "blue" ? " is-flip" : ""}`}
+                  />
+                </span>
+                <div className="cne-board-frame">
+                  <div
+                    className={`cne-sheet-shot${item.photo ? " is-photo" : ""}`}
+                    style={
+                      item.photo
+                        ? ({
+                            backgroundImage: `url(/menu/${item.photo}.webp)`,
+                            /* Per-photo framing — see photoFocus.ts. The CSS
+                               carries a fallback for both, so a photo missing
+                               from that map still renders sensibly. */
+                            "--cne-shot-focus": `${framingFor(item.photo)[0]}%`,
+                            "--cne-shot-zoom": `${framingFor(item.photo)[1]}%`,
+                          } as React.CSSProperties)
+                        : undefined
+                    }
+                    role="img"
+                    aria-label={itemPhotoAlt(item)}
+                  />
+                  {mostOrdered && <span className="cne-board-most">MOST ORDERED</span>}
+                </div>
               </div>
 
-              <div className="cne-sheet-hd">
+              {/* Name, dotted leader, price: a line off the menu board. The
+                  price drops its "$" the way a board does; the button below
+                  still says it in full, and a screen reader hears it here. */}
+              <div className="cne-board-hd">
+                <h3 className="cne-sheet-name">{item.name}</h3>
+                <i aria-hidden="true" />
                 {/* Every location charges the same pickup price (owner,
                     2026-09-26), so the label names the price, not a store. */}
-                <span className="w">Pickup</span>
-                <span className="p">{formatPrice(item.price)}</span>
+                <span className="cne-board-price">
+                  <small>Pickup</small>
+                  <span>
+                    <span className="cne-sr-only">$</span>
+                    {priceString(item.price)}
+                  </span>
+                </span>
               </div>
               {item.desc && <p className="cne-sheet-desc">{item.desc}</p>}
 
               {item.takesToppings && (
-                <WayPicker
-                  way={way}
-                  onChange={onWayChange}
-                  label="Topping style"
-                  className="cne-ways-sheet"
-                />
+                <>
+                  <p className="cne-board-lbl" id="cne-board-ways">
+                    Topping style
+                  </p>
+                  <WayPicker
+                    way={way}
+                    onChange={onWayChange}
+                    labelledBy="cne-board-ways"
+                    className="cne-ways-board"
+                  />
+
+                  {/* What lands in the bag. Picking a Way prints that Way's
+                      toppings onto the board as free lines, so the control has
+                      a result you can watch. Everything the next screen offers
+                      is spelled out here, extras and their prices included. */}
+                  <p className="cne-board-lbl" id="cne-board-bag">
+                    What lands in the bag
+                  </p>
+                  <div className="cne-board-list" aria-labelledby="cne-board-bag" role="group">
+                    <ul>
+                      {build?.map((line) => (
+                        <li key={line.n}>
+                          <span className="n">
+                            {line.q} &times; {line.n}
+                          </span>
+                          <i aria-hidden="true" />
+                        </li>
+                      ))}
+                      {freeToppings.map((t, i) => (
+                        <li
+                          key={t}
+                          className="is-free"
+                          /* Printed in order, the way a ticket comes off a
+                             printer. Suppressed under reduced motion. */
+                          style={{ animationDelay: `${i * 0.05}s` }}
+                        >
+                          <span className="n">+ {t}</span>
+                          <i aria-hidden="true" />
+                          <b className="v">Free</b>
+                        </li>
+                      ))}
+                      <li className="is-total">
+                        <span className="n">Total</span>
+                        <i aria-hidden="true" />
+                        <span className="v">{priceString(item.price)}</span>
+                      </li>
+                    </ul>
+                    <p className="cne-board-sub">Also on the next screen</p>
+                    <ul>
+                      {extras.map((e) => (
+                        <li key={e.name} className="is-extra">
+                          <span className="n">{e.name}</span>
+                          <i aria-hidden="true" />
+                          <span className="v">+{priceString(e.price)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {combo && onSwitch && (
+                    <button
+                      type="button"
+                      className="cne-board-combo"
+                      onClick={() => {
+                        onSwitch(combo);
+                        // The button unmounts on the combo, so keep focus and
+                        // scroll inside the sheet instead of dropping to <body>.
+                        sheetRef.current
+                          ?.querySelector<HTMLElement>(".cne-sheet-body")
+                          ?.scrollTo({ top: 0 });
+                        requestAnimationFrame(() =>
+                          closeRef.current?.focus({ preventScroll: true }),
+                        );
+                      }}
+                    >
+                      {/* Claude-drafted label, flagged to the owner 2026-09-28. */}
+                      <span className="k">Make it a combo</span>
+                      <span className="c">{combo.name}</span>
+                      <span className="p">
+                        <span className="cne-sr-only">$</span>
+                        {priceString(combo.price)} <span aria-hidden="true">&rarr;</span>
+                      </span>
+                    </button>
+                  )}
+                </>
               )}
             </>
           )}
@@ -283,71 +383,6 @@ export function ItemSheet({ item, open, way, onWayChange, onClose }: Props) {
             </>
           )}
         </div>
-
-        {/* The ticket: what the tap card, its note and the add-on chips became.
-            Picking a Way prints that Way's toppings into this list as free line
-            items, so the control has a result you can watch instead of a list
-            of chores it rewrites. */}
-        {item?.takesToppings && (
-          <div className={`cne-ticket${ticketOpen ? " is-open" : ""}`}>
-            <button
-              type="button"
-              className="cne-ticket-btn"
-              aria-expanded={ticketOpen}
-              aria-controls="cne-ticket-panel"
-              onClick={() => setTicketOpen((v) => !v)}
-            >
-              <span className="t">What lands in the bag</span>
-              {/* The count moves with the Way, so the row reports the picker's
-                  result even while the ticket is shut. */}
-              <span className="c">
-                {freeToppings.length} {freeToppings.length === 1 ? "topping" : "toppings"} free
-              </span>
-              <span className="s" aria-hidden="true" />
-            </button>
-            <div className="cne-ticket-wrap">
-              <div className="cne-ticket-panel" id="cne-ticket-panel">
-                <div className="cne-ticket-pad">
-                  {build?.map((line) => (
-                    <div key={line.n} className="cne-tl">
-                      <span className="q">{line.q} &times;</span>
-                      <span className="n">{line.n}</span>
-                    </div>
-                  ))}
-                  {freeToppings.map((t, i) => (
-                    <div
-                      key={t}
-                      className="cne-tl is-free"
-                      /* Printed in order, the way a ticket comes off a
-                         printer. Suppressed under reduced motion. */
-                      style={{ animationDelay: `${i * 0.05}s` }}
-                    >
-                      <span className="q">+</span>
-                      <span className="n">{t}</span>
-                      <span className="v">Free</span>
-                    </div>
-                  ))}
-                  <div className="cne-tl is-total">
-                    <span className="n">Total</span>
-                    <span className="v">{formatPrice(item.price)}</span>
-                  </div>
-                  <p className="cne-ticket-note">
-                    Toppings can&rsquo;t be pre-set from a link, so they get ticked on the next
-                    screen. All free.
-                  </p>
-                  <div className="cne-ticket-extra">
-                    <span className="l">Also on the next screen</span>
-                    {extras.map((e) => (
-                      <span key={e.name} className="x">
-                        {e.name} · +{formatPrice(e.price)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );

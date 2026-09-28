@@ -203,7 +203,13 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
               <div key={key} className="cat-hours-row">
                 <span className="cat-hours-day">{label}</span>
                 <label className="adm-toggle">
+                  {/* `key` keyed to the last successful save (see the same
+                   * `key` on `#orderingOn` below for the full explanation):
+                   * without it, this checkbox's native DOM state can get
+                   * silently desynced from React's own `checked={!closed}`
+                   * after a save. */}
                   <input
+                    key={`${key}-${state?.savedAt ?? "unsaved"}`}
                     type="checkbox"
                     className="adm-toggle-input"
                     checked={!closed}
@@ -431,7 +437,28 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
 
           <label className="adm-toggle-row" style={{ marginTop: 16 }}>
             <span className="adm-toggle">
+              {/* `key` keyed to the last successful save: React 19's
+               * `<form action={fn}>` calls `requestFormReset` on *every*
+               * submit, before the action even runs (`startHostTransition`
+               * in react-dom) — a native `form.reset()`-style call meant
+               * for uncontrolled fields. For a genuinely controlled
+               * checkbox like this one, that native reset silently flips
+               * the DOM's own `checked` property back to whatever it was
+               * before the click, without React knowing — and because
+               * React's own bookkeeping still says `checked` is exactly
+               * what it was ("true", unchanged since the click that
+               * triggered this submit), its diffing bails out and never
+               * rewrites the DOM property on the next render, leaving the
+               * native reset in place. The failure is silent and timing-
+               * dependent (it doesn't happen on every save), which is what
+               * made the owner's "Take catering requests online" toggle
+               * occasionally look like it reverted itself right after
+               * saving. Changing `key` on a successful save forces React
+               * to throw the old DOM node away and mount a fresh one with
+               * the correct `checked` value baked in, which a diff can't
+               * bail out of. */}
               <input
+                key={state?.savedAt ?? "unsaved"}
                 id="orderingOn"
                 name="orderingOn"
                 type="checkbox"

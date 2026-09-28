@@ -8,6 +8,7 @@
  * pages that show the result — same division of labour as
  * `../orders/[id]/actions.ts`. */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { requireOwner } from "@/lib/auth";
 import { getDb } from "@/db/client";
 import {
@@ -21,10 +22,45 @@ import {
 
 export type CateringActionState = { error?: string };
 
+function isTestEnv(): boolean {
+  return process.env.VITEST === "true" || process.env.NODE_ENV === "test";
+}
+
+/**
+ * `/admin/catering/${id}` — the page these actions are called from — is
+ * revalidated INLINE, not deferred: the pill, the timeline and every other
+ * piece of `order.status`-derived UI on that page live in the Server
+ * Component (`page.tsx`), not in `OrderActionsPanel`/`ChangeReviewPanel`'s
+ * own local state, so they only ever update from a fresh RSC render riding
+ * back on the action's own response. `revalidatePath` during a Server
+ * Action is what makes Next render that fresh payload for *this* page
+ * before the action resolves (it marks `workStore.pathWasRevalidated`,
+ * which the action handler checks right after the action returns) — skip
+ * it here and the response carries back Next's stale, pre-action render
+ * instead, which would silently snap "BOOKED"/"DECLINED" back to
+ * "REQUESTED" the instant the action resolved, the same class of bug a
+ * deferred `revalidatePath("/admin/settings")` caused for the catering
+ * settings toggle (`../settingsActions.ts`). This page reads just the one
+ * order plus a handful of small lookups, so revalidating it inline is
+ * cheap on its own — the risk in the settings fix was never revalidating
+ * *this* page, only rippling out to `/admin` (below).
+ *
+ * `/admin/catering` (the list) and `/admin` (the shared layout) ARE
+ * deferred to `after()`: revalidating the shared `/admin` layout invalidates
+ * and re-triggers the admin nav's own `<Link>` prefetches to
+ * `/admin/orders`, `/admin/customers` etc. — a much larger, unrelated pile
+ * of reads that, done inline, would serialize onto PGlite's one connection
+ * ahead of the response and is what hung the button here in the first
+ * place. Neither path is ever read by `/admin/catering/${id}` itself, so
+ * deferring them costs this page nothing.
+ */
 function revalidateOrder(id: string) {
   revalidatePath(`/admin/catering/${id}`);
-  revalidatePath("/admin/catering");
-  revalidatePath("/admin");
+  if (isTestEnv()) return;
+  after(() => {
+    revalidatePath("/admin/catering");
+    revalidatePath("/admin");
+  });
 }
 
 export async function approveOrderAction(

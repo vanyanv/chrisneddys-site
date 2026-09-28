@@ -69,24 +69,68 @@ export async function saveCateringSettingsAction(
   const result = await saveCateringSettings(patch);
   if (!result.ok) return { error: result.error, field: result.field };
 
+  // `/admin/settings` itself is revalidated INLINE (unlike the other two
+  // paths below): calling `revalidatePath` during a Server Action marks
+  // `workStore.pathWasRevalidated`, which is what makes Next render a
+  // fresh RSC payload for *this* page into the action's own response
+  // before it resolves — that's exactly the freshness this checkbox
+  // needs, since `/admin/settings` is the page actually showing the
+  // catering-settings row just written. Skipping it (deferring it into
+  // `after()` the same as the other two, as an earlier version of this
+  // fix did) doesn't just delay that re-render: React's `useActionState`
+  // applies whatever RSC payload rides along with the action's response
+  // regardless, so without an inline `revalidatePath` for this exact path
+  // that payload is Next's *stale*, pre-save render of the page — which
+  // silently snapped the just-toggled checkbox back to its old value the
+  // instant the save resolved, even though the write itself had already
+  // committed. `/admin/settings` only reads its own five things (this
+  // catering-settings row among them), so this render is cheap on its
+  // own — the risk was never revalidating *this* page, only revalidating
+  // `/admin` (the shared layout segment, below).
+  revalidatePath("/admin/settings/");
+
+  // The four storefront pages below are ALSO revalidated INLINE, not
+  // deferred, even though this action is never called from any of them:
+  // they all read `getPublicCateringConfig()` (`@/lib/catering/public`)
+  // for `orderingOn`, and none declares `dynamic = "force-dynamic"`, so
+  // per this repo's "storefront pages are static with revalidation" rule
+  // (CLAUDE.md) each is a static/ISR page that only picks up a settings
+  // change once something calls `revalidatePath` for it — nothing did,
+  // for this action, until now. Deferring them into `after()` (as an
+  // earlier version of this fix did, reasoning by analogy with the
+  // `/admin`/`/admin/catering` case below) is provably too late for any
+  // caller that flips the toggle and then immediately checks the
+  // storefront in the same flow — exactly what `enableCateringOrdering`/
+  // `disableCateringOrdering` (`e2e/catering/helpers.ts`) do, and what a
+  // real owner testing their own change right after saving would do too:
+  // `after()` only guarantees these run "once the response has been
+  // sent", not before the *next* request the caller makes, so a
+  // `page.goto("/catering/order/")` right after the save can land on the
+  // server before the deferred revalidation has even started, and gets
+  // served the stale, pre-save static page — with nothing to retry, since
+  // a plain navigation is a one-shot fetch, not a polled assertion. These
+  // four are cheap, ordinary page reads with no nav-prefetch fan-out (they
+  // aren't part of the admin layout), so revalidating them inline carries
+  // none of the risk that made revalidating `/admin` inline dangerous.
+  revalidatePath("/catering/");
+  revalidatePath("/catering/order/");
+  revalidatePath("/order/");
+  revalidatePath("/menu/");
+
   // Deferred to `after()`, same reasoning (and the same PGlite-single-
   // connection risk) as `saveStoreSettings` in `@/lib/settingsAdmin`:
-  // calling `revalidatePath` inline during a Server Action makes Next
-  // render a fresh RSC payload for *this* page (`/admin/settings`, which
-  // reads five separate things, including this same catering-settings
-  // row) into the action's own response before it can resolve. Racing
-  // that against the admin nav's own `<Link>` prefetches to
-  // `/admin/catering`, `/admin/orders`, `/admin/customers` etc. — which
   // revalidating `/admin` (the shared layout segment) invalidates and
-  // re-triggers — serializes a pile of unrelated reads onto PGlite's one
-  // connection ahead of the response, which is what left the Save button
-  // stuck on "Saving…" (or occasionally applied a stale RSC payload over
-  // the just-saved value). Running it in `after()` keeps these three
-  // paths fresh without ever putting that render in the action's own
-  // critical path.
+  // re-triggers the admin nav's own `<Link>` prefetches to
+  // `/admin/catering`, `/admin/orders`, `/admin/customers` etc. — a much
+  // larger, unrelated pile of reads that, done inline, would serialize
+  // onto PGlite's one connection ahead of the response and is what left
+  // the Save button stuck on "Saving…". Neither of these two paths is
+  // ever read by `/admin/settings` itself, so deferring them costs this
+  // page nothing — nothing here navigates straight to `/admin/catering`
+  // or bare `/admin` right after a catering-settings save the way the
+  // storefront flow above does.
   if (!isTestEnv()) {
     after(() => {
-      revalidatePath("/admin/settings");
       revalidatePath("/admin/catering");
       revalidatePath("/admin");
     });

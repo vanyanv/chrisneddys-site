@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 /**
@@ -65,6 +66,22 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 3111;
 const BASE_URL = `http://localhost:${PORT}`;
 
+/**
+ * This sandbox's preinstalled Chromium (revision 1194, under
+ * `PLAYWRIGHT_BROWSERS_PATH`) is older than what the pinned `@playwright/
+ * test` version's own bundled-browser manifest asks for (revision 1243),
+ * and the sandbox's network policy blocks `cdn.playwright.dev`, so
+ * `playwright install` can't fetch the newer one. Pointing `executablePath`
+ * straight at the preinstalled binary skips that revision check entirely.
+ * Scoped to the catering projects only, since only they were added here —
+ * the existing `chromium` project is left exactly as it was.
+ */
+const CHROMIUM_HEADLESS_SHELL =
+  "/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell";
+const PW_LAUNCH_OPTIONS = existsSync(CHROMIUM_HEADLESS_SHELL)
+  ? { executablePath: CHROMIUM_HEADLESS_SHELL }
+  : undefined;
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -91,6 +108,31 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: /e2e\/catering\//,
+    },
+    // Catering (issue #190) walks every flow at both a phone and a desktop
+    // viewport, so its specs get their own two projects instead of the one
+    // above — every other spec keeps running at Desktop Chrome only via
+    // `testIgnore` there.
+    {
+      name: "catering-phone",
+      testMatch: /e2e\/catering\/.*\.spec\.ts$/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+        launchOptions: PW_LAUNCH_OPTIONS,
+      },
+    },
+    {
+      name: "catering-desktop",
+      testMatch: /e2e\/catering\/.*\.spec\.ts$/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+        launchOptions: PW_LAUNCH_OPTIONS,
+      },
     },
   ],
   webServer: {
@@ -142,6 +184,11 @@ export default defineConfig({
       BLOB_READ_WRITE_TOKEN: "",
       RESEND_API_KEY: "",
       EMAIL_FROM: "",
+      // Catering (issue #190): skips the Stripe adapter entirely — checkout
+      // redirects straight to the sent page and capture/cancel/refund are
+      // no-ops that record fake ids. VERCEL_ENV must stay unset (it's never
+      // set above) since the adapter refuses fake mode in Vercel.
+      CATERING_FAKE_PAYMENTS: "1",
     },
   },
 });

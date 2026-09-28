@@ -7,7 +7,7 @@ import { ItemSheet } from "./ItemSheet";
 import { useItemSheet } from "./useItemSheet";
 
 export function FeaturedCards() {
-  const { item, open, way, setWay, openItem, close } = useItemSheet();
+  const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
   const items = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
@@ -59,7 +59,14 @@ export function FeaturedCards() {
           </button>
         ))}
       </div>
-      <ItemSheet item={item} open={open} way={way} onWayChange={setWay} onClose={close} />
+      <ItemSheet
+        item={item}
+        open={open}
+        way={way}
+        onWayChange={setWay}
+        onClose={close}
+        onSwitch={switchItem}
+      />
     </>
   );
 }

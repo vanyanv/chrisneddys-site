@@ -339,7 +339,17 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
                     <button
                       type="button"
                       className="cne-board-combo"
-                      onClick={() => onSwitch(combo)}
+                      onClick={() => {
+                        onSwitch(combo);
+                        // The button unmounts on the combo, so keep focus and
+                        // scroll inside the sheet instead of dropping to <body>.
+                        sheetRef.current
+                          ?.querySelector<HTMLElement>(".cne-sheet-body")
+                          ?.scrollTo({ top: 0 });
+                        requestAnimationFrame(() =>
+                          closeRef.current?.focus({ preventScroll: true }),
+                        );
+                      }}
                     >
                       {/* Claude-drafted label, flagged to the owner 2026-09-28. */}
                       <span className="k">Make it a combo</span>

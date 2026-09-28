@@ -512,7 +512,7 @@
 /* ---- landscape phones ---------------------------------------------------
    Height is what runs out, so the photo goes left and stays while the board
    scrolls on the right. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-height: 500px) and (orientation: landscape) {
   .cne-sheet {
     max-height: calc(100dvh - 40px);
   }
@@ -564,7 +564,7 @@
 }
 
 /* ---- desktop, and tablets tall enough for it: the side panel ------------ */
-@media (min-width: 901px), (min-width: 700px) and (min-height: 900px) {
+@media (min-width: 901px) and (min-height: 501px), (min-width: 700px) and (min-height: 900px) {
   .cne-sheet {
     top: 0;
     left: auto;

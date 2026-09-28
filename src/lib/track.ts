@@ -38,6 +38,13 @@ export type TrackEvent =
   | "delivery_click"
   /** A catering button (to the contact form), distinct from any other contact link. */
   | "catering_click"
+  /** Tapped into the online catering order builder (/catering/order/), as
+   * opposed to `catering_click`'s contact-form button. */
+  | "catering_order_start"
+  /** Landed on one of the order builder's five numbered steps. */
+  | "catering_order_step_view"
+  /** A catering request was sent — /catering/order/sent/ loaded. */
+  | "catering_order_request_sent"
   /** Tapped the phone number. */
   | "call_click"
   /** Tapped through to turn-by-turn directions. */

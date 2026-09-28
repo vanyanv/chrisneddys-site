@@ -6,6 +6,8 @@ import { brand } from "@/data/brand";
 import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { CATERING_HREF } from "@/data/catering";
+import { getPublicCateringConfig } from "@/lib/catering/public";
+import { getDb } from "@/db/client";
 import { itemPhotoAlt } from "@/lib/otter";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -64,10 +66,13 @@ const STEPS = [
  * Every catering button carries `data-catering` (so the click is a
  * `catering_click`) inside a `data-surface`, so Analytics shows them by spot.
  */
-export default function CateringPage() {
+export default async function CateringPage() {
   const food = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
+  const cateringConfig = await getPublicCateringConfig(await getDb());
+  const cateringHref = cateringConfig.orderingOn ? "/catering/order/" : CATERING_HREF;
+  const orderingOn = cateringConfig.orderingOn;
 
   return (
     <div className="cne-cat">
@@ -126,10 +131,10 @@ export default function CateringPage() {
           <Link
             prefetch={false}
             className="cne-big is-primary"
-            href={CATERING_HREF}
-            data-catering=""
+            href={cateringHref}
+            {...(orderingOn ? { "data-catering-order": "start" } : { "data-catering": "" })}
           >
-            ASK ABOUT CATERING &rarr;
+            {orderingOn ? "START A CATERING ORDER" : "ASK ABOUT CATERING"} &rarr;
           </Link>
           <Link prefetch={false} className="cne-hero-menu" href="/menu/">
             SEE THE MENU
@@ -231,10 +236,10 @@ export default function CateringPage() {
           <Link
             prefetch={false}
             className="cne-big is-primary"
-            href={CATERING_HREF}
-            data-catering=""
+            href={cateringHref}
+            {...(orderingOn ? { "data-catering-order": "start" } : { "data-catering": "" })}
           >
-            ASK ABOUT CATERING &rarr;
+            {orderingOn ? "START A CATERING ORDER" : "ASK ABOUT CATERING"} &rarr;
           </Link>
         </div>
       </section>

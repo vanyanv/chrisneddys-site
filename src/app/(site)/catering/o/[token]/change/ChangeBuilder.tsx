@@ -262,6 +262,7 @@ export function ChangeBuilder({
           if (!line) return;
           const item = itemById(line.itemId);
           if (!item) return;
+          setOrderSheetOpen(false);
           setEditingIndex(index);
           setOpenItem(item);
         }}

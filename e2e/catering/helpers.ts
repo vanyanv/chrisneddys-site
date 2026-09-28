@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, type Page } from "@playwright/test";
 import { signInAsOwner } from "../helpers";
@@ -21,23 +21,41 @@ export function dateStrDaysFromNow(days: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-/** Runs `e2e/catering/db-mutate.mjs` out-of-process against the same
- * `PGLITE_DATA_DIR` the running e2e server uses, to reach an order state the
- * customer UI can never produce itself (see that file's module comment). */
-export function mutateOrder(
-  command: "set-event-at" | "set-respond-by",
-  orderNumber: string,
-  isoValue: string,
-): void {
-  execFileSync(
-    process.execPath,
-    [path.join(__dirname, "db-mutate.mjs"), command, orderNumber, isoValue],
-    {
-      cwd: path.join(__dirname, "..", ".."),
-      env: { ...process.env, PGLITE_DATA_DIR: ".pglite/e2e", DATABASE_URL: "" },
-      stdio: "pipe",
-    },
-  );
+/** The two order fixtures `e2e/seed-catering-fixtures.mjs` seeds directly
+ * into `.pglite/e2e` before `next build`/`next start` ever open it (see
+ * that script's module comment for why a *second* `node` process reaching
+ * into the database once the e2e server already has it open doesn't work —
+ * a second process's write would eventually land, but only after the two
+ * PGlite instances fought over the same on-disk files for anywhere from
+ * tens of seconds to several minutes). Reading this file is a plain
+ * filesystem read, not a database connection, so it carries none of that
+ * risk. */
+type CateringFixtures = {
+  expired: { token: string; number: string };
+  /** One half-refund order per catering Playwright project, keyed by
+   * project name — `cancel.spec.ts` test 2 cancels it (a one-time state
+   * change), and that spec runs once per project against this one shared
+   * server, so a single shared fixture would already be cancelled by the
+   * time the second project's test 2 ran. */
+  halfRefund: Record<string, { token: string; number: string }>;
+};
+
+export function readCateringFixtures(): CateringFixtures {
+  const raw = readFileSync(path.join(__dirname, ".fixtures.json"), "utf8");
+  return JSON.parse(raw) as CateringFixtures;
+}
+
+/** This test's half-refund fixture — the one seeded for its own Playwright
+ * project (see `CateringFixtures.halfRefund`'s comment). */
+export function readHalfRefundFixture(projectName: string): { token: string; number: string } {
+  const fixture = readCateringFixtures().halfRefund[projectName];
+  if (!fixture) {
+    throw new Error(
+      `No seeded half-refund fixture for catering project "${projectName}" — ` +
+        `check e2e/seed-catering-fixtures.mjs seeds one per catering project.`,
+    );
+  }
+  return fixture;
 }
 
 export async function signInAsOwnerOnCateringList(page: Page): Promise<void> {
@@ -64,6 +82,14 @@ export function cateringSaveBar(page: Page) {
   return page.locator(".adm-savebar", { has: cateringSaveButton(page) });
 }
 
+// Playwright's `expect` polling timeout defaults to 5s and only picks up
+// `playwright.config.ts`'s longer `expect.timeout` (15s) inside a running
+// test's own worker context — not here, since `enableCateringOrdering`/
+// `disableCateringOrdering` also run from `e2e/catering/global-setup.ts`,
+// outside any test. Passed explicitly so both callers get the same
+// tolerance for a cold PGlite start's slower save round trip.
+const SAVE_BAR_TIMEOUT = 45_000;
+
 export async function enableCateringOrdering(page: Page): Promise<void> {
   await signInAsOwner(page);
   await page.goto("/admin/settings");
@@ -71,7 +97,7 @@ export async function enableCateringOrdering(page: Page): Promise<void> {
   if (await toggle.isChecked()) return;
   await toggle.click({ force: true });
   await cateringSaveButton(page).click();
-  await expect(cateringSaveBar(page)).not.toHaveClass(/is-visible/);
+  await expect(cateringSaveBar(page)).not.toHaveClass(/is-visible/, { timeout: SAVE_BAR_TIMEOUT });
   await expect(toggle).toBeChecked();
 }
 
@@ -82,7 +108,7 @@ export async function disableCateringOrdering(page: Page): Promise<void> {
   if (!(await toggle.isChecked())) return;
   await toggle.click({ force: true });
   await cateringSaveButton(page).click();
-  await expect(cateringSaveBar(page)).not.toHaveClass(/is-visible/);
+  await expect(cateringSaveBar(page)).not.toHaveClass(/is-visible/, { timeout: SAVE_BAR_TIMEOUT });
   await expect(toggle).not.toBeChecked();
 }
 
@@ -157,14 +183,52 @@ export async function setHeadcount(page: Page, n: number): Promise<void> {
   await page.getByLabel("Number of people").fill(String(n));
 }
 
-/** Opens an item's sheet from the food step's menu grid by its visible name. */
+/** Opens an item's sheet from the food step's menu grid by its visible name.
+ * `StepFood` only ever mounts the one active category's rows (`useState`,
+ * not CSS visibility), so a name from a different category than whatever's
+ * currently selected isn't in the DOM yet — this tries each category chip,
+ * in order, until the named row actually appears, rather than hardcoding a
+ * name-to-category table here that the menu data would drift out of sync
+ * with. A no-op loop (0 iterations) when the row's already there.
+ *
+ * Closes any already-open item sheet first: a fresh (non-editing) `Add`
+ * leaves the sheet open — "Added for ___. Add one for someone else?" — so
+ * the food grid stays reachable for another item, but the sheet's `cor-
+ * scrim` backdrop still covers the grid and intercepts a row click until
+ * it's closed. */
 export async function openItemByName(page: Page, name: string): Promise<void> {
-  await page.locator(".cor-menu-row", { hasText: name }).first().click();
+  if (await page.locator(".cor-item-sheet.is-open").count()) {
+    await closeItemSheet(page);
+  }
+  const row = page.locator(".cor-menu-row", { hasText: name }).first();
+  const chips = page.locator(".cor-cat-chips .cor-chip");
+  const chipCount = await chips.count();
+  for (let i = 0; i < chipCount && (await row.count()) === 0; i++) {
+    await chips.nth(i).click();
+  }
+  await row.click();
 }
 
+/** Closes the item sheet via its ✕. `ItemSheet`'s `handleAdd` only closes
+ * the sheet on an *editing* add — a fresh add instead shows "Added for
+ * ___. Add one for someone else?" and leaves it open, so the food grid
+ * stays reachable for another `openItemByName` — but the sheet is still a
+ * full modal (`role="dialog"`) intercepting clicks to anything else, e.g.
+ * the step's own "Continue" button, until this closes it explicitly. */
+export async function closeItemSheet(page: Page): Promise<void> {
+  await page.locator(".cor-item-sheet .cor-sheet-x").click();
+}
+
+/** Scoped to `.cor-item-sheet` (`ItemSheet`'s own root class): `FeedCrewSheet`
+ * renders a same-named, same-class "quick fill" button of its own (its own
+ * `wayId` state, defaulted to `"chris"`) and stays mounted (just `inert`)
+ * behind the item sheet, so an unscoped `getByRole` for "Chris's/Eddy's Way"
+ * resolves to two elements — this item's own quick-fill row plus the
+ * feed-crew sheet's — a strict-mode violation regardless of which is
+ * actually open. */
 export async function pickWay(page: Page, way: "chris" | "eddy"): Promise<void> {
   const label = way === "chris" ? /CHRIS.?S WAY/i : /EDDY.?S WAY/i;
-  await page.getByRole("button", { name: label }).click();
+  await page.locator(".cor-item-sheet").getByRole("button", { name: label }).click();
 }
 
 export async function toggleTopping(page: Page, name: string): Promise<void> {
@@ -224,7 +288,7 @@ export async function fillContactDetails(
 ): Promise<void> {
   await page.getByLabel("Your name").fill(contact.name);
   await page.getByLabel("Email", { exact: true }).fill(contact.email);
-  await page.getByLabel("Phone", { exact: true }).fill(contact.phone);
+  await page.getByLabel("Mobile", { exact: true }).fill(contact.phone);
 }
 
 /** Clicks "Request catering" on the review step and waits for the fake-
@@ -261,6 +325,7 @@ export async function quickOrder(
   await openItemByName(page, "2 Sliders and Fries");
   await pickWay(page, "chris");
   await addItem(page);
+  await closeItemSheet(page);
   await page.getByRole("button", { name: "Continue" }).click();
   await fillContactDetails(page, contact);
   await page.getByRole("button", { name: "Continue" }).click();

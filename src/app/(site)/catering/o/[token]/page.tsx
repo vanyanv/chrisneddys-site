@@ -11,6 +11,9 @@ import type { CartLine } from "@/lib/catering/types";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+// Order-link pages: never cache — must reflect live order state.
+export const dynamic = "force-dynamic";
+
 const STATUS_LABEL: Record<string, string> = {
   draft: "Waiting on us",
   requested: "Waiting on us",
@@ -117,7 +120,6 @@ export default async function CateringOrderLinkPage({
         date={null}
         time={null}
         headcount={order.headcount}
-        onEdit={() => {}}
       />
       <p className="cor-fine">
         {new Date(order.eventAt).toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}

@@ -22,7 +22,7 @@ test.describe.serial("flow 0: catering ordering on/off", () => {
     await disableCateringOrdering(page);
     await page.goto("/catering/order/");
     await expect(page.getByRole("heading", { name: "Catering", level: 1 })).toBeVisible();
-    await expect(page.getByText("Online ordering isn't open yet.", { exact: false })).toBeVisible();
+    await expect(page.getByText(/online ordering isn.t open yet\./i)).toBeVisible();
     const cta = page.getByRole("link", { name: /ask about catering/i });
     await expect(cta).toBeVisible();
     await expect(cta).toHaveAttribute("href", "/contact/");

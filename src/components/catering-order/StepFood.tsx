@@ -29,7 +29,10 @@ export function StepFood({
   onOpenOrder: () => void;
   onOpenFeedCrew: () => void;
 }) {
-  const [cat, setCat] = useState<MenuCategoryKey>("sliders");
+  // Wireframe C4 (`c4-food-empty.png`) opens on "Slider & Fries Combos" —
+  // "the order most people are actually here for" (`2-sliders-and-fries`'s
+  // own description) — not the alphabetically-first `ORDER` entry.
+  const [cat, setCat] = useState<MenuCategoryKey>("combos");
 
   return (
     <div className="cor-step cor-food-step">

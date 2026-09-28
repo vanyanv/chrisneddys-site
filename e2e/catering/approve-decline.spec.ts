@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { signInAsOwner } from "../helpers";
-import { enableCateringOrdering, quickOrder } from "./helpers";
+import { quickOrder } from "./helpers";
 
 /**
  * Flows 6 and 7: the owner approves a request (customer link shows booked;
@@ -17,7 +17,6 @@ test.describe.serial("flows 6 & 7: admin approve and decline", () => {
 
   test.beforeAll(async ({ browser }) => {
     customerPage = await browser.newPage();
-    await enableCateringOrdering(customerPage);
 
     const approve = await quickOrder(customerPage, {
       name: "Approve Me",
@@ -77,8 +76,10 @@ test.describe.serial("flows 6 & 7: admin approve and decline", () => {
     await adminPage.locator(".cat-row", { hasText: declineNumber }).click();
 
     await adminPage.getByRole("button", { name: "Decline" }).click();
+    // The label reads "Message to {firstName} (optional)" — the customer's
+    // own first name, not the literal word "customer".
     await adminPage
-      .getByRole("textbox", { name: /message to the customer/i })
+      .getByRole("textbox", { name: /^message to/i })
       .fill("We're fully booked that day.");
     await adminPage.getByRole("button", { name: /decline & release the hold/i }).click();
 

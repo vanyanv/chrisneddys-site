@@ -9,6 +9,9 @@ import { PrintButton } from "./PrintButton";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+// Order-link pages: never cache — must reflect live order state.
+export const dynamic = "force-dynamic";
+
 /** O4: the letter-size printable invoice, from the customer's order link. */
 export default async function CateringInvoicePage({
   params,

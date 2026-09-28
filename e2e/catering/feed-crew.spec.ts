@@ -1,6 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
-  enableCateringOrdering,
   startOrder,
   choosePickup,
   setHeadcount,
@@ -18,7 +17,6 @@ test.describe.serial("flow 4: feed my crew", () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await enableCateringOrdering(page);
     await startOrder(page);
     await choosePickup(page, "Hollywood");
     await page.getByRole("button", { name: "Continue" }).click();
@@ -47,7 +45,13 @@ test.describe.serial("flow 4: feed my crew", () => {
 
     await openOrderSheet(page);
     const orderSheet = page.getByRole("dialog", { name: "Your order" });
-    await expect(orderSheet.locator(".cor-line-qty")).toHaveText("20");
+    // "Fill my order" also adds a shakes line by default (see
+    // c7-feed-my-crew-sheet.png: "Add shakes" starts pre-filled, not 0,
+    // and the total shown includes them) — scope to the food line so this
+    // doesn't assume it's the only `.cor-line` in the sheet.
+    await expect(
+      orderSheet.locator(".cor-line", { hasText: "2 Sliders and Fries" }).locator(".cor-line-qty"),
+    ).toHaveText("20");
     await expect(orderSheet.getByText("2 Sliders and Fries")).toBeVisible();
     await orderSheet.getByRole("button", { name: "Done" }).click();
   });
@@ -61,8 +65,13 @@ test.describe.serial("flow 4: feed my crew", () => {
     await page.getByRole("button", { name: /^Save/ }).click();
 
     await openOrderSheet(page);
+    // Scoped to the food line, same reasoning as test 1: the shakes line
+    // from "Fill my order" is still in the cart alongside it.
     await expect(
-      page.getByRole("dialog", { name: "Your order" }).locator(".cor-line-qty"),
+      page
+        .getByRole("dialog", { name: "Your order" })
+        .locator(".cor-line", { hasText: "2 Sliders and Fries" })
+        .locator(".cor-line-qty"),
     ).toHaveText("25");
     await page
       .getByRole("dialog", { name: "Your order" })

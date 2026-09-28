@@ -5,6 +5,7 @@
  * customer. */
 import { useActionState, useEffect, useRef } from "react";
 import { addNoteAction, type CateringActionState } from "./actions";
+import { useRefreshOnSuccess } from "./useRefreshOnSuccess";
 
 const initial: CateringActionState = {};
 
@@ -21,6 +22,7 @@ export function NoteForm({
   useEffect(() => {
     if (!pending && !state?.error) formRef.current?.reset();
   }, [pending, state]);
+  useRefreshOnSuccess(pending, state?.error);
 
   return (
     <div className="cat-note-form">

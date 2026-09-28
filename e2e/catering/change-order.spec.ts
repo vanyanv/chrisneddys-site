@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { signInAsOwner } from "../helpers";
-import { enableCateringOrdering, quickOrder, openOrderSheet } from "./helpers";
+import { quickOrder, openOrderSheet } from "./helpers";
 
 /**
  * Flow 9: the customer changes their qty from the order link; the owner
@@ -15,7 +15,6 @@ test.describe.serial("flow 9: customer change, owner approval", () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await enableCateringOrdering(page);
     const order = await quickOrder(page, {
       name: "Change Order",
       email: "change.order@example.com",

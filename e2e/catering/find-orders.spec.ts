@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { enableCateringOrdering, quickOrder } from "./helpers";
+import { quickOrder } from "./helpers";
 
 /**
  * Flow 10: "Find my orders" always answers "sent" — whether or not the
@@ -18,7 +18,6 @@ test.describe("flow 10: find my orders always says sent", () => {
   });
 
   test("an email with a real order gets the identical sent confirmation", async ({ page }) => {
-    await enableCateringOrdering(page);
     await quickOrder(page, {
       name: "Find Me",
       email: "find.me@example.com",

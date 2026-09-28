@@ -751,15 +751,27 @@
   min-height: 44px;
   border-bottom: 1px solid var(--a-line);
 }
+/* The row is `<label><span class="v">`: the label (input + name) takes the
+   flexible space so the price/"Free" badge sits flush right, same layout
+   as before the price moved outside the label (see ItemSheet.tsx). */
+.cor-topping-row label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
 .cor-topping-row input {
   width: 20px;
   height: 20px;
+  flex: none;
 }
 .cor-topping-row .n {
   flex: 1;
   font-weight: 600;
 }
 .cor-topping-row .v {
+  flex: none;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--a-sub);

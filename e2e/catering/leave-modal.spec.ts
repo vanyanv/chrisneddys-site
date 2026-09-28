@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { enableCateringOrdering, startOrder, choosePickup } from "./helpers";
+import { startOrder, choosePickup } from "./helpers";
 
 /**
  * Flow 5: leaving mid-order. The header's ✕ opens a confirm modal;
@@ -7,12 +7,6 @@ import { enableCateringOrdering, startOrder, choosePickup } from "./helpers";
  * goes back to the order page's landing. Issue #190.
  */
 test.describe("flow 5: leave modal mid-order", () => {
-  test.beforeAll(async ({ browser }) => {
-    const page = await browser.newPage();
-    await enableCateringOrdering(page);
-    await page.close();
-  });
-
   test("keep ordering closes the modal and keeps the draft; leave exits to the landing", async ({
     page,
   }) => {

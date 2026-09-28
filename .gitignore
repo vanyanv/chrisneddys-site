@@ -23,6 +23,10 @@ tsconfig.tsbuildinfo
 playwright-report/
 test-results/
 
+# Tokens for the two order fixtures `e2e/seed-catering-fixtures.mjs` seeds
+# directly into `.pglite/e2e`, gitignored above — regenerated every run.
+e2e/catering/.fixtures.json
+
 # Claude Code agent worktrees
 .claude/worktrees/
 .vercel

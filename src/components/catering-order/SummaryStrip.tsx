@@ -24,7 +24,14 @@ function formatTime(timeStr: string): string {
 }
 
 /** The cream strip under the header from C3 onward: "Van Nuys · Delivery ·
- * Fri Oct 2 · 12:30 PM · 60 people", with an Edit link back to C2/C3. */
+ * Fri Oct 2 · 12:30 PM · 60 people", with an Edit link back to C2/C3.
+ * `onEdit` is optional: the order-link page (`/catering/o/[token]/`) reuses
+ * this strip read-only from a Server Component, where there's no edit flow
+ * to jump back into and — since it's a Server Component — no way to hand
+ * this Client Component a real event handler in the first place (an inline
+ * function prop crossing that boundary is exactly "Event handlers cannot be
+ * passed to Client Component props"). Omitting `onEdit` there just hides
+ * the button instead. */
 export function SummaryStrip({
   store,
   fulfilment,
@@ -38,7 +45,7 @@ export function SummaryStrip({
   date: string | null;
   time: string | null;
   headcount: number;
-  onEdit: () => void;
+  onEdit?: () => void;
 }) {
   const storeName = CATERING_STORES.find((s) => s.id === store)?.name;
   const parts = [
@@ -52,9 +59,11 @@ export function SummaryStrip({
   return (
     <div className="cor-summary">
       <p>{parts.join(" · ")}</p>
-      <button type="button" className="cor-summary-edit" onClick={onEdit}>
-        Edit
-      </button>
+      {onEdit && (
+        <button type="button" className="cor-summary-edit" onClick={onEdit}>
+          Edit
+        </button>
+      )}
     </div>
   );
 }

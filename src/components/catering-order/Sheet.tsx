@@ -75,6 +75,14 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-label={label}
+        // `inert` alone doesn't reliably drop this subtree from every
+        // engine's accessibility tree (the pinned older headless Chromium
+        // this suite runs against among them), so a closed sheet stays
+        // reachable by role/label queries and assistive tech even though
+        // it's invisible. `aria-hidden` is the well-supported belt to
+        // `inert`'s suspenders: both stay so the exit transition (driven by
+        // the `is-open` class) still gets to run.
+        aria-hidden={open ? undefined : "true"}
         inert={!open}
       >
         {children}

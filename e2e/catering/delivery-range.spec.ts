@@ -1,6 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
-  enableCateringOrdering,
   startOrder,
   chooseDelivery,
   selectCalendarDate,
@@ -8,6 +7,7 @@ import {
   openItemByName,
   pickWay,
   addItem,
+  closeItemSheet,
   fillContactDetails,
   submitAndGetToken,
   VAN_NUYS_NEAR_ZIP,
@@ -26,7 +26,6 @@ test.describe.serial("flow 2: delivery range (Van Nuys) and returning-customer p
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await enableCateringOrdering(page);
   });
 
   test.afterAll(async () => {
@@ -68,6 +67,7 @@ test.describe.serial("flow 2: delivery range (Van Nuys) and returning-customer p
     await openItemByName(page, "2 Sliders and Fries");
     await pickWay(page, "chris");
     await addItem(page);
+    await closeItemSheet(page);
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL(/step=details/);
 
@@ -100,6 +100,7 @@ test.describe.serial("flow 2: delivery range (Van Nuys) and returning-customer p
     await openItemByName(page, "2 Sliders and Fries");
     await pickWay(page, "eddy");
     await addItem(page);
+    await closeItemSheet(page);
     await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page.getByText("Welcome back")).toBeVisible();
@@ -107,6 +108,6 @@ test.describe.serial("flow 2: delivery range (Van Nuys) and returning-customer p
     await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
       "maya.returning@example.com",
     );
-    await expect(page.getByLabel("Phone", { exact: true })).toHaveValue("(818) 555-0142");
+    await expect(page.getByLabel("Mobile", { exact: true })).toHaveValue("(818) 555-0142");
   });
 });

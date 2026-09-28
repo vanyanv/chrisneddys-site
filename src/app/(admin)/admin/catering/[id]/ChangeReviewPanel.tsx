@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import type { CateringPendingChange } from "@/db/schema";
 import { formatCents } from "../format";
 import { approveChangeAction, declineChangeAction, type CateringActionState } from "./actions";
+import { useRefreshOnSuccess } from "./useRefreshOnSuccess";
 
 const initial: CateringActionState = {};
 
@@ -29,6 +30,8 @@ export function ChangeReviewPanel({
     declineChangeAction,
     initial,
   );
+  useRefreshOnSuccess(approvePending, approveState?.error);
+  useRefreshOnSuccess(declinePending, declineState?.error);
 
   const diff = pendingChange.totalCents - currentTotalCents;
 

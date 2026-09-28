@@ -124,7 +124,7 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
     setSubmitting(true);
     setCheckoutError(null);
     try {
-      const res = await fetch("/api/catering/checkout", {
+      const res = await fetch("/api/catering/checkout/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -267,7 +267,20 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
             }));
           }}
           errors={detailsErrors}
-          onChange={(patch) =>
+          onChange={(patch) => {
+            const nextContact = patch.contact ? { ...draft.contact, ...patch.contact } : null;
+            // `detailsErrors` is only ever *set* by a failed submit attempt
+            // (`submitCheckout`), so without this, fixing a field after
+            // that failed attempt never clears its error — "Enter your
+            // name." stays on screen under a now-valid name until the next
+            // submit. Once a submit attempt has shown errors, keep them
+            // live against every keystroke instead; before that first
+            // attempt, `detailsErrors` is still `{}` and this is a no-op,
+            // so nothing shows prematurely while the customer is still
+            // filling the form in for the first time.
+            if (nextContact && Object.keys(detailsErrors).length > 0) {
+              setDetailsErrors(validateDetails(nextContact));
+            }
             setDraft((d) => ({
               ...d,
               ...(patch.company !== undefined ? { company: patch.company } : {}),
@@ -275,8 +288,8 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
               ...(patch.customerNote !== undefined ? { customerNote: patch.customerNote } : {}),
               ...(patch.contact ? { contact: { ...d.contact, ...patch.contact } } : {}),
               ...(patch.onsite !== undefined ? { onsite: patch.onsite } : {}),
-            }))
-          }
+            }));
+          }}
         />
       )}
 
@@ -345,6 +358,11 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
           if (!line) return;
           const item = itemById(line.itemId);
           if (!item) return;
+          // Close the order sheet first, same as `onAddForOnePerson` below:
+          // otherwise both sheets stay stacked `is-open` at once, and the
+          // order sheet's own buttons (still on top in the DOM) intercept
+          // clicks meant for the item sheet's Save/Add button underneath.
+          setOrderSheetOpen(false);
           setEditingIndex(index);
           setOpenItem(item);
         }}

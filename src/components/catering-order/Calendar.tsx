@@ -87,7 +87,19 @@ export function Calendar({
               key={dateStr}
               type="button"
               className={`cor-cal-day is-${status}${isSelected ? " is-selected" : ""}`}
-              disabled={status !== "open"}
+              // `aria-disabled`, not the native `disabled` attribute: a
+              // closed/too-soon/past day still needs to be clickable so
+              // `onSelect` can set `date` and StepWhen can show *why* —
+              // "too soon for us to prep", "we're closed that day", "that
+              // date has passed", each with a `/contact/` link. A native
+              // `disabled` button never fires `onClick` at all, which
+              // silently dropped that whole explanation. `aria-disabled`
+              // still reads as disabled to assistive tech and to
+              // Playwright's `toBeDisabled()`, and selecting a non-open
+              // day can never actually complete an order: no slots are
+              // offered for it, so `whenComplete` (and Continue) stay
+              // blocked regardless.
+              aria-disabled={status !== "open" ? "true" : undefined}
               onClick={() => onSelect(dateStr)}
               aria-current={isSelected ? "date" : undefined}
               aria-label={`${dateStr}${status !== "open" ? `, ${status.replace("-", " ")}` : ""}`}

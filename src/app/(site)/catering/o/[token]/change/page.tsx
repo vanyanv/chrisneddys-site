@@ -10,6 +10,9 @@ import { ChangeBuilder } from "./ChangeBuilder";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+// Order-link pages: never cache — must reflect live order state.
+export const dynamic = "force-dynamic";
+
 /** O2: reopens the builder seeded with the order so the customer can change
  * headcount, lines or time, then sends the change for the owner to approve. */
 export default async function CateringChangePage({

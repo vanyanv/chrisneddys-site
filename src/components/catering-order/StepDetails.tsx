@@ -53,41 +53,55 @@ export function StepDetails({
         </p>
       )}
 
-      <label className="cor-field">
-        <span className="cor-label">Your name</span>
-        <input
-          type="text"
-          autoComplete="name"
-          value={contact.name}
-          placeholder="First and last"
-          onChange={(e) => onChange({ contact: { name: e.target.value } })}
-        />
+      {/* These three fields put the validation error as a sibling of
+          `<label>`, not a child of it: an error nested inside the label
+          becomes part of the label's own text (what `getByLabel` and
+          assistive tech read as the field's name), so "Email" would
+          become "Email Enter a valid email." the moment the error shows —
+          breaking `getByLabel("Email", { exact: true })` for the rest of
+          the field's life, not just while empty. `.cor-field` (now a
+          `<div>`) keeps the same block layout either way. */}
+      <div className="cor-field">
+        <label>
+          <span className="cor-label">Your name</span>
+          <input
+            type="text"
+            autoComplete="name"
+            value={contact.name}
+            placeholder="First and last"
+            onChange={(e) => onChange({ contact: { name: e.target.value } })}
+          />
+        </label>
         {errors.name && <span className="cor-field-err">{errors.name}</span>}
-      </label>
+      </div>
 
-      <label className="cor-field">
-        <span className="cor-label">Email</span>
-        <input
-          type="email"
-          autoComplete="email"
-          value={contact.email}
-          placeholder="you@company.com"
-          onChange={(e) => onChange({ contact: { email: e.target.value } })}
-        />
+      <div className="cor-field">
+        <label>
+          <span className="cor-label">Email</span>
+          <input
+            type="email"
+            autoComplete="email"
+            value={contact.email}
+            placeholder="you@company.com"
+            onChange={(e) => onChange({ contact: { email: e.target.value } })}
+          />
+        </label>
         {errors.email && <span className="cor-field-err">{errors.email}</span>}
-      </label>
+      </div>
 
-      <label className="cor-field">
-        <span className="cor-label">Mobile</span>
-        <input
-          type="tel"
-          autoComplete="tel"
-          value={contact.phone}
-          placeholder="(818) 555-0142"
-          onChange={(e) => onChange({ contact: { phone: e.target.value } })}
-        />
+      <div className="cor-field">
+        <label>
+          <span className="cor-label">Mobile</span>
+          <input
+            type="tel"
+            autoComplete="tel"
+            value={contact.phone}
+            placeholder="(818) 555-0142"
+            onChange={(e) => onChange({ contact: { phone: e.target.value } })}
+          />
+        </label>
         {errors.phone && <span className="cor-field-err">{errors.phone}</span>}
-      </label>
+      </div>
 
       <label className="cor-field">
         <span className="cor-label">

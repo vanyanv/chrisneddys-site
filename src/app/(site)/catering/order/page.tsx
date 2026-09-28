@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import "@/styles/catering-order.css";
 import { getPublicCateringConfig } from "@/lib/catering/public";
 import { getDb } from "@/db/client";
@@ -12,6 +13,11 @@ const description =
   "Order Chris N Eddy's catering online: pick a time, build the order, we confirm within 24 hours.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/catering/order/" });
+
+// This is the ordering app, not an SEO page: it must reflect the owner's
+// switch, hours and days off immediately, so it can never be served from
+// the static/ISR cache the way `/catering/`, `/order/` and `/menu/` are.
+export const dynamic = "force-dynamic";
 
 /**
  * The catering order builder. While `cateringOrderingOn` is off, this is
@@ -39,5 +45,9 @@ export default async function CateringOrderPage() {
     );
   }
 
-  return <OrderBuilder config={config} />;
+  return (
+    <Suspense fallback={<div className="cor-builder" />}>
+      <OrderBuilder config={config} />
+    </Suspense>
+  );
 }

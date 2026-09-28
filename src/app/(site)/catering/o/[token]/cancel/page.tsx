@@ -7,6 +7,9 @@ import { CancelPanel } from "./CancelPanel";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+// Order-link pages: never cache — must reflect live order state.
+export const dynamic = "force-dynamic";
+
 /** O3: cancel, with the exact refund tier for right now. */
 export default async function CateringCancelPage({
   params,

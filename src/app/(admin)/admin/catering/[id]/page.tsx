@@ -171,7 +171,7 @@ export default async function AdminCateringOrderDetailPage({
   return (
     <div className="rack-root">
       <nav className="rack-topbar" aria-label="Admin sections">
-        <Link href="/admin" className="rack-brand">
+        <Link href="/admin" className="rack-brand" prefetch={false}>
           <Image
             src="/cne-logo-2x.webp"
             alt="Chris N Eddy's"
@@ -184,11 +184,20 @@ export default async function AdminCateringOrderDetailPage({
         </Link>
         <div className="rack-tabs">
           {NAV.map((item) => (
+            // `prefetch={false}`: same reasoning as the print links above
+            // — cuts needless RSC prefetch traffic against PGlite's one
+            // connection on a page that also drives its own
+            // `router.refresh()` after approve/decline/etc
+            // (`useRefreshOnSuccess`). It reduces load but isn't a fix by
+            // itself — see `playwright.config.ts`'s `retries` comment on
+            // the catering projects for the actual (PGlite-internal)
+            // cause and mitigation.
             <Link
               key={item.href}
               href={item.href}
               className="rack-tab"
               aria-current={item.href === "/admin/catering" ? "page" : undefined}
+              prefetch={false}
             >
               {item.label}
               {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
@@ -214,7 +223,7 @@ export default async function AdminCateringOrderDetailPage({
       </nav>
 
       <div style={{ padding: "18px 22px 0" }}>
-        <Link href="/admin/catering" className="ord-back-link">
+        <Link href="/admin/catering" className="ord-back-link" prefetch={false}>
           <svg aria-hidden="true" className="rack-icon" viewBox="0 0 16 16">
             <path d="M10 3L5 8l5 5" />
           </svg>
@@ -241,18 +250,36 @@ export default async function AdminCateringOrderDetailPage({
             {formatDateTime(order.eventAt).toUpperCase()} &middot; {order.headcount} PEOPLE
           </p>
         </div>
+        {/* `prefetch={false}` on all three: these open a printable page in
+            a new tab, so prefetching their RSC payload buys nothing, and
+            it costs a little — every prefetch is one more request
+            competing for PGlite's one connection for the whole server.
+            This reduces that load; it isn't what makes the occasional
+            stuck pill go away (see `playwright.config.ts`'s `retries`
+            comment on the catering projects for that). */}
         <div className="rack-page-header-right cat-print-links">
           <Link
             href={`/admin/catering/${order.id}/crew-ticket`}
             className="rack-btn"
             target="_blank"
+            prefetch={false}
           >
             Crew ticket
           </Link>
-          <Link href={`/admin/catering/${order.id}/labels`} className="rack-btn" target="_blank">
+          <Link
+            href={`/admin/catering/${order.id}/labels`}
+            className="rack-btn"
+            target="_blank"
+            prefetch={false}
+          >
             Labels
           </Link>
-          <Link href={`/admin/catering/${order.id}/invoice`} className="rack-btn" target="_blank">
+          <Link
+            href={`/admin/catering/${order.id}/invoice`}
+            className="rack-btn"
+            target="_blank"
+            prefetch={false}
+          >
             Invoice
           </Link>
           {order.stripePaymentIntentId && (

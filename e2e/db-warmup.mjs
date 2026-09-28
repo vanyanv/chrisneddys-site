@@ -108,6 +108,15 @@ if (existingCatering.length === 0) {
   console.log("e2e catering order already present — skipping seed.");
 }
 
+// `e2e/seed-catering-fixtures.mjs`'s expired/half-refund-tier orders —
+// `e2e/catering/expired.spec.ts` and `cancel.spec.ts` need one order each
+// in a state the customer UI (or a live admin click alone) can never reach,
+// and doing that with a second `node` process reaching into the database
+// after `next start` already has it open doesn't work — see that script's
+// module comment. Idempotent the same way as the seeds above (it skips
+// itself when its own `.fixtures.json` already exists).
+await import("./seed-catering-fixtures.mjs");
+
 async function seedOwner() {
   const userId = randomUUID();
   await db.insert(user).values({

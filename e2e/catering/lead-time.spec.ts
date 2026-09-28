@@ -1,7 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { signInAsOwner } from "../helpers";
 import {
-  enableCateringOrdering,
   startOrder,
   choosePickup,
   setHeadcount,
@@ -22,7 +21,6 @@ test.describe.serial("flow 3: lead time", () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await enableCateringOrdering(page);
     await startOrder(page);
     await choosePickup(page, "Hollywood");
     await page.getByRole("button", { name: "Continue" }).click();
@@ -38,13 +36,24 @@ test.describe.serial("flow 3: lead time", () => {
     expect(await calendarDayStatus(page, 1)).toBe("too-soon");
 
     const tomorrow = page.locator(`button.cor-cal-day[aria-label^="${dateStrDaysFromNow(1)}"]`);
-    await tomorrow.click();
+    // `{ force: true }`: the day button is `aria-disabled`, not natively
+    // `disabled` — it stays clickable (that's how the day shows *why* it's
+    // too soon, below) and only reads as disabled to assistive tech and to
+    // `toBeDisabled()` (which honors `aria-disabled` too), never selectable
+    // into an actual booking (no slots ever appear for it). Playwright's
+    // own actionability check is more conservative than a real mouse click
+    // and refuses an `aria-disabled` target without `force`.
+    await tomorrow.click({ force: true });
+    const note = page.locator(".cor-note.is-error");
     await expect(
-      page.getByText(/too soon for us to prep — every slot that day is inside our notice window/),
+      note.getByText(/too soon for us to prep — every slot that day is inside our notice window/),
     ).toBeVisible();
-    const contactLink = page.getByRole("link", { name: "message us" });
+    const contactLink = note.getByRole("link", { name: "message us" });
     await expect(contactLink).toHaveAttribute("href", "/contact/");
-    await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
+    // Scoped to the note: the site footer always carries two real `tel:`
+    // links (each location's phone number), so an unscoped, page-wide
+    // check here would fail regardless of this message.
+    await expect(note.locator('a[href^="tel:"]')).toHaveCount(0);
     // Not clickable — no slot can ever appear for it.
     await expect(tomorrow).toBeDisabled();
   });
@@ -62,6 +71,20 @@ test.describe.serial("flow 3: lead time", () => {
     const adminPage = await page.context().browser()!.newPage();
     await signInAsOwner(adminPage);
     await adminPage.goto("/admin/settings");
+    // `catering-phone` and `catering-desktop` both run this same spec file
+    // against one shared server/database, and `dayOffDate` is derived from
+    // the real clock (not per-project), so whichever project runs this
+    // test second would otherwise find the first project's day off still
+    // saved from before and add a duplicate row alongside it — a strict-
+    // mode violation below. Clear any existing row(s) for this date first,
+    // so the state this test asserts on doesn't depend on run order.
+    const existingRows = adminPage
+      .locator(".cat-day-off-row")
+      .filter({ hasText: dayOffDate })
+      .getByRole("button", { name: "Remove day off" });
+    while ((await existingRows.count()) > 0) {
+      await existingRows.first().click();
+    }
     await adminPage.locator(".cat-add-day-off input[type='date']").fill(dayOffDate);
     await adminPage.getByRole("button", { name: "+ Add a day off" }).click();
     await expect(adminPage.getByText(dayOffDate)).toBeVisible();

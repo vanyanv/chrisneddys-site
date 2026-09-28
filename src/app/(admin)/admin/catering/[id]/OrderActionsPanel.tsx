@@ -9,12 +9,13 @@ import { useActionState, useState } from "react";
 import type { CateringOrderStatus } from "@/lib/catering/orders";
 import { formatCents, formatCountdown, formatDateTime } from "../format";
 import {
-  DECLINE_REASONS,
   approveOrderAction,
   declineOrderAction,
   markCompletedAction,
   type CateringActionState,
 } from "./actions";
+import { DECLINE_REASONS } from "./declineReasons";
+import { useRefreshOnSuccess } from "./useRefreshOnSuccess";
 
 const initial: CateringActionState = {};
 
@@ -40,6 +41,8 @@ function ApproveDecline({
     declineOrderAction,
     initial,
   );
+  useRefreshOnSuccess(approvePending, approveState?.error);
+  useRefreshOnSuccess(declinePending, declineState?.error);
 
   if (declining) {
     return (
@@ -125,6 +128,7 @@ function ApproveDecline({
 
 function MarkCompleted({ orderId }: { orderId: string }) {
   const [state, action, pending] = useActionState(markCompletedAction, initial);
+  useRefreshOnSuccess(pending, state?.error);
   return (
     <div className="cat-next-card">
       <p className="rack-eyebrow">Next</p>

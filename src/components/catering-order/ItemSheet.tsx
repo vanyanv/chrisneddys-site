@@ -138,12 +138,21 @@ export function ItemSheet({
               {toppings.map((t) => {
                 const on = toppingIds.includes(t.id);
                 return (
-                  <li key={t.id}>
-                    <label className="cor-topping-row">
+                  // The price badge is a sibling of `<label>`, not a child
+                  // of it: a `<label>`'s associated-control name (what
+                  // `getByLabel`/assistive tech read as the checkbox's
+                  // name) is every bit of text inside it, so nesting "Free"
+                  // there would make the name "Add {t.name} Free" instead
+                  // of "Add {t.name}" — the price is a visual aside, not
+                  // part of what the control is called. `.cor-topping-row`
+                  // (now on this `<li>`) still lays both out as one flex
+                  // row.
+                  <li key={t.id} className="cor-topping-row">
+                    <label>
                       <input type="checkbox" checked={on} onChange={() => toggleTopping(t.id)} />
                       <span className="n">Add {t.name}</span>
-                      <span className="v">Free</span>
                     </label>
+                    <span className="v">Free</span>
                   </li>
                 );
               })}
@@ -156,8 +165,10 @@ export function ItemSheet({
               {EXTRAS.map((e) => {
                 const on = extraIds.includes(e.id);
                 return (
-                  <li key={e.id}>
-                    <label className="cor-topping-row">
+                  // Same reasoning as the topping row above: the price
+                  // stays a sibling of `<label>`, not a child of it.
+                  <li key={e.id} className="cor-topping-row">
+                    <label>
                       <input
                         type="checkbox"
                         checked={on}
@@ -168,8 +179,8 @@ export function ItemSheet({
                         }
                       />
                       <span className="n">{e.name}</span>
-                      <span className="v">+{formatPrice(e.price)}</span>
                     </label>
+                    <span className="v">+{formatPrice(e.price)}</span>
                   </li>
                 );
               })}

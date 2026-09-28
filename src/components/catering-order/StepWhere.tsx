@@ -52,9 +52,15 @@ export function StepWhere({
       return;
     }
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    // Block Continue for the whole checking window, not just once a
+    // definite answer arrives: from the moment a 5-digit ZIP starts a new
+    // check (through the debounce and the request itself), `rangeBlocked`
+    // must already be true, or the button reads as enabled for that stretch
+    // on a store/address that's actually still unverified.
+    setChecking(true);
+    onRangeMiles(null, true);
     debounceRef.current = setTimeout(() => {
-      setChecking(true);
-      fetch("/api/catering/range", {
+      fetch("/api/catering/range/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ store, zip }),

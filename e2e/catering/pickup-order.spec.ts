@@ -1,6 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
-  enableCateringOrdering,
   startOrder,
   choosePickup,
   selectCalendarDate,
@@ -14,6 +13,7 @@ import {
   fillItemNote,
   setItemQty,
   addItem,
+  closeItemSheet,
   saveItem,
   openOrderSheet,
   fillContactDetails,
@@ -35,7 +35,6 @@ test.describe.serial("flow 1: pickup order", () => {
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    await enableCateringOrdering(page);
   });
 
   test.afterAll(async () => {
@@ -96,6 +95,7 @@ test.describe.serial("flow 1: pickup order", () => {
     await fillItemForName(page, "Priya S.");
     await fillItemNote(page, "Vegetarian, clean spot on the griddle");
     await addItem(page);
+    await closeItemSheet(page);
 
     // "Add one for someone else" from the order sheet.
     await openOrderSheet(page);
@@ -104,6 +104,7 @@ test.describe.serial("flow 1: pickup order", () => {
     await expect(page.getByRole("dialog", { name: "2 Sliders and Fries" })).toBeVisible();
     await fillItemForName(page, "Jordan K.");
     await addItem(page);
+    await closeItemSheet(page);
   });
 
   test("3. order sheet shows names/notes, a qty change, and a removed line", async () => {
@@ -170,9 +171,16 @@ test.describe.serial("flow 1: pickup order", () => {
     await expect(page).toHaveURL(/step=review/);
     await expect(page.getByRole("heading", { name: "Check it, then send it" })).toBeVisible();
 
-    await expect(page.locator(".cor-line")).toHaveCount(4);
-    await expect(page.getByText("For Sam T.")).toBeVisible();
-    await expect(page.getByText("For Jordan K.")).toBeVisible();
+    // Scoped to `.cor-step`, the current step's own root: the order sheet
+    // (`OrderSheet`/`Sheet`) stays mounted the whole time the builder is
+    // open — just `inert` while closed, not unmounted — so it renders its
+    // own copy of every line via the same `OrderLines` component. An
+    // unscoped page-wide locator would double-count (or strict-mode-fail
+    // on `getByText`) against that still-present, invisible copy.
+    const reviewStep = page.locator(".cor-step");
+    await expect(reviewStep.locator(".cor-line")).toHaveCount(4);
+    await expect(reviewStep.getByText("For Sam T.")).toBeVisible();
+    await expect(reviewStep.getByText("For Jordan K.")).toBeVisible();
 
     const totalBefore = await page.locator(".cor-review-total span").last().innerText();
     await page.getByRole("button", { name: "20%" }).click();

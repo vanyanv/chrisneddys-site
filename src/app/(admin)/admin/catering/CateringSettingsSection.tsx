@@ -152,7 +152,26 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
   }
 
   const hoursJson = useMemo(() => JSON.stringify(values.hours), [values.hours]);
-  const daysOffJson = useMemo(() => JSON.stringify(values.daysOff), [values.daysOff]);
+  // `values.daysOff` keeps a single `{ store: "all" }` row per date so the
+  // list above can show one combined "Both locations" line instead of one
+  // per store — but `toScheduleDaysOff` (`@/lib/catering/hours`), which
+  // turns the saved list back into what the calendar actually checks, has
+  // no such sentinel: per its own module comment, "all stores" is
+  // represented in the database as the same date repeated for every
+  // catering store, and a `store` value it doesn't recognize as a real
+  // store id is silently dropped. Expanding "all" into one row per store
+  // only here, at the boundary serialized into the hidden `daysOff` field,
+  // keeps that nice single-row display while saving a form the backend
+  // actually understands.
+  const daysOffJson = useMemo(
+    () =>
+      JSON.stringify(
+        values.daysOff.flatMap((d): CateringDayOff[] =>
+          d.store === "all" ? CATERING_STORES.map((s) => ({ date: d.date, store: s.id })) : [d],
+        ),
+      ),
+    [values.daysOff],
+  );
 
   return (
     <>

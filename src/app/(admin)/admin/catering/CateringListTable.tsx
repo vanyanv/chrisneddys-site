@@ -81,7 +81,22 @@ export function CateringListTable({ rows }: { rows: CateringListRow[] }) {
             const needsCountdown =
               (row.status === "requested" || row.hasPendingChange) && respondBy !== null;
             return (
-              <Link key={row.id} href={`/admin/catering/${row.id}`} className="cat-row">
+              // `prefetch={false}`: every visible row's Link auto-prefetches
+              // as it filters into view, and clicking a row right after
+              // typing in the search box (which remounts every filtered
+              // Link at once) could race that batch of prefetch fetches
+              // against the click's own navigation fetch — intermittently
+              // the navigation's RSC response would come back but the
+              // router never applied it, leaving the list showing with no
+              // error. Skipping prefetch for this short, already-fetched
+              // list costs nothing (the row's own data is already on the
+              // page) and removes the race.
+              <Link
+                key={row.id}
+                href={`/admin/catering/${row.id}`}
+                className="cat-row"
+                prefetch={false}
+              >
                 <span className="cat-row-num rack-mono" style={{ fontWeight: 700, fontSize: 13 }}>
                   {row.number}
                 </span>

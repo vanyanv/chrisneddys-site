@@ -83,6 +83,56 @@ export async function createCateringCheckoutSession(
   return { id: session.id, url: session.url };
 }
 
+/** What the sent page needs from a Checkout Session to confirm an order on
+ * return: whether it completed, which catering order it belongs to, and the
+ * ids the webhook branch would attach. */
+export type RetrievedCheckoutSession = {
+  id: string;
+  status: string | null;
+  cateringOrderId: string | null;
+  paymentIntentId: string | undefined;
+  customerId: string | undefined;
+  paymentMethodId: string | undefined;
+};
+
+/** Fetches a Checkout Session by id (the `session_id` on the return URL).
+ * Fake mode never talks to Stripe and returns null; so does any Stripe
+ * failure (bad or foreign id) — the caller just leaves the order to the
+ * webhook. */
+export async function retrieveCheckoutSession(
+  sessionId: string,
+): Promise<RetrievedCheckoutSession | null> {
+  if (isFakePaymentsMode()) return null;
+  try {
+    const session = await getStripe().checkout.sessions.retrieve(sessionId, {
+      expand: ["payment_intent"],
+    });
+    const intent =
+      session.payment_intent && typeof session.payment_intent !== "string"
+        ? session.payment_intent
+        : null;
+    const paymentIntentId =
+      typeof session.payment_intent === "string" ? session.payment_intent : intent?.id;
+    const paymentMethodId =
+      typeof intent?.payment_method === "string"
+        ? intent.payment_method
+        : (intent?.payment_method?.id ?? undefined);
+    return {
+      id: session.id,
+      status: session.status ?? null,
+      cateringOrderId: session.metadata?.cateringOrderId ?? null,
+      paymentIntentId: paymentIntentId || undefined,
+      customerId:
+        typeof session.customer === "string"
+          ? session.customer
+          : (session.customer?.id ?? undefined),
+      paymentMethodId,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Capture / cancel / refund
 // ---------------------------------------------------------------------------

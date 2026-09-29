@@ -21,6 +21,9 @@ vi.mock("@/lib/stripe", () => ({
   }),
 }));
 
+const ownerSessionMock = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/auth", () => ({ getOwnerSession: ownerSessionMock }));
+
 const sendRequestReceivedMock = vi.hoisted(() => vi.fn().mockResolvedValue({ sent: false }));
 const sendOwnerNewRequestMock = vi.hoisted(() => vi.fn().mockResolvedValue({ sent: false }));
 vi.mock("@/lib/catering/emails", async () => {
@@ -43,6 +46,8 @@ beforeAll(async () => {
 beforeEach(async () => {
   delete process.env.CATERING_FAKE_PAYMENTS;
   delete process.env.VERCEL_ENV;
+  ownerSessionMock.mockReset();
+  ownerSessionMock.mockResolvedValue(null);
   createSessionMock.mockReset();
   createSessionMock.mockImplementation(async () => ({
     id: `cs_test_${Math.random().toString(36).slice(2)}`,
@@ -125,6 +130,22 @@ describe("POST /api/catering/checkout — off", () => {
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ error: "off" });
     expect(createSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts the order while off when a signed-in owner is calling (owner preview)", async () => {
+    const saved = await saveCateringSettings({ orderingOn: false });
+    expect(saved.ok).toBe(true);
+    ownerSessionMock.mockResolvedValue({ email: "owner@example.com", name: null, issuedAt: 0 });
+    const res = await post(baseBody());
+    expect(res.status).toBe(200);
+    expect((await res.json()).url).toBeTruthy();
+    expect(createSessionMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not consult the owner session when ordering is on", async () => {
+    const res = await post(baseBody());
+    expect(res.status).toBe(200);
+    expect(ownerSessionMock).not.toHaveBeenCalled();
   });
 });
 
@@ -261,7 +282,9 @@ describe("POST /api/catering/checkout — real Stripe mode", () => {
     expect(params.metadata.cateringOrderId).toBeTruthy();
     expect(params.customer).toBe("cus_test_1");
     expect(params.cancel_url).toContain("/catering/order/?step=review&canceled=1");
-    expect(params.success_url).toMatch(/\/catering\/order\/sent\/\?o=/);
+    expect(params.success_url).toMatch(
+      /\/catering\/order\/sent\/\?o=[^&]+&session_id=\{CHECKOUT_SESSION_ID\}$/,
+    );
 
     const order = await getOrderById(params.metadata.cateringOrderId);
     expect(order?.status).toBe("draft");

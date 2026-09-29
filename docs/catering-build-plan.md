@@ -13,6 +13,8 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
   off, `/catering/order/` shows the existing "ask about catering" card that
   links to `/contact/`, and every catering button keeps `CATERING_HREF`
   (`/contact/`). While on, catering buttons go to `/catering/order/`.
+- Owner preview: while ordering is off, a signed-in owner (`getOwnerSession()`, read only on the dynamic `/catering/order/` page and in `POST /api/catering/checkout`, never on the static `/catering/`, `/order/` or `/menu/`) sees the real builder under an "Owner preview" banner and may place orders; everyone else still gets the ask card and a 503.
+- Confirm on return: real-Stripe `success_url` is `/catering/order/sent/?o=<token>&session_id={CHECKOUT_SESSION_ID}`, and the sent page runs `confirmFromReturn` (src/lib/catering/confirmFromReturn.ts): a still-`draft` order whose Checkout Session is `complete` with `metadata.cateringOrderId` equal to the order goes through `completeCateringCheckout`, which is idempotent with the webhook, so emails never send twice.
 - Menu and prices come from `src/data/menu.ts` (the Otter mirror) — never a
   second price list. Every item is caterable. Toppings (`toppings`) are free,
   `ways` are free presets, `extras` are paid (Extra Cheese $1, Make it Halal

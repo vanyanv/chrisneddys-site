@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import "@/styles/catering-order.css";
 import { getPublicCateringConfig } from "@/lib/catering/public";
 import { getDb } from "@/db/client";
+import { getOwnerSession } from "@/lib/auth";
 import { CATERING_HREF } from "@/data/catering";
 import { pageMetadata } from "@/lib/seo";
 import { isTestModeNoteVisible } from "@/lib/catering/payments";
@@ -29,7 +30,11 @@ export default async function CateringOrderPage() {
   const db = await getDb();
   const config = await getPublicCateringConfig(db);
 
-  if (!config.orderingOn) {
+  // Owner preview: while ordering is off, a signed-in owner sees the real
+  // builder. Only reads the session when off, and only on this dynamic page.
+  const ownerPreview = !config.orderingOn && (await getOwnerSession()) !== null;
+
+  if (!config.orderingOn && !ownerPreview) {
     return (
       <div className="cor-off-page">
         <div className="cor-off-card">
@@ -47,8 +52,18 @@ export default async function CateringOrderPage() {
   }
 
   return (
-    <Suspense fallback={<div className="cor-builder" />}>
-      <OrderBuilder config={config} testMode={isTestModeNoteVisible()} />
-    </Suspense>
+    <>
+      {ownerPreview && (
+        <p className="cor-note is-info" data-catering-owner-preview="">
+          Owner preview: catering is off, so only signed-in owners see this page.
+        </p>
+      )}
+      <Suspense fallback={<div className="cor-builder" />}>
+        <OrderBuilder
+          config={ownerPreview ? { ...config, orderingOn: true } : config}
+          testMode={isTestModeNoteVisible()}
+        />
+      </Suspense>
+    </>
   );
 }

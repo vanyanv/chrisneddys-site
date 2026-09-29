@@ -18,17 +18,24 @@ import { disableCateringOrdering, enableCateringOrdering } from "./helpers";
 test.describe.serial("flow 0: catering ordering on/off", () => {
   test("1. off: /catering/order/ shows the ask-about-catering card linking to /contact/", async ({
     page,
+    browser,
   }) => {
     await disableCateringOrdering(page);
     // The catering pages show catering's own state, not the shop's.
     await page.goto("/admin/catering");
     await expect(page.locator(".rack-store-pill")).toContainText(/catering: off/i);
-    await page.goto("/catering/order/");
-    await expect(page.getByRole("heading", { name: "Catering", level: 1 })).toBeVisible();
-    await expect(page.getByText(/online ordering isn.t open yet\./i)).toBeVisible();
-    const cta = page.getByRole("link", { name: /ask about catering/i });
+    // A signed-in owner gets the owner preview while it's off (see
+    // owner-preview.spec.ts), so the customer's view needs a fresh,
+    // signed-out context.
+    const customer = await browser.newContext();
+    const customerPage = await customer.newPage();
+    await customerPage.goto("/catering/order/");
+    await expect(customerPage.getByRole("heading", { name: "Catering", level: 1 })).toBeVisible();
+    await expect(customerPage.getByText(/online ordering isn.t open yet\./i)).toBeVisible();
+    const cta = customerPage.getByRole("link", { name: /ask about catering/i });
     await expect(cta).toBeVisible();
     await expect(cta).toHaveAttribute("href", "/contact/");
+    await customer.close();
   });
 
   test("2. the owner turns ordering on in Admin -> Catering -> Settings and saves", async ({

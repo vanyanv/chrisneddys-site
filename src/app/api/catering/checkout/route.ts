@@ -41,6 +41,7 @@ import { itemById } from "@/data/menu";
 import { locations } from "@/data/locations";
 import { absoluteUrl } from "@/lib/siteOrigin";
 import { getDb } from "@/db/client";
+import { getOwnerSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -204,7 +205,10 @@ function storeZip(storeId: string): string {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const db = await getDb();
   const settings = await getCateringSettings(db);
-  if (!settings.orderingOn) {
+  // Owner preview: while ordering is off, a signed-in owner may still place
+  // an order (so the owner can test on the live site). Anonymous callers get
+  // the same 503 as ever.
+  if (!settings.orderingOn && !(await getOwnerSession())) {
     return NextResponse.json({ error: "off" }, { status: 503 });
   }
 
@@ -377,7 +381,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       metadata: { cateringOrderId: draft.orderId, number: draft.number },
     },
     metadata: { cateringOrderId: draft.orderId, number: draft.number },
-    success_url: absoluteUrl(`/catering/order/sent/?o=${draft.token}`),
+    // `{CHECKOUT_SESSION_ID}` is Stripe's literal placeholder (must not be
+    // URL-encoded); the sent page uses it to confirm the order on return
+    // in case the webhook isn't configured or is slow.
+    success_url: absoluteUrl(
+      `/catering/order/sent/?o=${draft.token}&session_id={CHECKOUT_SESSION_ID}`,
+    ),
     cancel_url: absoluteUrl("/catering/order/?step=review&canceled=1"),
   };
 

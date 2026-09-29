@@ -5,6 +5,7 @@ import "@/styles/catering-order.css";
 import { getDb } from "@/db/client";
 import { isTestModeNoteVisible } from "@/lib/catering/payments";
 import { getOrderView } from "@/lib/catering/service";
+import { confirmFromReturn } from "@/lib/catering/confirmFromReturn";
 import { TrackSent } from "./TrackSent";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -14,14 +15,20 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 export default async function CateringOrderSentPage({
   searchParams,
 }: {
-  searchParams: Promise<{ o?: string }>;
+  searchParams: Promise<{ o?: string; session_id?: string }>;
 }) {
-  const { o: token } = await searchParams;
+  const { o: token, session_id: sessionId } = await searchParams;
   if (!token) notFound();
 
   const db = await getDb();
-  const view = await getOrderView(db, token);
+  let view = await getOrderView(db, token);
   if (!view.ok) notFound();
+  // Confirm on return: finish a still-draft order from the Checkout Session
+  // (verified against the order) without waiting for the webhook.
+  if (await confirmFromReturn(db, view.order, sessionId)) {
+    view = await getOrderView(db, token);
+    if (!view.ok) notFound();
+  }
   const { order } = view;
 
   return (

@@ -44,7 +44,6 @@ function parseArgs(argv) {
       "/about/",
       "/careers/",
       "/contact/",
-      "/catering/",
     ],
     profiles: ["iphone", "iphone-landscape", "desktop", "baseline-mobile"],
     runs: 3,

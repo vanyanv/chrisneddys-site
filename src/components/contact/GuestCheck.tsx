@@ -31,8 +31,6 @@ import {
 /** The message box's hint follows the chosen topic, so "Order issue" asks for
  * the one thing that lets us find the order. */
 const HINTS: Record<Topic, string> = {
-  "Catering & events":
-    "Tell us what you need. Dates, headcount and a neighbourhood help us answer in one go.",
   "Press & media": "Tell us what you need.",
   Partnerships: "Tell us what you need.",
   "Order issue": "Your order number and what went wrong.",
@@ -154,7 +152,7 @@ export function GuestCheck(): ReactElement {
       // Fired only once the form is genuinely delivered, not on submit — a
       // conversion that counts attempts counts its own failures as successes.
       track("contact_submit", { topic });
-      if (topic === "Catering & events" || topic === "Partnerships") {
+      if (topic === "Partnerships") {
         track("generate_lead", { topic });
       }
     } catch {

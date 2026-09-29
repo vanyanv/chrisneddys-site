@@ -9,8 +9,6 @@ import { formatPrice } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
-import { CateringCard } from "@/components/catering/CateringCard";
-import { getCateringOrderingOn } from "@/lib/catering/public";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
@@ -55,10 +53,6 @@ const FAQ: FaqEntry[] = [
     a: "No. Every topping is free — CNE sauce, lettuce, tomato, raw onions, grilled onions and pickles. Order it Chris's Way or Eddy's Way and you pay the price on the menu. Extra cheese is $1 and making it halal is $2; nothing else is a surcharge.",
   },
   {
-    q: "Do you cater?",
-    a: "Yes, for offices, sets and parties. Send us a message through our contact page at chrisneddys.com/contact/ with the date, headcount and neighbourhood, and we'll get back to you.",
-  },
-  {
     q: "Is there parking?",
     // Owner, 2026-09-26.
     a: "Yes, at both. In Hollywood there is parking behind the store, and more in the WSS parking lot next door. In Van Nuys there is a parking lot right in front of the store.",
@@ -69,9 +63,7 @@ const FAQ: FaqEntry[] = [
   },
 ];
 
-export default async function OrderPage() {
-  const orderingOn = await getCateringOrderingOn();
-  const cateringHref = orderingOn ? "/catering/order/" : undefined;
+export default function OrderPage() {
   // Split so a location that hasn't opened yet doesn't cost a phone the
   // same full card — address, hours placeholder, footer link — that an
   // actual pickup spot earns. See the compact row below (issue #108).
@@ -127,14 +119,6 @@ export default async function OrderPage() {
           and every topping free, at every location. Rather talk to someone? Call the location
           you&rsquo;re picking up from.
         </p>
-        <CateringCard
-          eyebrow="Feeding a group?"
-          title="Catering."
-          text="Office lunches, sets and parties. Tell us what you need."
-          surface="order-catering"
-          monster="yellow"
-          href={cateringHref}
-        />
       </section>
 
       <section className="cne-sec cne-rv">

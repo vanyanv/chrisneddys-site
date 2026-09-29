@@ -13,7 +13,7 @@ import { slugFor } from "@/lib/locationSlug";
  * whichever button, picker or page it sits in — including buttons added later
  * that nobody remembers to label. A `data-location` declared on an ancestor is
  * the fallback for links that don't identify a store on their own (directions).
- * Delivery and catering listings each belong to one store, so they answer from
+ * Delivery listings each belong to one store, so they answer from
  * the link too.
  */
 

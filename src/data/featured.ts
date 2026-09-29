@@ -1,7 +1,6 @@
 /**
- * The three items the home page leads with ("Start here") and the catering
- * page shows. Otter item ids, in display order. Kept out of the client
- * `FeaturedCards` component so a server page can read the list too.
+ * The three items the home page leads with ("Start here"). Otter item ids, in
+ * display order.
  */
 export const FEATURED_OTTER_IDS = [
   "7bbcdf64-0e6f-489f-8ca4-0bee1e835bb0", // 2 Sliders and Fries — most ordered

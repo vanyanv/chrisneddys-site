@@ -59,6 +59,15 @@ const nextConfig = {
   async rewrites() {
     return [{ source: "/service-worker.js", destination: "/sw.js" }];
   },
+  // The catering page and online catering ordering were taken down on
+  // 2026-09-29. Old links and search results land on the order page instead
+  // of a 404.
+  async redirects() {
+    return [
+      { source: "/catering", destination: "/order/", permanent: true },
+      { source: "/catering/:path*", destination: "/order/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

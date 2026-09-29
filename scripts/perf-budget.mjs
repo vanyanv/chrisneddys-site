@@ -42,7 +42,6 @@ const DEFAULT_PAGES = [
   "/about/",
   "/careers/",
   "/contact/",
-  "/catering/",
 ];
 
 const PROFILES = {

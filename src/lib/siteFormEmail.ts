@@ -99,7 +99,6 @@ function link(href: string, text: string): string {
 export type MonsterColour = "blue" | "red" | "yellow" | "lime";
 
 const TOPIC_MONSTER: Record<string, MonsterColour> = {
-  "Catering & events": "yellow",
   "Press & media": "blue",
   Partnerships: "lime",
   "Order issue": "red",

@@ -62,12 +62,7 @@ export function TrackEvents() {
         item_id: itemId,
       };
 
-      if (anchor.hasAttribute("data-catering")) {
-        // Catering is a link to our own contact form, so where it points
-        // can't tell it apart from any other /contact/ link; the button says
-        // so itself. See src/data/catering.ts.
-        event = "catering_click";
-      } else if (raw.startsWith("tel:")) {
+      if (raw.startsWith("tel:")) {
         event = "call_click";
       } else {
         let url: URL | null = null;

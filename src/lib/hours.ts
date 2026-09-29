@@ -186,46 +186,23 @@ export function statusParts(status: StoreStatus): StatusParts {
   }
 }
 
-const LA_OPENING = new Intl.DateTimeFormat("en-US", {
-  timeZone: "America/Los_Angeles",
-  weekday: "short",
-  hour: "numeric",
-  minute: "2-digit",
-  hour12: true,
-});
-
 /**
- * The status tag for a store that has not opened: "OPENS · FRI 6 PM" for a
- * dated opening, "COMING SOON" for an undated one. `storeStatus` has nothing
- * to say about such a store (it returns "unknown"), and a blank tag on its
- * own page is what let the header fall back to Hollywood's clock there.
+ * The status tag for a store that has not opened: "COMING SOON".
+ * `storeStatus` has nothing to say about such a store (it returns "unknown"),
+ * and a blank tag on its own page is what let the header fall back to
+ * Hollywood's clock there.
  */
-export function openingParts(loc: Location): StatusParts {
-  if (!loc.opensAt) {
-    return {
-      state: { short: "COMING SOON", rest: "" },
-      time: { lead: "", value: "" },
-      aria: "Coming soon",
-    };
-  }
-  const parts = LA_OPENING.formatToParts(new Date(loc.opensAt));
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-  const minute = get("minute");
-  const time = `${get("hour")}${minute === "00" ? "" : `:${minute}`} ${get("dayPeriod").toUpperCase()}`;
-  const day = get("weekday").toUpperCase();
+export function openingParts(): StatusParts {
   return {
-    state: { short: "OPENS", rest: "" },
-    // The day rides in the value, not the lead: the phone header drops the
-    // lead first, and "OPENS 6 PM" on its own reads as today.
-    time: { lead: "", value: `${day} ${time}` },
-    aria: `Opens ${get("weekday")} at ${time}`,
+    state: { short: "COMING SOON", rest: "" },
+    time: { lead: "", value: "" },
+    aria: "Coming soon",
   };
 }
 
 /** `openingParts` as one line, for the bottom bar's single text slot. */
-export function openingLabel(loc: Location): string {
-  const { state, time } = openingParts(loc);
-  return time.value ? `${state.short} ${time.value}` : state.short;
+export function openingLabel(): string {
+  return openingParts().state.short;
 }
 
 /** One line, for the surfaces that have a single text slot: map callouts, the dock. */

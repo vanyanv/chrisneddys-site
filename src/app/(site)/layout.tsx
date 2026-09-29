@@ -60,8 +60,6 @@ const marker = localFont({
 // so Google shows it whole; other pages use the template below.
 const SITE_TITLE = `${brand.name} | ${brand.tagline}: Sliders, Shakes & Fries`;
 
-// A function rather than a constant: the description changes by itself when
-// Van Nuys opens (`siteDescription`), and this layout regenerates every minute.
 export function generateMetadata(): Metadata {
   const description = siteDescription();
   return {

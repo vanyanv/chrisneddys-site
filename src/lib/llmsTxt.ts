@@ -18,7 +18,7 @@
  * verbatim would otherwise put that word in someone's mouth.
  */
 import { brand } from "@/data/brand";
-import { hasPassed, locations, VAN_NUYS_OPENS_AT, type Location } from "@/data/locations";
+import { locations, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
 import { deliveryFor } from "@/data/delivery";
@@ -47,17 +47,7 @@ function locationSection(loc: Location): string {
   const pageLine = `- Page: ${locationPageUrl(loc)}`;
 
   if (!loc.isOpen) {
-    return [
-      heading,
-      `Status: ${loc.openingAnnouncement ?? "opening soon"}.`,
-      ...(loc.openingAnnouncement
-        ? [
-            `- Address: ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
-            ...(loc.phone ? [`- Phone: ${loc.phone}`] : []),
-          ]
-        : []),
-      pageLine,
-    ].join("\n");
+    return [heading, "Status: opening soon.", pageLine].join("\n");
   }
 
   const lines = [
@@ -147,16 +137,13 @@ function optionalSection(): string {
  * `await listPublishedProducts()` (`src/lib/catalog.ts`) from the route.
  */
 export function buildLlmsTxt(products: MerchProduct[]): string {
-  const vanNuysOpen = hasPassed(VAN_NUYS_OPENS_AT);
   const summary =
     `${brand.name} is a Los Angeles smash-burger restaurant (${brand.tagline}), open now ` +
-    `on Sunset Blvd in Hollywood${vanNuysOpen ? " and on Sherman Way in Van Nuys" : ""}. ` +
+    `on Sunset Blvd in Hollywood and on Sherman Way in Van Nuys. ` +
     `The signature order is the slider: two smashed patties, two ` +
     `slices of cheese, a buttered Martin's roll, every topping free. Order pickup direct ` +
     `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. ` +
-    (vanNuysOpen
-      ? `Glendale is opening soon.`
-      : `Van Nuys has its grand opening Friday, Sept 25 at 6 PM; Glendale is opening soon.`);
+    `Glendale is opening soon.`;
 
   return [
     `# ${brand.name}`,

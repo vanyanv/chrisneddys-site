@@ -144,9 +144,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
                   </>
                 ) : (
                   <>
-                    <div className="cne-loc-note">
-                      {loc.openingAnnouncement ?? "Opening date to be announced."}
-                    </div>
+                    <div className="cne-loc-note">Opening date to be announced.</div>
                     <Link
                       prefetch={false}
                       href={`/locations/${slugFor(loc)}/`}

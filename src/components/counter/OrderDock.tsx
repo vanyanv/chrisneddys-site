@@ -42,7 +42,7 @@ export function OrderDock() {
 
   if (pathname.startsWith("/shop")) return null;
 
-  const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel(loc);
+  const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel();
 
   return (
     <div className="cne-dock" data-location={onLocationPage ? loc.id : undefined}>

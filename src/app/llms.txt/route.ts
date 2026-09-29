@@ -11,9 +11,7 @@ import { buildLlmsTxt } from "@/lib/llmsTxt";
  * `DATABASE_URL` set too.
  */
 export const dynamic = "force-static";
-// Regenerated every minute like the storefront pages, so the locations and
-// their open status change by themselves when Van Nuys opens
-// (`VAN_NUYS_OPENS_AT`), without a deploy.
+// Regenerated every minute like the storefront pages.
 export const revalidate = 60;
 
 export async function GET() {

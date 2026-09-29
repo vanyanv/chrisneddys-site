@@ -5,7 +5,6 @@ import { withUtm } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { OpenStatus, ComingSoonTag } from "@/components/shared/OpenStatus";
 import { LiveOpenLabel } from "@/components/shared/LiveOpenLabel";
-import { FromDate } from "@/components/shared/FromDate";
 import { AddressLink, DirectionsLink } from "@/components/locations/DirectionsLink";
 import { OpeningNotify } from "@/components/locations/OpeningNotify";
 import { locationMonster } from "@/components/locations/locationArt";
@@ -91,32 +90,14 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
             <address className="cne-lp-addr">
               <AddressLink loc={loc} />
             </address>
-            {/* A dated store's ticket below already says it is coming. */}
-            {(loc.isOpen || !loc.openingAnnouncement) && (
-              <div className="cne-lp-tag">
-                {loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
-              </div>
-            )}
+            <div className="cne-lp-tag">
+              {loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
+            </div>
           </div>
 
-          {!loc.isOpen && loc.openingAnnouncement && (
-            <p className="cne-lp-ticket">{loc.openingAnnouncement}</p>
-          )}
-          {loc.isOpen ? (
-            <HoursBox loc={loc} />
-          ) : (
-            // A store opening on a set day shows its hours from that day
-            // (`showHoursFrom`), with no deploy needed. An undated store's
-            // `hours` is only a "Date to be announced" placeholder, so it waits.
-            loc.showHoursFrom && (
-              <FromDate
-                at={loc.showHoursFrom}
-                initial={Date.now() >= Date.parse(loc.showHoursFrom)}
-              >
-                <HoursBox loc={loc} />
-              </FromDate>
-            )
-          )}
+          {/* A store that has not opened has only a "Date to be announced"
+              placeholder in `hours`, so it shows none. */}
+          {loc.isOpen && <HoursBox loc={loc} />}
 
           <div className="cne-lp-btns">
             {loc.isOpen && loc.orderUrl && (
@@ -174,11 +155,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
               />
             </>
           ) : (
-            <Tunnel
-              body={mon.body}
-              iris={mon.iris}
-              asleep={!loc.isOpen && !loc.openingAnnouncement}
-            />
+            <Tunnel body={mon.body} iris={mon.iris} asleep={!loc.isOpen} />
           )}
         </div>
       </section>
@@ -218,7 +195,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         >
           <div className="cne-lp-notify">
             <Monster
-              species={loc.openingAnnouncement ? "classic" : "classic-sleep"}
+              species="classic-sleep"
               bodyColor={mon.body}
               irisColor={mon.iris}
               size={64}
@@ -227,9 +204,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
             <div className="cne-eyebrow">Not open yet</div>
             <h2>First to know.</h2>
             <p className="cne-lede">
-              {loc.openingAnnouncement
-                ? `The ${hood} location has a date: ${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}. Leave an email and we will send the opening update.`
-                : `The ${hood} location is being built. We do not have a date to give you yet, and we would rather say that than invent one — leave an email and you will hear from us the day it starts serving.`}
+              {`The ${hood} location is being built. We do not have a date to give you yet, and we would rather say that than invent one — leave an email and you will hear from us the day it starts serving.`}
             </p>
             <OpeningNotify hood={hood} />
           </div>
@@ -278,7 +253,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
                 className={`cne-loc cne-lp-other ${o.isOpen ? "is-live" : "is-soon"}`}
               >
                 <Monster
-                  species={o.isOpen || o.openingAnnouncement ? "classic" : "classic-sleep"}
+                  species={o.isOpen ? "classic" : "classic-sleep"}
                   bodyColor={om.body}
                   irisColor={om.iris}
                   size={52}
@@ -292,11 +267,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
                     {o.city}, {o.region}
                   </div>
                   <div className="cne-loc-note">
-                    {o.isOpen ? (
-                      <LiveOpenLabel locationId={o.id} suffix=" →" />
-                    ) : (
-                      `${o.openingAnnouncement ?? "Opening soon"} →`
-                    )}
+                    {o.isOpen ? <LiveOpenLabel locationId={o.id} suffix=" →" /> : "Opening soon →"}
                   </div>
                 </div>
               </Link>

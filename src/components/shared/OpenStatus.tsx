@@ -30,13 +30,13 @@ export function OpenStatus({
   head?: boolean;
 }) {
   const status = useStoreStatus(locationId);
-  // A store that has not opened has no clock to read; it says when it opens.
+  // A store that has not opened has no clock to read; it says it is coming.
   const loc = locations.find((l) => l.id === locationId);
   const unopened = status?.state === "unknown" && loc && !loc.isOpen;
 
   return (
     <StatusTag
-      parts={!status ? null : unopened ? openingParts(loc) : statusParts(status)}
+      parts={!status ? null : unopened ? openingParts() : statusParts(status)}
       tone={
         unopened
           ? "soon"

@@ -280,76 +280,47 @@ export function openingListEmail(
   return { subject, text, html };
 }
 
-/** "Friday, Sept 25 · 6 PM" in Los Angeles time. */
-function laOpening(iso: string): string {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Los_Angeles",
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).formatToParts(new Date(iso));
-  const get = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((p) => p.type === type)?.value ?? "";
-  const month = get("month") === "Sep" ? "Sept" : get("month");
-  const minute = get("minute") === "00" ? "" : `:${get("minute")}`;
-  return `${get("weekday")}, ${month} ${get("day")} · ${get("hour")}${minute} ${get("dayPeriod")}`;
-}
-
 /**
  * The one email a visitor gets straight back after joining a location's
- * opening list: when it opens, where, and the hours. Facts from
- * `src/data/locations.ts` only — a store with no date yet (Glendale) says
- * the date is to be announced rather than guessing one.
+ * opening list: where it is, and that the date is to be announced. Facts
+ * from `src/data/locations.ts` only — no store on the list has a date, so
+ * the email says so rather than guessing one.
  */
 export function openingReplyEmail(location: Location): BuiltEmail {
   const hood = location.neighbourhood;
   const street = location.address;
   const cityLine = `${location.city}, ${location.region} ${location.postal}`;
-  const when = location.opensAt ? laOpening(location.opensAt) : null;
-  const heading = when
-    ? `${hood} opens ${when.replace(" · ", " at ")}.`
-    : `You're on the ${hood} list.`;
-  const subject = when
-    ? `${brand.name} ${hood}: grand opening ${when.replace(" · ", " at ")}`
-    : `${brand.name} ${hood}: you're on the list`;
+  const heading = `You're on the ${hood} list.`;
+  const subject = `${brand.name} ${hood}: you're on the list`;
   const directions = googleDirections(location);
-  const hoursKnown = location.opensAt !== undefined;
   const note = `You got this because you signed up on chrisneddys.com. It's a one-off, not a newsletter.`;
+  const when = "Date to be announced. We'll email you when the doors open.";
 
   const text = [
     heading,
     "",
-    `When: ${when ?? "Date to be announced. We'll email you when the doors open."}`,
+    `When: ${when}`,
     `Where: ${street}, ${cityLine}`,
-    ...(hoursKnown ? ["", "Hours:", ...location.hours.map(([d, h]) => `  ${d}  ${h}`)] : []),
     "",
     `Directions: ${directions}`,
     "",
     note,
   ].join("\n");
 
-  const hoursHtml = location.hours
-    .map(([d, h]) => `${escapeHtml(d)}&nbsp;&nbsp;${escapeHtml(h)}`)
-    .join("<br>");
-
   const bodyHtml = `
     <tr><td style="padding-top:14px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        ${detailRow("When", when ? `<strong>${escapeHtml(when)}</strong>` : "Date to be announced. We'll email you when the doors open.")}
+        ${detailRow("When", when)}
         ${detailRow("Where", `${escapeHtml(street)}<br>${escapeHtml(cityLine)}`)}
-        ${hoursKnown ? detailRow("Hours", hoursHtml) : ""}
       </table>
     </td></tr>`;
 
   const html = shell({
     tag: hood,
-    label: when ? "Grand opening" : "Opening list",
+    label: "Opening list",
     monster: HOOD_MONSTER[hood] ?? "blue",
     urgent: false,
-    // Keep "6 PM" together when the heading wraps on a phone.
-    heading: heading.replace(/ (AM|PM)\b/, "\u00a0$1"),
+    heading,
     stamp: `${street}, ${location.city}`,
     bodyHtml,
     buttonsHtml: [button(directions, "GET DIRECTIONS", true)],

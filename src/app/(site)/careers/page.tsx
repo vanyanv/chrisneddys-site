@@ -3,7 +3,7 @@ import "@/styles/careers.css";
 import { brand } from "@/data/brand";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import Link from "next/link";
-import { hasPassed, locations, VAN_NUYS_OPENS_AT } from "@/data/locations";
+import { locations } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { Monster } from "@/components/mascots/Monster";
 import { DripEdge } from "@/components/storeart/DripEdge";
@@ -34,9 +34,6 @@ const INDEED_URL = "https://www.indeed.com/cmp/Chris-N-Eddy's";
  * mural wall, and each store gets a tile in its own monster's colour.
  */
 export default function CareersPage() {
-  // The copy changes by itself when Van Nuys opens; this page regenerates
-  // every minute, like the rest of the storefront.
-  const vanNuysOpen = hasPassed(VAN_NUYS_OPENS_AT);
   return (
     <div className="cne-cr">
       <JsonLdScript data={breadcrumbLd([{ name: "Careers", path: "/careers/" }])} />
@@ -61,17 +58,8 @@ export default function CareersPage() {
           <p className="cne-cr-eyebrow">Careers</p>
           <h1 id="cr-h1">Join the crew.</h1>
           <p className="cne-cr-lede">
-            {vanNuysOpen ? (
-              <>
-                Hollywood and Van Nuys are open now. Glendale is next &mdash; that&rsquo;s more
-                shifts, more kitchens, more people.
-              </>
-            ) : (
-              <>
-                Hollywood is open now. Glendale and Van Nuys are next &mdash; that&rsquo;s more
-                shifts, more kitchens, more people.
-              </>
-            )}
+            Hollywood and Van Nuys are open now. Glendale is next &mdash; that&rsquo;s more shifts,
+            more kitchens, more people.
           </p>
         </div>
         {/* The crew: one monster per store, in the store's own colour, asleep
@@ -82,7 +70,7 @@ export default function CareersPage() {
             return (
               <li key={l.id}>
                 <Monster
-                  species={l.isOpen || l.openingAnnouncement ? "classic" : "classic-sleep"}
+                  species={l.isOpen ? "classic" : "classic-sleep"}
                   bodyColor={m.body}
                   irisColor={m.iris}
                   size={96}
@@ -115,9 +103,8 @@ export default function CareersPage() {
 
         <div className="cne-cr-pitch cne-rv">
           <p>
-            {vanNuysOpen
-              ? "We’re an LA smash-burger spot, open in Hollywood and Van Nuys with Glendale next — that means more shifts, more kitchens and more people needed to run them."
-              : "We’re a Hollywood smash-burger spot opening two more locations, in Glendale and Van Nuys — that means more shifts, more kitchens and more people needed to run them."}
+            We&rsquo;re an LA smash-burger spot, open in Hollywood and Van Nuys with Glendale next
+            &mdash; that means more shifts, more kitchens and more people needed to run them.
           </p>
           <p>
             Open roles, pay and how to apply all live on our Indeed page, kept current there rather
@@ -138,7 +125,7 @@ export default function CareersPage() {
                     className={`cne-cr-store ${l.isOpen ? "is-live" : "is-soon"}`}
                   >
                     <Monster
-                      species={l.isOpen || l.openingAnnouncement ? "classic" : "classic-sleep"}
+                      species={l.isOpen ? "classic" : "classic-sleep"}
                       bodyColor={m.body}
                       irisColor={m.iris}
                       size={48}

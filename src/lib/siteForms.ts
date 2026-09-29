@@ -48,8 +48,6 @@ const MAX_SENDS = 5;
 
 /** Neighbourhoods the opening list is offered for — anything else is not a
  * signup this site asked for. */
-// Read at send time, not once at load: a store that opens stops taking
-// sign-ups at that moment (Van Nuys, `VAN_NUYS_OPENS_AT`).
 function openingLocation(hood: string) {
   return locations.find((l) => !l.isOpen && l.neighbourhood === hood);
 }

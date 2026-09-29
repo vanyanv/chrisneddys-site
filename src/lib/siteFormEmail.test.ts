@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { contactEmail, laStamp, openingListEmail, openingReplyEmail } from "@/lib/siteFormEmail";
 import { locations } from "@/data/locations";
 
@@ -118,25 +118,14 @@ describe("openingListEmail", () => {
 describe("openingReplyEmail", () => {
   const find = (id: string) => locations.find((l) => l.id === id)!;
 
-  it("gives Van Nuys its date, address and hours before it opens", () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
-    const { subject, text, html } = openingReplyEmail(find("vannuys"));
-    vi.useRealTimers();
-    expect(subject).toBe("Chris N Eddy's Van Nuys: grand opening Friday, Sept 25 at 6 PM");
-    expect(text.split("\n")[0]).toBe("Van Nuys opens Friday, Sept 25 at 6 PM.");
-    expect(text).toContain("Where: 14523 Sherman Way, Van Nuys, CA 91405");
-    expect(text).toContain("Mon–Thu  10:00 AM – 1:00 AM");
-    expect(html).toContain("GET DIRECTIONS");
-    expect(html).toContain("monster-blue.png");
-    expect(html).toContain("not a newsletter");
-  });
-
   it("never invents a date for a store that has none", () => {
     const { subject, text, html } = openingReplyEmail(find("glendale"));
     expect(subject).toBe("Chris N Eddy's Glendale: you're on the list");
     expect(text).toContain("Date to be announced");
     expect(text).not.toContain("Hours:");
     expect(html).not.toContain("Sept");
+    expect(text).toContain("Where: 1360 E Colorado St, Glendale, CA 91205");
+    expect(html).toContain("GET DIRECTIONS");
+    expect(html).toContain("not a newsletter");
   });
 });

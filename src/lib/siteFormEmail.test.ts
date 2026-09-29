@@ -9,8 +9,8 @@ const base = {
   name: "Sam Rivera",
   email: "delivered@resend.dev",
   phone: "(323) 555-0142",
-  topic: "Partnerships",
-  message: "A pop-up at our street fair on the 12th?\nAround 6 PM.",
+  topic: "Catering & events",
+  message: "Forty sliders for a birthday on the 12th?\nAround 6 PM.",
 };
 
 describe("laStamp", () => {
@@ -22,8 +22,8 @@ describe("laStamp", () => {
 describe("contactEmail", () => {
   it("leads with the topic and who wrote, and keeps the subject sortable", () => {
     const { subject, text, html } = contactEmail(base, AT);
-    expect(subject).toBe("[Partnerships] Sam Rivera — chrisneddys.com");
-    expect(text.split("\n")[0]).toBe("PARTNERSHIPS");
+    expect(subject).toBe("[Catering & events] Sam Rivera — chrisneddys.com");
+    expect(text.split("\n")[0]).toBe("CATERING & EVENTS");
     expect(text).toContain("Sam Rivera wrote in through the website, Thu 9/24 · 11:12 AM.");
     expect(html).toContain("Sam Rivera wrote in.");
     expect(html).toContain("Thu 9/24 · 11:12 AM");
@@ -63,7 +63,7 @@ describe("contactEmail", () => {
 describe("the store art", () => {
   it("shows a monster in the topic's colour, hosted on the site", () => {
     expect(contactEmail(base, AT).html).toContain(
-      'src="https://www.chrisneddys.com/email/monster-lime.png"',
+      'src="https://www.chrisneddys.com/email/monster-yellow.png"',
     );
     expect(contactEmail({ ...base, topic: "Order issue" }, AT).html).toContain("monster-red.png");
     expect(

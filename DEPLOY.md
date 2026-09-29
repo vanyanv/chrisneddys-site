@@ -645,7 +645,7 @@ them in standard reports. `location` is always a location's URL slug
 (`van-nuys`), read from the Otter store ID or the store's own phone number in
 the link when it has one (`src/lib/clickLocation.ts`). Mark `purchase`,
 `generate_lead`, `notify_signup`, `order_click`, `call_click`,
-`directions_click` and `delivery_click` as key events (owner's
+`directions_click`, `delivery_click` and `catering_click` as key events (owner's
 call, 2026-09-26): Otter cannot report where its orders came from or take a GA4
 tag, so the order tap is the closest measure of a food sale the site has. The
 names keep their `_click` suffix so nobody reads them as revenue. For completed
@@ -662,9 +662,9 @@ in GA4 and can be redirected.
 Ordered so that nothing is measured after the fact.
 
 - [ ] Walk the site with `?ga_debug=1` and confirm `page_view` fires once per
-      navigation, plus `order_click`, `delivery_click`, `call_click`,
-      `directions_click`, `menu_item_open`, `contact_submit`, `generate_lead`
-      (for partnership enquiries), and `notify_signup`.
+      navigation, plus `order_click`, `delivery_click`, `catering_click`,
+      `call_click`, `directions_click`, `menu_item_open`, `contact_submit`,
+      `generate_lead` (for catering or partnership enquiries), and `notify_signup`.
 - [ ] With a Stripe test payment, confirm one `purchase` per transaction ID,
       with matching item IDs from `view_item`, merchandise `value`, `shipping`,
       and `tax`. Check a buyer who closes Checkout without returning to the site.

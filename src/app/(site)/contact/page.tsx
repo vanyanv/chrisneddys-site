@@ -9,9 +9,9 @@ import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { GuestCheck } from "@/components/contact/GuestCheck";
 
-const title = "Contact Us — Press, Partnerships & Questions";
+const title = "Contact Us — Catering, Press & Questions";
 const description =
-  "Press, partnerships or a problem with an order — one form at Chris N Eddy’s, answered by a real person. Or call (323) 544-3600.";
+  "Catering, press, partnerships or a problem with an order — one form at Chris N Eddy’s, answered by a real person. Or call (323) 544-3600.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/contact/" });
 
@@ -58,6 +58,14 @@ export default function ContactPage() {
           areaServed: "US",
           availableLanguage: "English",
         },
+        {
+          "@type": "ContactPoint",
+          contactType: "sales",
+          name: "Catering & events",
+          email: brand.email,
+          areaServed: "US",
+          availableLanguage: "English",
+        },
       ],
     },
   };
@@ -74,8 +82,8 @@ export default function ContactPage() {
             <p className="cne-ct-eyebrow">Contact</p>
             <h1 id="ct-h1">Get in touch</h1>
             <p className="cne-ct-lede">
-              Press, partnerships, a burger that showed up wrong — it all lands in the same inbox,
-              and a real person reads it.
+              Catering, press, a burger that showed up wrong — it all lands in the same inbox, and a
+              real person reads it.
             </p>
           </div>
         </div>

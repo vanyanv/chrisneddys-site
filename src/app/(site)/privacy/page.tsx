@@ -13,7 +13,7 @@ const description =
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/privacy/" });
 
-const UPDATED_HUMAN = "29 September 2026";
+const UPDATED_HUMAN = "26 September 2026";
 
 /** Re-checked at most once a minute, like the rest of the shop — the support
  * email in the Contact section comes from the same `store_settings` row
@@ -193,9 +193,9 @@ export default async function PrivacyPage() {
           </ul>
           <p>
             Alongside page views, Google Analytics receives a named event when you do one of a fixed
-            set of things: tap an order, delivery, phone or directions link; open an item on the
-            menu; view a product, add one to the bag, or open the bag; send the contact form; join
-            an opening list; or land on a page that doesn&rsquo;t exist. When a shop payment is
+            set of things: tap an order, delivery, catering, phone or directions link; open an item
+            on the menu; view a product, add one to the bag, or open the bag; send the contact form;
+            join an opening list; or land on a page that doesn&rsquo;t exist. When a shop payment is
             confirmed, Google Analytics also receives the order number, products bought, and the
             amounts for merchandise, shipping and tax. To connect a payment to the earlier visit, we
             pass Google Analytics browser and session identifiers through checkout. Events can carry

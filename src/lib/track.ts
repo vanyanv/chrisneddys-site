@@ -36,6 +36,8 @@ export type TrackEvent =
   | "order_click"
   /** Left for a third-party delivery platform. */
   | "delivery_click"
+  /** A catering button (to the contact form), distinct from any other contact link. */
+  | "catering_click"
   /** Tapped the phone number. */
   | "call_click"
   /** Tapped through to turn-by-turn directions. */
@@ -44,7 +46,7 @@ export type TrackEvent =
   | "menu_item_open"
   /** Sent the guest check on /contact/. */
   | "contact_submit"
-  /** A successful partnership enquiry. */
+  /** A successful catering or partnership enquiry. */
   | "generate_lead"
   /** The guest check could not be sent. Carries a reason, never a message. */
   | "contact_error"

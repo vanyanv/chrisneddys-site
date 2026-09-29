@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { CateringCard } from "@/components/catering/CateringCard";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
@@ -51,6 +52,10 @@ const FAQ: FaqEntry[] = [
   {
     q: "Do the toppings cost extra?",
     a: "No. Every topping is free — CNE sauce, lettuce, tomato, raw onions, grilled onions and pickles. Order it Chris's Way or Eddy's Way and you pay the price on the menu. Extra cheese is $1 and making it halal is $2; nothing else is a surcharge.",
+  },
+  {
+    q: "Do you cater?",
+    a: "Yes, for offices, sets and parties. Send us a message through our contact page at chrisneddys.com/contact/ with the date, headcount and neighbourhood, and we'll get back to you.",
   },
   {
     q: "Is there parking?",
@@ -119,6 +124,13 @@ export default function OrderPage() {
           and every topping free, at every location. Rather talk to someone? Call the location
           you&rsquo;re picking up from.
         </p>
+        <CateringCard
+          eyebrow="Feeding a group?"
+          title="Catering."
+          text="Office lunches, sets and parties. Tell us what you need."
+          surface="order-catering"
+          monster="yellow"
+        />
       </section>
 
       <section className="cne-sec cne-rv">

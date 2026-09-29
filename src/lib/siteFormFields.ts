@@ -8,6 +8,7 @@
  */
 
 export const CONTACT_TOPICS = [
+  "Catering & events",
   "Press & media",
   "Partnerships",
   "Order issue",

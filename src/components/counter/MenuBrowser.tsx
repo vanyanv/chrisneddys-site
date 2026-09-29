@@ -4,6 +4,7 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuSectionChips } from "./MenuSectionChips";
 import { LazyItemSheet } from "./LazyItemSheet";
+import { CateringCard } from "@/components/catering/CateringCard";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
 import { GlyphRow, OpStamp, MenuPillar, type StampKind } from "@/components/storeart/SectionOpener";
@@ -129,6 +130,15 @@ export function MenuBrowser() {
               </div>
             </section>
           ))}
+          <div className="cne-sec">
+            <CateringCard
+              eyebrow="Same menu, bigger order"
+              title="Feeding a crowd?"
+              text="The sliders, fries and shakes on this page, for the whole office."
+              surface="menu-catering"
+              monster="blue"
+            />
+          </div>
         </div>
       </div>
 

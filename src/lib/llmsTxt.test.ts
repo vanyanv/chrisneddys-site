@@ -11,6 +11,12 @@ const flagship = locations.find((l) => l.id === "hollywood")!;
 describe("buildLlmsTxt", () => {
   const text = buildLlmsTxt(merch);
 
+  it("sends catering to the catering page and the contact form, not ezCater", () => {
+    expect(text).toContain(`${brand.siteUrl}/catering/`);
+    expect(text).toMatch(/Catering:.*\/contact\//);
+    expect(text).not.toMatch(/ezcater/i);
+  });
+
   it("states the open location's address, phone and hours", () => {
     expect(text).toContain(flagship.address);
     expect(text).toContain(flagship.phone!);

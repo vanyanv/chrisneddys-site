@@ -12,7 +12,7 @@ brand
 
 **The repeat fan.** Already sold on the burger. Comes back for new locations, hours changes, merch drops, and the story. This is the audience the shop and the about page serve.
 
-**Press and partners.** Journalists, festival bookers, event organizers. They need credibility, facts and a way to reach a human, fast, and they should never have to hunt through a marketing page to find it. The contact form exists for them.
+**Press, partners and catering.** Journalists, festival bookers, event organizers. They need credibility, facts and a way to reach a human, fast, and they should never have to hunt through a marketing page to find it. The contact form exists for them.
 
 ## Product Purpose
 

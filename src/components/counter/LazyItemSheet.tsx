@@ -9,7 +9,7 @@ type SheetProps = ComponentProps<typeof import("./ItemSheet").ItemSheet>;
  * The item sheet is the biggest client module on the menu and the home page,
  * and it does nothing until somebody taps an item. Importing it statically put
  * it in a chunk that Next's link prefetching then pulled onto every page, which
- * is what tipped /careers/ over its script budget. So it is a
+ * is what tipped /careers/ and /catering/ over their script budget. So it is a
  * separate chunk that is fetched on the first tap and never prefetched.
  *
  * It mounts closed and opens a frame later, so the slide-in still has a closed

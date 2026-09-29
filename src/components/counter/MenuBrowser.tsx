@@ -3,7 +3,7 @@
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuSectionChips } from "./MenuSectionChips";
-import { ItemSheet } from "./ItemSheet";
+import { LazyItemSheet } from "./LazyItemSheet";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
@@ -143,7 +143,7 @@ export function MenuBrowser({ cateringHref }: { cateringHref?: string } = {}) {
         </div>
       </div>
 
-      <ItemSheet
+      <LazyItemSheet
         item={item}
         open={open}
         way={way}

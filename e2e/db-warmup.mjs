@@ -57,7 +57,7 @@ import { eq } from "drizzle-orm";
 register("./order-seed-resolve-hook.mjs", import.meta.url);
 
 const { getDb } = await import("../src/db/client.ts");
-const { orders, user, account, cateringOrders } = await import("../src/db/schema.ts");
+const { orders, user, account } = await import("../src/db/schema.ts");
 const { createPendingOrder, markPaid, markReadyForPickup, setFulfilment } =
   await import("../src/lib/orders.ts");
 const { hashPassword } = await import("../src/lib/password.ts");
@@ -90,32 +90,6 @@ if (existingOrder.length === 0) {
 } else {
   console.log("e2e orders already present — skipping seed.");
 }
-
-// `e2e/seed-catering.mjs`'s "round-3" order — `e2e/catering/admin-crew-
-// labels.spec.ts` needs one real catering order with named lines and bulk
-// builds to check the crew ticket/labels pages against, and building that
-// by hand through 12 UI steps in every spec run would be slow and brittle.
-// Importing the module runs its own `main()` at the top level (it always
-// creates a *new* `CAT-xxxx` order — see that file's module comment), so
-// this only imports it once, the same idempotency guard as the two seeds
-// above.
-const existingCatering = await db.select({ id: cateringOrders.id }).from(cateringOrders).limit(1);
-if (existingCatering.length === 0) {
-  console.log("Seeding e2e catering order…");
-  await import("./seed-catering.mjs");
-  console.log("e2e catering order seeded.");
-} else {
-  console.log("e2e catering order already present — skipping seed.");
-}
-
-// `e2e/seed-catering-fixtures.mjs`'s expired/half-refund-tier orders —
-// `e2e/catering/expired.spec.ts` and `cancel.spec.ts` need one order each
-// in a state the customer UI (or a live admin click alone) can never reach,
-// and doing that with a second `node` process reaching into the database
-// after `next start` already has it open doesn't work — see that script's
-// module comment. Idempotent the same way as the seeds above (it skips
-// itself when its own `.fixtures.json` already exists).
-await import("./seed-catering-fixtures.mjs");
 
 async function seedOwner() {
   const userId = randomUUID();

@@ -21,11 +21,8 @@ import {
 } from "../format";
 import { AddressBlock, FulfilmentCard } from "./FulfilmentCard";
 import { RefundTrigger } from "./RefundPanel";
-import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
-import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
-import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +32,6 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -297,10 +293,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const [order, settings] = await Promise.all([getOrderForAdmin(id), getStoreSettings()]);
   if (!order) notFound();
 
-  const [edition, history, cateringCount] = await Promise.all([
+  const [edition, history] = await Promise.all([
     getOrderEdition(order.id),
     order.email ? getCustomerForAdmin(order.email) : Promise.resolve(undefined),
-    getCateringNeedsYouCount(),
   ]);
   const run = edition ? ((await getRunForAdmin(edition.productId)) ?? null) : null;
 
@@ -332,7 +327,6 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               aria-current={item.href === "/admin/orders" ? "page" : undefined}
             >
               {item.label}
-              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

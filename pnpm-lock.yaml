@@ -69,9 +69,6 @@ importers:
       stripe:
         specifier: ^22.6.2
         version: 22.6.2(@types/node@22.19.17)
-      zipcodes:
-        specifier: ^8.0.0
-        version: 8.0.0
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.7
@@ -94,9 +91,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.0
         version: 19.2.3(@types/react@19.2.14)
-      '@types/zipcodes':
-        specifier: ^8.0.5
-        version: 8.0.5
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
@@ -1501,9 +1495,6 @@ packages:
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
-
-  '@types/zipcodes@8.0.5':
-    resolution: {integrity: sha512-NxtKCnUa/LJ6kIku6Rl8mkXfpGkZ0y6AG7rh+WHYtaxfhVgi1bDOZDfGVZiY+JxW+GPdvYXmyERB9rd/xa/pEg==}
 
   '@typescript-eslint/eslint-plugin@8.59.0':
     resolution: {integrity: sha512-HyAZtpdkgZwpq8Sz3FSUvCR4c+ScbuWa9AksK2Jweub7w4M3yTz4O11AqVJzLYjy/B9ZWPyc81I+mOdJU/bDQw==}
@@ -3909,9 +3900,6 @@ packages:
     resolution: {integrity: sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg==}
     engines: {node: '>=18'}
 
-  zipcodes@8.0.0:
-    resolution: {integrity: sha512-V8NolFaJhsPamGeCv5lJdk60Q7JBiXI6e+8JDksPC1NJWZ0t7g1OFfqVLZb2Nc2F5jmf9JTdYdWJBnIhGBvtbA==}
-
   zod@4.1.11:
     resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
 
@@ -4982,8 +4970,6 @@ snapshots:
   '@types/react@19.2.14':
     dependencies:
       csstype: 3.2.3
-
-  '@types/zipcodes@8.0.5': {}
 
   '@typescript-eslint/eslint-plugin@8.59.0(@typescript-eslint/parser@8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
@@ -7452,8 +7438,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors@2.2.0: {}
-
-  zipcodes@8.0.0: {}
 
   zod@4.1.11: {}
 

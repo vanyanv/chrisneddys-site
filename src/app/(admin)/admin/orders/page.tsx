@@ -11,11 +11,8 @@ import {
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { OrdersTable, type OrdersTableRow } from "./OrdersTable";
-import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
-import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
-import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +33,6 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -71,11 +67,10 @@ export default async function AdminOrdersPage({
     ? (rawStatus as OrdersAdminFilter)
     : "all";
 
-  const [{ rows, nextCursor }, counts, settings, cateringCount] = await Promise.all([
+  const [{ rows, nextCursor }, counts, settings] = await Promise.all([
     listOrdersForAdmin(filter, cursor),
     getOrdersDashboardCounts(),
     getStoreSettings(),
-    getCateringNeedsYouCount(),
   ]);
 
   const tableRows: OrdersTableRow[] = rows.map((row) => ({
@@ -109,7 +104,6 @@ export default async function AdminOrdersPage({
               aria-current={item.href === "/admin/orders" ? "page" : undefined}
             >
               {item.label}
-              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

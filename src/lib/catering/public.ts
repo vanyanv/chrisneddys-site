@@ -5,7 +5,7 @@
  * the library's (see `hours.ts`). Safe to pass straight into a client
  * component — nothing here is a secret, and nothing here is a Drizzle row.
  */
-import type { Db } from "@/db/client";
+import { getDb, hasDatabase, type Db } from "@/db/client";
 import { locations } from "@/data/locations";
 import { getCateringSettings } from "./settings";
 import { toScheduleDaysOff, toScheduleHours } from "./hours";
@@ -57,4 +57,18 @@ export async function getPublicCateringConfig(db?: Db): Promise<PublicCateringCo
     replyHours: settings.replyHours,
     leadHours: settings.leadHours,
   };
+}
+
+/**
+ * Whether catering ordering is on, for the static storefront pages
+ * (`/catering/`, `/order/`, `/menu/`) that only need the switch. With no
+ * database (a production build in CI, or a preview without one) it answers
+ * "off" without opening one: `getDb()` would otherwise open a file-backed
+ * PGlite from every static-generation worker at once, which races on
+ * `CREATE SCHEMA "drizzle"` and fails the build.
+ */
+export async function getCateringOrderingOn(): Promise<boolean> {
+  if (!hasDatabase()) return false;
+  const settings = await getCateringSettings(await getDb());
+  return settings.orderingOn;
 }

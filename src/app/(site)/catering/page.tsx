@@ -6,8 +6,7 @@ import { brand } from "@/data/brand";
 import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { CATERING_HREF } from "@/data/catering";
-import { getPublicCateringConfig } from "@/lib/catering/public";
-import { getDb } from "@/db/client";
+import { getCateringOrderingOn } from "@/lib/catering/public";
 import { itemPhotoAlt } from "@/lib/otter";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -70,9 +69,8 @@ export default async function CateringPage() {
   const food = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
-  const cateringConfig = await getPublicCateringConfig(await getDb());
-  const cateringHref = cateringConfig.orderingOn ? "/catering/order/" : CATERING_HREF;
-  const orderingOn = cateringConfig.orderingOn;
+  const orderingOn = await getCateringOrderingOn();
+  const cateringHref = orderingOn ? "/catering/order/" : CATERING_HREF;
 
   return (
     <div className="cne-cat">

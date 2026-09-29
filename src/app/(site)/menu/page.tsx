@@ -8,8 +8,7 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/otter";
 import { ScrollChecker } from "@/components/storeart/ScrollChecker";
 import { GlyphRow } from "@/components/storeart/SectionOpener";
-import { getPublicCateringConfig } from "@/lib/catering/public";
-import { getDb } from "@/db/client";
+import { getCateringOrderingOn } from "@/lib/catering/public";
 
 const title = "Menu & Prices — Sliders, Combos & Fries";
 /**
@@ -27,8 +26,8 @@ const description = `The full Chris N Eddy's menu and pickup prices: sliders fro
 export const metadata: Metadata = pageMetadata({ title, description, path: "/menu/" });
 
 export default async function MenuPage() {
-  const cateringConfig = await getPublicCateringConfig(await getDb());
-  const cateringHref = cateringConfig.orderingOn ? "/catering/order/" : undefined;
+  const orderingOn = await getCateringOrderingOn();
+  const cateringHref = orderingOn ? "/catering/order/" : undefined;
 
   return (
     <>

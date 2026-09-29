@@ -9,9 +9,14 @@
  * - `checkout.session.completed` / `checkout.session.async_payment_succeeded`
  *   (when `payment_status === "paid"`) — `markPaid()` (assigns edition
  *   numbers, decrements quantity stock), then a confirmation email, then
- *   `catalogueChanged()` so the storefront's "N left" count updates.
+ *   `catalogueChanged()` so the storefront's "N left" count updates. A
+ *   session carrying `metadata.cateringOrderId` (from `POST /api/catering/
+ *   checkout`) is a catering order instead, branched off to
+ *   `completeCateringCheckout` — see `handleCateringSessionCompleted` — with
+ *   none of the merch logic below it ever running for that session.
  * - `checkout.session.expired` / `checkout.session.async_payment_failed` —
- *   `releaseOrder()` returns the hold to the pool.
+ *   `releaseOrder()` returns the hold to the pool, or for a catering session
+ *   (`metadata.cateringOrderId`), cancels the still-`draft` catering order.
  * - `charge.refunded` — fires for a partial refund too (Stripe's charge
  *   object doesn't distinguish "a" refund from "the" refund in the event
  *   type). Looked up by payment intent: `markRefunded()` then a refund
@@ -45,6 +50,8 @@ import type { ShipTo } from "@/db/schema";
 import { sendOrderConfirmation, sendRefundConfirmation } from "@/lib/email";
 import { getStripe } from "@/lib/stripe";
 import { sendConfirmedPurchase } from "@/lib/gaPurchase";
+import { getDb } from "@/db/client";
+import { completeCateringCheckout, cancelCateringDraft } from "@/lib/catering/checkoutComplete";
 
 export const runtime = "nodejs";
 
@@ -82,7 +89,52 @@ function paymentIntentId(session: Stripe.Checkout.Session): string {
     : (session.payment_intent?.id ?? "");
 }
 
+async function cateringPaymentMethodId(paymentIntentId: string): Promise<string | undefined> {
+  if (!paymentIntentId) return undefined;
+  try {
+    const intent = await getStripe().paymentIntents.retrieve(paymentIntentId);
+    return typeof intent.payment_method === "string"
+      ? intent.payment_method
+      : intent.payment_method?.id;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * `checkout.session.completed` for a catering order (`metadata.
+ * cateringOrderId` set by `POST /api/catering/checkout`) — a completely
+ * separate flow from the merch `markPaid` below, sharing this route only
+ * because Stripe delivers every Checkout Session event to the one endpoint
+ * on file. Delegates to `completeCateringCheckout`, the same function
+ * fake-payments mode calls directly (see `checkoutComplete.ts`), so a real
+ * and a faked checkout end up `requested` identically.
+ */
+async function handleCateringSessionCompleted(
+  session: Stripe.Checkout.Session,
+  cateringOrderId: string,
+): Promise<void> {
+  const db = await getDb();
+  const intentId = paymentIntentId(session);
+  const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
+  const paymentMethodId = await cateringPaymentMethodId(intentId);
+
+  await completeCateringCheckout(db, {
+    orderId: cateringOrderId,
+    checkoutSessionId: session.id,
+    paymentIntentId: intentId || undefined,
+    customerId,
+    paymentMethodId,
+  });
+}
+
 async function handleSessionPaid(session: Stripe.Checkout.Session): Promise<void> {
+  const cateringOrderId = session.metadata?.cateringOrderId;
+  if (cateringOrderId) {
+    await handleCateringSessionCompleted(session, cateringOrderId);
+    return;
+  }
+
   if (session.payment_status !== "paid") return;
 
   const result = await markPaid({
@@ -117,6 +169,12 @@ async function handleSessionPaid(session: Stripe.Checkout.Session): Promise<void
 }
 
 async function handleSessionReleased(session: Stripe.Checkout.Session): Promise<void> {
+  const cateringOrderId = session.metadata?.cateringOrderId;
+  if (cateringOrderId) {
+    await cancelCateringDraft(await getDb(), cateringOrderId);
+    return;
+  }
+
   await releaseOrder({ sessionId: session.id }, "expired");
   catalogueChanged();
 }

@@ -9,7 +9,10 @@ import { getSetupChecklist } from "@/lib/setupChecklist";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { RackCatalogue } from "./RackCatalogue";
 import { RackEmptyState } from "./RackEmptyState";
+import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
+import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
+import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +25,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -34,10 +38,11 @@ export default async function AdminProductsPage({
   const session = await requireOwner();
   const { open } = await searchParams;
 
-  const [allRows, archived, settings] = await Promise.all([
+  const [allRows, archived, settings, cateringCount] = await Promise.all([
     listProductsForAdmin(),
     listArchivedProductsForAdmin(),
     getStoreSettings(),
+    getCateringNeedsYouCount(),
   ]);
   // `listProductsForAdmin` returns every status, archived included — archived
   // products only belong in the "Archived (n)" disclosure, never the grid.
@@ -71,6 +76,7 @@ export default async function AdminProductsPage({
               aria-current={item.href === "/admin/products" ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

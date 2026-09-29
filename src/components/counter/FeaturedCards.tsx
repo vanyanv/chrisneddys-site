@@ -3,7 +3,7 @@
 import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice, itemPhotoAlt } from "@/lib/otter";
-import { ItemSheet } from "./ItemSheet";
+import { LazyItemSheet } from "./LazyItemSheet";
 import { useItemSheet } from "./useItemSheet";
 
 export function FeaturedCards() {
@@ -59,7 +59,7 @@ export function FeaturedCards() {
           </button>
         ))}
       </div>
-      <ItemSheet
+      <LazyItemSheet
         item={item}
         open={open}
         way={way}

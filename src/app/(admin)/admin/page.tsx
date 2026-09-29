@@ -13,7 +13,11 @@ import {
   type RecentActivityEntry,
   type WorkQueueItem,
 } from "@/lib/workQueue";
+import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
+import { getCateringOverviewSummary } from "@/app/(admin)/admin/catering/overview";
+import { formatDateTime as formatCateringDateTime } from "@/app/(admin)/admin/catering/format";
 import "@/styles/admin-rack.css";
+import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +33,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -229,16 +234,18 @@ function healthFooterText(queueIsEmpty: boolean, healthyConnections: string[]): 
 
 export default async function TodayPage() {
   const session = await requireOwner();
-  const [settings, stats, queue, activity] = await Promise.all([
+  const [settings, stats, queue, activity, catering] = await Promise.all([
     getStoreSettings(),
     getTodayStats(),
     getWorkQueue(),
     getRecentActivity(5),
+    getCateringOverviewSummary(),
   ]);
   const healthFooter = healthFooterText(queue.length === 0, getHealthyConnections());
 
   const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
+  const cateringCount = catering.needsYouCount;
   const dateLabel = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     day: "numeric",
@@ -270,6 +277,7 @@ export default async function TodayPage() {
               aria-current={item.href === "/admin" ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>
@@ -322,6 +330,20 @@ export default async function TodayPage() {
               : "NONE WAITING"}
           </div>
         </div>
+        <Link
+          href="/admin/catering"
+          className="rack-stat-card cat-stat-highlight"
+          style={{ display: "block", textDecoration: "none" }}
+        >
+          <div className="rack-eyebrow">Catering this week</div>
+          <div className="rack-bow rack-mono rack-stat-value">{catering.thisWeekCount}</div>
+          <div className="rack-mono rack-stat-meta">
+            {catering.next
+              ? `NEXT: ${formatCateringDateTime(catering.next.when).toUpperCase()} · ${catering.next.store.toUpperCase()}`
+              : "NOTHING BOOKED"}
+          </div>
+        </Link>
+
         {run && (
           <div className="rack-stat-card">
             <div className="rack-eyebrow">Left of the run</div>

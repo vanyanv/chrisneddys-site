@@ -1691,6 +1691,17 @@
     padding: 0;
     width: auto;
   }
+  /* The catering invoice's totals grid (cancellation/allergens beside
+     Food/Delivery/Tax/Tip/Total/Balance due) shouldn't split across a page
+     break with "Balance due" stranded alone on the next sheet.
+     `break-inside: avoid` on a CSS grid's own child is unreliable in
+     Chromium's print engine, so this is set on the grid container itself —
+     and, belt and braces, on the totals list too. */
+  .cat-invoice-totals-grid,
+  .rack-slip-page .adm-status-list {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }
 
 /* ---------------------------------------------------------------------- */

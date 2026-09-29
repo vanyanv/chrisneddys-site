@@ -149,7 +149,7 @@ test.describe.serial("admin settings", () => {
     await storeName.fill(`${original} E`);
     await expect(page.getByText("Unsaved changes", { exact: true })).toBeVisible();
 
-    const box = await page.locator(".adm-savebar").boundingBox();
+    const box = await page.locator(".adm-settings-savebar").boundingBox();
     expect(box?.width).toBeGreaterThan(370);
 
     await page.setViewportSize({ width: 1280, height: 800 });

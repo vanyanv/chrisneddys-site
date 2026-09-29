@@ -40,7 +40,18 @@ export function OrderDock() {
   const loc = !onLocationPage && chosen ? chosen : viewed;
   const status = useStoreStatus(loc.id);
 
-  if (pathname.startsWith("/shop")) return null;
+  // The catering order builder and order-link pages carry their own sticky
+  // bottom bar (the running total / step actions), the same reason /shop
+  // stands down above: two bars fighting over the bottom 60px means neither
+  // gets pressed.
+  if (
+    pathname.startsWith("/shop") ||
+    pathname.startsWith("/catering/order") ||
+    pathname.startsWith("/catering/o/") ||
+    pathname.startsWith("/catering/find")
+  ) {
+    return null;
+  }
 
   const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel(loc);
 

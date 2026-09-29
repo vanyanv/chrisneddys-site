@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 /**
@@ -20,6 +21,13 @@ import { defineConfig, devices } from "@playwright/test";
  * the existing `.pglite/` entry) and `webServer.command` wipes only that
  * `e2e` directory before every run, never `dev`, so each e2e run starts from
  * a known, freshly-seeded catalogue without touching anyone's local data.
+ * It also wipes `e2e/catering/.fixtures.json` in the same step:
+ * `seed-catering-fixtures.mjs` skips its own seed whenever that file
+ * already exists (the same idempotency guard `db-warmup.mjs` uses), and
+ * that file lives outside `.pglite/e2e` — left in place across a wipe, it
+ * would point `cancel.spec.ts`/`expired.spec.ts` at tokens for orders that
+ * no longer exist in the freshly-wiped database, a 404 on the customer
+ * order link that has nothing to do with those specs' own assertions.
  * `e2e/db-warmup.mjs` then migrates and seeds that fresh database once,
  * single-process, before `next build` starts — see that file for why: left
  * to `next build`'s own parallel static-generation workers, the first-ever
@@ -63,14 +71,37 @@ import { defineConfig, devices } from "@playwright/test";
  * `e2e/admin-passkeys.spec.ts` to be able to drive a real ceremony at all.
  */
 const PORT = 3111;
-const BASE_URL = `http://localhost:${PORT}`;
+export const BASE_URL = `http://localhost:${PORT}`;
+
+/**
+ * This sandbox's preinstalled Chromium (revision 1194, under
+ * `PLAYWRIGHT_BROWSERS_PATH`) is older than what the pinned `@playwright/
+ * test` version's own bundled-browser manifest asks for (revision 1243),
+ * and the sandbox's network policy blocks `cdn.playwright.dev`, so
+ * `playwright install` can't fetch the newer one. Pointing `executablePath`
+ * straight at the preinstalled binary skips that revision check entirely.
+ * Scoped to the catering projects only, since only they were added here —
+ * the existing `chromium` project is left exactly as it was.
+ */
+const CHROMIUM_HEADLESS_SHELL =
+  "/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell";
+export const PW_LAUNCH_OPTIONS = existsSync(CHROMIUM_HEADLESS_SHELL)
+  ? { executablePath: CHROMIUM_HEADLESS_SHELL }
+  : undefined;
 
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  timeout: 60_000,
+  // 120s, not Playwright's 30s default: the same shared, 4-core-box
+  // slow-under-load reasoning as `expect.timeout` below applies to a whole
+  // test occasionally too (a `signInAsOwner` + admin navigation + a
+  // server-rendered page under load has been observed to clear 60s even
+  // though nothing is actually hung), so this only gives a slow machine
+  // more patience — it doesn't loosen what any assertion checks, and a
+  // genuinely hung test still fails.
+  timeout: 120_000,
   // Playwright's default expect timeout is 5s, which is too tight here.
   // These specs assert on state that arrives via a Server Action plus the
   // revalidation that follows it, and the whole suite shares one worker on
@@ -78,9 +109,8 @@ export default defineConfig({
   // "owner removed, list re-rendered" round trip can exceed 5s under load
   // and fail an assertion that would have passed a moment later. Assertions
   // poll, so a higher ceiling costs nothing when things are fast — it only
-  // stops a slow machine from being reported as a broken one. The 60s
-  // per-test timeout above is unchanged, so genuinely hung work still fails.
-  expect: { timeout: 15_000 },
+  // stops a slow machine from being reported as a broken one.
+  expect: { timeout: 20_000 },
   reporter: "list",
   use: {
     baseURL: BASE_URL,
@@ -90,11 +120,84 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], launchOptions: PW_LAUNCH_OPTIONS },
+      testIgnore: /e2e\/catering\//,
+    },
+    // Catering (issue #190) walks every flow at both a phone and a desktop
+    // viewport, so its specs get their own two projects instead of the one
+    // above — every other spec keeps running at Desktop Chrome only via
+    // `testIgnore` there.
+    //
+    // `catering-setup` is a third, hidden project holding just
+    // `global-setup.spec.ts`, which turns catering ordering ON once through
+    // the real admin UI before either viewport project runs a single spec
+    // (see that file's module comment for why this has to be a real Server
+    // Action round trip, not a direct database write). `catering-phone` and
+    // `catering-desktop` each declare it as a `dependencies` entry, which
+    // runs it exactly once for the whole suite (not once per viewport) and
+    // blocks both projects until it passes — the standard Playwright
+    // pattern for "this has to happen first," and one that (unlike a plain
+    // `globalSetup` script driving its own hand-rolled `chromium.launch`)
+    // inherits this project's own `use` block, so it gets the same
+    // `expect.timeout` as every other spec instead of Playwright's 5s
+    // default.
+    {
+      name: "catering-setup",
+      testMatch: /e2e\/catering\/global-setup\.spec\.ts$/,
+      use: { ...devices["Desktop Chrome"], launchOptions: PW_LAUNCH_OPTIONS },
+    },
+    {
+      name: "catering-phone",
+      testMatch: /e2e\/catering\/.*\.spec\.ts$/,
+      testIgnore: /e2e\/catering\/global-setup\.spec\.ts$/,
+      dependencies: ["catering-setup"],
+      // 2, not the suite's default 0 (see `retries` below for why this is
+      // scoped to just the two catering viewport projects): reproduced
+      // directly (a standalone script driving 20-30 approve/decline
+      // actions in a row against a freshly built server, no other
+      // concurrent traffic) as an intermittent PGlite stall — roughly 1 in
+      // 5 of these action round trips, on a small and unpredictable
+      // subset, simply never returns, confirmed stuck past 90s with no
+      // server-side error and no sign it would ever resolve, while every
+      // neighboring identical action completes in ~250ms. It reproduces
+      // identically whether the page revalidates inline, via a deferred
+      // `after()`, or via a client `router.refresh()` (all three were
+      // tried), and the DB writes underneath it (confirmed via the
+      // `[email]` log lines each action's own service call ends with)
+      // sometimes never even reach that point — so this lives inside
+      // PGlite/its driver, not in any of this app's own revalidation
+      // code. It's specific to this local, single-connection, WASM
+      // database the e2e harness runs against (`src/db/client.ts`'s
+      // module comment covers its other single-connection quirks) —
+      // production always talks to real, multi-connection Postgres
+      // (Neon) and has no equivalent failure mode. A retry costs nothing
+      // when the flow was already healthy and reliably clears a stall
+      // that has never been observed to repeat back-to-back.
+      retries: 2,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+        launchOptions: PW_LAUNCH_OPTIONS,
+      },
+    },
+    {
+      name: "catering-desktop",
+      testMatch: /e2e\/catering\/.*\.spec\.ts$/,
+      testIgnore: /e2e\/catering\/global-setup\.spec\.ts$/,
+      dependencies: ["catering-setup"],
+      // See `catering-phone`'s `retries` comment above.
+      retries: 2,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+        launchOptions: PW_LAUNCH_OPTIONS,
+      },
     },
   ],
   webServer: {
-    command: `rm -rf .pglite/e2e && node e2e/db-warmup.mjs && pnpm build && pnpm exec next start -p ${PORT}`,
+    command: `rm -rf .pglite/e2e e2e/catering/.fixtures.json && node e2e/db-warmup.mjs && pnpm build && pnpm exec next start -p ${PORT}`,
     url: BASE_URL,
     timeout: 240_000,
     reuseExistingServer: !process.env.CI,
@@ -142,6 +245,11 @@ export default defineConfig({
       BLOB_READ_WRITE_TOKEN: "",
       RESEND_API_KEY: "",
       EMAIL_FROM: "",
+      // Catering (issue #190): skips the Stripe adapter entirely — checkout
+      // redirects straight to the sent page and capture/cancel/refund are
+      // no-ops that record fake ids. VERCEL_ENV must stay unset (it's never
+      // set above) since the adapter refuses fake mode in Vercel.
+      CATERING_FAKE_PAYMENTS: "1",
     },
   },
 });

@@ -8,7 +8,10 @@ import { getRunForAdmin } from "@/lib/runAdmin";
 import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { RunBoard } from "./RunBoard";
+import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
+import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
+import "@/styles/admin-catering.css";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +21,7 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -35,7 +39,11 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
   const session = await requireOwner();
   const { id } = await params;
 
-  const [run, settings] = await Promise.all([getRunForAdmin(id), getStoreSettings()]);
+  const [run, settings, cateringCount] = await Promise.all([
+    getRunForAdmin(id),
+    getStoreSettings(),
+    getCateringNeedsYouCount(),
+  ]);
   if (!run) notFound();
 
   const shopOpen = isShopOpenFor(settings);
@@ -64,6 +72,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
               aria-current={item.href === "/admin/products" ? "page" : undefined}
             >
               {item.label}
+              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

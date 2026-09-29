@@ -3,7 +3,7 @@
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuSectionChips } from "./MenuSectionChips";
-import { ItemSheet } from "./ItemSheet";
+import { LazyItemSheet } from "./LazyItemSheet";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
@@ -55,7 +55,7 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
  * here too, repeating rows a thumb-length below; the page's item links live
  * in its desktop list, which stays in the HTML at every width.
  */
-export function MenuBrowser() {
+export function MenuBrowser({ cateringHref }: { cateringHref?: string } = {}) {
   const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
 
   return (
@@ -137,12 +137,13 @@ export function MenuBrowser() {
               text="The sliders, fries and shakes on this page, for the whole office."
               surface="menu-catering"
               monster="blue"
+              href={cateringHref}
             />
           </div>
         </div>
       </div>
 
-      <ItemSheet
+      <LazyItemSheet
         item={item}
         open={open}
         way={way}

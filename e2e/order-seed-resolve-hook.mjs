@@ -36,9 +36,8 @@
  *    resolution and under Next's bundler, but not under Node's own ESM
  *    resolver, which never infers an extension for a relative specifier.
  *    `src/db/client.ts`/`schema.ts` (imported with an explicit `.ts`
- *    already) happen not to need this, but modules reachable from
- *    `src/lib/catering/service.ts` (e.g. `./pricing`) do — this widens the
- *    same "try appending an extension" fallback the `@/...` case above
+ *    already) happen not to need this, but a `src/lib` module that imports
+ *    a sibling as `./pricing` would — this widens the same "try appending an extension" fallback the `@/...` case above
  *    already does, resolved against the importing file instead of
  *    `srcRoot`.
  */

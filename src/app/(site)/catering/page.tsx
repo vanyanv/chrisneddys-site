@@ -6,7 +6,6 @@ import { brand } from "@/data/brand";
 import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { CATERING_HREF } from "@/data/catering";
-import { getCateringOrderingOn } from "@/lib/catering/public";
 import { itemPhotoAlt } from "@/lib/otter";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -65,12 +64,10 @@ const STEPS = [
  * Every catering button carries `data-catering` (so the click is a
  * `catering_click`) inside a `data-surface`, so Analytics shows them by spot.
  */
-export default async function CateringPage() {
+export default function CateringPage() {
   const food = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id)).filter(
     (i): i is MenuItem => Boolean(i),
   );
-  const orderingOn = await getCateringOrderingOn();
-  const cateringHref = orderingOn ? "/catering/order/" : CATERING_HREF;
 
   return (
     <div className="cne-cat">
@@ -129,10 +126,10 @@ export default async function CateringPage() {
           <Link
             prefetch={false}
             className="cne-big is-primary"
-            href={cateringHref}
-            {...(orderingOn ? { "data-catering-order": "start" } : { "data-catering": "" })}
+            href={CATERING_HREF}
+            data-catering=""
           >
-            {orderingOn ? "START A CATERING ORDER" : "ASK ABOUT CATERING"} &rarr;
+            ASK ABOUT CATERING &rarr;
           </Link>
           <Link prefetch={false} className="cne-hero-menu" href="/menu/">
             SEE THE MENU
@@ -234,10 +231,10 @@ export default async function CateringPage() {
           <Link
             prefetch={false}
             className="cne-big is-primary"
-            href={cateringHref}
-            {...(orderingOn ? { "data-catering-order": "start" } : { "data-catering": "" })}
+            href={CATERING_HREF}
+            data-catering=""
           >
-            {orderingOn ? "START A CATERING ORDER" : "ASK ABOUT CATERING"} &rarr;
+            ASK ABOUT CATERING &rarr;
           </Link>
         </div>
       </section>

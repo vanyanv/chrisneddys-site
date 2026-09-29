@@ -30,9 +30,7 @@ export type EmailResult = { sent: true } | { sent: false; reason: string };
 type OrderItem = OrderWithItems["items"][number];
 type Settings = { pickupAddress: string; returnsPolicy: string | null; supportEmail: string };
 
-/** Exported for other email builders (e.g. `src/lib/catering/emails.ts`) that
- * want the same "$12.34" formatting rather than re-deriving it. */
-export function centsToPrice(cents: number): string {
+function centsToPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
@@ -173,9 +171,7 @@ function textBody(
   return lines.join("\n");
 }
 
-/** Exported for other email builders (e.g. `src/lib/catering/emails.ts`) that
- * hand-build their own HTML table shell and need the same escaping. */
-export function escapeHtml(s: string): string {
+function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => {
     switch (c) {
       case "&":

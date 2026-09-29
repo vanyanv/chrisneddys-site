@@ -42,8 +42,6 @@ const latest = (...isos: string[]): string => isos.sort().at(-1)!;
 const RETURNS_TERMS_ADDED = "2026-09-14";
 /** When /catering was added. */
 const CATERING_UPDATED = "2026-09-27";
-/** When /catering/order/ (the customer ordering flow) was added. */
-const CATERING_ORDER_UPDATED = "2026-09-27";
 /** When /careers last changed (the store-art pass, issue #146). */
 const CAREERS_UPDATED = "2026-09-24";
 
@@ -106,7 +104,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // The page a "catering" search should land on; catering is arranged
     // through the contact form, so it sits under /order/ rather than beside it.
     { path: "/catering/", priority: 0.7, updated: CATERING_UPDATED },
-    { path: "/catering/order/", priority: 0.6, updated: CATERING_ORDER_UPDATED },
     // The shop is its own funnel: /shop/ is the entry point and each product
     // page is what a search for the product itself should land on, so the
     // product ranks above the index it sits in.

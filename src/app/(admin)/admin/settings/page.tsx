@@ -12,8 +12,6 @@ import { ConnectionsCard } from "./ConnectionsCard";
 import { ChangePasswordCard } from "./ChangePasswordCard";
 import { OwnersCard } from "./OwnersCard";
 import { PasskeysCard } from "./PasskeysCard";
-import { CateringNavBadge } from "@/app/(admin)/admin/catering/CateringNavBadge";
-import { getCateringNeedsYouCount } from "@/app/(admin)/admin/catering/navCount";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-settings.css";
 
@@ -23,7 +21,6 @@ const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/catering", label: "Catering" },
   { href: "/admin/customers", label: "Customers" },
   { href: "/admin/settings", label: "Settings" },
 ];
@@ -49,11 +46,10 @@ export default async function AdminSettingsPage() {
   // `isShopOpenFor` needs — a separate `getStoreSettings()` call here would
   // just be the identical query run twice against PGlite's one serialized
   // connection (issue #38).
-  const [settings, owners, passkeys, cateringCount] = await Promise.all([
+  const [settings, owners, passkeys] = await Promise.all([
     getSettingsForAdmin(),
     listOwners(session.email),
     listPasskeysForEmail(session.email),
-    getCateringNeedsYouCount(),
   ]);
 
   const shopOpen = isShopOpenFor(settings);
@@ -83,7 +79,6 @@ export default async function AdminSettingsPage() {
               aria-current={item.href === "/admin/settings" ? "page" : undefined}
             >
               {item.label}
-              {item.href === "/admin/catering" && <CateringNavBadge count={cateringCount} />}
             </Link>
           ))}
         </div>

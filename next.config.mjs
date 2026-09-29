@@ -59,6 +59,18 @@ const nextConfig = {
   async rewrites() {
     return [{ source: "/service-worker.js", destination: "/sw.js" }];
   },
+  // Online catering ordering was taken down on 2026-09-29. Its old links
+  // (the order builder, order links and "find my orders") land on the
+  // catering page instead of a 404.
+  async redirects() {
+    return [
+      { source: "/catering/order", destination: "/catering/", permanent: true },
+      { source: "/catering/order/:path*", destination: "/catering/", permanent: true },
+      { source: "/catering/o/:path*", destination: "/catering/", permanent: true },
+      { source: "/catering/find", destination: "/catering/", permanent: true },
+      { source: "/catering/find/:path*", destination: "/catering/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

@@ -10,7 +10,6 @@ import { slugFor } from "@/lib/locationSlug";
 import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
 import { CateringCard } from "@/components/catering/CateringCard";
-import { getCateringOrderingOn } from "@/lib/catering/public";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 
@@ -69,9 +68,7 @@ const FAQ: FaqEntry[] = [
   },
 ];
 
-export default async function OrderPage() {
-  const orderingOn = await getCateringOrderingOn();
-  const cateringHref = orderingOn ? "/catering/order/" : undefined;
+export default function OrderPage() {
   // Split so a location that hasn't opened yet doesn't cost a phone the
   // same full card — address, hours placeholder, footer link — that an
   // actual pickup spot earns. See the compact row below (issue #108).
@@ -133,7 +130,6 @@ export default async function OrderPage() {
           text="Office lunches, sets and parties. Tell us what you need."
           surface="order-catering"
           monster="yellow"
-          href={cateringHref}
         />
       </section>
 

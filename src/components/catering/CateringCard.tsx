@@ -22,24 +22,14 @@ export function CateringCard({
   text,
   surface,
   monster,
-  href,
 }: {
   eyebrow: string;
   title: string;
   text: string;
   surface: string;
   monster: keyof typeof MONSTER_COLORS;
-  /**
-   * Where the button goes — `CATERING_HREF` (the contact form) unless the
-   * caller has checked `cateringOrderingOn` and passes `/catering/order/`
-   * instead. Defaults to the contact form so a caller that hasn't checked
-   * keeps today's behaviour.
-   */
-  href?: string;
 }) {
   const colors = MONSTER_COLORS[monster];
-  const target = href ?? CATERING_HREF;
-  const ordering = target !== CATERING_HREF;
   return (
     <aside className="cne-catcard" aria-label="Catering" data-surface={surface}>
       <Monster
@@ -55,13 +45,8 @@ export function CateringCard({
         <p className="cne-catcard-p">{text}</p>
       </div>
       <div className="cne-catcard-act">
-        <Link
-          prefetch={false}
-          className="cne-big"
-          href={target}
-          {...(ordering ? { "data-catering-order": "start" } : { "data-catering": "" })}
-        >
-          {ordering ? "START A CATERING ORDER" : "ASK ABOUT CATERING"} &rarr;
+        <Link prefetch={false} className="cne-big" href={CATERING_HREF} data-catering="">
+          ASK ABOUT CATERING &rarr;
         </Link>
       </div>
     </aside>

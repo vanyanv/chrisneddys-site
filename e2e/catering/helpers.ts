@@ -136,10 +136,17 @@ export async function chooseDelivery(
 
 async function goToCalendarMonth(page: Page, target: Date): Promise<void> {
   const label = target.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  // The calendar opens on the first month with an open day, which can be
+  // after the target's month, so this may have to go back as well as forward.
+  const targetKey = target.getFullYear() * 12 + target.getMonth();
   for (let i = 0; i < 12; i++) {
     const current = await page.locator(".cor-cal-nav p").innerText();
     if (current === label) return;
-    await page.getByRole("button", { name: "Next month" }).click();
+    const shown = new Date(`${current} 1`);
+    const shownKey = shown.getFullYear() * 12 + shown.getMonth();
+    await page
+      .getByRole("button", { name: shownKey > targetKey ? "Previous month" : "Next month" })
+      .click();
   }
   throw new Error(`could not navigate calendar to ${label}`);
 }

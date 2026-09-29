@@ -6,6 +6,12 @@ import type { Fulfilment } from "@/lib/catering/types";
 import type { PublicCateringStore } from "@/lib/catering/public";
 import type { Address } from "./draft";
 
+/** Only stores whose parking the owners have described; Hollywood's differs
+ * (lot in back), so a one-size line would be wrong there. */
+const PICKUP_PARKING: Partial<Record<CateringStoreId, string>> = {
+  vannuys: "Parking lot in front.",
+};
+
 type RangeResult = { miles: number | null; inRange: boolean; unknown: boolean };
 
 /** C2: fulfilment, store, and — for delivery — the address plus a live
@@ -147,7 +153,8 @@ export function StepWhere({
 
       {fulfilment === "pickup" && selectedStore && (
         <p className="cor-note">
-          You&rsquo;ll pick up at {selectedStore.address}. Parking lot in front.
+          You&rsquo;ll pick up at {selectedStore.address}.
+          {PICKUP_PARKING[selectedStore.id] ? ` ${PICKUP_PARKING[selectedStore.id]}` : ""}
         </p>
       )}
 
@@ -211,7 +218,7 @@ export function StepWhere({
           {checking && <p className="cor-note is-checking">Checking address…</p>}
           {!checking && range && !range.unknown && range.inRange && (
             <p className="cor-note is-ok">
-              &check; {range.miles} miles from {selectedStore?.name}. Delivery is $
+              ✓ {range.miles} miles from {selectedStore?.name}. Delivery is $
               {(deliveryFeeCents / 100).toFixed(0)}.
             </p>
           )}

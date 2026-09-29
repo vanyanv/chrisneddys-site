@@ -4,6 +4,7 @@ import "@/styles/catering-invoice.css";
 import { getDb } from "@/db/client";
 import { getOrderView } from "@/lib/catering/service";
 import { CATERING_STORES } from "@/lib/catering/stores";
+import { LA_ZONE } from "@/lib/catering/timezone";
 import { money } from "@/components/catering-order/money";
 import { PrintButton } from "./PrintButton";
 
@@ -47,12 +48,18 @@ export default async function CateringInvoicePage({
         <div className="cinv-dates">
           <div>
             <span>Invoice date</span>
-            <b>{new Date().toLocaleDateString("en-US", { dateStyle: "medium" })}</b>
+            <b>
+              {new Date().toLocaleDateString("en-US", { timeZone: LA_ZONE, dateStyle: "medium" })}
+            </b>
           </div>
           <div>
             <span>Ordered</span>
             <b>
-              {order.createdAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+              {order.createdAt.toLocaleString("en-US", {
+                timeZone: LA_ZONE,
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
             </b>
           </div>
           <div>
@@ -60,6 +67,7 @@ export default async function CateringInvoicePage({
             <b>
               {order.approvedAt
                 ? order.approvedAt.toLocaleString("en-US", {
+                    timeZone: LA_ZONE,
                     dateStyle: "medium",
                     timeStyle: "short",
                   })
@@ -84,9 +92,15 @@ export default async function CateringInvoicePage({
             {order.poNumber && <p>PO {order.poNumber}</p>}
           </div>
           <div>
-            <p className="cinv-label">Delivered to</p>
+            <p className="cinv-label">
+              {order.fulfilment === "delivery" ? "Delivered to" : "Pickup"}
+            </p>
             <p>
-              {order.eventAt.toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}
+              {order.eventAt.toLocaleString("en-US", {
+                timeZone: LA_ZONE,
+                dateStyle: "full",
+                timeStyle: "short",
+              })}
             </p>
             {order.fulfilment === "delivery" && order.address ? (
               <>

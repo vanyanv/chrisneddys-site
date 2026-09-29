@@ -6,6 +6,7 @@ import { getOrderView } from "@/lib/catering/service";
 import { isCateringStoreId } from "@/lib/catering/stores";
 import { OrderLines } from "@/components/catering-order/OrderLines";
 import { SummaryStrip } from "@/components/catering-order/SummaryStrip";
+import { LA_ZONE } from "@/lib/catering/timezone";
 import { money } from "@/components/catering-order/money";
 import type { CartLine } from "@/lib/catering/types";
 
@@ -85,6 +86,7 @@ export default async function CateringOrderLinkPage({
           <p>
             We&rsquo;ll confirm by{" "}
             {order.respondBy?.toLocaleString("en-US", {
+              timeZone: LA_ZONE,
               dateStyle: "medium",
               timeStyle: "short",
             }) ?? "soon"}
@@ -95,7 +97,7 @@ export default async function CateringOrderLinkPage({
           <p>
             Charged {money(order.totalCents)}
             {order.approvedAt
-              ? ` on ${order.approvedAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              ? ` on ${order.approvedAt.toLocaleDateString("en-US", { timeZone: LA_ZONE, month: "short", day: "numeric" })}`
               : ""}
             .{" "}
             {cancellationQuote.tier === "free"
@@ -121,7 +123,11 @@ export default async function CateringOrderLinkPage({
         time={null}
       />
       <p className="cor-fine">
-        {new Date(order.eventAt).toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}
+        {new Date(order.eventAt).toLocaleString("en-US", {
+          timeZone: LA_ZONE,
+          dateStyle: "full",
+          timeStyle: "short",
+        })}
         {order.fulfilment === "delivery" && order.address ? ` · ${order.address.line1}` : ""}
       </p>
 

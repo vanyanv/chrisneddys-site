@@ -35,7 +35,7 @@ export function FindForm() {
       </button>
       {sent && (
         <p className="cor-note is-ok">
-          &check; Sent. If that email has orders, the links are in your inbox.
+          ✓ Sent. If that email has orders, the links are in your inbox.
         </p>
       )}
     </form>

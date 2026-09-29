@@ -186,7 +186,7 @@ export function OrderBuilder({
   }
 
   if (!step) {
-    return <Landing onStart={start} />;
+    return <Landing onStart={start} leadHours={config.leadHours} />;
   }
 
   const store = draft.store ?? config.stores[0]?.id ?? "hollywood";

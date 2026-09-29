@@ -121,7 +121,8 @@ export function ItemSheet({
                 <button
                   key={w.id}
                   type="button"
-                  className="cor-way-fill"
+                  className={`cor-way-fill${wayId === w.id ? " is-selected" : ""}`}
+                  aria-pressed={wayId === w.id}
                   onClick={() => quickFill(w)}
                 >
                   <span className="t">{w.name.toUpperCase()}</span>
@@ -218,10 +219,15 @@ export function ItemSheet({
             Same build already in your order — adding this will add to that line&rsquo;s quantity.
           </p>
         )}
-        {justAdded && (
-          <p className="cor-note is-ok">Added for {justAdded}. Add one for someone else?</p>
-        )}
       </div>
+
+      {/* Outside the scroll area, so the confirmation shows right above the
+          Add button instead of below the fold at the end of the sheet. */}
+      {justAdded && (
+        <p className="cor-note is-ok cor-sheet-added" role="status">
+          ✓ Added for {justAdded}. Add one for someone else?
+        </p>
+      )}
 
       <div className="cor-sheet-foot">
         <div className="cor-stepper">

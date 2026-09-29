@@ -448,6 +448,9 @@
   border: none;
   font-size: 20px;
 }
+.cor-cal-nav button:disabled {
+  opacity: 0.25;
+}
 .cor-cal-nav p {
   margin: 0;
   font-weight: 700;
@@ -739,6 +742,10 @@
   background: var(--a-ink);
   color: var(--a-cream);
 }
+.cor-way-fill.is-selected .s {
+  color: var(--a-cream);
+  opacity: 0.8;
+}
 .cor-topping-list {
   list-style: none;
   margin: 0;
@@ -893,7 +900,9 @@
 }
 .cor-menu-row {
   display: grid;
-  grid-template-columns: 56px 1fr auto auto;
+  /* minmax(0, 1fr): a plain 1fr can't shrink below the one-line
+     description's full width, which pushed the price off the screen. */
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
   gap: 10px;
   align-items: center;
   width: 100%;
@@ -930,6 +939,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.cor-menu-body {
+  min-width: 0;
 }
 .cor-menu-body .n {
   display: block;
@@ -1244,4 +1256,11 @@
     max-width: 1180px;
     margin: 0 auto;
   }
+}
+
+.cor-sheet-added {
+  margin: 0;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
 }

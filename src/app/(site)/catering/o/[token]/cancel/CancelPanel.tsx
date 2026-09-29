@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { CancellationQuote } from "@/lib/catering/types";
+import { LA_ZONE } from "@/lib/catering/timezone";
 import { money } from "@/components/catering-order/money";
 import { cancelOrderAction } from "../actions";
 
@@ -31,6 +32,7 @@ export function CancelPanel({
   const halfUntil = new Date(eventDate.getTime() - 24 * 60 * 60 * 1000);
   const fmt = (d: Date) =>
     d.toLocaleString("en-US", {
+      timeZone: LA_ZONE,
       month: "short",
       day: "numeric",
       hour: "numeric",

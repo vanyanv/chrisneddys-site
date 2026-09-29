@@ -35,7 +35,24 @@ export function Calendar({
   onSelect: (dateStr: string) => void;
 }) {
   const today = new Date(nowMs);
-  const [view, setView] = useState({ y: today.getFullYear(), m: today.getMonth() });
+  // Open on the month of the chosen day, or else of the first day that can
+  // actually be ordered: with 48 hours' notice at the end of a month, the
+  // current month can be entirely unavailable.
+  const [view, setView] = useState(() => {
+    if (selected) {
+      const [y, m] = selected.split("-").map(Number);
+      if (y && m) return { y, m: m - 1 };
+    }
+    for (let i = 0; i < 120; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+      const ds = toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+      if (dayStatus(ds, store, hours, daysOff, nowMs, leadHours) === "open") {
+        return { y: d.getFullYear(), m: d.getMonth() };
+      }
+    }
+    return { y: today.getFullYear(), m: today.getMonth() };
+  });
+  const atCurrentMonth = view.y === today.getFullYear() && view.m === today.getMonth();
 
   const first = new Date(view.y, view.m, 1);
   const startWeekday = first.getDay();
@@ -53,6 +70,7 @@ export function Calendar({
         <button
           type="button"
           aria-label="Previous month"
+          disabled={atCurrentMonth}
           onClick={() =>
             setView((v) => (v.m === 0 ? { y: v.y - 1, m: 11 } : { y: v.y, m: v.m - 1 }))
           }

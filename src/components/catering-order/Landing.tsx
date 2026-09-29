@@ -6,8 +6,8 @@ import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { CATERING_HREF } from "@/data/catering";
 import { itemPhotoAlt, formatPrice } from "@/lib/otter";
 
-const TILES = [
-  { k: "48 h", v: "notice, 72 h for 50+" },
+const TILES = (leadHours: number) => [
+  { k: `${leadHours} h`, v: "notice" },
   { k: "10 mi", v: "delivery, $25" },
   { k: "24 h", v: "we confirm" },
   { k: "$0", v: "charged until we confirm" },
@@ -20,7 +20,7 @@ const STEPS = [
 ];
 
 /** C1: the order page's own landing, before the wizard starts. */
-export function Landing({ onStart }: { onStart: () => void }) {
+export function Landing({ onStart, leadHours }: { onStart: () => void; leadHours: number }) {
   const food = FEATURED_OTTER_IDS.map((id) => allItems.find((i) => i.otterId === id))
     .filter((i): i is MenuItem => Boolean(i))
     .slice(0, 3);
@@ -51,7 +51,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
       </section>
 
       <ul className="cor-tiles">
-        {TILES.map((t) => (
+        {TILES(leadHours).map((t) => (
           <li key={t.k}>
             <span className="k">{t.k}</span>
             <span className="v">{t.v}</span>

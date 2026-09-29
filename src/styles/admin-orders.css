@@ -9,18 +9,6 @@
  * so it can never collide with or shadow a rule products/the shell rely on.
  */
 
-/* ---- list header --------------------------------------------------------- */
-.ord-head-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.ord-count {
-  display: block;
-  margin-top: 6px;
-}
 .ord-filter-row {
   display: flex;
   flex-wrap: wrap;
@@ -194,11 +182,6 @@ a.adm-filter-chip {
   color: var(--a-fg);
   text-decoration: underline;
 }
-.ord-head-placed {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 12px;
-  color: var(--a-sub);
-}
 .ord-text-link {
   font-size: 13px;
   font-weight: 600;
@@ -206,11 +189,6 @@ a.adm-filter-chip {
   color: var(--a-fg);
 }
 
-/* ---- detail: three-column body (reuses .adm-row-expand-grid as a static,
-   always-open layout — no .adm-row-expand wrapper, so no collapse) -------- */
-.ord-group-label-spaced {
-  margin-top: 20px;
-}
 .ord-customer-line {
   font-size: 13px;
   line-height: 1.5;
@@ -306,40 +284,6 @@ a.adm-filter-chip {
   display: flex;
   flex-direction: column;
 }
-.ord-refund-btn {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: none;
-  border: 1px solid var(--a-line);
-  color: var(--a-fg);
-  padding: 8px 14px;
-  cursor: pointer;
-  transition:
-    border-color 0.18s ease-out,
-    background-color 0.18s ease-out,
-    color 0.18s ease-out;
-}
-.ord-refund-btn:hover,
-.ord-refund-btn.is-armed {
-  border-color: var(--a-red-deep);
-  background: var(--a-red-cta);
-  color: var(--a-cream);
-}
-.ord-refund-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
 .ord-notes {
   margin-top: 22px;
-}
-
-/* ---- detail: timeline (no card) ------------------------------------------- */
-.ord-timeline-section {
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--a-line);
-  max-width: 480px;
 }

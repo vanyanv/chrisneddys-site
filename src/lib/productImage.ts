@@ -41,16 +41,6 @@ export function imageThumbSrc(
   return null;
 }
 
-/** The 720px cut, same order of preference. */
-export function imageFullSrc(
-  photoDir: string | null | undefined,
-  image: ResolvableImage,
-): string | null {
-  if (image.urlFull) return image.urlFull;
-  if (photoDir && image.src) return `${photoDir}/${image.src}.webp`;
-  return image.urlThumb ?? null;
-}
-
 /**
  * The alt text every upload used to be stored with until the owner typed a
  * real one. It reached customers verbatim on the product page, so it is now

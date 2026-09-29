@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   LEGACY_PLACEHOLDER_ALT,
-  imageFullSrc,
   imageThumbSrc,
   needsAltText,
   shopperAlt,
@@ -40,18 +39,6 @@ describe("imageThumbSrc", () => {
     expect(
       imageThumbSrc("/shop/foam-trucker-blue", { src: "", urlFull: null, urlThumb: null }),
     ).toBeNull();
-  });
-});
-
-describe("imageFullSrc", () => {
-  it("builds the 720px cut for a seeded image", () => {
-    expect(imageFullSrc("/shop/foam-trucker-blue", seeded)).toBe(
-      "/shop/foam-trucker-blue/front.webp",
-    );
-  });
-
-  it("prefers the uploaded blob url", () => {
-    expect(imageFullSrc("/shop/foam-trucker-blue", uploaded)).toBe(uploaded.urlFull);
   });
 });
 

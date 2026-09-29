@@ -9,188 +9,11 @@
  * does. Bowlby One only on `.adm-h1`, `.adm-btn-primary`, and
  * `.adm-name-cell-name`; Inter everywhere else; JetBrains Mono for
  * labels/pills/prices/slugs/timestamps. The brand itself never renders as
- * type — `.adm-logo`/`.rack-logo`/`.adm-slip-logo` are all the same
- * `/cne-logo-2x.webp` mark, sized per surface. Full primitive reference: CSS.md.
+ * type — `.rack-logo` is the `/cne-logo-2x.webp` mark, sized per surface.
  */
 @import "./tokens.css";
 * {
   box-sizing: border-box;
-}
-/* ---- top bar --------------------------------------------------------- */
-.adm-topbar {
-  background: var(--a-ink);
-  color: var(--a-cream);
-}
-.adm-topbar-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 12px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-}
-.adm-brand {
-  order: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
-}
-.adm-logo {
-  height: 22px;
-  width: auto;
-  display: block;
-}
-.adm-store-label {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  color: var(--a-yel-ink);
-  border-left: 1px solid rgba(255, 242, 201, 0.35);
-  padding-left: 10px;
-}
-.adm-topbar-right {
-  order: 2;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.adm-nav-tabs {
-  order: 3;
-  flex-basis: 100%;
-  display: flex;
-  gap: 22px;
-  justify-content: center;
-  overflow-x: auto;
-  margin-top: 6px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 242, 201, 0.16);
-}
-.adm-nav-tab {
-  position: relative;
-  flex: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--a-cream);
-  opacity: 0.72;
-  text-decoration: none;
-  white-space: nowrap;
-  padding: 4px 2px 8px;
-  transition: opacity 0.18s ease-out;
-}
-.adm-nav-tab::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--a-yel);
-  transform: scaleX(0);
-  transition: transform 0.2s ease-out;
-}
-.adm-nav-tab:hover {
-  opacity: 1;
-}
-.adm-nav-tab:hover::after {
-  transform: scaleX(1);
-}
-.adm-nav-tab[aria-current="page"] {
-  opacity: 1;
-}
-.adm-nav-tab[aria-current="page"]::after {
-  transform: scaleX(1);
-}
-@media (min-width: 760px) {
-  .adm-topbar-inner {
-    flex-wrap: nowrap;
-    padding: 14px 24px;
-  }
-  .adm-nav-tabs {
-    order: 2;
-    flex: 1;
-    flex-basis: auto;
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-    overflow: visible;
-  }
-  .adm-topbar-right {
-    order: 3;
-    margin-left: 0;
-  }
-  .adm-logo {
-    height: 34px;
-  }
-}
-/* light-surface `.adm-pill` (below) overridden here for the ink top bar */
-.adm-topbar-right .adm-pill {
-  background: transparent;
-  border-color: rgba(255, 242, 201, 0.35);
-  color: var(--a-cream);
-}
-.adm-topbar-right .adm-pill::before {
-  background: var(--a-sub);
-}
-/* `.adm-pill`'s is-open/is-live/is-hidden/is-closed modifiers (below) set a
-   text colour at the same specificity as the cream override above — on the
-   ink bar, is-closed's dark `--a-sub` text is ink-on-ink. Pin text to cream
-   for both states here and let only the dot carry the green/muted signal. */
-.adm-topbar-right .adm-pill.is-open,
-.adm-topbar-right .adm-pill.is-closed {
-  color: var(--a-cream);
-}
-.adm-topbar-right .adm-pill.is-open::before {
-  background: var(--a-ok);
-}
-.adm-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: var(--a-yel);
-  color: var(--a-ink);
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-}
-.adm-avatar::-webkit-details-marker {
-  display: none;
-}
-.adm-menu-email {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  color: var(--a-sub);
-  word-break: break-all;
-  margin: 0 0 8px;
-  padding: 2px 8px 10px;
-  border-bottom: 1px solid var(--a-line);
-}
-/* rides on `.adm-menu button`'s layout (below); only the colour differs */
-.adm-menu-signout {
-  color: var(--a-red-cta);
-}
-
-/* ---- main -------------------------------------------------------------- */
-.adm-main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 20px 16px 48px;
-}
-@media (min-width: 760px) {
-  .adm-main {
-    padding: 32px 24px 56px;
-  }
 }
 
 /* ---- typography ---------------------------------------------------------- */
@@ -201,12 +24,6 @@
   font-size: clamp(26px, 4vw, 38px);
   margin: 0 0 20px;
 }
-.adm-h2 {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  margin: 0 0 12px;
-}
 .adm-label {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 9.5px;
@@ -216,125 +33,6 @@
   color: var(--a-sub);
 }
 
-/* ---- cards ------------------------------------------------------------------ */
-.adm-card {
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  padding: 18px;
-}
-.adm-checklist {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.adm-checklist li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-.adm-check-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  border: 1px solid var(--a-line);
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 700;
-}
-.adm-check-icon[data-ok="true"] {
-  background: var(--a-ok);
-  color: var(--a-cream);
-  border-color: var(--a-ok);
-}
-.adm-check-icon[data-ok="false"] {
-  background: var(--a-card);
-  color: var(--a-sub);
-}
-
-/* ---- table ----------------------------------------------------------------- */
-.adm-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--a-line);
-  background: var(--a-card);
-}
-.adm-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.adm-table th,
-.adm-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--a-line);
-  white-space: nowrap;
-}
-.adm-table th {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--a-sub);
-  font-weight: 700;
-}
-.adm-table tr:last-child td {
-  border-bottom: none;
-}
-/* `.adm-chip`: pills for table cells. `.adm-pill` below is the same shape
-   for new markup; both read the same is-live/is-hidden/etc. modifiers. */
-.adm-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--a-line);
-  background: var(--a-card);
-  color: var(--a-fg);
-}
-.adm-chip[data-status="published"],
-.adm-chip.is-published,
-.adm-chip.is-live,
-.adm-chip[data-order-status="fulfilled"],
-.adm-chip[data-order-status="picked_up"] {
-  background: var(--a-ok);
-  color: var(--a-cream);
-  border-color: var(--a-ok);
-}
-.adm-chip[data-status="draft"],
-.adm-chip.is-draft,
-.adm-chip.is-hidden {
-  background: var(--a-cream);
-  color: var(--a-fg);
-}
-.adm-chip[data-status="archived"],
-.adm-chip.is-archived,
-.adm-chip[data-order-status="cancelled"],
-.adm-chip[data-order-status="pending"] {
-  background: var(--a-line);
-  color: var(--a-sub);
-}
-.adm-chip[data-order-status="ready_for_pickup"] {
-  background: var(--a-yel);
-  border-color: var(--a-yel-deep);
-}
-.adm-chip[data-order-status="refunded"] {
-  background: var(--a-red-cta);
-  color: var(--a-cream);
-  border-color: var(--a-red-cta);
-}
 .adm-empty {
   padding: 20px;
   color: var(--a-sub);
@@ -385,10 +83,6 @@
 }
 .adm-btn-danger:hover {
   background: var(--a-red-deep);
-}
-.adm-btn-block {
-  width: 100%;
-  justify-content: center;
 }
 
 /* ---- fields (shared by every admin form, guest and signed-in) --------- */
@@ -469,15 +163,6 @@
   color: var(--a-red-cta);
   margin: 4px 0 0;
 }
-.adm-field-row {
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-.adm-checkbox {
-  width: 18px;
-  height: 18px;
-}
 .adm-grid-2 {
   display: grid;
   grid-template-columns: 1fr;
@@ -489,48 +174,6 @@
   }
 }
 
-/* ---- products list head + status filter tabs -------------------------------- */
-.adm-products-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.adm-new-product {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-.adm-new-product .adm-input {
-  width: auto;
-  min-width: 220px;
-}
-/* status-filter pills (products/orders lists), distinct from the top-bar's
-   `.adm-nav-tabs`/`.adm-nav-tab` above */
-.adm-tabs {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 16px;
-  flex-wrap: wrap;
-}
-.adm-tab {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 12.5px;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--a-fg);
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  border-radius: 999px;
-  padding: 6px 14px;
-}
-.adm-tab[aria-current="page"] {
-  background: var(--a-ink);
-  color: var(--a-bg);
-  border-color: var(--a-ink);
-}
 .adm-row-link {
   display: flex;
   flex-direction: column;
@@ -538,68 +181,10 @@
   text-decoration: none;
   color: inherit;
 }
-.adm-product-name {
-  font-weight: 600;
-}
-.adm-product-slug {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  color: var(--a-sub);
-}
-.adm-thumb {
-  display: block;
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border: 1px solid var(--a-line);
-  background: var(--a-cream);
-}
 .adm-thumb-empty {
   background: var(--a-cream);
 }
-.adm-inv-untracked {
-  color: var(--a-sub);
-}
-.adm-inv-edition {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 90px;
-}
-.adm-inv-bar {
-  height: 4px;
-  background: var(--a-line);
-  width: 100%;
-}
-.adm-inv-bar > span {
-  display: block;
-  height: 100%;
-  background: var(--a-ok);
-}
 
-/* ---- editor layout ------------------------------------------------------------ */
-.adm-editor-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  align-items: start;
-}
-@media (min-width: 900px) {
-  .adm-editor-grid {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  }
-}
-.adm-editor-left,
-.adm-editor-right {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-}
-.adm-product-form {
-  display: flex;
-  flex-direction: column;
-}
 .adm-fact-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -637,9 +222,6 @@
   gap: 10px;
   margin-left: auto;
 }
-.adm-inline-form {
-  display: inline-flex;
-}
 .adm-saved-note {
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-size: 11px;
@@ -647,18 +229,7 @@
 }
 
 /* ---- photos card ---------------------------------------------------------------- */
-/* `.adm-photo-row` is also used, unchanged, by the sheet's Archived-list
-   disclosure (`ProductSheet.tsx`) for a plain name/slug/Restore row — keep
-   its 3-column layout working for that even though the photos editor below
-   no longer uses it. */
-.adm-photo-row {
-  display: grid;
-  grid-template-columns: 72px 1fr auto;
-  gap: 10px;
-  align-items: start;
-  border: 1px solid var(--a-line);
-  padding: 10px;
-}
+
 /* Compact 3-up thumb grid: 72-96px square cells (capped by max-width, not
    by a fixed px size, so the same 3 columns hold at both the ~350px desktop
    column and a 390px phone). */
@@ -807,19 +378,6 @@
   gap: 6px;
 }
 
-/* ---- inventory card --------------------------------------------------------------- */
-.adm-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.adm-radio {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
 .adm-inv-summary {
   font-size: 13px;
   margin: 14px 0 8px;
@@ -921,18 +479,6 @@
   font-family: var(--font-mono-jb), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
-.adm-table td.adm-items-cell {
-  white-space: normal;
-  max-width: 320px;
-}
-.adm-order-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-}
 .adm-order-head-meta {
   display: flex;
   align-items: center;
@@ -941,11 +487,6 @@
   font-size: 13px;
   color: var(--a-sub);
   margin-top: 6px;
-}
-.adm-order-head-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 .adm-address {
   font-style: normal;
@@ -988,73 +529,7 @@
   color: var(--a-sub);
   white-space: nowrap;
 }
-
-/* ---- packing slip ------------------------------------------------------------------------ */
-.adm-slip-noprint {
-  margin-bottom: 16px;
-}
-.adm-slip-sheet {
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  padding: 24px;
-  max-width: 480px;
-}
-.adm-slip-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--a-ink);
-  padding-bottom: 10px;
-  margin-bottom: 16px;
-}
-.adm-slip-logo {
-  height: 24px;
-  width: auto;
-  display: block;
-}
-.adm-slip-number {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 13px;
-}
-.adm-slip-to p {
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 6px 0 16px;
-}
-.adm-slip-items {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin-bottom: 16px;
-}
-.adm-slip-items th,
-.adm-slip-items td {
-  text-align: left;
-  padding: 6px 4px;
-  border-bottom: 1px solid var(--a-line);
-}
-.adm-slip-thanks {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  text-align: center;
-  margin: 20px 0 0;
-}
-@media print {
-  .adm-topbar,
-  .adm-slip-noprint {
-    display: none !important;
-  }
-  .adm-main {
-    padding: 0;
-  }
-  .adm-slip-sheet {
-    border: none;
-    box-shadow: none;
-    max-width: none;
-  }
-}
-/* ==== shared primitives — new for The Sheet; see CSS.md for markup ==== */
+/* ==== shared primitives — new for The Sheet ==== */
 
 /* ---- pill --------------------------------------------------------------- */
 .adm-pill {
@@ -1179,168 +654,7 @@
 }
 
 /* ---- sheet (the products table) -------------------------------------------- */
-/* Row shape shared by the header and every row: handle · thumb · name ·
-   price · stock · live pill · updated · chevron. */
-.adm-sheet-cols,
-.adm-sheet-row {
-  display: grid;
-  grid-template-columns: 24px 40px minmax(160px, 1fr) 84px 140px 100px 84px 28px;
-  column-gap: 12px;
-  align-items: center;
-  padding: 0 16px;
-  min-height: 56px;
-}
-.adm-sheet-cols {
-  border-top: 1px solid var(--a-line);
-  border-bottom: 1px solid var(--a-line);
-  color: var(--a-sub);
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  min-height: 34px;
-}
-.adm-sheet-row {
-  border-bottom: 1px solid var(--a-line);
-  background: var(--a-card);
-  transition:
-    background-color 0.15s ease-out,
-    box-shadow 0.18s ease-out;
-}
-.adm-sheet-row:hover {
-  background: rgba(26, 22, 18, 0.02);
-}
-.adm-sheet-row.is-dragging {
-  position: relative;
-  z-index: 2;
-  box-shadow: 0 8px 20px rgba(26, 22, 18, 0.14);
-}
-.adm-drag-handle {
-  color: var(--a-line);
-  cursor: grab;
-  display: flex;
-}
-.adm-drag-handle:hover {
-  color: var(--a-sub);
-}
-@media (max-width: 720px) {
-  .adm-drag-handle {
-    display: none;
-  }
-}
-.adm-chevron-btn {
-  background: none;
-  border: 0;
-  color: var(--a-sub);
-  padding: 6px;
-  display: flex;
-  cursor: pointer;
-}
-.adm-chevron-btn svg {
-  transition: transform 0.15s ease-out;
-}
-.adm-sheet-row.is-expanded .adm-chevron-btn svg {
-  transform: rotate(180deg);
-}
-.adm-add-row {
-  border: 1px dashed var(--a-line);
-  color: var(--a-sub);
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 12px;
-  padding: 15px 22px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-.adm-add-row:hover {
-  border-color: var(--a-sub);
-  color: var(--a-fg);
-}
-.adm-add-row.is-editing {
-  border-style: solid;
-  border-color: var(--a-ink);
-  background: var(--a-card);
-  cursor: default;
-}
 
-/* ---- editable cell ---------------------------------------------------------- */
-.adm-cell-edit {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 13px;
-  padding: 6px 8px;
-  border: 1px solid transparent;
-  font-variant-numeric: tabular-nums;
-  cursor: text;
-  position: relative;
-}
-.adm-cell-edit:hover {
-  border-color: var(--a-line);
-}
-.adm-cell-edit.is-editing {
-  border: 1.5px solid var(--a-ink);
-  background: var(--a-card);
-}
-.adm-cell-input {
-  border: 0;
-  background: none;
-  outline: 0;
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  color: var(--a-fg);
-  width: 100%;
-}
-.adm-cell-edit.is-changed {
-  border-left: 3px solid var(--a-yel-deep);
-  padding-left: 5px;
-}
-.adm-cell-edit.is-error {
-  border-left: 3px solid var(--a-red-cta);
-  padding-left: 5px;
-}
-.adm-cell-error {
-  font-size: 11px;
-  color: var(--a-red-cta);
-  margin-top: 3px;
-}
-
-/* ---- stock text (paired with the existing `.adm-inv-bar`) ------------------ */
-.adm-stock {
-  font-size: 13px;
-}
-.adm-stock.is-low {
-  color: var(--a-yel-deep);
-  font-weight: 600;
-}
-.adm-stock.is-out {
-  color: var(--a-red-cta);
-  font-weight: 600;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  white-space: nowrap;
-}
-.adm-restock {
-  font-size: 11px;
-  color: var(--a-fg);
-  text-decoration: underline;
-  flex: none;
-}
-
-/* ---- row expand (accordion area under a sheet row) -------------------------- */
-.adm-row-expand {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.22s ease-out;
-}
-.adm-row-expand.is-open {
-  grid-template-rows: 1fr;
-}
 .adm-row-expand-grid {
   overflow: hidden;
   min-height: 0;
@@ -1597,30 +911,6 @@
   border-color: var(--a-ink);
 }
 
-/* ---- fab (phones only) --------------------------------------------------------- */
-.adm-fab {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: var(--a-yel);
-  border: 1px solid var(--a-yel-deep);
-  color: var(--a-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 12px 32px rgba(26, 22, 18, 0.14);
-  z-index: 40;
-  cursor: pointer;
-}
-@media (min-width: 720px) {
-  .adm-fab {
-    display: none;
-  }
-}
-
 /* ---- menu ("···" dropdown, and the top bar's owner menu) ------------------------ */
 .adm-menu-wrap {
   position: relative;
@@ -1690,29 +980,6 @@
   background: var(--a-ok);
 }
 
-/* ---- sheet row name cell (product name + slug; reuses `.adm-thumb`
-   for the photo column) --------------------------------------------------- */
-.adm-name-cell {
-  min-width: 0;
-}
-.adm-name-cell-name {
-  font-family: var(--font-bowlby), Impact, sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.adm-name-cell-slug {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
-  font-size: 11px;
-  color: var(--a-sub);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ---- iPhone / iPad text boxes ---------------------------------------------
    iOS zooms the whole page into any text box under 16px on tap and leaves it
    zoomed, in every iPhone browser (they all run Safari's engine). The
@@ -1723,8 +990,7 @@
   :root .adm-field input,
   :root .adm-input,
   :root .adm-textarea,
-  :root .adm-search input,
-  :root .adm-cell-input {
+  :root .adm-search input {
     font-size: 16px;
   }
 }

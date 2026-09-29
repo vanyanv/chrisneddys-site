@@ -1,5 +1,3 @@
-import { brand } from "@/data/brand";
-
 /**
  * The hero still, at the widths the layout actually asks for.
  *
@@ -81,6 +79,3 @@ export const HERO_WIDE = {
   webpSrcSet: WIDE_WIDTHS.map((w) => `/hero-wide-${w}.webp ${w}w`).join(", "),
   sizes: "100vw",
 } as const;
-
-/** Absolute URL for the hero still, for structured data and social cards. */
-export const heroImageUrl = `${brand.siteUrl}${HERO.src}`;

@@ -532,12 +532,12 @@ export type CateringPendingChange = {
   tipCents: number;
   totalCents: number;
   requestedAt: string;
-  /** Set only when the change also asks for a different headcount or time
-   * of day (same calendar date — the change request never offers a new
-   * date) — `jsonb`, so adding these optional fields needed no migration.
+  /** Set only when the change also asks for a different time of day (same
+   * calendar date — the change request never offers a new date) — `jsonb`,
+   * so adding this optional field needed no migration.
    * `applyPendingChange` (`src/lib/catering/orders.ts`) patches the order's
-   * own `headcount`/`eventAt` from these when present. */
-  headcount?: number;
+   * own `eventAt` from it when present. (Older rows may also carry a
+   * `headcount`; nothing reads it any more.) */
   eventAt?: string;
 };
 
@@ -555,7 +555,9 @@ export const cateringOrders = pgTable(
     fulfilment: cateringFulfilmentEnum("fulfilment").notNull(),
     /** The pickup/delivery time the customer chose. */
     eventAt: timestamp("event_at", { withTimezone: true }).notNull(),
-    headcount: integer("headcount").notNull(),
+    /** No longer asked for (the owner does not need it) — nullable so new
+     * orders leave it empty; old rows keep whatever they had. */
+    headcount: integer("headcount"),
     contactName: text("contact_name").notNull(),
     contactEmail: text("contact_email").notNull(),
     contactPhone: text("contact_phone").notNull(),
@@ -680,6 +682,9 @@ export const cateringSettings = pgTable("catering_settings", {
   rangeMiles: integer("range_miles").notNull().default(10),
   replyHours: integer("reply_hours").notNull().default(24),
   leadHours: integer("lead_hours").notNull().default(48),
+  /** Unused since the "50+ people need 72 hours" rule was removed — the
+   * columns stay (dropping is riskier than leaving them) but nothing reads
+   * or writes them. */
   bigLeadHours: integer("big_lead_hours").notNull().default(72),
   bigHeadcount: integer("big_headcount").notNull().default(50),
   ownerEmail: text("owner_email").notNull().default("chris@chrisneddys.com"),

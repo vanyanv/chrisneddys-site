@@ -2,15 +2,14 @@ import { test, expect, type Page } from "@playwright/test";
 import {
   startOrder,
   choosePickup,
-  setHeadcount,
   selectCalendarDate,
   selectFirstSlot,
   openOrderSheet,
 } from "./helpers";
 
 /**
- * Flow 4: "Feed my crew" suggests a cart sized to the headcount, and the
- * result stays a normal, editable cart afterwards. Issue #190.
+ * Flow 4: "Feed my crew" suggests a cart sized to a group size typed into
+ * the sheet itself (never stored or required), and the result stays a normal, editable cart afterwards. Issue #190.
  */
 test.describe.serial("flow 4: feed my crew", () => {
   let page: Page;
@@ -20,7 +19,6 @@ test.describe.serial("flow 4: feed my crew", () => {
     await startOrder(page);
     await choosePickup(page, "Hollywood");
     await page.getByRole("button", { name: "Continue" }).click();
-    await setHeadcount(page, 20);
     await selectCalendarDate(page, 5);
     await selectFirstSlot(page);
     await page.getByRole("button", { name: "Continue" }).click();
@@ -31,11 +29,12 @@ test.describe.serial("flow 4: feed my crew", () => {
     await page.close();
   });
 
-  test("1. suggests a cart sized to the headcount", async () => {
+  test("1. suggests a cart sized to the number typed into the sheet", async () => {
     await page.getByRole("button", { name: /feed my crew/i }).click();
     const sheet = page.getByRole("dialog", { name: "Feed my crew" });
     await expect(sheet).toBeVisible();
-    await expect(sheet.getByText("For 20 people.")).toBeVisible();
+    await sheet.getByLabel("Number of people").fill("20");
+    await expect(sheet.getByLabel("Number of people")).toHaveValue("20");
 
     // "Classic" (2 Sliders and Fries each) is selected by default.
     await expect(sheet.locator(".cor-choice.is-selected", { hasText: "Classic" })).toBeVisible();

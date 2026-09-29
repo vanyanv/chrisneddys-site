@@ -5,21 +5,18 @@ import type { CateringStoreId } from "./stores";
 import type { CateringHours, DayStatus, DaysOff, Weekday } from "./types";
 import { addMinutes, laDateString, weekdayOf, zonedTimeToUtcMs } from "./timezone";
 
-const STANDARD_LEAD_HOURS = 48;
-const LARGE_PARTY_LEAD_HOURS = 72;
-const LARGE_PARTY_THRESHOLD = 50;
+/** The default notice, and what the owner's "Notice (hours)" setting
+ * (`catering_settings.lead_hours`) starts at. One rule for every order,
+ * whatever its size. */
+export const DEFAULT_LEAD_HOURS = 48;
 const SLOT_MINUTES = 30;
 export const READY_BY_MINUTES_BEFORE = 30;
 export const DRIVER_LEAVES_MINUTES_BEFORE = 20;
 
-/** 48h before the event, or 72h when the headcount is 50 or more. */
-export function leadHours(headcount: number): number {
-  return headcount >= LARGE_PARTY_THRESHOLD ? LARGE_PARTY_LEAD_HOURS : STANDARD_LEAD_HOURS;
-}
-
-/** The earliest UTC instant (ms) an order for this headcount may be booked for. */
-export function earliestAllowed(nowMs: number, headcount: number): number {
-  return addMinutes(nowMs, leadHours(headcount) * 60);
+/** The earliest UTC instant (ms) an order may be booked for: `leadHours`
+ * (default 48) from now, whatever the size of the order. */
+export function earliestAllowed(nowMs: number, leadHours: number = DEFAULT_LEAD_HOURS): number {
+  return addMinutes(nowMs, leadHours * 60);
 }
 
 function isDayOff(dateStr: string, storeId: CateringStoreId, daysOff: DaysOff): boolean {
@@ -44,7 +41,7 @@ function minutesToHHMM(minutes: number): string {
 
 /**
  * Every 30-minute slot on `dateStr` at `storeId` whose start is at or after
- * the lead-time cutoff for `headcount`. Empty when the store is closed,
+ * the lead-time cutoff. Empty when the store is closed,
  * the day is off, or every slot on an open day falls before the cutoff.
  */
 export function slotsForDate(
@@ -53,14 +50,14 @@ export function slotsForDate(
   hours: CateringHours,
   daysOff: DaysOff,
   nowMs: number,
-  headcount: number,
+  leadHours: number = DEFAULT_LEAD_HOURS,
 ): string[] {
   if (isDayOff(dateStr, storeId, daysOff)) return [];
   const weekday = weekdayOf(dateStr) as Weekday;
   const day = scheduleFor(hours, storeId, weekday);
   if (!day || day.closed) return [];
 
-  const earliest = earliestAllowed(nowMs, headcount);
+  const earliest = earliestAllowed(nowMs, leadHours);
   const slots: string[] = [];
   for (const window of day.windows) {
     const openMin = toMinutes(window.open);
@@ -85,7 +82,7 @@ export function dayStatus(
   hours: CateringHours,
   daysOff: DaysOff,
   nowMs: number,
-  headcount: number,
+  leadHours: number = DEFAULT_LEAD_HOURS,
 ): DayStatus {
   const today = laDateString(nowMs);
   if (dateStr < today) return "past";
@@ -95,7 +92,7 @@ export function dayStatus(
   const day = scheduleFor(hours, storeId, weekday);
   if (!day || day.closed) return "closed";
 
-  const slots = slotsForDate(dateStr, storeId, hours, daysOff, nowMs, headcount);
+  const slots = slotsForDate(dateStr, storeId, hours, daysOff, nowMs, leadHours);
   return slots.length > 0 ? "open" : "too-soon";
 }
 

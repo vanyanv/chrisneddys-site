@@ -3,7 +3,8 @@ import { signInAsOwner } from "../helpers";
 import {
   startOrder,
   choosePickup,
-  setHeadcount,
+  selectCalendarDate,
+  selectFirstSlot,
   calendarDayStatus,
   dateStrDaysFromNow,
   cateringSaveButton,
@@ -12,9 +13,9 @@ import {
 
 /**
  * Flow 3: lead time. Tomorrow is always too soon (48h notice) and its
- * message links to `/contact/` with no `tel:` link; a 50+ headcount needs
- * 72h, blocking a day that's fine for a normal order; a day the owner has
- * marked off shows closed. Issue #190.
+ * message links to `/contact/` with no `tel:` link; the same 48h notice
+ * applies whatever the size of the order (there is no longer notice for big
+ * ones); a day the owner has marked off shows closed. Issue #190.
  */
 test.describe.serial("flow 3: lead time", () => {
   let page: Page;
@@ -32,7 +33,6 @@ test.describe.serial("flow 3: lead time", () => {
   });
 
   test("1. tomorrow is too soon, with a /contact/ link and no tel: link", async () => {
-    await setHeadcount(page, 12);
     expect(await calendarDayStatus(page, 1)).toBe("too-soon");
 
     const tomorrow = page.locator(`button.cor-cal-day[aria-label^="${dateStrDaysFromNow(1)}"]`);
@@ -58,10 +58,33 @@ test.describe.serial("flow 3: lead time", () => {
     await expect(tomorrow).toBeDisabled();
   });
 
-  test("2. 50+ headcount needs 72h notice, blocking a day well inside it", async () => {
-    await setHeadcount(page, 60);
-    await expect(page.getByText(/72 hours’ notice/)).toBeVisible();
-    expect(await calendarDayStatus(page, 2)).toBe("too-soon");
+  test("2. a 60-person order gets the same 48h notice as any other, not 72h", async () => {
+    // Nothing on this step depends on the order's size, and nothing says
+    // otherwise: no "72 hours' notice" note, and the day the calendar
+    // opens up is the same one a small order gets.
+    await expect(page.getByText(/72 hours/)).toHaveCount(0);
+    expect(await calendarDayStatus(page, 3)).toBe("open");
+
+    // Build a big order (Feed my crew for 60), then come back to the
+    // calendar: still tomorrow too soon, three days out open, no 72h note.
+    await selectCalendarDate(page, 3);
+    await selectFirstSlot(page);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page).toHaveURL(/step=food/);
+    await page.getByRole("button", { name: /feed my crew/i }).click();
+    const sheet = page.getByRole("dialog", { name: "Feed my crew" });
+    await sheet.getByLabel("Number of people").fill("60");
+    await sheet.getByRole("button", { name: /^Fill my order/ }).click();
+    await expect(sheet).toBeHidden();
+
+    await page.locator(".cor-summary").getByRole("button", { name: "Edit" }).click();
+    await expect(page).toHaveURL(/step=where/);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page).toHaveURL(/step=when/);
+
+    await expect(page.getByText(/72 hours/)).toHaveCount(0);
+    expect(await calendarDayStatus(page, 1)).toBe("too-soon");
+    expect(await calendarDayStatus(page, 3)).toBe("open");
     expect(await calendarDayStatus(page, 5)).toBe("open");
   });
 
@@ -70,7 +93,7 @@ test.describe.serial("flow 3: lead time", () => {
 
     const adminPage = await page.context().browser()!.newPage();
     await signInAsOwner(adminPage);
-    await adminPage.goto("/admin/settings");
+    await adminPage.goto("/admin/catering/settings");
     // `catering-phone` and `catering-desktop` both run this same spec file
     // against one shared server/database, and `dayOffDate` is derived from
     // the real clock (not per-project), so whichever project runs this
@@ -92,7 +115,6 @@ test.describe.serial("flow 3: lead time", () => {
     await expect(cateringSaveBar(adminPage)).not.toHaveClass(/is-visible/);
     await adminPage.close();
 
-    await setHeadcount(page, 12);
     // Force a fresh render of the calendar/day-status with the new setting:
     // reload the whole order page (the draft persists in localStorage, but
     // `config` — including `daysOff` — only ever comes from the server render).

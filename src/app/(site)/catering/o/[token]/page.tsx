@@ -119,7 +119,6 @@ export default async function CateringOrderLinkPage({
         fulfilment={order.fulfilment}
         date={null}
         time={null}
-        headcount={order.headcount}
       />
       <p className="cor-fine">
         {new Date(order.eventAt).toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" })}

@@ -2,7 +2,7 @@
 /**
  * Seeds one catering order for local/e2e use — the "round-3" wireframe
  * order (`a3-catering-order-new-request-desktop.png` and friends): a
- * Northlight Pictures delivery for 60 people, Van Nuys, Friday at 12:30 PM,
+ * Northlight Pictures delivery, Van Nuys, Friday at 12:30 PM,
  * with a mix of bulk builds and named lines (including a halal table and a
  * halal individual order).
  *
@@ -275,7 +275,6 @@ async function main() {
     store: "vannuys",
     fulfilment: "delivery",
     eventAt,
-    headcount: 60,
     contactName: "Maya Torres",
     contactEmail: "maya@northlightpictures.com",
     contactPhone: "(818) 555-0142",

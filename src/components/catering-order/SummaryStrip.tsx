@@ -24,7 +24,7 @@ function formatTime(timeStr: string): string {
 }
 
 /** The cream strip under the header from C3 onward: "Van Nuys · Delivery ·
- * Fri Oct 2 · 12:30 PM · 60 people", with an Edit link back to C2/C3.
+ * Fri Oct 2 · 12:30 PM", with an Edit link back to C2/C3.
  * `onEdit` is optional: the order-link page (`/catering/o/[token]/`) reuses
  * this strip read-only from a Server Component, where there's no edit flow
  * to jump back into and — since it's a Server Component — no way to hand
@@ -37,14 +37,12 @@ export function SummaryStrip({
   fulfilment,
   date,
   time,
-  headcount,
   onEdit,
 }: {
   store: CateringStoreId | null;
   fulfilment: Fulfilment | null;
   date: string | null;
   time: string | null;
-  headcount: number;
   onEdit?: () => void;
 }) {
   const storeName = CATERING_STORES.find((s) => s.id === store)?.name;
@@ -53,7 +51,6 @@ export function SummaryStrip({
     fulfilment === "delivery" ? "Delivery" : fulfilment === "pickup" ? "Pickup" : null,
     date ? formatDate(date) : null,
     time ? formatTime(time) : null,
-    `${headcount} people`,
   ].filter(Boolean);
 
   return (

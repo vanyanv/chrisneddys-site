@@ -30,7 +30,7 @@ export { LA_ZONE, laDateString, weekdayOf, zonedTimeToUtcMs } from "./timezone";
 export {
   READY_BY_MINUTES_BEFORE,
   DRIVER_LEAVES_MINUTES_BEFORE,
-  leadHours,
+  DEFAULT_LEAD_HOURS,
   earliestAllowed,
   slotsForDate,
   dayStatus,

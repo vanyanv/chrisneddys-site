@@ -1,8 +1,9 @@
 "use server";
 
-/** `/admin/settings`'s "Catering" section — its own save action against
+/** `/admin/catering/settings/` — its own save action against
  * `catering_settings`, independent of the store's own `saveSettingsAction`
- * (a different table, a different form, its own sticky save bar). Mirrors
+ * (a different table, a different page, a different form, its own sticky
+ * save bar). Mirrors
  * `../settings/actions.ts`'s `saveSettingsAction` shape: parse-then-validate
  * server-side, `saveCateringSettings` (`@/lib/catering/settings`) is the
  * real source of truth for every rule this enforces. */
@@ -49,8 +50,6 @@ export async function saveCateringSettingsAction(
   const deliveryFeeCents = dollarsToCents(String(formData.get("deliveryFeeDollars") ?? ""));
   const replyHours = Number(formData.get("replyHours"));
   const leadHours = Number(formData.get("leadHours"));
-  const bigLeadHours = Number(formData.get("bigLeadHours"));
-  const bigHeadcount = Number(formData.get("bigHeadcount"));
   const ownerEmail = String(formData.get("ownerEmail") ?? "").trim();
 
   const patch: CateringSettingsPatch = {
@@ -61,8 +60,6 @@ export async function saveCateringSettingsAction(
     deliveryFeeCents,
     replyHours,
     leadHours,
-    bigLeadHours,
-    bigHeadcount,
     ownerEmail,
   };
 
@@ -83,7 +80,7 @@ export async function saveCateringSettingsAction(
   // response body arrives at the browser complete and well-formed.
   //
   // Deferring all of it into `after()` avoids that entirely, and nothing
-  // depends on the inline RSC refresh: `/admin/settings`'s save bar shows
+  // depends on the inline RSC refresh: `/admin/catering/settings/`'s save bar shows
   // the saved values from `useActionState`'s own result (keyed by
   // `savedAt`), not from a fresh server render riding the action response.
   // `/catering/order/` is `force-dynamic`, so it has no Full Route Cache
@@ -94,8 +91,12 @@ export async function saveCateringSettingsAction(
   // commit b52a70e.
   if (!isTestEnv()) {
     after(() => {
-      revalidatePath("/admin/settings");
+      // The admin pages that show the catering on/off pill or read these
+      // settings. `/admin/settings` is the shop's page now and no longer
+      // shows anything from `catering_settings`, so it isn't listed.
+      revalidatePath("/admin/catering/settings");
       revalidatePath("/admin/catering");
+      revalidatePath("/admin/catering/emails");
       revalidatePath("/admin");
       revalidatePath("/catering/");
       revalidatePath("/order/");

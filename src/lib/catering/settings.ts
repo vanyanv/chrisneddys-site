@@ -64,8 +64,6 @@ export type CateringSettingsPatch = Partial<{
   rangeMiles: number;
   replyHours: number;
   leadHours: number;
-  bigLeadHours: number;
-  bigHeadcount: number;
   ownerEmail: string;
 }>;
 
@@ -169,35 +167,12 @@ export async function saveCateringSettings(
   if (patch.leadHours !== undefined && !isPositiveInt(patch.leadHours)) {
     return { ok: false, error: "Lead hours must be a positive whole number.", field: "leadHours" };
   }
-  if (patch.bigLeadHours !== undefined && !isPositiveInt(patch.bigLeadHours)) {
-    return {
-      ok: false,
-      error: "Big-order lead hours must be a positive whole number.",
-      field: "bigLeadHours",
-    };
-  }
-  if (patch.bigHeadcount !== undefined && !isPositiveInt(patch.bigHeadcount)) {
-    return {
-      ok: false,
-      error: "Big-order headcount must be a positive whole number.",
-      field: "bigHeadcount",
-    };
-  }
   if (patch.ownerEmail !== undefined && !EMAIL_PATTERN.test(patch.ownerEmail)) {
     return { ok: false, error: "Owner email is not a valid email address.", field: "ownerEmail" };
   }
 
-  // Also ensures the row exists before the update below.
-  const current = await getCateringSettings(database);
-  const effectiveLeadHours = patch.leadHours ?? current.leadHours;
-  const effectiveBigLeadHours = patch.bigLeadHours ?? current.bigLeadHours;
-  if (effectiveBigLeadHours < effectiveLeadHours) {
-    return {
-      ok: false,
-      error: "Big-order lead hours can't be shorter than the ordinary lead time.",
-      field: "bigLeadHours",
-    };
-  }
+  // Ensure the row exists before the update below.
+  await getCateringSettings(database);
 
   const [row] = await database
     .update(cateringSettings)

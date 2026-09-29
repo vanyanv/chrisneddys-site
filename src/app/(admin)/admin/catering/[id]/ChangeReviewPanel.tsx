@@ -39,8 +39,7 @@ export function ChangeReviewPanel({
     <div className="cat-change-card">
       <p className="rack-eyebrow">Pending change</p>
       <p className="cat-next-heading">
-        {pendingChange.lines.length} line{pendingChange.lines.length === 1 ? "" : "s"} · headcount{" "}
-        {pendingChange.plateSets}
+        {pendingChange.lines.length} line{pendingChange.lines.length === 1 ? "" : "s"}
       </p>
       <div className="cat-change-diff">
         New total {formatCents(pendingChange.totalCents)} (was {formatCents(currentTotalCents)}) —{" "}

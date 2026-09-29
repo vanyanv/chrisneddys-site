@@ -3,12 +3,12 @@ import Link from "next/link";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
-import { getStoreSettings } from "@/lib/orders";
-import { isShopOpenFor } from "@/lib/shopStatus";
+import { getCateringSettings } from "@/lib/catering/settings";
 import { getDb } from "@/db/client";
 import { listOrders, type CateringOrdersTab } from "@/lib/catering/orders";
 import { expireDue } from "@/lib/catering/service";
 import { CateringNavBadge } from "./CateringNavBadge";
+import { CateringPill } from "./CateringPill";
 import { CateringListTable, type CateringListRow } from "./CateringListTable";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
@@ -54,8 +54,8 @@ export default async function AdminCateringListPage({
   const db = await getDb();
   await expireDue(db, new Date());
 
-  const [settings, rows, needsYou, upcoming, past] = await Promise.all([
-    getStoreSettings(),
+  const [cateringSettings, rows, needsYou, upcoming, past] = await Promise.all([
+    getCateringSettings(db),
     listOrders({ tab }, db),
     listOrders({ tab: "needs-you" }, db),
     listOrders({ tab: "upcoming" }, db),
@@ -75,7 +75,6 @@ export default async function AdminCateringListPage({
     store: o.store,
     eventAt: o.eventAt.toISOString(),
     respondBy: o.respondBy ? o.respondBy.toISOString() : null,
-    headcount: o.headcount,
     contactName: o.contactName,
     contactEmail: o.contactEmail,
     company: o.company,
@@ -83,7 +82,6 @@ export default async function AdminCateringListPage({
     hasPendingChange: o.pendingChange !== null,
   }));
 
-  const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
 
   return (
@@ -114,9 +112,7 @@ export default async function AdminCateringListPage({
           ))}
         </div>
         <div className="rack-top-right">
-          <span className={`rack-store-pill rack-mono ${shopOpen ? "" : "is-closed"}`}>
-            <i></i>Store: {shopOpen ? "Open" : "Closed"}
-          </span>
+          <CateringPill on={cateringSettings.orderingOn} />
           <details className="rack-avatar-menu">
             <summary className="rack-avatar">{initials}</summary>
             <div className="rack-menu">
@@ -140,6 +136,9 @@ export default async function AdminCateringListPage({
             {totalCount} order{totalCount === 1 ? "" : "s"} &middot; {needsYou.length} need you
             &middot; {thisWeekCount} this week
           </span>
+          <Link href="/admin/catering/settings" className="rack-btn">
+            Settings
+          </Link>
           <Link href="/admin/catering/emails" className="rack-btn">
             Email previews
           </Link>
@@ -173,7 +172,7 @@ export default async function AdminCateringListPage({
                   : "No catering yet."}
             </p>
             <p className="rack-mono" style={{ fontSize: 11 }}>
-              Requests land here and in {settings.supportEmail || "your inbox"}.
+              Requests land here and in {cateringSettings.ownerEmail || "your inbox"}.
             </p>
           </div>
         ) : (

@@ -1,11 +1,11 @@
 "use client";
 
-/** Settings → Catering (A6): ordering on/off, hours per store per weekday,
- * days off, and the delivery/reply/lead-time rules — `catering_settings`,
- * via `saveCateringSettingsAction`. Its own form and its own sticky save
- * bar, independent of the store settings form above it on the page (same
- * "separate form, separate save" pattern `ChangePasswordCard`/`OwnersCard`
- * already use there) — a different table, so a different save. */
+/** `/admin/catering/settings/` (A6): ordering on/off, hours per store per
+ * weekday, days off, and the delivery/reply/notice rules —
+ * `catering_settings`, via `saveCateringSettingsAction`. Catering has its
+ * own settings page, its own form and its own sticky save bar, deliberately
+ * apart from the shop's `/admin/settings`: turning catering on or off never
+ * touches the shop, and the shop's switches never touch catering. */
 import { useActionState, useCallback, useMemo, useRef, useState } from "react";
 import type { CateringDayOff, CateringHours } from "@/db/schema";
 import type { CateringSettings } from "@/lib/catering/settings";
@@ -43,8 +43,6 @@ type FormValues = {
   deliveryFeeDollars: string;
   replyHours: string;
   leadHours: string;
-  bigLeadHours: string;
-  bigHeadcount: string;
   ownerEmail: string;
 };
 
@@ -57,8 +55,6 @@ function valuesFromSettings(settings: CateringSettings): FormValues {
     deliveryFeeDollars: (settings.deliveryFeeCents / 100).toFixed(2),
     replyHours: String(settings.replyHours),
     leadHours: String(settings.leadHours),
-    bigLeadHours: String(settings.bigLeadHours),
-    bigHeadcount: String(settings.bigHeadcount),
     ownerEmail: settings.ownerEmail,
   };
 }
@@ -175,13 +171,6 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
 
   return (
     <>
-      <h2 className="adm-group-label" style={{ fontSize: 22, fontFamily: "inherit" }}>
-        Catering
-      </h2>
-      <p className="adm-settings-lede" style={{ margin: "4px 0 18px" }}>
-        What catering customers can pick online.
-      </p>
-
       {state?.error && (
         <p className="adm-error" role="alert">
           {state.error}
@@ -196,6 +185,52 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
       >
         <input type="hidden" name="hours" value={hoursJson} />
         <input type="hidden" name="daysOff" value={daysOffJson} />
+
+        <div className="adm-settings-section is-full">
+          <h3 className="adm-group-label">Online catering &middot; catering only</h3>
+          <label className="adm-toggle-row">
+            <span className="adm-toggle">
+              {/* `key` keyed to the last successful save: React 19's
+               * `<form action={fn}>` calls `requestFormReset` on *every*
+               * submit, before the action even runs (`startHostTransition`
+               * in react-dom) — a native `form.reset()`-style call meant
+               * for uncontrolled fields. For a genuinely controlled
+               * checkbox like this one, that native reset silently flips
+               * the DOM's own `checked` property back to whatever it was
+               * before the click, without React knowing — and because
+               * React's own bookkeeping still says `checked` is exactly
+               * what it was ("true", unchanged since the click that
+               * triggered this submit), its diffing bails out and never
+               * rewrites the DOM property on the next render, leaving the
+               * native reset in place. The failure is silent and timing-
+               * dependent (it doesn't happen on every save), which is what
+               * made the owner's "Take catering requests online" toggle
+               * occasionally look like it reverted itself right after
+               * saving. Changing `key` on a successful save forces React
+               * to throw the old DOM node away and mount a fresh one with
+               * the correct `checked` value baked in, which a diff can't
+               * bail out of. */}
+              <input
+                key={state?.savedAt ?? "unsaved"}
+                id="orderingOn"
+                name="orderingOn"
+                type="checkbox"
+                checked={values.orderingOn}
+                onChange={(e) => setField("orderingOn", e.target.checked)}
+                className="adm-toggle-input"
+              />
+              <span className="adm-toggle-track" aria-hidden="true">
+                <span className="adm-toggle-thumb" />
+              </span>
+            </span>
+            Take catering requests online
+          </label>
+          <p className="adm-help">
+            Catering only. This doesn&rsquo;t open or close the shop, and the shop&rsquo;s own
+            switch doesn&rsquo;t change this. Off: the catering page and every catering button send
+            people to the contact page instead.
+          </p>
+        </div>
 
         <div className="adm-settings-section is-full">
           <div className="cat-store-tabs">
@@ -366,34 +401,6 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
               />
             </div>
             <div className="adm-field">
-              <label htmlFor="bigLeadHours" className="adm-label">
-                Notice for {values.bigHeadcount}+ people
-              </label>
-              <input
-                id="bigLeadHours"
-                name="bigLeadHours"
-                type="number"
-                min={1}
-                className="adm-input"
-                value={values.bigLeadHours}
-                onChange={(e) => setField("bigLeadHours", e.target.value)}
-              />
-            </div>
-            <div className="adm-field">
-              <label htmlFor="bigHeadcount" className="adm-label">
-                Big-order headcount
-              </label>
-              <input
-                id="bigHeadcount"
-                name="bigHeadcount"
-                type="number"
-                min={1}
-                className="adm-input"
-                value={values.bigHeadcount}
-                onChange={(e) => setField("bigHeadcount", e.target.value)}
-              />
-            </div>
-            <div className="adm-field">
               <label htmlFor="replyHours" className="adm-label">
                 Reply within (hours)
               </label>
@@ -453,53 +460,11 @@ export function CateringSettingsSection({ settings }: { settings: CateringSettin
               />
             </div>
           </div>
-
-          <label className="adm-toggle-row" style={{ marginTop: 16 }}>
-            <span className="adm-toggle">
-              {/* `key` keyed to the last successful save: React 19's
-               * `<form action={fn}>` calls `requestFormReset` on *every*
-               * submit, before the action even runs (`startHostTransition`
-               * in react-dom) — a native `form.reset()`-style call meant
-               * for uncontrolled fields. For a genuinely controlled
-               * checkbox like this one, that native reset silently flips
-               * the DOM's own `checked` property back to whatever it was
-               * before the click, without React knowing — and because
-               * React's own bookkeeping still says `checked` is exactly
-               * what it was ("true", unchanged since the click that
-               * triggered this submit), its diffing bails out and never
-               * rewrites the DOM property on the next render, leaving the
-               * native reset in place. The failure is silent and timing-
-               * dependent (it doesn't happen on every save), which is what
-               * made the owner's "Take catering requests online" toggle
-               * occasionally look like it reverted itself right after
-               * saving. Changing `key` on a successful save forces React
-               * to throw the old DOM node away and mount a fresh one with
-               * the correct `checked` value baked in, which a diff can't
-               * bail out of. */}
-              <input
-                key={state?.savedAt ?? "unsaved"}
-                id="orderingOn"
-                name="orderingOn"
-                type="checkbox"
-                checked={values.orderingOn}
-                onChange={(e) => setField("orderingOn", e.target.checked)}
-                className="adm-toggle-input"
-              />
-              <span className="adm-toggle-track" aria-hidden="true">
-                <span className="adm-toggle-thumb" />
-              </span>
-            </span>
-            Take catering requests online
-          </label>
-          <p className="adm-help">
-            Off: the catering page and every catering button send people to the contact page
-            instead.
-          </p>
         </div>
       </form>
 
       <div className={`adm-savebar${dirty ? " is-visible" : ""}`}>
-        <span className="adm-savebar-count">Catering: Unsaved changes</span>
+        <span className="adm-savebar-count">Catering settings: unsaved changes</span>
         <button type="button" className="adm-savebar-discard" onClick={discard}>
           Discard
         </button>

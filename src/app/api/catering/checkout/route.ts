@@ -53,7 +53,6 @@ type CheckoutBody = {
   fulfilment: Fulfilment;
   date: string;
   time: string;
-  headcount: number;
   lines: CartLine[];
   tip?: TipInput;
   plateSets?: number;
@@ -127,9 +126,6 @@ function parseBody(raw: unknown): CheckoutBody | NextResponse {
   const time = typeof raw.time === "string" ? raw.time : "";
   if (!TIME_PATTERN.test(time)) fields.time = "Choose a time.";
 
-  const headcount = Math.floor(Number(raw.headcount));
-  if (!Number.isInteger(headcount) || headcount < 1) fields.headcount = "Enter how many people.";
-
   const rawLines = Array.isArray(raw.lines) ? raw.lines : [];
   const lines = rawLines.map(parseCartLine);
   if (rawLines.length === 0 || lines.some((l) => l === null)) fields.lines = "Your order is empty.";
@@ -187,7 +183,6 @@ function parseBody(raw: unknown): CheckoutBody | NextResponse {
     fulfilment: fulfilment as Fulfilment,
     date,
     time,
-    headcount,
     lines: lines as CartLine[],
     tip,
     plateSets,
@@ -229,12 +224,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const hours = toScheduleHours(settings.hours);
   const daysOff = toScheduleDaysOff(settings.daysOff);
-  const status = dayStatus(body.date, body.store, hours, daysOff, Date.now(), body.headcount);
+  const status = dayStatus(body.date, body.store, hours, daysOff, Date.now(), settings.leadHours);
   if (status === "too-soon") return conflict("too-soon");
   if (status !== "open") return conflict("closed");
 
   const eventAtMs = slotToUtcMs(body.date, body.time);
-  if (eventAtMs < earliestAllowed(Date.now(), body.headcount)) return conflict("too-soon");
+  if (eventAtMs < earliestAllowed(Date.now(), settings.leadHours)) {
+    return conflict("too-soon");
+  }
 
   let distanceMiles: number | null = null;
   let rangeUnknown = false;
@@ -283,7 +280,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       store: body.store,
       fulfilment: body.fulfilment,
       eventAt: new Date(eventAtMs),
-      headcount: body.headcount,
       contactName: body.contact.name,
       contactEmail: body.contact.email,
       contactPhone: body.contact.phone,

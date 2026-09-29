@@ -22,8 +22,6 @@ describe("getCateringSettings", () => {
     expect(settings.rangeMiles).toBe(10);
     expect(settings.replyHours).toBe(24);
     expect(settings.leadHours).toBe(48);
-    expect(settings.bigLeadHours).toBe(72);
-    expect(settings.bigHeadcount).toBe(50);
     expect(settings.ownerEmail).toBe("chris@chrisneddys.com");
     expect(settings.daysOff).toEqual([]);
     expect(settings.hours["hollywood"]?.["0"]).toEqual([{ open: "10:00", close: "20:00" }]);
@@ -108,14 +106,14 @@ describe("saveCateringSettings", () => {
     expect(ok.ok).toBe(true);
   });
 
-  it("rejects a non-positive reply/lead/headcount setting", async () => {
+  it("rejects a non-positive reply/lead setting", async () => {
     const result = await saveCateringSettings({ replyHours: 0 });
     expect(result).toMatchObject({ ok: false, field: "replyHours" });
   });
 
-  it("rejects a big-order lead time shorter than the ordinary lead time", async () => {
-    const result = await saveCateringSettings({ leadHours: 80, bigLeadHours: 72 });
-    expect(result).toMatchObject({ ok: false, field: "bigLeadHours" });
+  it("accepts any positive notice: there is no separate big-order notice to conflict with", async () => {
+    const result = await saveCateringSettings({ leadHours: 80 });
+    expect(result).toMatchObject({ ok: true });
   });
 
   it("rejects a malformed owner email", async () => {

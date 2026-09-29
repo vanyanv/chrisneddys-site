@@ -25,6 +25,7 @@ import {
   isFakePaymentsMode,
   reauthorizeOffSession,
   refundPaymentIntent,
+  isTestModeNoteVisible,
 } from "./payments";
 
 beforeEach(() => {
@@ -64,6 +65,11 @@ describe("isFakePaymentsMode", () => {
     process.env.CATERING_FAKE_PAYMENTS = "1";
     process.env.VERCEL_ENV = "development";
     expect(() => isFakePaymentsMode()).toThrow();
+  });
+
+  it("is false in production when the flag isn't set", () => {
+    process.env.VERCEL_ENV = "production";
+    expect(isFakePaymentsMode()).toBe(false);
   });
 });
 
@@ -157,5 +163,17 @@ describe("real mode: calls Stripe", () => {
     const id = await findOrCreateCustomer("a@b.com");
     expect(id).toBe("cus_existing");
     expect(createCustomerMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("isTestModeNoteVisible", () => {
+  it("shows on local/test runs and previews with fake payments on, never in production", () => {
+    expect(isTestModeNoteVisible()).toBe(false);
+    process.env.CATERING_FAKE_PAYMENTS = "1";
+    expect(isTestModeNoteVisible()).toBe(true);
+    process.env.VERCEL_ENV = "preview";
+    expect(isTestModeNoteVisible()).toBe(true);
+    process.env.VERCEL_ENV = "production";
+    expect(isTestModeNoteVisible()).toBe(false);
   });
 });

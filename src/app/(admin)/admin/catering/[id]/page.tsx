@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
-import { getStoreSettings } from "@/lib/orders";
-import { isShopOpenFor } from "@/lib/shopStatus";
+import { CateringPill } from "../CateringPill";
 import {
   getOrderById,
   type CateringOrderItem,
@@ -154,16 +153,14 @@ export default async function AdminCateringOrderDetailPage({
   const db = await getDb();
   await expireDue(db, new Date());
 
-  const [order, settings, cateringCount, events, publicConfig] = await Promise.all([
+  const [order, cateringCount, events, publicConfig] = await Promise.all([
     getOrderById(id, db),
-    getStoreSettings(),
     getCateringNeedsYouCount(),
     listCateringEvents(id),
     getPublicCateringConfig(db),
   ]);
   if (!order) notFound();
 
-  const shopOpen = isShopOpenFor(settings);
   const initials = ownerInitials(session);
   const pill = cateringStatusPill(order.status, order.pendingChange !== null);
   const pickupStore = publicConfig.stores.find((s) => s.id === order.store);
@@ -205,9 +202,7 @@ export default async function AdminCateringOrderDetailPage({
           ))}
         </div>
         <div className="rack-top-right">
-          <span className={`rack-store-pill rack-mono ${shopOpen ? "" : "is-closed"}`}>
-            <i></i>Store: {shopOpen ? "Open" : "Closed"}
-          </span>
+          <CateringPill on={publicConfig.orderingOn} />
           <details className="rack-avatar-menu">
             <summary className="rack-avatar">{initials}</summary>
             <div className="rack-menu">
@@ -247,7 +242,7 @@ export default async function AdminCateringOrderDetailPage({
           >
             {storeName(order.store).toUpperCase()} &middot;{" "}
             {fulfilmentLabel(order.fulfilment).toUpperCase()} &middot;{" "}
-            {formatDateTime(order.eventAt).toUpperCase()} &middot; {order.headcount} PEOPLE
+            {formatDateTime(order.eventAt).toUpperCase()}
           </p>
         </div>
         {/* `prefetch={false}` on all three: these open a printable page in

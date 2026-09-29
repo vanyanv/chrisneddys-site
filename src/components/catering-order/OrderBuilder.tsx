@@ -42,7 +42,14 @@ type CheckoutErrorCode =
 /** The whole `/catering/order/` wizard: landing (C1) then the five numbered
  * steps (C2-C9), with the item/order/crew sheets (C5-C7) and the leave modal
  * (C11) layered on top. Step lives in `?step=`, the draft in `localStorage`. */
-export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
+export function OrderBuilder({
+  config,
+  testMode = false,
+}: {
+  config: PublicCateringConfig;
+  /** Fake payments are on (a preview or local run): the review step says so. */
+  testMode?: boolean;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -132,7 +139,6 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
           fulfilment: draft.fulfilment,
           date: draft.date,
           time: draft.time,
-          headcount: draft.headcount,
           lines: draft.lines,
           tip:
             "tipPercent" in draft.tip
@@ -190,7 +196,6 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
       fulfilment={draft.fulfilment}
       date={draft.date}
       time={draft.time}
-      headcount={draft.headcount}
       onEdit={() => goToStep(onEdit)}
     />
   );
@@ -223,10 +228,7 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
           fulfilment={draft.fulfilment ?? "pickup"}
           hours={config.hours}
           daysOff={config.daysOff}
-          bigHeadcount={config.bigHeadcount}
-          bigLeadHours={config.bigLeadHours}
-          headcount={draft.headcount}
-          onHeadcount={(n) => setDraft({ headcount: n })}
+          leadHours={config.leadHours}
           date={draft.date}
           time={draft.time}
           onDate={(d) => setDraft({ date: d, time: null })}
@@ -302,6 +304,7 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
           plateSets={draft.plateSets}
           onPlateSets={(n) => setDraft({ plateSets: n })}
           checkoutError={checkoutError}
+          testMode={testMode}
         />
       )}
 
@@ -376,7 +379,6 @@ export function OrderBuilder({ config }: { config: PublicCateringConfig }) {
 
       <FeedCrewSheet
         open={crewSheetOpen}
-        headcount={draft.headcount}
         onClose={() => setCrewSheetOpen(false)}
         onFill={(lines) => setDraft({ lines })}
       />

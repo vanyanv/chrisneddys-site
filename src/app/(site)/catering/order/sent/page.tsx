@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import "@/styles/catering-order.css";
 import { getDb } from "@/db/client";
+import { isTestModeNoteVisible } from "@/lib/catering/payments";
 import { getOrderView } from "@/lib/catering/service";
 import { TrackSent } from "./TrackSent";
 
@@ -30,6 +31,11 @@ export default async function CateringOrderSentPage({
         <p className="cor-sent-tag">{order.number}</p>
         <h1>Request sent.</h1>
         <p>We&rsquo;ll confirm within 24 hours. Your card is held, not charged.</p>
+        {isTestModeNoteVisible() && (
+          <p className="cor-note is-info" data-catering-test-mode="">
+            Test mode: no card is charged.
+          </p>
+        )}
       </section>
       <div className="cor-sent-timeline">
         <ol>

@@ -124,7 +124,7 @@ export default async function CateringInvoicePage({ params }: { params: Promise<
 
         <div className="rack-slip-items">
           <div className="rack-eyebrow" style={{ marginBottom: 15 }}>
-            {order.headcount} people &middot; {order.items.length} line item
+            {order.items.length} line item
             {order.items.length === 1 ? "" : "s"}
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>

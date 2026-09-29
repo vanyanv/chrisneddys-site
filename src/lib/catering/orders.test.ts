@@ -33,7 +33,6 @@ function baseInput(overrides: Partial<CreateDraftOrderInput> = {}): CreateDraftO
     store: "hollywood",
     fulfilment: "pickup",
     eventAt: new Date("2026-10-10T18:00:00-07:00"),
-    headcount: 20,
     contactName: "Pat Customer",
     contactEmail: "Pat@Example.com",
     contactPhone: "555-1234",

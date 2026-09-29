@@ -30,8 +30,6 @@ export type PublicCateringConfig = {
   rangeMiles: number;
   replyHours: number;
   leadHours: number;
-  bigLeadHours: number;
-  bigHeadcount: number;
 };
 
 function publicStore(id: CateringStoreId): PublicCateringStore {
@@ -58,7 +56,5 @@ export async function getPublicCateringConfig(db?: Db): Promise<PublicCateringCo
     rangeMiles: settings.rangeMiles,
     replyHours: settings.replyHours,
     leadHours: settings.leadHours,
-    bigLeadHours: settings.bigLeadHours,
-    bigHeadcount: settings.bigHeadcount,
   };
 }

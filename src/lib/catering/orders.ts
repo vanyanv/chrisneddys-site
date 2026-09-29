@@ -89,7 +89,6 @@ export type CreateDraftOrderInput = {
   store: string;
   fulfilment: CateringFulfilment;
   eventAt: Date;
-  headcount: number;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
@@ -137,7 +136,6 @@ export async function createDraftOrder(
         store: input.store,
         fulfilment: input.fulfilment,
         eventAt: input.eventAt,
-        headcount: input.headcount,
         contactName: input.contactName,
         contactEmail: input.contactEmail,
         contactPhone: input.contactPhone,
@@ -464,7 +462,6 @@ export async function applyPendingChange(orderId: string, db?: Db): Promise<Orde
         taxCents: change.taxCents,
         tipCents: change.tipCents,
         totalCents: change.totalCents,
-        ...(change.headcount !== undefined ? { headcount: change.headcount } : {}),
         ...(change.eventAt !== undefined ? { eventAt: new Date(change.eventAt) } : {}),
         pendingChange: null,
         updatedAt: new Date(),

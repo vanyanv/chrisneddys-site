@@ -36,6 +36,18 @@ export function isFakePaymentsMode(): boolean {
   return requested;
 }
 
+/** For the customer-facing "Test mode: no card is charged" note. Never
+ * throws: a misconfigured production (which `isFakePaymentsMode` refuses to
+ * fake, loudly, at checkout) must not also take the page showing this note
+ * down, and it must not claim test mode when payments are not being faked. */
+export function isTestModeNoteVisible(): boolean {
+  try {
+    return isFakePaymentsMode();
+  } catch {
+    return false;
+  }
+}
+
 function fakeId(prefix: string): string {
   return `${prefix}_fake_${randomBytes(8).toString("hex")}`;
 }

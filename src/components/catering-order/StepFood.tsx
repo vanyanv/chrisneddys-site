@@ -40,7 +40,7 @@ export function StepFood({
       <p className="cor-fine">Every topping is free. Extra cheese +$1, halal +$2.</p>
 
       <button type="button" className="cor-crew-cta" onClick={onOpenFeedCrew}>
-        Feed my crew — get a suggested order for your headcount
+        Feed my crew — get a suggested order for a group
       </button>
 
       <div className="cor-food-layout">

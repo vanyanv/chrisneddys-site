@@ -6,16 +6,13 @@ import { slotsForDate, dayStatus } from "@/lib/catering/schedule";
 import { Calendar } from "./Calendar";
 import { formatTime } from "./SummaryStrip";
 
-/** C3: headcount, the calendar, and that day's 30-minute slots. */
+/** C3: the calendar, and that day's 30-minute slots. */
 export function StepWhen({
   store,
   fulfilment,
   hours,
   daysOff,
-  bigHeadcount,
-  bigLeadHours,
-  headcount,
-  onHeadcount,
+  leadHours,
   date,
   time,
   onDate,
@@ -26,58 +23,30 @@ export function StepWhen({
   fulfilment: Fulfilment;
   hours: CateringHours;
   daysOff: DaysOff;
-  bigHeadcount: number;
-  bigLeadHours: number;
-  headcount: number;
-  onHeadcount: (n: number) => void;
+  leadHours: number;
   date: string | null;
   time: string | null;
   onDate: (d: string) => void;
   onTime: (t: string) => void;
   nowMs: number;
 }) {
-  const status = date ? dayStatus(date, store, hours, daysOff, nowMs, headcount) : null;
-  const slots = date ? slotsForDate(date, store, hours, daysOff, nowMs, headcount) : [];
-  const isBig = headcount >= bigHeadcount;
+  const status = date ? dayStatus(date, store, hours, daysOff, nowMs, leadHours) : null;
+  const slots = date ? slotsForDate(date, store, hours, daysOff, nowMs, leadHours) : [];
 
   return (
     <div className="cor-step">
-      <h1>When and how many?</h1>
+      <h1>When do you need it?</h1>
 
-      <p className="cor-label">How many people?</p>
-      <div className="cor-stepper">
-        <button
-          type="button"
-          aria-label="Fewer people"
-          onClick={() => onHeadcount(Math.max(1, headcount - 5))}
-        >
-          &minus;
-        </button>
-        <input
-          type="number"
-          inputMode="numeric"
-          min={1}
-          value={headcount}
-          onChange={(e) => onHeadcount(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
-          aria-label="Number of people"
-        />
-        <button type="button" aria-label="More people" onClick={() => onHeadcount(headcount + 5)}>
-          +
-        </button>
-      </div>
-
-      {isBig && (
-        <p className="cor-note">
-          {bigHeadcount}+ people needs {bigLeadHours} hours&rsquo; notice, so the earliest open day
-          may be a few days out.
-        </p>
-      )}
+      <p className="cor-fine">
+        We need {leadHours} hours&rsquo; notice, so the earliest open day may be a couple of days
+        out.
+      </p>
 
       <Calendar
         store={store}
         hours={hours}
         daysOff={daysOff}
-        headcount={headcount}
+        leadHours={leadHours}
         nowMs={nowMs}
         selected={date}
         onSelect={onDate}

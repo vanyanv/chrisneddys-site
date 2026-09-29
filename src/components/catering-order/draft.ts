@@ -41,7 +41,6 @@ export type OrderDraft = {
   store: CateringStoreId | null;
   address: Address | null;
   rangeMiles: number | null;
-  headcount: number;
   date: string | null;
   time: string | null;
   lines: CartLine[];
@@ -59,7 +58,6 @@ export const EMPTY_DRAFT: OrderDraft = {
   store: null,
   address: null,
   rangeMiles: null,
-  headcount: 20,
   date: null,
   time: null,
   lines: [],

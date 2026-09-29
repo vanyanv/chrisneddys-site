@@ -6,6 +6,7 @@ import { getPublicCateringConfig } from "@/lib/catering/public";
 import { getDb } from "@/db/client";
 import { CATERING_HREF } from "@/data/catering";
 import { pageMetadata } from "@/lib/seo";
+import { isTestModeNoteVisible } from "@/lib/catering/payments";
 import { OrderBuilder } from "@/components/catering-order/OrderBuilder";
 
 const title = "Catering Order";
@@ -47,7 +48,7 @@ export default async function CateringOrderPage() {
 
   return (
     <Suspense fallback={<div className="cor-builder" />}>
-      <OrderBuilder config={config} />
+      <OrderBuilder config={config} testMode={isTestModeNoteVisible()} />
     </Suspense>
   );
 }

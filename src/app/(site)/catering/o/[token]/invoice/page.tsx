@@ -101,7 +101,9 @@ export default async function CateringInvoicePage({
           </div>
           <div>
             <p className="cinv-label">Order</p>
-            <p>{order.headcount} people</p>
+            <p>
+              {order.items.length} line item{order.items.length === 1 ? "" : "s"}
+            </p>
             {order.customerNote && <p className="cinv-note">&ldquo;{order.customerNote}&rdquo;</p>}
           </div>
         </div>

@@ -21,7 +21,6 @@ export type CateringListRow = {
   store: string;
   eventAt: string;
   respondBy: string | null;
-  headcount: number;
   contactName: string;
   contactEmail: string;
   company: string | null;
@@ -71,7 +70,6 @@ export function CateringListTable({ rows }: { rows: CateringListRow[] }) {
             <span className="cat-row-when">For</span>
             <span className="cat-row-customer">Customer</span>
             <span className="cat-row-store">Location</span>
-            <span className="cat-row-headcount">People</span>
             <span className="cat-row-total">Total</span>
             <span className="cat-row-status">Status</span>
           </div>
@@ -110,7 +108,6 @@ export function CateringListTable({ rows }: { rows: CateringListRow[] }) {
                 <span className="cat-row-store">
                   {storeName(row.store)} &middot; {fulfilmentLabel(row.fulfilment)}
                 </span>
-                <span className="cat-row-headcount">{row.headcount}</span>
                 <span className="cat-row-total adm-money">{formatCents(row.totalCents)}</span>
                 <span className="cat-row-status">
                   <span className={`adm-pill ${pill.pillClass}`}>{pill.label}</span>

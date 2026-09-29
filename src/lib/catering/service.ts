@@ -11,7 +11,7 @@ import type { Db } from "@/db/client";
 import type { CateringAddress, CateringPendingChangeLine } from "@/db/schema";
 import { describeLine, quote, validateLine } from "./pricing";
 import { refundForCancel } from "./cancellation";
-import { dayStatus, leadHours, slotToUtcMs } from "./schedule";
+import { dayStatus, earliestAllowed, slotToUtcMs } from "./schedule";
 import { laDateString } from "./timezone";
 import { isCateringStoreId } from "./stores";
 import { getCateringSettings } from "./settings";
@@ -158,7 +158,6 @@ export async function cancelByCustomer(db: Db, token: string): Promise<ServiceRe
 
 export type RequestChangeInput = {
   lines: CartLine[];
-  headcount: number;
   /** A new time of day on the *same* calendar date — the change flow never
    * offers a different date. */
   time?: string;
@@ -216,20 +215,20 @@ export async function requestChange(
     if (!result.ok) return { ok: false, error: `Invalid line: ${result.errors.join(", ")}` };
   }
 
+  const settings = await getCateringSettings(db);
   let eventAtMs = order.eventAt.getTime();
   if (input.time) {
     const dateStr = laDateString(eventAtMs);
-    const settings = await getCateringSettings(db);
     const hours = toScheduleHours(settings.hours);
     const daysOff = toScheduleDaysOff(settings.daysOff);
-    const status = dayStatus(dateStr, order.store, hours, daysOff, Date.now(), input.headcount);
+    const status = dayStatus(dateStr, order.store, hours, daysOff, Date.now(), settings.leadHours);
     if (status !== "open") return { ok: false, error: "That day is no longer available." };
     eventAtMs = slotToUtcMs(dateStr, input.time);
-    const earliest = Date.now() + leadHours(input.headcount) * 60 * 60 * 1000;
-    if (eventAtMs < earliest) return { ok: false, error: "too-soon" };
+    if (eventAtMs < earliestAllowed(Date.now(), settings.leadHours)) {
+      return { ok: false, error: "too-soon" };
+    }
   }
 
-  const settings = await getCateringSettings(db);
   const fulfilment: Fulfilment = order.fulfilment;
   const priced = quote(input.lines, {
     fulfilment,
@@ -248,7 +247,6 @@ export async function requestChange(
       tipCents: priced.tipCents,
       totalCents: priced.totalCents,
       requestedAt: new Date().toISOString(),
-      headcount: input.headcount,
       ...(input.time ? { eventAt: new Date(eventAtMs).toISOString() } : {}),
     },
     db,

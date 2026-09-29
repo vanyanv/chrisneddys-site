@@ -14,7 +14,7 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 /** O2: reopens the builder seeded with the order so the customer can change
- * headcount, lines or time, then sends the change for the owner to approve. */
+ * lines or time, then sends the change for the owner to approve. */
 export default async function CateringChangePage({
   params,
 }: {
@@ -45,7 +45,6 @@ export default async function CateringChangePage({
         number={view.order.number}
         store={store}
         fulfilment={view.order.fulfilment}
-        headcount={view.order.headcount}
         eventAtIso={view.order.eventAt.toISOString()}
         totalCents={view.order.totalCents}
         lines={lines}

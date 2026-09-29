@@ -7,6 +7,7 @@ import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { getOrderById } from "@/lib/catering/orders";
 import { saveCateringSettings } from "@/lib/catering/settings";
+import { laDateString, zonedTimeToUtcMs } from "@/lib/catering";
 
 vi.mock("server-only", () => ({}));
 
@@ -63,13 +64,33 @@ function farEnoughDate(): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** The half-hour slot (10:00-20:00 LA, the default hours) closest to
+ * `hours` from now, so a test sits the same distance from the notice cutoff
+ * whatever time of day it runs. */
+function slotAboutHoursOut(hours: number): { date: string; time: string; hoursOut: number } {
+  const target = Date.now() + hours * 60 * 60 * 1000;
+  let best = { date: "", time: "", ms: Number.POSITIVE_INFINITY };
+  for (let day = 0; day <= 6; day++) {
+    const date = laDateString(Date.now() + day * 24 * 60 * 60 * 1000);
+    for (let m = 10 * 60; m <= 20 * 60; m += 30) {
+      const time = `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+      const ms = zonedTimeToUtcMs(date, time);
+      if (Math.abs(ms - target) < Math.abs(best.ms - target)) best = { date, time, ms };
+    }
+  }
+  return { date: best.date, time: best.time, hoursOut: (best.ms - Date.now()) / 3_600_000 };
+}
+
+function bigLine() {
+  return { itemId: "single-patty-slider", qty: 80, wayId: null, toppings: ["lettuce"], extras: [] };
+}
+
 function baseBody(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     store: "hollywood",
     fulfilment: "pickup",
     date: farEnoughDate(),
     time: "12:00",
-    headcount: 20,
     lines: [
       {
         itemId: "single-patty-slider",
@@ -147,15 +168,20 @@ describe("POST /api/catering/checkout — validation", () => {
     expect(await res.json()).toEqual({ error: "too-soon" });
   });
 
-  it("409s too-soon for a 50+ headcount inside 72 hours but past the standard 48", async () => {
-    const between = new Date(Date.now() + 60 * 60 * 60 * 1000); // 60 hours out
-    const res = await post(
-      baseBody({
-        headcount: 60,
-        date: between.toISOString().slice(0, 10),
-        time: "12:00",
-      }),
-    );
+  it("gives a big order the same 48 hours' notice as any other, not 72", async () => {
+    // About 60 hours out: past the 48 h notice, inside the old 72 h rule for
+    // big orders.
+    const slot = slotAboutHoursOut(60);
+    expect(slot.hoursOut).toBeGreaterThan(50);
+    expect(slot.hoursOut).toBeLessThan(70);
+    const res = await post(baseBody({ date: slot.date, time: slot.time, lines: [bigLine()] }));
+    expect(res.status).toBe(200);
+  });
+
+  it("409s too-soon inside 48 hours whatever the order size", async () => {
+    const slot = slotAboutHoursOut(30);
+    expect(slot.hoursOut).toBeLessThan(48);
+    const res = await post(baseBody({ date: slot.date, time: slot.time, lines: [bigLine()] }));
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual({ error: "too-soon" });
   });

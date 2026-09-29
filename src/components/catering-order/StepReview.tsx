@@ -17,6 +17,7 @@ export function StepReview({
   plateSets,
   onPlateSets,
   checkoutError,
+  testMode = false,
 }: {
   lines: CartLine[];
   quote: Quote;
@@ -25,6 +26,7 @@ export function StepReview({
   plateSets: number;
   onPlateSets: (n: number) => void;
   checkoutError: string | null;
+  testMode?: boolean;
 }) {
   const selectedPercent = "tipPercent" in tip ? tip.tipPercent : null;
   const [customOpen, setCustomOpen] = useState(selectedPercent === null);
@@ -35,6 +37,12 @@ export function StepReview({
   return (
     <div className="cor-step">
       <h1>Check it, then send it</h1>
+
+      {testMode && (
+        <p className="cor-note is-info" data-catering-test-mode="">
+          Test mode: no card is charged.
+        </p>
+      )}
 
       {checkoutError === "too-soon" && (
         <p className="cor-note is-error">

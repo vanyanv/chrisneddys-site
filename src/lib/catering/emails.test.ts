@@ -55,7 +55,7 @@ function order(overrides: Partial<CateringOrderWithItems> = {}): CateringOrderWi
     store: "hollywood",
     fulfilment: "pickup",
     eventAt: new Date("2026-10-10T18:00:00-07:00"),
-    headcount: 20,
+    headcount: null,
     contactName: "Pat Customer",
     contactEmail: "pat@example.com",
     contactPhone: "555-1234",

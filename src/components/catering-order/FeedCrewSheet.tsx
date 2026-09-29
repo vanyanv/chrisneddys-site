@@ -27,24 +27,30 @@ const TIERS = [
 const SHAKE_ITEM_ID = "chocolate-shake-20-oz-cup";
 const SODA_ITEM_ID = "coca-cola-20-oz-cup";
 
-/** C7: "Feed my crew" — a headcount-based suggested cart, still editable
- * after. Replaces the current lines with the built suggestion. */
+const DEFAULT_PEOPLE = 20;
+
+/** C7: "Feed my crew" — a suggested cart sized to a number the customer
+ * types right here. That number is only a helper for the suggestion: it is
+ * never stored, sent, or required to order. Still editable after. Replaces
+ * the current lines with the built suggestion. */
 export function FeedCrewSheet({
   open,
-  headcount,
   onClose,
   onFill,
 }: {
   open: boolean;
-  headcount: number;
   onClose: () => void;
   onFill: (lines: CartLine[]) => void;
 }) {
   const [tier, setTier] = useState<(typeof TIERS)[number]["id"]>("classic");
   const [wayId, setWayId] = useState<WayId>("chris");
+  const [headcount, setHeadcount] = useState(DEFAULT_PEOPLE);
   // Default to about a third of the crew wanting a shake (60 people -> 20),
-  // matching c7-feed-my-crew-sheet.png; sodas start at 0. Both stay editable.
-  const [shakes, setShakes] = useState(Math.round(headcount / 3));
+  // matching c7-feed-my-crew-sheet.png, until the customer sets their own;
+  // sodas start at 0. Both stay editable.
+  const [shakesPicked, setShakesPicked] = useState<number | null>(null);
+  const shakes = shakesPicked ?? Math.round(headcount / 3);
+  const setShakes = (update: (n: number) => number) => setShakesPicked(update(shakes));
   const [sodas, setSodas] = useState(0);
 
   const chosen = TIERS.find((t) => t.id === tier) ?? TIERS[1];
@@ -80,7 +86,35 @@ export function FeedCrewSheet({
       </button>
       <div className="cor-sheet-scroll">
         <h2>Feed my crew</h2>
-        <p className="cor-fine">For {headcount} people. Every line stays editable.</p>
+        <p className="cor-fine">Tell us how many people and we&rsquo;ll suggest an order.</p>
+
+        <div className="cor-crew-row">
+          <span>How many people?</span>
+          <div className="cor-stepper">
+            <button
+              type="button"
+              aria-label="Fewer people"
+              onClick={() => setHeadcount((n) => Math.max(1, n - 5))}
+            >
+              &minus;
+            </button>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              value={headcount}
+              onChange={(e) => setHeadcount(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+              aria-label="Number of people"
+            />
+            <button
+              type="button"
+              aria-label="More people"
+              onClick={() => setHeadcount((n) => n + 5)}
+            >
+              +
+            </button>
+          </div>
+        </div>
 
         <ul className="cor-tier-list">
           {TIERS.map((t) => {

@@ -32,8 +32,8 @@ describe("getPublicCateringConfig", () => {
     expect(config.rangeMiles).toBe(10);
     expect(config.replyHours).toBe(24);
     expect(config.leadHours).toBe(48);
-    expect(config.bigLeadHours).toBe(72);
-    expect(config.bigHeadcount).toBe(50);
+    expect(config).not.toHaveProperty("bigLeadHours");
+    expect(config).not.toHaveProperty("bigHeadcount");
     expect(config.hours.hollywood[0]).toEqual({
       closed: false,
       windows: [{ open: "10:00", close: "20:00" }],

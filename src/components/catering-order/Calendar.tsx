@@ -21,7 +21,7 @@ export function Calendar({
   store,
   hours,
   daysOff,
-  headcount,
+  leadHours,
   nowMs,
   selected,
   onSelect,
@@ -29,7 +29,7 @@ export function Calendar({
   store: CateringStoreId;
   hours: CateringHours;
   daysOff: DaysOff;
-  headcount: number;
+  leadHours: number;
   nowMs: number;
   selected: string | null;
   onSelect: (dateStr: string) => void;
@@ -80,7 +80,7 @@ export function Calendar({
           if (day === null)
             return <span key={`e-${i}`} className="cor-cal-empty" aria-hidden="true" />;
           const dateStr = toDateStr(view.y, view.m, day);
-          const status = dayStatus(dateStr, store, hours, daysOff, nowMs, headcount);
+          const status = dayStatus(dateStr, store, hours, daysOff, nowMs, leadHours);
           const isSelected = dateStr === selected;
           return (
             <button

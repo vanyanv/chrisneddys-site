@@ -46,7 +46,7 @@ function changedLines(
     .filter((c) => c.oldQty !== c.newQty);
 }
 
-/** O2: a small builder over the existing order — headcount, time (same
+/** O2: a small builder over the existing order — time (same
  * date), and the same food step/sheets the new-order flow uses — followed by
  * a diff review before sending the change to the owner. */
 export function ChangeBuilder({
@@ -54,7 +54,6 @@ export function ChangeBuilder({
   number,
   store,
   fulfilment,
-  headcount: initialHeadcount,
   eventAtIso,
   totalCents: originalTotalCents,
   lines: initialLines,
@@ -64,7 +63,6 @@ export function ChangeBuilder({
   number: string;
   store: CateringStoreId;
   fulfilment: Fulfilment;
-  headcount: number;
   eventAtIso: string;
   totalCents: number;
   lines: CartLine[];
@@ -74,7 +72,6 @@ export function ChangeBuilder({
   const dateStr = laDateString(eventAt.getTime());
   const originalTime = `${String(eventAt.getUTCHours()).padStart(2, "0")}:${String(eventAt.getUTCMinutes()).padStart(2, "0")}`;
 
-  const [headcount, setHeadcount] = useState(initialHeadcount);
   const [time, setTime] = useState<string>(originalTime);
   const [lines, setLines] = useState<CartLine[]>(initialLines);
   const [openItem, setOpenItem] = useState<MenuItem | null>(null);
@@ -85,8 +82,22 @@ export function ChangeBuilder({
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
-  const status = dayStatus(dateStr, store, config.hours, config.daysOff, Date.now(), headcount);
-  const slots = slotsForDate(dateStr, store, config.hours, config.daysOff, Date.now(), headcount);
+  const status = dayStatus(
+    dateStr,
+    store,
+    config.hours,
+    config.daysOff,
+    Date.now(),
+    config.leadHours,
+  );
+  const slots = slotsForDate(
+    dateStr,
+    store,
+    config.hours,
+    config.daysOff,
+    Date.now(),
+    config.leadHours,
+  );
 
   const newQuote = useMemo(
     () =>
@@ -102,7 +113,6 @@ export function ChangeBuilder({
     setError(null);
     const result = await requestChangeAction(token, {
       lines,
-      headcount,
       time: time !== originalTime ? time : undefined,
     });
     setBusy(false);
@@ -128,14 +138,6 @@ export function ChangeBuilder({
         <section className="cor-link-hero">
           <p className="cor-link-tag">Change {number}</p>
           <h1>What&rsquo;s changing?</h1>
-          {headcount !== initialHeadcount && (
-            <p className="cor-diff-row">
-              <span>People</span>
-              <span>
-                {initialHeadcount} &rarr; {headcount}
-              </span>
-            </p>
-          )}
           {lineDiffs.map((line) => (
             <p className="cor-diff-row" key={line.key}>
               <span>{line.label}</span>
@@ -189,17 +191,6 @@ export function ChangeBuilder({
     <>
       <section className="cor-step">
         <h1>Change your order</h1>
-        <p className="cor-label">How many people?</p>
-        <div className="cor-stepper">
-          <button type="button" onClick={() => setHeadcount((n) => Math.max(1, n - 5))}>
-            &minus;
-          </button>
-          <input type="number" value={headcount} readOnly />
-          <button type="button" onClick={() => setHeadcount((n) => n + 5)}>
-            +
-          </button>
-        </div>
-
         {status === "open" && (
           <>
             <p className="cor-label">Time on {dateStr}</p>

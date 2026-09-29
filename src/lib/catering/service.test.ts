@@ -84,7 +84,6 @@ async function draftInput(
     store: "hollywood",
     fulfilment: "pickup",
     eventAt: daysFromNow(10),
-    headcount: 20,
     contactName: "Pat Customer",
     contactEmail: "pat@example.com",
     contactPhone: "555-1234",
@@ -222,7 +221,6 @@ describe("requestChange / approveChange / declineChange", () => {
           extras: [],
         },
       ],
-      headcount: 40,
     });
     expect(result).toEqual({ ok: true });
 
@@ -236,7 +234,6 @@ describe("requestChange / approveChange / declineChange", () => {
     const draft = await requestedOrder({ eventAt: daysFromNow(1) });
     const result = await requestChange(db, draft.token, {
       lines: [{ itemId: "single-patty-slider", qty: 1, wayId: null, toppings: [], extras: [] }],
-      headcount: 5,
     });
     expect(result.ok).toBe(false);
   });
@@ -245,7 +242,6 @@ describe("requestChange / approveChange / declineChange", () => {
     const draft = await requestedOrder({ eventAt: daysFromNow(10) });
     const result = await requestChange(db, draft.token, {
       lines: [{ itemId: "not-a-real-item", qty: 1, wayId: null, toppings: [], extras: [] }],
-      headcount: 5,
     });
     expect(result.ok).toBe(false);
   });
@@ -256,7 +252,6 @@ describe("requestChange / approveChange / declineChange", () => {
       lines: [
         { itemId: "single-patty-slider", qty: 40, wayId: null, toppings: ["lettuce"], extras: [] },
       ],
-      headcount: 40,
     });
 
     const result = await approveChange(db, draft.orderId);
@@ -279,7 +274,6 @@ describe("requestChange / approveChange / declineChange", () => {
       lines: [
         { itemId: "single-patty-slider", qty: 20, wayId: null, toppings: ["lettuce"], extras: [] },
       ],
-      headcount: 20,
     });
 
     const result = await approveChange(db, draft.orderId);
@@ -295,7 +289,6 @@ describe("requestChange / approveChange / declineChange", () => {
       lines: [
         { itemId: "single-patty-slider", qty: 2, wayId: null, toppings: ["lettuce"], extras: [] },
       ],
-      headcount: 5,
     });
 
     const result = await approveChange(db, draft.orderId);
@@ -308,7 +301,6 @@ describe("requestChange / approveChange / declineChange", () => {
     const draft = await requestedOrder({ eventAt: daysFromNow(10) });
     await requestChange(db, draft.token, {
       lines: [{ itemId: "single-patty-slider", qty: 99, wayId: null, toppings: [], extras: [] }],
-      headcount: 40,
     });
 
     const before = await getOrderById(draft.orderId, db);

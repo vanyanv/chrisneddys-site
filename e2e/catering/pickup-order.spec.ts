@@ -4,7 +4,6 @@ import {
   choosePickup,
   selectCalendarDate,
   selectFirstSlot,
-  setHeadcount,
   openItemByName,
   pickWay,
   toggleTopping,
@@ -21,7 +20,7 @@ import {
 } from "./helpers";
 
 /**
- * Flow 1: the full pickup order — Hollywood, headcount 12, a mix of
+ * Flow 1: the full pickup order — Hollywood, a mix of
  * Chris's/Eddy's Way, a custom halal build, a named line with a note, and
  * "add one for someone else" — through the order sheet edits, details
  * validation, review, request and the sent/order-link pages. Issue #190.
@@ -41,7 +40,7 @@ test.describe.serial("flow 1: pickup order", () => {
     await page.close();
   });
 
-  test("1. landing -> Hollywood pickup -> date >=3 days out, a slot, headcount 12", async () => {
+  test("1. landing -> Hollywood pickup -> date >=3 days out, a slot", async () => {
     await startOrder(page);
     await expect(page.getByRole("heading", { name: "How are you getting it?" })).toBeVisible();
 
@@ -52,10 +51,13 @@ test.describe.serial("flow 1: pickup order", () => {
 
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL(/step=when/);
-    await expect(page.getByRole("heading", { name: "When and how many?" })).toBeVisible();
-
-    await setHeadcount(page, 12);
-    await expect(page.getByLabel("Number of people")).toHaveValue("12");
+    await expect(page.getByRole("heading", { name: "When do you need it?" })).toBeVisible();
+    // Nobody asks how many people are ordering.
+    // (Scoped to the step: the closed "Feed my crew" sheet has its own
+    // helper field for a group size, which is never sent or required.)
+    const whenStep = page.locator(".cor-step");
+    await expect(whenStep.getByLabel("Number of people")).toHaveCount(0);
+    await expect(whenStep.getByText(/how many people/i)).toHaveCount(0);
 
     await selectCalendarDate(page, 5);
     await expect(page.getByText(/Pickup time/)).toBeVisible();
@@ -178,6 +180,8 @@ test.describe.serial("flow 1: pickup order", () => {
     // unscoped page-wide locator would double-count (or strict-mode-fail
     // on `getByText`) against that still-present, invisible copy.
     const reviewStep = page.locator(".cor-step");
+    // The e2e server fakes payments, so the review says so.
+    await expect(reviewStep.getByText("Test mode: no card is charged.")).toBeVisible();
     await expect(reviewStep.locator(".cor-line")).toHaveCount(4);
     await expect(reviewStep.getByText("For Sam T.")).toBeVisible();
     await expect(reviewStep.getByText("For Jordan K.")).toBeVisible();
@@ -197,6 +201,7 @@ test.describe.serial("flow 1: pickup order", () => {
   test("6. request -> sent page -> order link shows waiting", async () => {
     const token = await submitAndGetToken(page);
     await expect(page.getByRole("heading", { name: "Request sent." })).toBeVisible();
+    await expect(page.getByText("Test mode: no card is charged.")).toBeVisible();
     await expect(page.getByText(/We’ll confirm within 24 hours/)).toBeVisible();
 
     await page.getByRole("link", { name: "View your order" }).click();

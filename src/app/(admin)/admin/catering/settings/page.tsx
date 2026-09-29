@@ -4,12 +4,12 @@ import { requireOwner } from "@/lib/auth";
 import { signOutAction } from "@/app/(admin)/admin/actions";
 import { ownerInitials } from "@/app/(admin)/admin/ownerDisplay";
 import { getCateringSettings } from "@/lib/catering/settings";
-import { renderCateringEmailPreviews } from "@/lib/catering/emails";
 import { CateringNavBadge } from "../CateringNavBadge";
 import { CateringPill } from "../CateringPill";
-import { SendTestEmails } from "./SendTestEmails";
+import { CateringSettingsSection } from "../CateringSettingsSection";
 import { getCateringNeedsYouCount } from "../navCount";
 import "@/styles/admin-rack.css";
+import "@/styles/admin-orders.css";
 import "@/styles/admin-settings.css";
 import "@/styles/admin-catering.css";
 
@@ -25,22 +25,16 @@ const NAV = [
 ];
 
 /**
- * `/admin/catering/emails/` — every catering email rendered against a
- * sample order, for the owner to OK before ordering goes live (customer
- * emails are drafts until then — see `docs/catering-build-plan.md`'s
- * "Emails" ground rule). Each preview renders in a sandboxed `<iframe
- * srcdoc>` rather than injected into the page: the HTML is our own
- * template output, but it's still full email markup (`<html>`/`<body>` of
- * its own), not a fragment meant to share this page's styles or scripts.
+ * `/admin/catering/settings/` — catering's own settings, reached from the
+ * Catering tab. Deliberately not part of the shop's `/admin/settings`:
+ * catering and the shop are switched on and off separately.
  */
-export default async function AdminCateringEmailsPage() {
+export default async function AdminCateringSettingsPage() {
   const session = await requireOwner();
-  const [cateringSettings, cateringCount] = await Promise.all([
+  const [settings, cateringCount] = await Promise.all([
     getCateringSettings(),
     getCateringNeedsYouCount(),
   ]);
-  const previews = renderCateringEmailPreviews();
-
   const initials = ownerInitials(session);
 
   return (
@@ -71,7 +65,7 @@ export default async function AdminCateringEmailsPage() {
           ))}
         </div>
         <div className="rack-top-right">
-          <CateringPill on={cateringSettings.orderingOn} />
+          <CateringPill on={settings.orderingOn} />
           <details className="rack-avatar-menu">
             <summary className="rack-avatar">{initials}</summary>
             <div className="rack-menu">
@@ -98,38 +92,18 @@ export default async function AdminCateringEmailsPage() {
       <div className="rack-page-header" style={{ paddingTop: 11 }}>
         <div>
           <h1 className="rack-page-title rack-bow" style={{ fontSize: 32 }}>
-            Catering emails
+            Catering settings
           </h1>
           <p className="adm-settings-lede">
-            Every catering email, rendered against a sample order — OK the copy before turning
-            ordering on.
+            What catering customers can pick online. The shop has its own settings.
           </p>
         </div>
       </div>
 
-      <div style={{ padding: "0 22px 18px" }}>
-        <SendTestEmails ownerEmail={cateringSettings.ownerEmail} />
-      </div>
-
-      <div style={{ padding: "0 22px 40px" }}>
-        <div className="cat-email-list">
-          {previews.map((preview) => (
-            <div key={preview.id} className="cat-email-card">
-              <div className="cat-email-card-head">
-                <div>
-                  <div className="cat-email-subject">{preview.content.subject}</div>
-                  <div className="cat-email-key">{preview.label}</div>
-                </div>
-              </div>
-              <iframe
-                className="cat-email-frame"
-                title={preview.label}
-                srcDoc={preview.content.html}
-                sandbox=""
-              />
-            </div>
-          ))}
-        </div>
+      {/* Bottom padding clears the fixed save bar so the last field is never
+          hidden behind it on a phone. */}
+      <div style={{ padding: "0 22px 96px" }}>
+        <CateringSettingsSection settings={settings} />
       </div>
     </div>
   );

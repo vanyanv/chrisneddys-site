@@ -120,9 +120,7 @@ export default async function CrewTicketPage({ params }: { params: Promise<Param
           <div className="cat-who-grid">
             <div>
               <div className="rack-eyebrow">For</div>
-              <div>
-                {order.company || order.contactName} &middot; {order.headcount} people
-              </div>
+              <div>{order.company || order.contactName}</div>
               <div>
                 {order.contactName} · {order.contactPhone}
               </div>

@@ -289,8 +289,8 @@ export function buildBookedEmail(order: CateringOrderWithItems): CateringEmailCo
   const cancelFreeUntil = new Date(order.eventAt.getTime() - 48 * 60 * 60 * 1000);
   const summary =
     order.fulfilment === "delivery" && order.address
-      ? `${order.headcount} people, ${formatDateTime(order.eventAt)}, delivered from ${storeName(order.store)} to ${order.address.line1}${order.address.line2 ? ` ${order.address.line2}` : ""}.`
-      : `${order.headcount} people, ${formatDateTime(order.eventAt)}, pickup at ${storeName(order.store)}.`;
+      ? `${formatDateTime(order.eventAt)}, delivered from ${storeName(order.store)} to ${order.address.line1}${order.address.line2 ? ` ${order.address.line2}` : ""}.`
+      : `${formatDateTime(order.eventAt)}, pickup at ${storeName(order.store)}.`;
 
   const text = [
     heading,
@@ -587,11 +587,16 @@ async function ownerEmail(db?: Db): Promise<string> {
   return settings.ownerEmail;
 }
 
+/** `subjectPrefix` exists for the admin "Send test emails" button
+ * (`sendCateringTestEmails`) — real orders never pass it. */
+export type SendOptions = { subjectPrefix?: string };
+
 export async function sendRequestReceivedEmail(
   order: CateringOrderWithItems,
+  options: SendOptions = {},
 ): Promise<EmailResult> {
   const { subject, html, text } = buildRequestReceivedEmail(order);
-  return sendEmail(order.contactEmail, subject, text, html);
+  return sendEmail(order.contactEmail, `${options.subjectPrefix ?? ""}${subject}`, text, html);
 }
 
 export async function sendBookedEmail(order: CateringOrderWithItems): Promise<EmailResult> {
@@ -657,9 +662,10 @@ export async function sendThankYouEmail(order: CateringOrderWithItems): Promise<
 export async function sendOwnerNewRequestEmail(
   order: CateringOrderWithItems,
   db?: Db,
+  options: SendOptions = {},
 ): Promise<EmailResult> {
   const { subject, html, text } = buildOwnerNewRequestEmail(order);
-  return sendEmail(await ownerEmail(db), subject, text, html);
+  return sendEmail(await ownerEmail(db), `${options.subjectPrefix ?? ""}${subject}`, text, html);
 }
 
 // ---------------------------------------------------------------------------
@@ -721,7 +727,7 @@ function sampleOrder(): CateringOrderWithItems {
     store: "vannuys",
     fulfilment: "delivery",
     eventAt,
-    headcount: 60,
+    headcount: null,
     contactName: "Maya Torres",
     contactEmail: "maya@example.com",
     contactPhone: "(818) 555-0142",
@@ -764,6 +770,13 @@ function sampleOrder(): CateringOrderWithItems {
     updatedAt: now,
     items,
   };
+}
+
+/** The same hand-built sample order the previews use, addressed to
+ * `contactEmail` — the "Send test emails" button sends the real "Request
+ * received" and "New catering request" emails against it. */
+export function sampleOrderFor(contactEmail: string): CateringOrderWithItems {
+  return { ...sampleOrder(), contactEmail };
 }
 
 export type CateringEmailPreview = { id: string; label: string; content: CateringEmailContent };

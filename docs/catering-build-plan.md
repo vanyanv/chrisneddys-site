@@ -9,7 +9,7 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
 ## Ground rules
 
 - Ships dark: catering ordering is off until an owner turns it on in
-  Admin → Settings → Catering (`cateringOrderingOn`, default false). While
+  Admin → Catering → Settings (`/admin/catering/settings/`, `cateringOrderingOn`, default false; catering and the shop are switched on separately and never read each other's state). While
   off, `/catering/order/` shows the existing "ask about catering" card that
   links to `/contact/`, and every catering button keeps `CATERING_HREF`
   (`/contact/`). While on, catering buttons go to `/catering/order/`.
@@ -23,7 +23,8 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
 - Money is integer cents everywhere. Tax 9.75% on food (subtotal of lines),
   not on delivery or tip. Delivery flat $25 (setting). Tip 0/10/15/20% of food
   or a custom amount, default 10%.
-- Lead time: 48 h before the chosen time; 72 h when headcount ≥ 50. Anything
+- Lead time: 48 h before the chosen time (the `leadHours` setting), for every
+  order whatever its size; there is no headcount rule. Anything
   sooner shows the "Too soon" state linking to `/contact/` (never a phone
   link). Times come from owner-set catering hours per store per weekday, in
   30-minute slots, minus days off. No capacity limits. All times are
@@ -44,7 +45,8 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
   payment adapter skips Stripe: checkout redirects straight to the success
   page and marks the order held; capture/cancel/refund are no-ops that
   record fake ids. Playwright sets it. Preview requires an isolated test
-  database. Production and other Vercel environments reject the flag.
+  database. Production and other Vercel environments reject the flag. While it is on, the review step and the sent page show "Test mode: no card is
+  charged."
 - Cancellation (customer, from the order link): free until 48 h before the
   time, 50% back from 48 h to 24 h, nothing inside 24 h. Before approval,
   cancelling releases the hold. After capture, refund the tier's share.
@@ -71,7 +73,7 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
   (tabs: Needs you / Upcoming / Past, search), `/admin/catering/[id]/` order
   page (approve, decline with reason, timeline, notes), print pages
   `/admin/catering/[id]/crew-ticket/`, `/labels/`, `/invoice/`; Overview gets
-  a catering card; Settings gets a Catering section (on/off, hours per store
+  a catering card; Catering gets its own Settings page (on/off, hours per store
   per weekday, days off, delivery fee, range, reply hours, owner email).
 - Crew ticket (owner's latest ask): lead with times (day, ready by = 30 min
   before, driver leaves = 20 min before for delivery, deliver/pickup at), who
@@ -101,7 +103,7 @@ and copy; match them. Copy in them is a Claude draft the owner has seen.
 5. Admin: nav, list, order page, print pages, overview card, settings.
 6. Playwright: every flow step by step at 390×844 (iPhone) and 1280×800,
    with fake payments: pickup order, delivery order with named lines,
-   too far, too soon, 50+ lead time, closed day, approve, decline, expire,
+   too far, too soon, 48 h notice for any order size, closed day, approve, decline, expire,
    cancel tiers, change, find my orders, admin settings, print pages.
 
 ## Contracts between phases 3, 4 and 5
@@ -117,11 +119,11 @@ Phase 3 (server) owns and exports:
 - `src/lib/catering/hours.ts`: `toScheduleHours(dbHours)`, `toScheduleDaysOff(dbDaysOff)`.
 - `src/lib/catering/public.ts`: `getPublicCateringConfig(db)` →
   `{ orderingOn, stores: {id, name, address, city, zip, phone}[], hours, daysOff,
-deliveryFeeCents, rangeMiles, replyHours, leadHours, bigLeadHours, bigHeadcount }`
+deliveryFeeCents, rangeMiles, replyHours, leadHours }`
   (hours/daysOff in the library shape). Safe to pass to client components.
 - `POST /api/catering/range` `{store, zip}` → `{miles: number|null, inRange: boolean, unknown: boolean}`.
 - `POST /api/catering/checkout` body
-  `{store, fulfilment, date:"YYYY-MM-DD", time:"HH:MM", headcount, lines: CartLine[],
+  `{store, fulfilment, date:"YYYY-MM-DD", time:"HH:MM", lines: CartLine[],
 tip: {percent}|{cents}, plateSets, contact:{name,email,phone}, company?, poNumber?,
 onsite?:{name,phone}, address?:{line1,line2?,city,state,zip,instructions?}, customerNote?}`
   → `200 {url}` (Stripe Checkout, or `/catering/order/sent/?o=<token>` in fake mode) |
@@ -131,7 +133,7 @@ onsite?:{name,phone}, address?:{line1,line2?,city,state,zip,instructions?}, cust
 - `src/lib/catering/service.ts` (server-only, takes `db`):
   `getOrderView(db, token)` (lazily expires overdue requests; returns order, items,
   events, cancellation quote, whether change/cancel allowed) ·
-  `cancelByCustomer(db, token)` · `requestChange(db, token, {lines, headcount, time?, tip?})` ·
+  `cancelByCustomer(db, token)` · `requestChange(db, token, {lines, time?, tip?})` ·
   `findMyOrders(db, email)` (emails links; always resolves) ·
   `approveOrder(db, id)` · `declineOrder(db, id, reason)` · `approveChange(db, id)` ·
   `declineChange(db, id, reason?)` · `markCompleted(db, id)` · `expireDue(db, now)` ·

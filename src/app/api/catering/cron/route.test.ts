@@ -48,7 +48,6 @@ function baseDraftInput(overrides: Partial<CreateDraftOrderInput> = {}): CreateD
     store: "hollywood",
     fulfilment: "pickup",
     eventAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-    headcount: 10,
     contactName: "Pat Customer",
     contactEmail: "pat@example.com",
     contactPhone: "555-1234",

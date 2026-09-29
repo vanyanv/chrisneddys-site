@@ -64,17 +64,16 @@ export async function signInAsOwnerOnCateringList(page: Page): Promise<void> {
 }
 
 /** Turns catering ordering on (idempotent — a no-op if already on) from
- * Admin -> Settings -> Catering, saving through the sticky save bar (the
- * same bar phone has to reach per issue #190's acceptance criteria).
- * `/admin/settings` is middleware-protected, so this signs in as the owner
- * first — on the same `page` a spec then reuses as the customer, which is
- * fine: the admin session cookie doesn't gate the storefront/order routes. */
-/** `/admin/settings` renders two independent forms, each with its own save
- * bar (`CateringSettingsSection`'s module comment: "a different table, so a
- * different save") — so every selector here is scoped to the catering
- * form's own save button (`form="catering-settings-form"`), not just
- * `.adm-savebar-save`, which the store-settings save bar shares the class
- * name with too. */
+ * Admin -> Catering -> Settings (`/admin/catering/settings/`), saving
+ * through the sticky save bar (the same bar phone has to reach per issue
+ * #190's acceptance criteria). The page is middleware-protected, so this
+ * signs in as the owner first — on the same `page` a spec then reuses as
+ * the customer, which is fine: the admin session cookie doesn't gate the
+ * storefront/order routes. */
+/** Catering settings have their own page and their own form and save bar
+ * (`CateringSettingsSection`), separate from the shop's `/admin/settings`
+ * — every selector here is scoped to the catering form's own save button
+ * (`form="catering-settings-form"`). */
 export function cateringSaveButton(page: Page) {
   return page.locator('button.adm-savebar-save[form="catering-settings-form"]');
 }
@@ -92,7 +91,7 @@ const SAVE_BAR_TIMEOUT = 45_000;
 
 export async function enableCateringOrdering(page: Page): Promise<void> {
   await signInAsOwner(page);
-  await page.goto("/admin/settings");
+  await page.goto("/admin/catering/settings");
   const toggle = page.locator("#orderingOn");
   if (await toggle.isChecked()) return;
   await toggle.click({ force: true });
@@ -103,7 +102,7 @@ export async function enableCateringOrdering(page: Page): Promise<void> {
 
 export async function disableCateringOrdering(page: Page): Promise<void> {
   await signInAsOwner(page);
-  await page.goto("/admin/settings");
+  await page.goto("/admin/catering/settings");
   const toggle = page.locator("#orderingOn");
   if (!(await toggle.isChecked())) return;
   await toggle.click({ force: true });
@@ -177,10 +176,6 @@ export async function calendarDayStatus(
 
 export async function selectFirstSlot(page: Page): Promise<void> {
   await page.locator(".cor-slots .cor-slot").first().click();
-}
-
-export async function setHeadcount(page: Page, n: number): Promise<void> {
-  await page.getByLabel("Number of people").fill(String(n));
 }
 
 /** Opens an item's sheet from the food step's menu grid by its visible name.
@@ -318,7 +313,6 @@ export async function quickOrder(
   await startOrder(page);
   await choosePickup(page, "Hollywood");
   await page.getByRole("button", { name: "Continue" }).click();
-  await setHeadcount(page, 12);
   await selectCalendarDate(page, 5);
   await selectFirstSlot(page);
   await page.getByRole("button", { name: "Continue" }).click();

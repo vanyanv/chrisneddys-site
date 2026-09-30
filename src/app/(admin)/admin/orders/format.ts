@@ -3,7 +3,6 @@
  * outside `/admin/orders` needs them. */
 
 export const CARRIERS = ["USPS", "UPS", "FedEx", "Other"] as const;
-export type Carrier = (typeof CARRIERS)[number];
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",

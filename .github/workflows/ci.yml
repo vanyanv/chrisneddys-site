@@ -38,6 +38,13 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Unused code
+        # Unused files, exports, types and dependencies. When it flags
+        # something that is used in a way knip can't see (read as text by a
+        # script, loaded by a config), tag the export `@public` or list the
+        # dependency in knip.json's ignoreDependencies, with the reason.
+        run: pnpm knip
+
       - name: Test
         run: pnpm test
 

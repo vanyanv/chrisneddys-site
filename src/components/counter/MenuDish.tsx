@@ -44,9 +44,10 @@ export function MenuDish({
         </span>
       )}
       <span className="cne-dish-ph">
-        {item.photo ? (
-          /* The name alone, as the list rows had it: the button already
-             announces the description and the price. */
+        {/* Every item drawn as a card has a photo (menu.test.ts). The name
+            alone, as the list rows had it: the button already announces the
+            description and the price. */}
+        {item.photo && (
           <picture>
             <source type="image/avif" srcSet={`/menu/${item.photo}-card.avif`} />
             <img
@@ -58,8 +59,6 @@ export function MenuDish({
               decoding="async"
             />
           </picture>
-        ) : (
-          <span className="cne-dish-noph">{item.name}</span>
         )}
       </span>
       <span className="cne-dish-body">

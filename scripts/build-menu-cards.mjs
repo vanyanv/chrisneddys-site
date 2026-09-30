@@ -14,20 +14,17 @@
  * `public/photos/double-4x3.jpg` into the AVIF/WebP ladder its `<picture>`
  * asks for: `public/photos/double-4x3-{480,720,900}.{avif,webp}`.
  *
- * Better sources drop straight in: a file at `assets/menu-hq/<photo>.png`
- * (or `.jpg`/`.webp`) is used instead of the Otter photo for that id. Run
- * again after adding or replacing one:
+ * Run again after replacing a photo in `public/menu/`:
  *
  *     node scripts/build-menu-cards.mjs
  */
 import sharp from "sharp";
-import { existsSync, readdirSync, writeFileSync } from "node:fs";
+import { readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MENU = join(root, "public/menu");
-const HQ = join(root, "assets/menu-hq");
 
 /** The card frame: 4:3, the food plus 7% of its size on each side. */
 const RATIO = 4 / 3;
@@ -37,16 +34,8 @@ const WEBP = { quality: 80 };
 // Same settings as scripts/build-photo-cuts.mjs, for the same reasons.
 const AVIF = { quality: 50, effort: 6, chromaSubsampling: "4:2:0" };
 
-function sourceFor(id) {
-  for (const ext of ["png", "jpg", "webp"]) {
-    const p = join(HQ, `${id}.${ext}`);
-    if (existsSync(p)) return p;
-  }
-  return join(MENU, `${id}.webp`);
-}
-
 async function cardCut(id) {
-  const src = sourceFor(id);
+  const src = join(MENU, `${id}.webp`);
   const meta = await sharp(src).metadata();
   // `trim` reports the box it kept as negative offsets into the original.
   const { info } = await sharp(src).trim({ threshold: 18 }).toBuffer({ resolveWithObject: true });
@@ -84,9 +73,7 @@ async function cardCut(id) {
     const out = join(MENU, `${id}-card.${ext}`);
     const buf = await encode(cut()).toBuffer();
     writeFileSync(out, buf);
-    console.log(
-      `${out} — ${buf.length} bytes${src.startsWith(HQ) ? " (from assets/menu-hq)" : ""}`,
-    );
+    console.log(`${out} — ${buf.length} bytes`);
   }
 }
 

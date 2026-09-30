@@ -161,17 +161,6 @@
     scale: 1.06;
   }
 }
-.cne-dish-noph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 8px;
-  font-family: var(--font-display);
-  font-size: 13px;
-  text-align: center;
-  color: var(--a-sub);
-}
 .cne-dish-body {
   display: flex;
   flex-direction: column;

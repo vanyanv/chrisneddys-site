@@ -63,3 +63,14 @@ describe("drinkGetsPhoto", () => {
     ]);
   });
 });
+
+describe("menu photo cards", () => {
+  it("has a photo for every item the menu draws as a card", () => {
+    for (const [key, items] of Object.entries(foodMenu) as [MenuCategoryKey, typeof allItems][]) {
+      for (const item of items) {
+        if (key === "drinks" && !drinkGetsPhoto(item) && SECTION_LEADS.drinks !== item.id) continue;
+        expect(item.photo, `${key}: ${item.id}`).toBeTruthy();
+      }
+    }
+  });
+});

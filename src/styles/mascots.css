@@ -70,10 +70,6 @@
   filter: drop-shadow(1px 1px 0 var(--a-ink));
   pointer-events: none;
 }
-.cne-badge-corner.is-tl {
-  top: -8px;
-  left: -8px;
-}
 .cne-badge-corner.is-tr {
   top: -10px;
   right: -8px;

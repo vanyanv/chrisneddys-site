@@ -170,10 +170,6 @@ const cachedCatalogueUpdatedAt = unstable_cache(queryCatalogueUpdatedAt, ["catal
   tags: CACHE_TAGS,
   revalidate: REVALIDATE_SECONDS,
 });
-const cachedInventory = unstable_cache(queryInventory, ["catalogue-inventory"], {
-  tags: CACHE_TAGS,
-  revalidate: REVALIDATE_SECONDS,
-});
 const cachedInventoryList = unstable_cache(queryInventoryList, ["catalogue-inventory-list"], {
   tags: CACHE_TAGS,
   revalidate: REVALIDATE_SECONDS,
@@ -327,14 +323,17 @@ export function editionCounts(editions: EditionCell[]): {
  * Never returns a decrementing count that isn't backed by a real store — the
  * fallback (no database) always reports `tracked: false`, matching the
  * catalogue's honesty rule (see `src/data/merch.ts`).
+ *
+ * No page calls this any more (both shop pages read `listInventory`), so it
+ * has no cache: it is the uncached, row-by-row reading the tests check
+ * `listInventory` and the checkout against.
  */
 export async function getInventory(slug: string): Promise<InventoryStatus | undefined> {
   if (shouldUseFallback()) {
     if (!merch.some((p) => p.slug === slug)) return undefined;
     return { tracked: false, available: 0, editionSize: null };
   }
-  if (isTestEnv()) return queryInventory(slug);
-  return cachedInventory(slug);
+  return queryInventory(slug);
 }
 
 /**

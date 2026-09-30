@@ -7,7 +7,7 @@
  * writes it; the perf scripts and screenshot tooling do, so they measure the
  * page underneath. (The old once-per-browser flag, `cne-welcome-intro-seen`,
  * is deliberately ignored now so browsers that saw the intro see it again.) */
-export const INTRO_STORAGE_KEY = "cne-welcome-intro-off";
+const INTRO_STORAGE_KEY = "cne-welcome-intro-off";
 
 /** Set on `<html>` the moment a visit is gated in — before hydration, by the
  * inline script `WelcomeIntro` renders, so the CSS curtain in

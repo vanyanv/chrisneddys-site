@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { scheduleHoldBack } from "./skeletonHoldBack";
 
-export { SKELETON_HOLD_MS } from "./skeletonHoldBack";
-
 /**
  * Delays rendering `children` by `SKELETON_HOLD_MS` (see
  * `skeletonHoldBack.ts`). Each admin `loading.tsx` wraps only its

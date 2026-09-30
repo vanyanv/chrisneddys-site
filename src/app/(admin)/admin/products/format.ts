@@ -15,7 +15,7 @@ export function relativeTime(date: Date | number): string {
   return `${Math.floor(months / 12)}y ago`;
 }
 
-export function formatDollars(cents: number): string {
+function formatDollars(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 

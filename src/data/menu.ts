@@ -440,7 +440,7 @@ export const COMBO_FROM_PRICE = Math.min(...menu.combos.map((i) => i.price));
  *
  * `id` is already a URL-safe slug, so it doubles as the route segment.
  */
-export const featuredItemIds = [
+const featuredItemIds = [
   "chris-n-eddy-s-slider",
   "2-sliders-and-fries",
   "the-quad",

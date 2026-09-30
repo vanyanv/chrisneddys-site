@@ -47,7 +47,7 @@ const fries = (q = 1): BuildLine => ({ q, n: FRIES });
  * that don't (drinks, a bag of fries, the ball cap) have nothing to itemise and
  * the sheet renders the ticket without a contents block.
  */
-export const builds: Record<string, BuildLine[]> = {
+const builds: Record<string, BuildLine[]> = {
   // combos
   "1-slider-and-fries": [...sliders(2), fries()],
   "2-sliders-and-fries": [...sliders(2, 2), fries()],

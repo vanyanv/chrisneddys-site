@@ -28,7 +28,7 @@ import {
   type UpdateStoreSettingsResult,
 } from "@/lib/orders";
 
-export type { StoreSettings, StoreSettingsPatch, UpdateStoreSettingsResult };
+export type { StoreSettings };
 
 function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";

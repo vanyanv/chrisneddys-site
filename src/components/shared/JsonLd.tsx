@@ -85,7 +85,7 @@ const menuStub = {
  * `parentOrganization` resolves against the Organization node in the sitewide
  * graph, which every page still carries.
  */
-export function restaurantNode(loc: Location) {
+function restaurantNode(loc: Location) {
   return {
     "@type": "Restaurant",
     // The store's own page is the canonical home for this node, so both

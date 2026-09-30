@@ -24,7 +24,7 @@ export const SIGN_IN_KIND = "sign_in";
 /** How long `sign_in_attempts` rows are kept before `pruneSignInAttempts`
  * deletes them — well past the lockout window, just enough to be useful in
  * logs/debugging without growing forever. */
-export const ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000;
+const ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000;
 
 type FailureStats = { count: number; oldestAttemptedAt: Date | null };
 

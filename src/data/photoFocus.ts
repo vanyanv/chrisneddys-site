@@ -3,7 +3,8 @@
  * where focus is a `background-position-y` percentage and zoom a
  * `background-size` percentage.
  *
- * Generated, not authored. Every shot in /public/menu is 720x479 on a white
+ * Generated, not authored. Every shot in /public/menu is 720x479 (720x480 for
+ * the photos added with `scripts/add-menu-photo.mjs`) on a white
  * sweep, and the food's place inside that frame varies a lot: one shot fills
  * 26-82% of the height, another only 43-78%, and the two Mexican bottles run
  * nearly the full height. One shared crop cannot serve all three cases — tuned
@@ -18,7 +19,6 @@
  * Regenerate when the photography changes. Keyed by `MenuItem.photo`.
  */
 export const photoFraming: Record<string, readonly [focus: number, zoom: number]> = {
-  "0a500a4b-3624-4ea3-b99a-9a5f83f2155b": [66, 132],
   "0fa97f11-898b-440d-b40e-dddb1e6fc897": [57, 132],
   "115c038a-7ed0-4de8-9c67-d7bf54d70f0e": [79, 132],
   "1d36f305-06ca-4bfe-bbc7-c01aa67757f5": [50, 100],
@@ -29,10 +29,8 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "42b6ff6c-9e02-43da-bdeb-dd181e8ec348": [65, 132],
   "51c416bb-c2f4-43b7-8710-5493f9d98ba3": [58, 132],
   "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa": [87, 132],
-  "5f336391-8daf-4d23-929a-cb78c125ce0d": [93, 132],
   "688ed85d-8dd9-4d31-be94-5994801863be": [56, 132],
   "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf": [53, 132],
-  "6dcd14a3-7032-489a-9e66-5f4718e96af1": [89, 132],
   "6e108101-0671-4280-a3f9-69d5738349b7": [50, 100],
   "7678a45c-dd42-4249-a148-ca575e757d3d": [78, 132],
   "828b4720-c3f3-42d0-b5f6-851bb8ec6621": [76, 132],
@@ -44,7 +42,12 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "c6748e47-aa70-4aee-938b-91108530bb84": [65, 132],
   "cb39bdad-a744-46f1-b004-f78ac93596ff": [69, 132],
   "cceb4fd1-72ae-43f5-8432-8e4648f26e07": [66, 132],
-  "e714a53e-90be-4cc8-8692-1358c9faebb1": [70, 132],
+  "cheese-fries": [61, 113],
+  "combo-1-chris": [98, 100],
+  "combo-1-eddy": [98, 100],
+  "combo-2-chris": [88, 100],
+  "combo-2-eddy": [90, 100],
+  "loaded-fries": [90, 107],
   "f4a0f2cc-ba78-4149-88b7-c2f04c81903c": [54, 132],
   "fe9754fa-6f48-423a-a833-b52f0a9c2f89": [74, 132],
   "feaff547-96d8-4bf5-abe1-6d597acc02fb": [78, 132],

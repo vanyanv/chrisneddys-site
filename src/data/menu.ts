@@ -24,6 +24,12 @@ export type MenuItem = {
    * this is the photo's own id rather than the item's.
    */
   photo?: string;
+  /**
+   * A photo per Way, for items shot both ways (issue #208): Chris’s Way with
+   * lettuce and tomato, Eddy’s Way with pickles and grilled onions. `photo`
+   * is the default, shown for a Way that isn't listed here.
+   */
+  wayPhotos?: Partial<Record<WayId, string>>;
   /** Exactly as Otter names it — the name is part of the deep link path. */
   name: string;
   desc: string;
@@ -104,7 +110,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "1-slider-and-fries",
       otterId: "d119da4a-bfc1-4913-8249-21dd96d58456",
-      photo: "5f336391-8daf-4d23-929a-cb78c125ce0d",
+      photo: "combo-1-chris",
+      wayPhotos: { eddy: "combo-1-eddy" },
       name: "1 Slider and Fries",
       desc: "One slider and a side of chris-cut fries. A slider is two smashed patties on two slices of cheese, buttered Martin’s roll.",
       price: 12.49,
@@ -113,7 +120,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "2-sliders-and-fries",
       otterId: "7bbcdf64-0e6f-489f-8ca4-0bee1e835bb0",
-      photo: "6dcd14a3-7032-489a-9e66-5f4718e96af1",
+      photo: "combo-2-chris",
+      wayPhotos: { eddy: "combo-2-eddy" },
       name: "2 Sliders and Fries",
       desc: "Two sliders and a side of chris-cut fries. The order most people are actually here for.",
       price: 17.49,
@@ -150,7 +158,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "cheese-fries",
       otterId: "e2233b25-5761-4be8-a891-4e6e77aa1a50",
-      photo: "0a500a4b-3624-4ea3-b99a-9a5f83f2155b",
+      photo: "cheese-fries",
       name: "Cheese Fries",
       desc: "Melted cheese over our seasoned chris-cut fries.",
       price: 5.99,
@@ -158,7 +166,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "loaded-fries",
       otterId: "db826564-9237-48f6-9756-b8320bea377c",
-      photo: "e714a53e-90be-4cc8-8692-1358c9faebb1",
+      photo: "loaded-fries",
       name: "Loaded Fries",
       desc: "Melted cheese, Chris N Eddy’s sauce and grilled onions over the fries.",
       price: 6.99,
@@ -466,4 +474,9 @@ export const SECTION_LEADS: Partial<Record<MenuCategoryKey, string>> = {
  */
 export function drinkGetsPhoto(item: MenuItem): boolean {
   return item.id.includes("shake");
+}
+
+/** The item's photo for the Way picked, falling back to its default. */
+export function photoFor(item: MenuItem, way?: WayId): string | undefined {
+  return (way && item.wayPhotos?.[way]) || item.photo;
 }

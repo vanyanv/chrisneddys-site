@@ -1,10 +1,14 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { photoFraming } from "@/data/photoFocus";
 import {
   allItems,
   drinkGetsPhoto,
   foodMenu,
   isFoodItem,
   menu,
+  photoFor,
   SECTION_LEADS,
   type MenuCategoryKey,
 } from "@/data/menu";
@@ -71,6 +75,26 @@ describe("menu photo cards", () => {
         if (key === "drinks" && !drinkGetsPhoto(item) && SECTION_LEADS.drinks !== item.id) continue;
         expect(item.photo, `${key}: ${item.id}`).toBeTruthy();
       }
+    }
+  });
+});
+
+describe("photoFor", () => {
+  const combo = foodMenu.combos.find((i) => i.id === "2-sliders-and-fries")!;
+
+  it("shows the photo of the Way picked, and the default otherwise", () => {
+    expect(photoFor(combo, "eddy")).toBe("combo-2-eddy");
+    expect(photoFor(combo, "chris")).toBe("combo-2-chris");
+    expect(photoFor(combo)).toBe("combo-2-chris");
+  });
+
+  it("has every file the site draws for each photo", () => {
+    const ids = allItems.flatMap((i) => [i.photo, ...Object.values(i.wayPhotos ?? {})]);
+    for (const id of ids.filter(Boolean)) {
+      for (const file of [`${id}.webp`, `${id}-thumb.webp`, `${id}-card.webp`, `${id}-card.avif`]) {
+        expect(existsSync(join(process.cwd(), "public/menu", file)), file).toBe(true);
+      }
+      expect(photoFraming[id!], `photoFocus.ts: ${id}`).toBeDefined();
     }
   });
 });

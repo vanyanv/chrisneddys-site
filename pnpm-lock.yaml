@@ -45,9 +45,6 @@ importers:
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@electric-sql/pglite@0.5.8)(@neondatabase/serverless@1.1.0)(kysely@0.29.5)
-      jose:
-        specifier: ^6.2.12
-        version: 6.2.12
       next:
         specifier: ^15.5.25
         version: 15.5.25(@playwright/test@1.63.0)(@types/node@22.19.17)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)

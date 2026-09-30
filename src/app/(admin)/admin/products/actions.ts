@@ -1,16 +1,13 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
 import { requireOwner } from "@/lib/auth";
 import {
-  addImage,
   applyProductChanges,
   backfillDraftSeo,
   createDraft,
   duplicateProduct,
   getProductForAdmin,
-  moveImage,
   reorderImages,
   reorderProducts,
   removeImage,
@@ -19,16 +16,12 @@ import {
   setStatus,
   updateImage,
   updateProduct,
-  updateProductField,
   type AdminProduct,
   type InventoryMode,
   type ProductChange,
-  type ProductField,
-  type ProductFieldValues,
   type ProductPatch,
 } from "@/lib/catalogAdmin";
 import { seoWriterConfigured, writeProductSeo, type WrittenSeo } from "@/lib/seoWriter";
-import type { AuthenticityFact } from "@/db/schema";
 
 /** Every write the storefront could show goes through here: the cached
  * catalogue reads (`src/lib/catalog.ts`) and the two /shop routes that could
@@ -43,7 +36,7 @@ function revalidateStorefront(...slugs: string[]): void {
 
 /** The rest of `product` carried through unchanged, with `fields` (the
  * model's four lines, or the derived fallback's) laid over the search-engine columns
- * — `updateProduct` takes a full patch, so both `createProductAction` and
+ * — `updateProduct` takes a full patch, so `generateProductSeoAction`
  * `generateProductSeoAction` build one of these rather than writing the four
  * fields with four separate calls. */
 function seoPatch(product: AdminProduct, fields: WrittenSeo): ProductPatch {
@@ -73,8 +66,7 @@ function seoPatch(product: AdminProduct, fields: WrittenSeo): ProductPatch {
 }
 
 /** Writes and saves a product's four search-engine fields in one go — the
- * shared core of `createProductAction`'s creation-time write and the
- * "Write with AI" button's `generateProductSeoAction`. Throws only if the
+ * core of the "Write with AI" button's `generateProductSeoAction`. Throws only if the
  * save itself fails (in practice never, since the slug is unchanged), never
  * because `writeProductSeo` failed — that function already falls back to
  * derived copy on its own. */
@@ -83,50 +75,6 @@ async function writeProductSeoFields(product: AdminProduct): Promise<WrittenSeo>
   const result = await updateProduct(product.id, seoPatch(product, fields));
   if (!result.ok) throw new Error(result.error);
   return fields;
-}
-
-export type CreateDraftState = { error?: string };
-
-export async function createProductAction(
-  _prevState: CreateDraftState | undefined,
-  formData: FormData,
-): Promise<CreateDraftState> {
-  await requireOwner();
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) return { error: "Give the product a name." };
-
-  const { id } = await createDraft(name);
-
-  // A named product should arrive with its search-engine fields already
-  // written (issue #64), but nothing here is allowed to stop the product
-  // being created — worst case the owner sees the same blank fields
-  // creation always had before this existed.
-  try {
-    const product = await getProductForAdmin(id);
-    if (product) await writeProductSeoFields(product);
-  } catch (error) {
-    console.warn("[createProductAction] writing SEO fields failed, continuing", error);
-  }
-
-  redirect(`/admin/products/${id}`);
-}
-
-export type CreateProductPlainResult =
-  | { ok: true; id: string; slug: string }
-  | { ok: false; error: string };
-
-/** The Sheet's inline "+ Add a product" row: a plain (non-FormData, non-
- * redirecting) equivalent of `createProductAction` so the row can create the
- * draft, apply its starting price, and expand in place instead of
- * navigating away to the full editor. */
-export async function createProductPlainAction(name: string): Promise<CreateProductPlainResult> {
-  await requireOwner();
-  const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Give the product a name." };
-
-  const { id, slug } = await createDraft(trimmed);
-  revalidateStorefront(slug);
-  return { ok: true, id, slug };
 }
 
 export type CreateBlankProductResult = { id: string; slug: string };
@@ -143,147 +91,6 @@ export async function createBlankProductAction(): Promise<CreateBlankProductResu
   const { id, slug } = await createDraft("");
   revalidateStorefront(slug);
   return { id, slug };
-}
-
-export type SaveProductState = {
-  ok?: boolean;
-  error?: string;
-  /** ISO timestamp — formatted client-side (`ProductForm`) so it renders in
-   * the viewer's local time instead of the server's (UTC on Vercel). */
-  savedAt?: string;
-};
-
-function linesToList(value: FormDataEntryValue | null): string[] {
-  return String(value ?? "")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function parseAuthenticityFacts(formData: FormData): AuthenticityFact[] {
-  const facts: AuthenticityFact[] = [];
-  for (let i = 0; i < 4; i++) {
-    const label = String(formData.get(`authFactLabel${i}`) ?? "").trim();
-    const value = String(formData.get(`authFactValue${i}`) ?? "").trim();
-    if (label && value) facts.push({ label, value });
-  }
-  return facts;
-}
-
-export async function saveProductAction(
-  _prevState: SaveProductState | undefined,
-  formData: FormData,
-): Promise<SaveProductState> {
-  await requireOwner();
-
-  const id = String(formData.get("id") ?? "");
-  if (!id) return { error: "Missing product id." };
-
-  const priceDollars = Number(formData.get("priceDollars") ?? "0");
-  if (!Number.isFinite(priceDollars) || priceDollars < 0) {
-    return { error: "Price must be a positive number." };
-  }
-  const perOrderLimit = Number(formData.get("perOrderLimit") ?? "6");
-  if (!Number.isInteger(perOrderLimit) || perOrderLimit < 1) {
-    return { error: "Per-order limit must be a positive whole number." };
-  }
-  const metaDescription = String(formData.get("metaDescription") ?? "");
-  if (metaDescription.length > 155) {
-    return { error: "Meta description must be 155 characters or fewer." };
-  }
-  const metaTitle = String(formData.get("metaTitle") ?? "").trim();
-  if (metaTitle.length > 60) {
-    return { error: "Meta title must be 60 characters or fewer." };
-  }
-  const metaKeywords = String(formData.get("metaKeywords") ?? "").trim();
-  if (metaKeywords.length > 160) {
-    return { error: "Meta keywords must be 160 characters or fewer." };
-  }
-  const socialImageUrl = String(formData.get("socialImageUrl") ?? "").trim();
-  if (
-    socialImageUrl &&
-    !(socialImageUrl.startsWith("/") || socialImageUrl.startsWith("https://"))
-  ) {
-    return { error: `Social image URL must start with "/" or be an https:// URL.` };
-  }
-  const socialImageAlt = String(formData.get("socialImageAlt") ?? "").trim();
-  if (socialImageAlt && (socialImageAlt.length < 8 || socialImageAlt.length > 125)) {
-    return { error: "Social image alt text must be between 8 and 125 characters." };
-  }
-
-  const result = await updateProduct(id, {
-    name: String(formData.get("name") ?? "").trim(),
-    displayName1: String(formData.get("displayName1") ?? "").trim(),
-    displayName2: String(formData.get("displayName2") ?? "").trim(),
-    eyebrow: String(formData.get("eyebrow") ?? "").trim(),
-    slug: String(formData.get("slug") ?? "").trim(),
-    priceCents: Math.round(priceDollars * 100),
-    perOrderLimit,
-    oneSize: formData.get("oneSize") === "on",
-    description: String(formData.get("description") ?? ""),
-    metaDescription,
-    limitedNote: String(formData.get("limitedNote") ?? ""),
-    details: linesToList(formData.get("details")),
-    fit: String(formData.get("fit") ?? "").trim() || null,
-    limitedCopy: String(formData.get("limitedCopy") ?? "").trim() || null,
-    why: String(formData.get("why") ?? "").trim() || null,
-    authenticityCopy: String(formData.get("authenticityCopy") ?? "").trim() || null,
-    authenticityFacts: parseAuthenticityFacts(formData),
-    metaTitle: metaTitle || null,
-    metaKeywords: metaKeywords || null,
-    socialImageUrl: socialImageUrl || null,
-    socialImageAlt: socialImageAlt || null,
-  });
-
-  if (!result.ok) return { error: result.error };
-
-  await backfillDraftSeo(id);
-  revalidateStorefront(result.oldSlug, result.newSlug);
-
-  return { ok: true, savedAt: new Date().toISOString() };
-}
-
-export type StatusActionState = { error?: string };
-
-export async function setStatusAction(
-  _prevState: StatusActionState | undefined,
-  formData: FormData,
-): Promise<StatusActionState> {
-  await requireOwner();
-  const id = String(formData.get("id") ?? "");
-  const status = String(formData.get("status") ?? "") as "draft" | "published" | "archived";
-  if (!id || !["draft", "published", "archived"].includes(status)) {
-    return { error: "Bad status change." };
-  }
-
-  const result = await setStatus(id, status);
-  if (!result.ok) return { error: result.error };
-
-  revalidateStorefront(result.slug);
-  return {};
-}
-
-export type InventoryActionState = { ok?: boolean; error?: string };
-
-export async function setInventoryAction(
-  _prevState: InventoryActionState | undefined,
-  formData: FormData,
-): Promise<InventoryActionState> {
-  await requireOwner();
-  const id = String(formData.get("id") ?? "");
-  const mode = String(formData.get("mode") ?? "") as InventoryMode;
-  if (!id || !["untracked", "quantity", "edition"].includes(mode)) {
-    return { error: "Bad inventory mode." };
-  }
-
-  const nRaw = formData.get("n");
-  const n = nRaw !== null && nRaw !== "" ? Number(nRaw) : undefined;
-
-  const result = await setInventory(id, mode, n);
-  if (!result.ok) return { error: result.error };
-
-  revalidateStorefront(result.slug);
-  return { ok: true };
 }
 
 export type ImageActionState = { ok?: boolean; error?: string };
@@ -306,18 +113,6 @@ export async function updateImageAction(
   const product = await getProductForAdmin(productId);
   if (product) revalidateStorefront(product.slug);
   return { ok: true };
-}
-
-export async function moveImageAction(formData: FormData): Promise<void> {
-  await requireOwner();
-  const imageId = String(formData.get("imageId") ?? "");
-  const productId = String(formData.get("productId") ?? "");
-  const direction = String(formData.get("direction") ?? "") as "up" | "down";
-  if (!imageId || !productId || (direction !== "up" && direction !== "down")) return;
-
-  await moveImage(imageId, direction);
-  const product = await getProductForAdmin(productId);
-  if (product) revalidateStorefront(product.slug);
 }
 
 export async function removeImageAction(formData: FormData): Promise<void> {
@@ -353,25 +148,6 @@ export async function duplicateProductAction(id: string): Promise<DuplicateProdu
   const result = await duplicateProduct(id);
   if (!result.ok) return result;
   revalidateStorefront(result.slug);
-  return result;
-}
-
-/** Per-field autosave for the panel's single controls and its Story &
- * details / Authenticity / Search engines accordions. `F` pins `value` and
- * the returned `previous` to that one field's type — see `ProductField` /
- * `ProductFieldValues` in `@/lib/catalogAdmin`. */
-export async function updateProductFieldAction<F extends ProductField>(
-  id: string,
-  field: F,
-  value: ProductFieldValues[F],
-): Promise<Awaited<ReturnType<typeof updateProductField<F>>>> {
-  await requireOwner();
-  const result = await updateProductField(id, field, value);
-  if (result.ok) {
-    await backfillDraftSeo(id);
-    const product = await getProductForAdmin(id);
-    if (product) revalidateStorefront(product.slug);
-  }
   return result;
 }
 
@@ -462,30 +238,13 @@ export async function applyProductChangesAction(
   const result = await applyProductChanges(changes);
   if (!result.ok) return result;
 
+  for (const id of touchedIds) await backfillDraftSeo(id);
+
   const after = await Promise.all(touchedIds.map((id) => getProductForAdmin(id)));
   const newSlugs = after.filter((p): p is AdminProduct => Boolean(p)).map((p) => p.slug);
 
   revalidateStorefront(...oldSlugs, ...newSlugs);
   return result;
-}
-
-export async function addImageAction(input: {
-  productId: string;
-  kind: "view" | "certificate" | "sticker";
-  viewId: string;
-  label: string;
-  alt: string;
-  urlFull: string;
-  urlMid?: string;
-  urlThumb: string;
-  width: number;
-  height: number;
-}): Promise<{ id: string }> {
-  await requireOwner();
-  const row = await addImage(input);
-  const product = await getProductForAdmin(input.productId);
-  if (product) revalidateStorefront(product.slug);
-  return row;
 }
 
 export type GenerateProductSeoResult =

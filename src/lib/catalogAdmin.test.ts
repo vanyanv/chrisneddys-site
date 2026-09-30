@@ -17,7 +17,6 @@ import {
   EditionSizeLockedError,
   getProductForAdmin,
   listProductsForAdmin,
-  moveImage,
   reorderImages,
   reorderProducts,
   removeImage,
@@ -467,8 +466,8 @@ describe("setInventory", () => {
   });
 });
 
-describe("image add/move/remove", () => {
-  it("keeps positions contiguous through adds, a move and a removal", async () => {
+describe("image add/remove", () => {
+  it("keeps positions contiguous through adds and a removal", async () => {
     const draft = await createDraft("Gallery Product");
 
     const img1 = await addImage({
@@ -509,14 +508,9 @@ describe("image add/move/remove", () => {
     expect(admin?.views.map((v) => v.id)).toEqual([img1.id, img2.id, img3.id]);
     expect(admin?.views.map((v) => v.position)).toEqual([0, 1, 2]);
 
-    await moveImage(img3.id, "up");
-    admin = await getProductForAdmin(draft.id);
-    expect(admin?.views.map((v) => v.id)).toEqual([img1.id, img3.id, img2.id]);
-    expect(admin?.views.map((v) => v.position)).toEqual([0, 1, 2]);
-
     await removeImage(img1.id);
     admin = await getProductForAdmin(draft.id);
-    expect(admin?.views.map((v) => v.id)).toEqual([img3.id, img2.id]);
+    expect(admin?.views.map((v) => v.id)).toEqual([img2.id, img3.id]);
     expect(admin?.views.map((v) => v.position)).toEqual([0, 1]);
 
     const db = await getDb();

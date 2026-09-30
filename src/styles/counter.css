@@ -37,12 +37,6 @@ body {
   color: var(--a-fg);
 }
 
-.cne-shell {
-  max-width: 1440px;
-  margin: 0 auto;
-  width: 100%;
-}
-
 /* ---- header ------------------------------------------------------------- */
 .cne-header {
   position: sticky;
@@ -2790,21 +2784,6 @@ body {
     margin-inline: auto;
   }
 }
-.cne-notify {
-  display: flex;
-  gap: 7px;
-  margin-top: 11px;
-}
-.cne-notify input {
-  flex: 1;
-  border: 2px solid var(--a-ink);
-  background: var(--a-bg);
-  color: var(--a-fg);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 9px;
-  min-width: 0;
-}
 
 @media (min-width: 901px) {
   .cne-locs {
@@ -3247,12 +3226,6 @@ h3 {
 }
 .cne-br-desk {
   display: none;
-}
-
-/* /about predates the design system and sizes its body copy by inheritance,
-   so it keeps the 16px base the rest of the site no longer uses. */
-.cne-legacy-theme {
-  font-size: 16px;
 }
 
 /* The prototype's item name is a block, so the description wraps to the name

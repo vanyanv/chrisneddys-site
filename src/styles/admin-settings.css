@@ -1,5 +1,5 @@
 /**
- * Settings — a few rules CSS.md's shared primitive set doesn't cover, kept
+ * Settings — a few rules admin.css's shared primitive set doesn't cover, kept
  * in a separate file per the build brief (admin.css is off-limits for this
  * feature). Imported once, from `src/app/(admin)/admin/settings/page.tsx`.
  * The shared primitives this page reuses as-is (not redefined here):
@@ -9,18 +9,6 @@
  * `.adm-saved-note`, `.adm-error`.
  */
 
-/* ---- header ---------------------------------------------------------- */
-.adm-settings-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 20px;
-  margin: 0 0 24px;
-}
-.adm-settings-header-text {
-  min-width: 0;
-}
 .adm-settings-lede {
   font-size: 14px;
   color: var(--a-sub);

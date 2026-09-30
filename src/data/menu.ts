@@ -467,3 +467,18 @@ export const SECTION_LEADS: Partial<Record<MenuCategoryKey, string>> = {
 export function drinkGetsPhoto(item: MenuItem): boolean {
   return item.id.includes("shake");
 }
+
+/**
+ * Patties and cheese slices per item, drawn as the dot count on its menu
+ * card (issue #210): red dots for patties, yellow for cheese, after the dot
+ * column on the Van Nuys spec-sheet wall. Read off each item's own
+ * description. Combos and boxes hold several sliders, so they have none.
+ */
+export const SLIDER_STACKS: Readonly<Record<string, readonly [patties: number, cheese: number]>> = {
+  "chris-n-eddy-s-slider": [2, 2],
+  "single-patty-slider": [1, 1],
+  "triple-patty-slider": [3, 3],
+  "grilled-cheese": [0, 2],
+  "the-quad": [4, 4],
+  "the-reverse-bun": [2, 2],
+};

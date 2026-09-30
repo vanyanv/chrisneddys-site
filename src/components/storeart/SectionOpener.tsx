@@ -90,6 +90,35 @@ export function OpStamp({
 }
 
 /**
+ * "The Smash" (issue #210): the Sliders heading's bullseye with the red
+ * monster beside it. When the section is revealed (`.cne-cat.is-in`) the
+ * monster hops over and presses the bullseye flat like a patty, grease
+ * flicks out, and it hops home, every few seconds (`menu-art.css`). With
+ * reduced motion it is the still stamp and monster.
+ */
+export function SmashStamp() {
+  const red = MONSTER_COLORS.red;
+  return (
+    <span className="cne-smash" aria-hidden="true">
+      <span className="cne-smash-sp">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
+      <OpStamp kind="bullseye" size={40} className="cne-cat-stamp cne-smash-patty" />
+      <Monster
+        species="classic"
+        bodyColor={red.body}
+        irisColor={red.iris}
+        size={34}
+        className="cne-smash-mon"
+      />
+    </span>
+  );
+}
+
+/**
  * Idea 4's "wall pillar": the menu rail's empty foot, desktop only
  * (`.cne-op-pillar` is hidden below 901px in counter.css). A checkerboard
  * slab in ink and cream, the three most-used monster colours piled at its

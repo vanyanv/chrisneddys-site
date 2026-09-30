@@ -56,9 +56,13 @@ const region = {
   height: h,
 };
 
-const full = await sharp(src).extract(region).resize(720, 480).webp({ quality: 80 }).toBuffer();
+const full = await sharp(src)
+  .extract(region)
+  .resize(720, 480)
+  .webp({ quality: 80, effort: 6 })
+  .toBuffer();
 writeFileSync(join(root, "public/menu", `${id}.webp`), full);
-const thumb = await sharp(full).resize(200, 133).webp({ quality: 80 }).toBuffer();
+const thumb = await sharp(full).resize(200, 133).webp({ quality: 80, effort: 6 }).toBuffer();
 writeFileSync(join(root, "public/menu", `${id}-thumb.webp`), thumb);
 console.log(`public/menu/${id}.webp — ${full.length} bytes`);
 console.log(`public/menu/${id}-thumb.webp — ${thumb.length} bytes`);

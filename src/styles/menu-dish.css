@@ -1,0 +1,422 @@
+/* ---- menu photo cards (issue #206) ---------------------------------------
+   The menu used to be a list with a 56px thumbnail per row, and the Otter
+   photos only fill about 45% of their frame, so a burger was drawn about 25px
+   wide. Now every item is a card with the food on top, cropped tight by
+   `scripts/build-menu-cards.mjs`; each section opens with its best seller as
+   a wide card, and the signature slider opens the page (`.cne-lead`).
+
+   Square corners, ink borders and hard offset shadows, like every other card
+   in DESIGN.md: a grid of photos without that is the delivery app. */
+
+/* ---- the card the page opens with ---------------------------------------- */
+.cne-lead {
+  padding-bottom: 8px;
+}
+.cne-lead-lbl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-red-cta);
+  margin: 0 0 10px;
+}
+.cne-lead-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: #fff2c9;
+  background: var(--a-ink);
+  border: 3px solid var(--a-ink);
+  box-shadow: 4px 4px 0 var(--a-yel);
+  cursor: pointer;
+}
+.cne-lead-ph {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 3px solid var(--a-ink);
+}
+.cne-lead-ph picture,
+.cne-dish-ph picture {
+  display: block;
+  height: 100%;
+}
+.cne-lead-ph img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 55% 45%;
+  /* Food that moves reads as fresher: a slow push-in, back and forth. */
+  animation: cne-lead-push 9s ease-in-out infinite alternate;
+}
+@keyframes cne-lead-push {
+  to {
+    scale: 1.08;
+    translate: -1.5% -1%;
+  }
+}
+.cne-lead-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+.cne-lead-body .n {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.cne-lead-body .d {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.cne-lead-body .ft {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+.cne-lead-body .p {
+  font-family: var(--font-mono);
+  font-size: 21px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cne-lead-body .cta,
+.cne-dish-cta {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--a-ink);
+  background: var(--a-yel);
+  border: 2px solid #fff2c9;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+/* ---- the cards ----------------------------------------------------------- */
+.cne-dish-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 12px;
+}
+.cne-dish {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  box-shadow: 3px 3px 0 var(--a-ink);
+  cursor: pointer;
+  transition:
+    translate 0.14s,
+    box-shadow 0.14s;
+}
+.cne-dish:active {
+  translate: 2px 2px;
+  box-shadow: 1px 1px 0 var(--a-ink);
+}
+.cne-dish-ph {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--a-card);
+  border-bottom: 2.5px solid var(--a-ink);
+}
+.cne-dish-ph img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The photos are shot on pure white; multiplying against the card warms
+     the sweep to match the paper, as the list thumbnails did. */
+  mix-blend-mode: multiply;
+  /* Settle-in when the section scrolls into view (the `.cne-rv` reveal),
+     staggered by the card's place in its grid. Hover uses `scale`, a
+     separate property, so it never inherits the stagger delay. */
+  transition:
+    translate 0.6s cubic-bezier(0.2, 0.8, 0.25, 1.15) calc(var(--i, 0) * 70ms + 0.1s),
+    opacity 0.45s ease calc(var(--i, 0) * 70ms + 0.1s),
+    scale 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.js .cne-cat.cne-rv:not(.is-in) .cne-dish-ph img {
+  translate: 0 14px;
+  opacity: 0;
+}
+@media (hover: hover) {
+  .cne-dish:hover .cne-dish-ph img {
+    scale: 1.06;
+  }
+}
+.cne-dish-noph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-align: center;
+  color: var(--a-sub);
+}
+.cne-dish-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  padding: 9px 10px 10px;
+}
+.cne-dish-body .n {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+/* A phone shows the description on the section's lead card only; the sheet
+   every card opens has it in full. */
+.cne-dish-body .d {
+  display: none;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--a-sub);
+}
+.cne-dish-body .p {
+  margin-top: auto;
+  padding-right: 34px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cne-dish .cne-chev {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 28px;
+  height: 28px;
+}
+.cne-dish-most {
+  position: absolute;
+  z-index: 1;
+  left: -5px;
+  top: -9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--a-ink);
+  background: var(--a-yel);
+  border: 2px solid var(--a-ink);
+  box-shadow: 2px 2px 0 var(--a-ink);
+  padding: 2px 6px;
+  rotate: -3deg;
+}
+
+/* The section's lead: photo beside name, description, price, PICK YOURS. */
+.cne-dish.is-lead {
+  flex-direction: row;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+.cne-dish.is-lead .cne-dish-ph {
+  flex: none;
+  width: 52%;
+  aspect-ratio: auto;
+  min-height: 176px;
+  border-bottom: 0;
+  border-right: 2.5px solid var(--a-ink);
+}
+.cne-dish.is-lead .cne-dish-body {
+  gap: 6px;
+  padding: 12px;
+  min-width: 0;
+}
+.cne-dish.is-lead .n {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.cne-dish.is-lead .d {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cne-dish.is-lead .p {
+  font-size: 17px;
+  padding-right: 0;
+}
+.cne-dish.is-lead .cne-dish-cta {
+  align-self: flex-start;
+  font-size: 12.5px;
+  padding: 6px 9px;
+  border-color: var(--a-ink);
+  box-shadow: 2px 2px 0 var(--a-ink);
+}
+
+/* An odd count on a phone: the last card goes wide rather than leaving a
+   hole beside it. */
+@media (max-width: 599px) {
+  .cne-dish-grid.is-odd > .cne-dish:last-child {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+  .cne-dish-grid.is-odd > .cne-dish:last-child .cne-dish-ph {
+    flex: none;
+    width: 50%;
+    border-bottom: 0;
+    border-right: 2.5px solid var(--a-ink);
+  }
+}
+
+/* iPad and a landscape phone: three or four across, and the lead cards get
+   room for a proper photo. */
+@media (min-width: 600px) {
+  .cne-dish-grid {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+  .cne-dish.is-lead .cne-dish-ph {
+    width: min(46%, 420px);
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+  }
+  .cne-dish.is-lead .cne-dish-body {
+    justify-content: center;
+    padding: 18px 20px;
+  }
+  .cne-dish.is-lead .n {
+    font-size: 28px;
+  }
+  .cne-dish.is-lead .d {
+    font-size: 14.5px;
+    max-width: 48ch;
+  }
+  .cne-dish.is-lead .p {
+    margin-top: 8px;
+    font-size: 21px;
+  }
+  .cne-dish.is-lead .cne-dish-cta {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  .cne-lead-card {
+    flex-direction: row;
+  }
+  .cne-lead-ph {
+    flex: 0 0 56%;
+    border-bottom: 0;
+    border-right: 3px solid var(--a-ink);
+  }
+  .cne-lead-body {
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px;
+  }
+  .cne-lead-body .n {
+    font-size: 34px;
+  }
+  .cne-lead-body .d {
+    font-size: 15.5px;
+  }
+  .cne-lead-body .p {
+    font-size: 24px;
+  }
+  .cne-lead-body .cta {
+    font-size: 16px;
+    padding: 10px 16px;
+  }
+}
+/* A landscape phone is short: keep the opening card from filling it. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cne-lead-ph {
+    flex-basis: 42%;
+    aspect-ratio: 16 / 10;
+  }
+  .cne-lead-body .n {
+    font-size: 26px;
+  }
+}
+
+@media (min-width: 901px) {
+  .cne-menu-main .cne-lead {
+    padding: 0 0 34px;
+  }
+  .cne-lead-body .n {
+    font-size: clamp(30px, 2.9vw, 42px);
+  }
+  .cne-dish-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .cne-dish {
+    border-width: 3px;
+    box-shadow: 4px 4px 0 var(--a-ink);
+  }
+  .cne-dish-body {
+    padding: 12px 14px 14px;
+  }
+  .cne-dish-body .n {
+    font-size: 17px;
+  }
+  .cne-dish-body .d {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .cne-dish-body .p {
+    font-size: 17px;
+  }
+  .cne-dish .cne-chev {
+    right: 12px;
+    bottom: 12px;
+  }
+  .cne-dish.is-lead {
+    margin-bottom: 20px;
+  }
+  .cne-dish.is-lead .n {
+    font-size: 34px;
+  }
+  .cne-dish.is-lead .d {
+    font-size: 16px;
+  }
+  /* The drinks list under the shakes. */
+  .cne-dish-grid + .cne-menu-grid {
+    margin-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cne-lead-ph img {
+    animation: none;
+  }
+  .cne-dish,
+  .cne-dish-ph img {
+    transition: none !important;
+  }
+  .js .cne-cat.cne-rv:not(.is-in) .cne-dish-ph img {
+    translate: none;
+    opacity: 1;
+  }
+  .cne-dish:hover .cne-dish-ph img,
+  .cne-dish:active {
+    scale: none !important;
+    translate: none !important;
+  }
+}

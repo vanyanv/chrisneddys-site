@@ -1129,6 +1129,11 @@ export type AddImageInput = {
    * passes one for a new or replaced image. */
   urlMid?: string;
   urlThumb: string;
+  /** AVIF twins of the three cuts, which the storefront offers first. Optional
+   * for the same reason as `urlMid`; `/api/admin/upload` always passes them. */
+  urlFullAvif?: string;
+  urlMidAvif?: string;
+  urlThumbAvif?: string;
   width: number;
   height: number;
 };
@@ -1161,6 +1166,9 @@ export async function addImage(input: AddImageInput): Promise<{ id: string }> {
       urlFull: input.urlFull,
       urlMid: input.urlMid ?? null,
       urlThumb: input.urlThumb,
+      urlFullAvif: input.urlFullAvif ?? null,
+      urlMidAvif: input.urlMidAvif ?? null,
+      urlThumbAvif: input.urlThumbAvif ?? null,
     })
     .onConflictDoUpdate({
       target: [productImages.productId, productImages.viewId],
@@ -1172,6 +1180,9 @@ export async function addImage(input: AddImageInput): Promise<{ id: string }> {
         urlFull: input.urlFull,
         urlMid: input.urlMid ?? null,
         urlThumb: input.urlThumb,
+        urlFullAvif: input.urlFullAvif ?? null,
+        urlMidAvif: input.urlMidAvif ?? null,
+        urlThumbAvif: input.urlThumbAvif ?? null,
         updatedAt: new Date(),
       },
     })

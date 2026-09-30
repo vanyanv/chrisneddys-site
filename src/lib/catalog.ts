@@ -56,6 +56,9 @@ type ImageRow = {
   urlFull?: string | null;
   urlMid?: string | null;
   urlThumb?: string | null;
+  urlFullAvif?: string | null;
+  urlMidAvif?: string | null;
+  urlThumbAvif?: string | null;
 };
 
 /** Maps a database product row (with its images) onto the app's existing `MerchProduct` shape. */
@@ -74,6 +77,9 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
         url: img.urlFull ?? undefined,
         midUrl: img.urlMid ?? undefined,
         thumbUrl: img.urlThumb ?? undefined,
+        avifUrl: img.urlFullAvif ?? undefined,
+        avifMidUrl: img.urlMidAvif ?? undefined,
+        avifThumbUrl: img.urlThumbAvif ?? undefined,
       },
     }));
   const certificate = images.find((img) => img.kind === "certificate");
@@ -115,6 +121,8 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
               alt: shopperAlt(certificate.alt, `${row.name} certificate`),
               url: certificate.urlFull ?? undefined,
               thumbUrl: certificate.urlThumb ?? undefined,
+              avifUrl: certificate.urlFullAvif ?? undefined,
+              avifThumbUrl: certificate.urlThumbAvif ?? undefined,
             },
             sticker: {
               src: sticker.src,
@@ -123,6 +131,8 @@ function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
               alt: shopperAlt(sticker.alt, `${row.name} sticker`),
               url: sticker.urlFull ?? undefined,
               thumbUrl: sticker.urlThumb ?? undefined,
+              avifUrl: sticker.urlFullAvif ?? undefined,
+              avifThumbUrl: sticker.urlThumbAvif ?? undefined,
             },
           }
         : undefined,

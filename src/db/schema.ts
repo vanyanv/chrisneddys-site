@@ -145,6 +145,13 @@ export const productImages = pgTable(
      * `src/components/shop/ProductShot.tsx` falls back to the 200w/720w
      * srcSet when it's absent. */
     urlMid: text("url_mid"),
+    /** AVIF twins of the three cuts above, which the storefront offers first
+     * in a `<picture>`. Null for seeded images (their AVIF files sit beside
+     * the WebP ones in `photo_dir`) and for uploads made before AVIF shipped
+     * (no backfill), which keep serving WebP only. */
+    urlFullAvif: text("url_full_avif"),
+    urlMidAvif: text("url_mid_avif"),
+    urlThumbAvif: text("url_thumb_avif"),
     ...timestamps,
   },
   (t) => [unique("product_images_product_view_unique").on(t.productId, t.viewId)],

@@ -68,6 +68,12 @@ export type MerchView = {
     url?: string;
     midUrl?: string;
     thumbUrl?: string;
+    /** AVIF twins of `url`, `midUrl` and `thumbUrl` for an upload made since
+     * AVIF shipped. Repo photography needs none: its `.avif` files sit beside
+     * the `.webp` ones. See `avifSrcSet` in `src/lib/productImage.ts`. */
+    avifUrl?: string;
+    avifMidUrl?: string;
+    avifThumbUrl?: string;
   };
 };
 
@@ -81,6 +87,9 @@ type AuthPhoto = {
   /** Same convention as `MerchView.photo.url`/`thumbUrl` — set for an uploaded image. */
   url?: string;
   thumbUrl?: string;
+  /** Same convention as `MerchView.photo.avifUrl`/`avifThumbUrl`. */
+  avifUrl?: string;
+  avifThumbUrl?: string;
 };
 
 export type MerchProduct = {

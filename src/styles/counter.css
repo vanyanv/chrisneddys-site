@@ -3401,6 +3401,15 @@ h3 {
   display: block;
 }
 
+/* The AVIF `<picture>` around a product photo (ProductShot). A block filling
+   the frame, not `display: contents`: that let the short-landscape gallery
+   size the frame from the photo and shift the thumbnails as it arrived. */
+.cne-capshot.is-photo picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 /* Matched to scripts/merch-og-card.html: same dot size, tile and opacity, so
    the product image and the social card are one picture in two places. */
 .cne-capshot-dots {

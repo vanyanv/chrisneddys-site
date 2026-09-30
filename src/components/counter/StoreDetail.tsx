@@ -13,30 +13,61 @@ import { OpenLateNight } from "@/components/counter/OpenLateNight";
 import { Tunnel } from "@/components/storeart/Tunnel";
 import { OpStamp } from "@/components/storeart/SectionOpener";
 import { ArtPhoto } from "@/components/art/ArtPhoto";
+import { SoundWave } from "@/components/locations/SoundWave";
+
+type Photo = { name: string; alt: string };
 
 /**
- * Which stores have a photo of their own. Only Hollywood so far: the owner's
- * photos are all of that room and its murals, and a Hollywood photo on the
- * Van Nuys page would be showing people a room they will not walk into.
- * Every other store gets the mural's checkerboard tunnel in its place.
+ * The stores with photos of their own: the room beside the sign, and three
+ * portrait crops of its walls for the strip under the hero, in walking order.
+ * Each store shows only its own room. Any store not listed (Glendale) gets
+ * the mural's checkerboard tunnel in the photo's place and no strip.
  */
-const HAS_PHOTOS: ReadonlySet<Location["id"]> = new Set(["hollywood"]);
-
-/** The three mural crops in the "Art by Slider" strip, in wall order. */
-const MURALS = [
+const STORE_ART: Partial<Record<Location["id"], { room: Photo; artist: string; walls: Photo[] }>> =
   {
-    name: "mural-vortex",
-    alt: "A black-and-white checkerboard tunnel painted on the wall, with blue, red and yellow one-eyed monsters being pulled into it.",
-  },
-  {
-    name: "mural-monsters",
-    alt: "Grinning one-eyed monsters in blue, red and yellow painted over a checkerboard wall, under a Slider tag.",
-  },
-  {
-    name: "mural-hallway",
-    alt: "The blacklight hallway: a lime one-eyed monster painted over the door, walls covered in neon numbers, dots and starbursts.",
-  },
-];
+    hollywood: {
+      room: {
+        name: "hollywood-room",
+        alt: "Inside Chris N Eddy's Hollywood: the logo on the floor, the menu board over the kitchen, and walls painted with monsters and op-art.",
+      },
+      artist: "Slider",
+      walls: [
+        {
+          name: "mural-vortex",
+          alt: "A black-and-white checkerboard tunnel painted on the wall, with blue, red and yellow one-eyed monsters being pulled into it.",
+        },
+        {
+          name: "mural-monsters",
+          alt: "Grinning one-eyed monsters in blue, red and yellow painted over a checkerboard wall, under a Slider tag.",
+        },
+        {
+          name: "mural-hallway",
+          alt: "The blacklight hallway: a lime one-eyed monster painted over the door, walls covered in neon numbers, dots and starbursts.",
+        },
+      ],
+    },
+    vannuys: {
+      room: {
+        name: "vannuys-hall-wide",
+        alt: "The Van Nuys hallway: yellow, orange and red triangles and black swirls down one wall, the spec-sheet wall down the other.",
+      },
+      artist: "Robert Anthony Jacobs",
+      walls: [
+        {
+          name: "vannuys-soundwave",
+          alt: "The red one-eyed monster on the black sound-wave wall in the Van Nuys dining room.",
+        },
+        {
+          name: "vannuys-swirl-tall",
+          alt: "The glowing Chris N Eddy's sign on a black-and-white swirl mural, over a table and red chairs.",
+        },
+        {
+          name: "vannuys-spec",
+          alt: "The spec-sheet wall: dashed cut lines, the three locations, the origin story and a column of red to yellow dots.",
+        },
+      ],
+    },
+  };
 
 function HoursBox({ loc }: { loc: Location }) {
   return (
@@ -66,7 +97,7 @@ function HoursBox({ loc }: { loc: Location }) {
 export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
   const others = locations.filter((l) => l.id !== loc.id);
   const mon = locationMonster(loc.id);
-  const hasPhoto = HAS_PHOTOS.has(loc.id);
+  const art = STORE_ART[loc.id];
 
   return (
     <>
@@ -134,16 +165,16 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         <div className="cne-lp-seam" aria-hidden="true" />
 
         <div className="cne-lp-media">
-          {hasPhoto ? (
+          {art ? (
             <>
               <ArtPhoto
-                name="hollywood-room"
+                name={art.room.name}
                 widths={[480, 720, 960]}
                 phoneWidths={[480, 720]}
                 width={720}
                 height={540}
                 sizes="(min-width: 901px) 52vw, 100vw"
-                alt={`Inside Chris N Eddy's ${hood}: the logo on the floor, the menu board over the kitchen, and walls painted with monsters and op-art.`}
+                alt={art.room.alt}
                 priority
               />
               <Monster
@@ -160,12 +191,14 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         </div>
       </section>
 
-      {hasPhoto && (
+      {loc.id === "vannuys" && <SoundWave />}
+
+      {art && (
         <section className="cne-sec cne-locd cne-lp-walls cne-rv" aria-labelledby="lp-walls">
-          <div className="cne-eyebrow">Art by Slider</div>
+          <div className="cne-eyebrow">Art by {art.artist}</div>
           <h2 id="lp-walls">The walls.</h2>
           <ul className="cne-lp-murals">
-            {MURALS.map((m) => (
+            {art.walls.map((m) => (
               <li key={m.name}>
                 <ArtPhoto
                   name={m.name}

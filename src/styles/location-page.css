@@ -599,3 +599,139 @@
     opacity: 1;
   }
 }
+
+/* ---- Van Nuys: the sound-wave wall (SoundWave.tsx) ---------------------- */
+/* The dining-room wall, drawn: black bars with a red edge on one side and a
+   yellow edge on the other, the red and yellow monsters over them, and the
+   name's pronunciation under it. White like the wall, between two ink rules. */
+.cne-lp-wave {
+  position: relative;
+  background: var(--a-card);
+  border-bottom: 3px solid var(--a-ink);
+  padding: 34px 16px 22px;
+  overflow: hidden;
+}
+.cne-lp-wave-bars {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 1.1vw, 12px);
+  height: clamp(150px, 26vw, 300px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.cne-lp-wave-bars span {
+  flex: 1 1 0;
+  max-width: 34px;
+  background: var(--a-ink);
+  box-shadow:
+    3px 0 0 var(--a-yel),
+    -3px 0 0 var(--a-red);
+}
+.cne-lp-wave-mon {
+  position: absolute;
+  width: clamp(84px, 17vw, 190px);
+  height: auto;
+  filter: drop-shadow(3px 3px 0 var(--a-ink));
+}
+.cne-lp-wave-mon.is-red {
+  left: 20%;
+  top: 4%;
+}
+.cne-lp-wave-mon.is-yel {
+  right: 18%;
+  bottom: 0;
+}
+.cne-lp-wave-say {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  margin: 16px 0 0;
+}
+.cne-lp-wave-arc {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The wave plays. Before it scrolls into view the bars lie flat; on arrival
+   they rise left to right, then keep bouncing like a level meter, each bar
+   at its own period and dipping to its own floor (`--t`, `--lo`), while the
+   monsters pop in and bob and the speaker's arcs pulse. Transforms and
+   opacity only, so it all runs on the compositor. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .cne-lp-wave-bars span {
+    transform: scaleY(0.06);
+  }
+  .js .cne-lp-wave.is-in .cne-lp-wave-bars span {
+    animation:
+      cne-lp-wave-rise 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.15s + var(--i) * 45ms) both,
+      cne-lp-wave-eq var(--t) ease-in-out calc(0.75s + var(--i) * 45ms) infinite alternate;
+  }
+  .js .cne-lp-wave-mon {
+    transform: scale(0);
+  }
+  .js .cne-lp-wave.is-in .cne-lp-wave-mon {
+    animation:
+      cne-lp-wave-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both,
+      cne-lp-wave-bob 0.62s ease-in-out 1s infinite alternate;
+  }
+  .js .cne-lp-wave.is-in .cne-lp-wave-mon.is-yel {
+    animation-delay: 0.85s, 1.35s;
+    animation-duration: 0.5s, 0.7s;
+  }
+  .cne-lp-wave-arc {
+    animation: cne-lp-wave-arc 1.2s ease-in-out infinite;
+  }
+  .cne-lp-wave-arc.is-far {
+    animation-delay: 0.2s;
+  }
+}
+
+@keyframes cne-lp-wave-rise {
+  from {
+    transform: scaleY(0.06);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes cne-lp-wave-eq {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(var(--lo));
+  }
+}
+@keyframes cne-lp-wave-pop {
+  from {
+    transform: scale(0) rotate(-20deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes cne-lp-wave-bob {
+  from {
+    transform: translateY(0) rotate(0);
+  }
+  to {
+    transform: translateY(-8px) rotate(-5deg);
+  }
+}
+@keyframes cne-lp-wave-arc {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}

@@ -21,7 +21,7 @@ export const dynamic = "force-static";
 const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 
 /** When the location set — addresses, hours, which locations are open — last moved. */
-const LOCATIONS_UPDATED = "2026-09-24";
+const LOCATIONS_UPDATED = "2026-09-30";
 /**
  * When each page's own copy or structure last changed. Bump the one you touch:
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.

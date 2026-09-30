@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type { MenuItem } from "@/data/menu";
+import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice } from "@/lib/otter";
 import { PattyDots } from "./PattyDots";
@@ -22,15 +22,19 @@ export function MenuDish({
   item,
   lead,
   index = 0,
+  way,
   onOpen,
 }: {
   item: MenuItem;
   lead?: boolean;
   /** Position in its grid, for the scroll-in stagger. */
   index?: number;
+  /** The Way picked on the menu: an item shot both ways shows that one. */
+  way?: WayId;
   onOpen: (item: MenuItem) => void;
 }) {
   const mostOrdered = item.otterId === FEATURED_OTTER_IDS[0];
+  const photo = photoFor(item, way);
   return (
     <button
       type="button"
@@ -48,11 +52,11 @@ export function MenuDish({
         {/* Every item drawn as a card has a photo (menu.test.ts). The name
             alone, as the list rows had it: the button already announces the
             description and the price. */}
-        {item.photo && (
+        {photo && (
           <picture>
-            <source type="image/avif" srcSet={`/menu/${item.photo}-card.avif`} />
+            <source type="image/avif" srcSet={`/menu/${photo}-card.avif`} />
             <img
-              src={`/menu/${item.photo}-card.webp`}
+              src={`/menu/${photo}-card.webp`}
               alt={item.name}
               width={560}
               height={420}

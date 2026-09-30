@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
 import { allLocationSlugs } from "@/lib/locationSlug";
-import { foodMenu, featuredItems, MENU_UPDATED, type MenuCategoryKey } from "@/data/menu";
+import {
+  allPhotosFor,
+  foodMenu,
+  featuredItems,
+  MENU_UPDATED,
+  type MenuCategoryKey,
+} from "@/data/menu";
 import { PRIVACY_UPDATED } from "@/data/privacy";
 import { catalogueUpdatedAt, listPublishedProducts } from "@/lib/catalog";
 import { productSocialImage } from "@/lib/productSeo";
@@ -31,10 +37,11 @@ const ORDER_UPDATED = "2026-09-27";
 const ABOUT_UPDATED = "2026-09-22";
 const CONTACT_UPDATED = "2026-09-27";
 /**
- * The /menu/ page's own layout (the Sliders section, merch moved out), which
- * can change without the prices in `MENU_UPDATED` being re-reconciled.
+ * The /menu/ page's own layout and photos (the photo cards of issue #206,
+ * the new combo and fries photos of issue #208), which can change without
+ * the prices in `MENU_UPDATED` being re-reconciled.
  */
-const MENU_PAGE_UPDATED = "2026-09-26";
+const MENU_PAGE_UPDATED = "2026-09-30";
 const latest = (...isos: string[]): string => isos.sort().at(-1)!;
 /** When /returns and /terms were added. Both also carry the store settings
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
@@ -48,8 +55,8 @@ const CAREERS_UPDATED = "2026-09-24";
 /** The menu photography, so image search has a route in to the food. */
 const menuImages = (Object.keys(foodMenu) as MenuCategoryKey[])
   .flatMap((key) => foodMenu[key])
-  .filter((item) => item.photo)
-  .map((item) => `${brand.siteUrl}/menu/${item.photo}.webp`);
+  .flatMap(allPhotosFor)
+  .map((photo) => `${brand.siteUrl}/menu/${photo}.webp`);
 
 /** Deduplicated: several items share a photograph. */
 const uniqueMenuImages = Array.from(new Set(menuImages));
@@ -97,8 +104,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...featuredItems.map((i) => ({
       path: `/menu/${i.id}/`,
       priority: 0.6,
-      updated: MENU_UPDATED,
-      images: i.photo ? [`${brand.siteUrl}/menu/${i.photo}.webp`] : undefined,
+      updated: latest(MENU_UPDATED, MENU_PAGE_UPDATED),
+      images: i.photo
+        ? allPhotosFor(i).map((photo) => `${brand.siteUrl}/menu/${photo}.webp`)
+        : undefined,
     })),
     { path: "/order/", priority: 0.9, updated: ORDER_UPDATED },
     // The page a "catering" search should land on; catering is arranged

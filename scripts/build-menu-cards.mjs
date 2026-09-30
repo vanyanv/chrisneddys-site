@@ -10,6 +10,12 @@
  *   public/menu/<photo>-card.avif   (at most 560px wide, never upscaled)
  *   public/menu/<photo>-card.webp   (the same, for browsers without AVIF)
  *
+ * and AVIF copies of the photo's own two sizes, which `MenuPhoto` offers
+ * ahead of the WebP (issue #208):
+ *
+ *   public/menu/<photo>.avif         (720px, the item page and card images)
+ *   public/menu/<photo>-thumb.avif   (200px)
+ *
  * It also cuts the photo that leads the menu ("Asked about most") from
  * `public/photos/double-4x3.jpg` into the AVIF/WebP ladder its `<picture>`
  * asks for: `public/photos/double-4x3-{480,720,900}.{avif,webp}`.
@@ -77,6 +83,17 @@ async function cardCut(id) {
   }
 }
 
+async function avifCopies(id) {
+  for (const name of [id, `${id}-thumb`]) {
+    const out = join(MENU, `${name}.avif`);
+    const buf = await sharp(join(MENU, `${name}.webp`))
+      .avif(AVIF)
+      .toBuffer();
+    writeFileSync(out, buf);
+    console.log(`${out} — ${buf.length} bytes`);
+  }
+}
+
 async function leadCuts() {
   const src = join(root, "public/photos/double-4x3.jpg");
   for (const w of [480, 720, 900]) {
@@ -96,7 +113,10 @@ async function main() {
   const ids = readdirSync(MENU)
     .filter((f) => f.endsWith(".webp") && !/-(thumb|card)\.webp$/.test(f))
     .map((f) => f.slice(0, -".webp".length));
-  for (const id of ids) await cardCut(id);
+  for (const id of ids) {
+    await cardCut(id);
+    await avifCopies(id);
+  }
   await leadCuts();
 }
 

@@ -151,11 +151,11 @@ export function MenuBrowser() {
                 </h2>
                 <div className="cne-cat-rule" aria-hidden="true" />
                 {key === "sliders" && <PattyKey />}
-                {lead && <MenuDish item={lead} lead onOpen={openItem} />}
+                {lead && <MenuDish item={lead} lead way={way} onOpen={openItem} />}
                 {cards.length > 0 && (
                   <div className={`cne-dish-grid${cards.length % 2 ? " is-odd" : ""}`}>
                     {cards.map((it, i) => (
-                      <MenuDish key={it.id} item={it} index={i + 1} onOpen={openItem} />
+                      <MenuDish key={it.id} item={it} index={i + 1} way={way} onOpen={openItem} />
                     ))}
                   </div>
                 )}

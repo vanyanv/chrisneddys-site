@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MenuItem, WayId } from "@/data/menu";
-import { ways, extras } from "@/data/menu";
+import { ways, extras, photoFor } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
@@ -170,6 +170,8 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
   const selected = ways.find((w) => w.id === way) ?? ways[0];
   const build = item ? buildFor(item.id) : undefined;
   const combo = item ? comboFor(item) : undefined;
+  /* A combo shot both ways shows the one being picked (issue #208). */
+  const photo = item ? photoFor(item, way) : undefined;
   /* The home page's "MOST ORDERED" card, not a second opinion: the same item
      wears the same label in both places. */
   const mostOrdered = item?.otterId === FEATURED_OTTER_IDS[0];
@@ -237,16 +239,16 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
                 </span>
                 <div className="cne-board-frame">
                   <div
-                    className={`cne-sheet-shot${item.photo ? " is-photo" : ""}`}
+                    className={`cne-sheet-shot${photo ? " is-photo" : ""}`}
                     style={
-                      item.photo
+                      photo
                         ? ({
-                            backgroundImage: `url(/menu/${item.photo}.webp)`,
+                            backgroundImage: `url(/menu/${photo}.webp)`,
                             /* Per-photo framing — see photoFocus.ts. The CSS
                                carries a fallback for both, so a photo missing
                                from that map still renders sensibly. */
-                            "--cne-shot-focus": `${framingFor(item.photo)[0]}%`,
-                            "--cne-shot-zoom": `${framingFor(item.photo)[1]}%`,
+                            "--cne-shot-focus": `${framingFor(photo)[0]}%`,
+                            "--cne-shot-zoom": `${framingFor(photo)[1]}%`,
                           } as React.CSSProperties)
                         : undefined
                     }

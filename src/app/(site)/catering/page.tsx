@@ -13,6 +13,7 @@ import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import { DripEdge } from "@/components/storeart/DripEdge";
 import { GlyphRow } from "@/components/storeart/SectionOpener";
+import { MenuPhoto } from "@/components/counter/MenuPhoto";
 
 const title = "Catering — Sliders for Offices & Parties";
 const description =
@@ -170,13 +171,10 @@ export default function CateringPage() {
             <li key={it.id} className={`cne-card${i === 0 ? " is-star" : ""}`}>
               <span className="cne-card-img">
                 {it.photo && (
-                  <img
-                    src={`/menu/${it.photo}.webp`}
-                    srcSet={`/menu/${it.photo}-thumb.webp 200w, /menu/${it.photo}.webp 720w`}
+                  <MenuPhoto
+                    photo={it.photo}
                     sizes="(min-width: 901px) 440px, 60px"
                     alt={itemPhotoAlt(it)}
-                    width={720}
-                    height={479}
                     loading="lazy"
                     decoding="async"
                   />

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { openLocations, openNames } from "@/lib/openLocations";
-import { featuredItems, itemById, ways, toppings, extras } from "@/data/menu";
+import { allPhotosFor, featuredItems, itemById, ways, toppings, extras } from "@/data/menu";
 import { itemOrderUrl, itemPhotoAlt, formatPrice, priceString } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
 import { OpenLocationCards } from "@/components/locations/OpenLocationCards";
@@ -11,6 +11,7 @@ import { OrderLink } from "@/components/order/OrderLink";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { clampToWord } from "@/lib/text";
+import { MenuPhoto } from "@/components/counter/MenuPhoto";
 
 type Params = { params: Promise<{ item: string }> };
 
@@ -68,7 +69,9 @@ export default async function MenuItemPage({ params }: Params) {
     name: item.name,
     description: item.desc,
     url: `${brand.siteUrl}/menu/${item.id}/`,
-    ...(item.photo ? { image: `${brand.siteUrl}/menu/${item.photo}.webp` } : {}),
+    ...(item.photo
+      ? { image: allPhotosFor(item).map((photo) => `${brand.siteUrl}/menu/${photo}.webp`) }
+      : {}),
     offers: {
       "@type": "Offer",
       price: priceString(item.price),
@@ -133,13 +136,10 @@ export default async function MenuItemPage({ params }: Params) {
               overflow: "hidden",
             }}
           >
-            <img
-              src={`/menu/${item.photo}.webp`}
-              srcSet={`/menu/${item.photo}-thumb.webp 200w, /menu/${item.photo}.webp 720w`}
+            <MenuPhoto
+              photo={item.photo}
               sizes="(min-width: 901px) 520px, calc(100vw - 36px)"
               alt={itemPhotoAlt(item)}
-              width={720}
-              height={479}
               decoding="async"
               className="cne-item-photo-img"
             />

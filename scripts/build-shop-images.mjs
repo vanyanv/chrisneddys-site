@@ -2,7 +2,8 @@
 /**
  * Converts raw Foam Trucker photography into the three web cuts /shop expects:
  * a 720px-wide `.webp` (quality ~82), a 400px-wide `-mid.webp` and a 200px-wide
- * `-thumb.webp`, for every `.png`/`.jpg`/`.jpeg` in the input directory.
+ * `-thumb.webp`, each with an `.avif` twin, for every `.png`/`.jpg`/`.jpeg` in
+ * the input directory.
  *
  * The middle cut exists because the gallery's thumbnail strip draws tiles about
  * 50-175px wide. On a 2x or 3x screen — which is nearly every phone and most
@@ -70,6 +71,8 @@ const CROP = {
 
 const WIDTHS = { full: 720, mid: 400, thumb: 200 };
 const QUALITY = 82;
+// Same settings as the hero and careers AVIF cuts (scripts/build-photo-cuts.mjs).
+const AVIF = { quality: 50, effort: 6, chromaSubsampling: "4:2:0" };
 
 function flag(name) {
   const i = process.argv.indexOf(`--${name}`);
@@ -125,9 +128,20 @@ async function main() {
         .resize({ width })
         .webp({ quality: QUALITY })
         .toFile(join(resolvedOut, outName));
+      // The AVIF twin of every cut, offered first by the `<picture>` in
+      // `ProductShot` and the authenticity images: the front shot is 54 KB
+      // as WebP and 23 KB as AVIF, and it is the shop pages' Largest
+      // Contentful Paint.
+      const avifPipeline = crop ? sharp(src).extract(crop) : sharp(src);
+      await avifPipeline
+        .resize({ width })
+        .avif(AVIF)
+        .toFile(join(resolvedOut, outName.replace(/\.webp$/, ".avif")));
     }
 
-    console.log(`${file} -> ${cuts.map(([n]) => n).join(", ")}${crop ? " (cropped)" : ""}`);
+    console.log(
+      `${file} -> ${cuts.map(([n]) => `${n} (+ .avif)`).join(", ")}${crop ? " (cropped)" : ""}`,
+    );
   }
 }
 

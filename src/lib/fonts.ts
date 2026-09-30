@@ -20,8 +20,9 @@ export const bowlby = localFont({
 
 /**
  * The same latin Inter file next/font/google serves, with its weight axis
- * pinned to the 400-800 the site actually uses instead of 100-900: 48 KB ->
- * 37 KB, no visible change. It is preloaded on every page, and on a slow phone
+ * pinned to the 400-800 the site actually uses instead of 100-900, and its
+ * unused stylistic sets dropped (scripts/slim-fonts.sh): 48 KB -> 33 KB, no
+ * visible change. It is preloaded on every page, and on a slow phone
  * connection it downloads alongside the home hero photo, the page's Largest
  * Contentful Paint. See scripts/instance-inter-font.sh.
  */
@@ -35,7 +36,11 @@ export const inter = localFont({
   variable: "--font-inter",
 });
 
-/** One variable file covers both weights the site uses (400 and 500). */
+/**
+ * One variable file covers both weights the site uses (400 and 500). Its
+ * programming ligatures are stripped (scripts/slim-fonts.sh), since the site
+ * sets labels and prices in it, never code: 31 KB -> 15 KB.
+ */
 export const jetbrains = localFont({
   src: "../fonts/jetbrains-mono-latin.woff2",
   weight: "400 500",

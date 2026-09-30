@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   LEGACY_PLACEHOLDER_ALT,
+  avifSrcSet,
   imageThumbSrc,
   needsAltText,
   shopperAlt,
@@ -102,5 +103,36 @@ describe("thumbStripSrcSet", () => {
     expect(thumbStripSrcSet({ thumb: false, base, thumbSrc, fullSrc })).toBe(
       `${thumbSrc} 200w, ${fullSrc} 720w`,
     );
+  });
+});
+
+describe("avifSrcSet", () => {
+  it("swaps every repo cut for the .avif file beside it", () => {
+    expect(
+      avifSrcSet(
+        "/shop/x/front-thumb.webp 200w, /shop/x/front-mid.webp 400w, /shop/x/front.webp 720w",
+      ),
+    ).toBe("/shop/x/front-thumb.avif 200w, /shop/x/front-mid.avif 400w, /shop/x/front.avif 720w");
+  });
+
+  it("uses an upload's stored AVIF URLs, since Blob names can't be derived", () => {
+    const b = "https://x.public.blob.vercel-storage.com";
+    expect(
+      avifSrcSet(`${b}/a-thumb-R1.webp 200w, ${b}/a-R2.webp 720w`, {
+        [`${b}/a-thumb-R1.webp`]: `${b}/a-thumb-R3.avif`,
+        [`${b}/a-R2.webp`]: `${b}/a-R4.avif`,
+      }),
+    ).toBe(`${b}/a-thumb-R3.avif 200w, ${b}/a-R4.avif 720w`);
+  });
+
+  it("gives up for an upload made before AVIF shipped, so the plain <img> renders", () => {
+    const b = "https://x.public.blob.vercel-storage.com";
+    expect(
+      avifSrcSet(`${b}/a-thumb.webp 200w, ${b}/a.webp 720w`, {
+        [`${b}/a-thumb.webp`]: undefined,
+        [`${b}/a.webp`]: undefined,
+      }),
+    ).toBeUndefined();
+    expect(avifSrcSet(`${b}/a-thumb.webp 200w, ${b}/a.webp 720w`)).toBeUndefined();
   });
 });

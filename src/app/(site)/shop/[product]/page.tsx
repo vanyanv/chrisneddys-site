@@ -15,6 +15,7 @@ import { getPublicStoreSettings } from "@/lib/orders";
 import { editionFlag, pauseNotice, shippingReturnsNote } from "@/lib/shopCopy";
 import { isShopOpenFor, isShopPausedFor } from "@/lib/shopStatus";
 import { formatPrice } from "@/lib/otter";
+import { avifSrcSet } from "@/lib/productImage";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
@@ -324,7 +325,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                       cert.url || cert.thumbUrl
                         ? `${certThumb} 200w, ${certFull} 720w`
                         : `${certThumb} 200w, ${product.photoDir}/${cert.src}-mid.webp 400w, ${certFull} 720w`;
-                    return (
+                    const certAvif = avifSrcSet(
+                      certSrcSet,
+                      cert.url ? { [certFull]: cert.avifUrl, [certThumb]: cert.avifThumbUrl } : {},
+                    );
+                    const certImg = (
                       <img
                         className="cne-auth-img is-cert"
                         src={certFull}
@@ -338,6 +343,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         decoding="async"
                       />
                     );
+                    return certAvif ? (
+                      <picture className="cne-auth-pic">
+                        <source
+                          type="image/avif"
+                          srcSet={certAvif}
+                          sizes="(min-width: 901px) 280px, 45vw"
+                        />
+                        {certImg}
+                      </picture>
+                    ) : (
+                      certImg
+                    );
                   })()}
                   {(() => {
                     const sticker = product.authenticity.sticker;
@@ -348,7 +365,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                       sticker.url || sticker.thumbUrl
                         ? `${stickerThumb} 200w, ${stickerFull} 720w`
                         : `${stickerThumb} 200w, ${product.photoDir}/${sticker.src}-mid.webp 400w, ${stickerFull} 720w`;
-                    return (
+                    const stickerAvif = avifSrcSet(
+                      stickerSrcSet,
+                      sticker.url
+                        ? { [stickerFull]: sticker.avifUrl, [stickerThumb]: sticker.avifThumbUrl }
+                        : {},
+                    );
+                    const stickerImg = (
                       <img
                         className="cne-auth-img is-sticker"
                         src={stickerFull}
@@ -361,6 +384,18 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         loading="lazy"
                         decoding="async"
                       />
+                    );
+                    return stickerAvif ? (
+                      <picture className="cne-auth-pic">
+                        <source
+                          type="image/avif"
+                          srcSet={stickerAvif}
+                          sizes="(min-width: 901px) 280px, 45vw"
+                        />
+                        {stickerImg}
+                      </picture>
+                    ) : (
+                      stickerImg
                     );
                   })()}
                 </div>

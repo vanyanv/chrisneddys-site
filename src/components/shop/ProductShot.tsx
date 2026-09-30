@@ -1,6 +1,7 @@
+import type { CSSProperties } from "react";
 import { CapArt, type CapView } from "./CapArt";
 import type { MerchProduct, MerchView } from "@/data/merch";
-import { thumbStripSrcSet } from "@/lib/productImage";
+import { avifSrcSet, thumbStripSrcSet } from "@/lib/productImage";
 
 /**
  * One product image.
@@ -65,7 +66,8 @@ export function ProductShot({
   }
 
   if (view.photo) {
-    const { src, width, height, url, midUrl, thumbUrl } = view.photo;
+    const { src, width, height, url, midUrl, thumbUrl, avifUrl, avifMidUrl, avifThumbUrl } =
+      view.photo;
     const base = `${product.photoDir ?? ""}/${src}`;
     const fullSrc = url ?? `${base}.webp`;
     const thumbSrc = thumbUrl ?? `${base}-thumb.webp`;
@@ -87,23 +89,55 @@ export function ProductShot({
     // the plain 200w/720w pair, same as it always rendered. See
     // `thumbStripSrcSet` (`src/lib/productImage.ts`) for the three cases.
     const srcSet = thumbStripSrcSet({ thumb, base, thumbSrc, fullSrc, url, thumbUrl, midUrl });
+    // The same candidates as AVIF, which is roughly half the bytes: the front
+    // shot is the shop pages' Largest Contentful Paint. Undefined for an
+    // upload made before AVIF shipped, which keeps the plain `<img>`.
+    const avif = avifSrcSet(
+      srcSet,
+      url
+        ? {
+            [fullSrc]: avifUrl,
+            [thumbSrc]: avifThumbUrl,
+            ...(midUrl ? { [midUrl]: avifMidUrl } : {}),
+          }
+        : {},
+    );
+    const img = (
+      <img
+        src={fullSrc}
+        srcSet={srcSet}
+        sizes={sizes}
+        alt={view.caption}
+        width={width}
+        height={height}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
+        decoding={priority ? "sync" : "async"}
+      />
+    );
 
     return (
       <div
         className={`cne-capshot is-photo ${className}`.trim()}
-        style={thumb || cropToFrame ? undefined : { aspectRatio: `${width} / ${height}` }}
+        style={
+          thumb || cropToFrame
+            ? undefined
+            : ({
+                aspectRatio: `${width} / ${height}`,
+                "--cne-shot-ratio": width / height,
+              } as CSSProperties)
+        }
       >
-        <img
-          src={fullSrc}
-          srcSet={srcSet}
-          sizes={sizes}
-          alt={view.caption}
-          width={width}
-          height={height}
-          loading={priority ? "eager" : "lazy"}
-          fetchPriority={priority ? "high" : undefined}
-          decoding={priority ? "sync" : "async"}
-        />
+        {avif ? (
+          // Styled as a block filling the frame (counter.css), so the `<img>`
+          // inside sizes exactly as it did without the wrapper.
+          <picture>
+            <source type="image/avif" srcSet={avif} sizes={sizes} />
+            {img}
+          </picture>
+        ) : (
+          img
+        )}
       </div>
     );
   }

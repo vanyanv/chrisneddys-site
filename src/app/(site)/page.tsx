@@ -174,18 +174,27 @@ export default function HomePage() {
       <div className="cne-ig cne-rv">
         {GRAM.map((g) => (
           <span key={g.src}>
-            {/* 3 columns on a phone (~120px), 6 on desktop (~230px) — the
-                300px variant covers the phone at 2x, the 500px the desktop. */}
-            <img
-              src={g.src}
-              srcSet={`${g.src.replace(".webp", "-sm.webp")} 300w, ${g.src} 500w`}
-              sizes="(min-width: 901px) 230px, 33vw"
-              alt={g.alt}
-              width={500}
-              height={500}
-              loading="lazy"
-              decoding="async"
-            />
+            {/* 3 columns on a phone (~130px), 6 on desktop (~230px). AVIF at
+                300w/400w covers a 3x phone for a quarter of the bytes the
+                500w WebP cost; the WebP pair stays as the fallback. Cuts
+                come from scripts/build-photo-cuts.mjs. */}
+            <picture>
+              <source
+                type="image/avif"
+                srcSet={`${g.src.replace(".webp", "-300.avif")} 300w, ${g.src.replace(".webp", "-400.avif")} 400w`}
+                sizes="(min-width: 901px) 230px, 33vw"
+              />
+              <img
+                src={g.src}
+                srcSet={`${g.src.replace(".webp", "-sm.webp")} 300w, ${g.src} 500w`}
+                sizes="(min-width: 901px) 230px, 33vw"
+                alt={g.alt}
+                width={500}
+                height={500}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
           </span>
         ))}
       </div>

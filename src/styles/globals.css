@@ -1,6 +1,13 @@
-@import "tailwindcss";
+/* `source(none)`: the site styles itself with its own classes and uses no
+   Tailwind utility class anywhere, but Tailwind's automatic source scan was
+   turning ordinary words in the code ("table", "hidden", "start") into
+   utilities that every page then carried, twice over (inline and in the page
+   data). `@theme static` keeps the variables below in the output even though
+   no utility references them: without it Tailwind drops them, and every
+   headline set in var(--font-display) falls back to the body font. */
+@import "tailwindcss" source(none);
 
-@theme {
+@theme static {
   --color-cne-red: #e63027;
   --color-cne-red-deep: #b41d14;
   --color-cne-yellow: #f5b82e;

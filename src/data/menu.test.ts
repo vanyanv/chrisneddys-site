@@ -11,6 +11,7 @@ import {
   menu,
   photoFor,
   SECTION_LEADS,
+  SLIDER_STACKS,
   type MenuCategoryKey,
 } from "@/data/menu";
 
@@ -113,5 +114,25 @@ describe("allPhotosFor", () => {
     expect(allPhotosFor(combo)).toEqual(["combo-1-chris", "combo-1-eddy"]);
     const fries = foodMenu.fries.find((i) => i.id === "cheese-fries")!;
     expect(allPhotosFor(fries)).toEqual(["cheese-fries"]);
+  });
+});
+describe("SLIDER_STACKS", () => {
+  const words = ["no", "one", "two", "three", "four"];
+  it("names real food items", () => {
+    for (const id of Object.keys(SLIDER_STACKS)) {
+      expect(
+        allItems.some((i) => i.id === id && isFoodItem(i)),
+        id,
+      ).toBe(true);
+    }
+  });
+
+  it("matches the cheese count each description states", () => {
+    for (const [id, [, cheese]] of Object.entries(SLIDER_STACKS)) {
+      const item = allItems.find((i) => i.id === id)!;
+      if (id === "the-reverse-bun") continue; // "The Slider, but…": same as the house slider
+      const said = new RegExp(`\\b(${words[cheese]}|a) slices? of cheese`, "i");
+      expect(item.desc, id).toMatch(said);
+    }
   });
 });

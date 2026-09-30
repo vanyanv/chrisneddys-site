@@ -16,7 +16,14 @@ import { LazyItemSheet } from "./LazyItemSheet";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
-import { GlyphRow, OpStamp, MenuPillar, type StampKind } from "@/components/storeart/SectionOpener";
+import {
+  GlyphRow,
+  OpStamp,
+  MenuPillar,
+  SmashStamp,
+  type StampKind,
+} from "@/components/storeart/SectionOpener";
+import { PattyKey } from "./PattyDots";
 import "@/styles/menu-art.css";
 import "@/styles/menu-dish.css";
 
@@ -135,9 +142,15 @@ export function MenuBrowser() {
               <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
                 <h2 className="cne-cat-h">
                   {categoryTitles[key]}
-                  <OpStamp kind={CAT_STAMP[key]} size={40} className="cne-cat-stamp" />
+                  {/* Issue #210: Sliders' bullseye is the one the monster smashes. */}
+                  {key === "sliders" ? (
+                    <SmashStamp />
+                  ) : (
+                    <OpStamp kind={CAT_STAMP[key]} size={40} className="cne-cat-stamp" />
+                  )}
                 </h2>
                 <div className="cne-cat-rule" aria-hidden="true" />
+                {key === "sliders" && <PattyKey />}
                 {lead && <MenuDish item={lead} lead way={way} onOpen={openItem} />}
                 {cards.length > 0 && (
                   <div className={`cne-dish-grid${cards.length % 2 ? " is-odd" : ""}`}>

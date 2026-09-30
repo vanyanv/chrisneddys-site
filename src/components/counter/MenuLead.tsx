@@ -2,6 +2,7 @@
 
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
+import { PattyDots } from "./PattyDots";
 
 const CUTS = [480, 720, 900];
 const srcSet = (ext: string) => CUTS.map((w) => `/photos/double-4x3-${w}.${ext} ${w}w`).join(", ");
@@ -45,6 +46,7 @@ export function MenuLead({ item, onOpen }: { item: MenuItem; onOpen: (item: Menu
         </span>
         <span className="cne-lead-body">
           <span className="n">{item.name}</span>
+          <PattyDots id={item.id} />
           <span className="d">{item.desc}</span>
           <span className="ft">
             <span className="p">{formatPrice(item.price)}</span>

@@ -98,3 +98,323 @@
     display: none;
   }
 }
+
+/* ---- The Smash (issue #210) ---------------------------------------------
+   The Sliders heading's bullseye with the red monster beside it. Once the
+   section is revealed the monster hops over, presses the bullseye flat like
+   a patty while grease flicks out, and hops home, every 5.5s. Transforms
+   and opacity only, in a fixed box, so nothing around it moves. */
+.cne-smash {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+.cne-smash .cne-smash-patty {
+  display: block;
+  transform-origin: 50% 100%;
+}
+.cne-smash-mon {
+  position: absolute;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  left: -36px;
+  bottom: 2px;
+}
+.cne-smash-sp {
+  position: absolute;
+  inset: auto 0 2px 0;
+  height: 0;
+}
+.cne-smash-sp i {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--a-ink);
+  opacity: 0;
+}
+.cne-smash-sp i:nth-child(1) {
+  --x: -26px;
+  --y: -10px;
+}
+.cne-smash-sp i:nth-child(2) {
+  --x: -14px;
+  --y: -20px;
+}
+.cne-smash-sp i:nth-child(3) {
+  --x: 16px;
+  --y: -18px;
+}
+.cne-smash-sp i:nth-child(4) {
+  --x: 28px;
+  --y: -6px;
+}
+@media (min-width: 901px) {
+  .cne-smash {
+    width: 44px;
+    height: 44px;
+  }
+  .cne-smash-mon {
+    width: 38px;
+    height: 38px;
+    left: -46px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-cat.is-in .cne-smash-mon {
+    animation: cne-smash-press 5.5s cubic-bezier(0.3, 0, 0.3, 1) 0.5s infinite;
+  }
+  .cne-cat.is-in .cne-smash-patty {
+    animation: cne-smash-squash 5.5s ease-out 0.5s infinite;
+  }
+  .cne-cat.is-in .cne-smash-sp i {
+    animation: cne-smash-spray 5.5s ease-out 0.5s infinite;
+  }
+}
+/* Hop up and over, slam down on the stamp, lift off and hop home. */
+@keyframes cne-smash-press {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  6% {
+    transform: translate(0, 3px) scale(1.08, 0.9);
+  }
+  12% {
+    transform: translate(22px, -34px) rotate(14deg);
+  }
+  17% {
+    transform: translate(38px, -30px) rotate(0);
+  }
+  20%,
+  30% {
+    transform: translate(38px, 2px) scale(1.12, 0.86);
+  }
+  38% {
+    transform: translate(26px, -26px) rotate(-10deg);
+  }
+  46% {
+    transform: translate(0, 0) scale(1.06, 0.94);
+  }
+  52% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes cne-smash-squash {
+  0%,
+  19%,
+  52%,
+  100% {
+    transform: scale(1, 1);
+  }
+  21%,
+  31% {
+    transform: scale(1.35, 0.42);
+  }
+  38% {
+    transform: scale(0.92, 1.12);
+  }
+  44% {
+    transform: scale(1.04, 0.96);
+  }
+}
+@keyframes cne-smash-spray {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.4);
+  }
+  22% {
+    opacity: 1;
+  }
+  34%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), var(--y)) scale(1);
+  }
+}
+
+/* ---- Patty count (issue #210) -------------------------------------------
+   The Van Nuys spec-sheet wall's dot column: a red dot per patty, a yellow
+   one per slice of cheese, stamped on as the section scrolls in. */
+.cne-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 3px 0 1px;
+}
+.cne-dots i,
+.cne-dots-key i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--a-ink);
+}
+.cne-dots .is-p,
+.cne-dots-key .is-p {
+  background: var(--a-red);
+}
+.cne-dots .is-c,
+.cne-dots-key .is-c {
+  background: var(--a-yel);
+}
+.cne-dots .is-p + .is-c {
+  margin-left: 5px;
+}
+.cne-dish.is-lead .cne-dots i,
+.cne-lead-body .cne-dots i {
+  width: 16px;
+  height: 16px;
+}
+/* The big card at the top is ink: its dots get a cream edge. */
+.cne-lead-body .cne-dots i {
+  border-color: #fff2c9;
+}
+.cne-dots-key {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+}
+.cne-dots-key .is-c {
+  margin-left: 8px;
+}
+@media (min-width: 901px) {
+  .cne-dots i {
+    width: 14px;
+    height: 14px;
+  }
+  .cne-dish.is-lead .cne-dots i,
+  .cne-lead-body .cne-dots i {
+    width: 20px;
+    height: 20px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .cne-cat .cne-dots i {
+    transform: scale(0);
+  }
+  .js .cne-cat.is-in .cne-dots i,
+  .cne-lead-body .cne-dots i {
+    animation: cne-dot-stamp 0.36s cubic-bezier(0.34, 1.7, 0.6, 1)
+      calc(0.45s + var(--d) * 90ms + var(--i, 0) * 70ms) both;
+  }
+}
+@keyframes cne-dot-stamp {
+  from {
+    transform: scale(0) rotate(-40deg);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ---- Little bites (issue #210) ------------------------------------------
+   MOST ORDERED slaps on like a sticker hitting a wall as its section
+   arrives, and on a pointer that hovers, each card's arrow chip grows the
+   monsters' teeth and bites twice. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .cne-cat .cne-dish-most {
+    opacity: 0;
+  }
+  .js .cne-cat.is-in .cne-dish-most {
+    animation: cne-slap 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) 0.55s both;
+  }
+}
+@keyframes cne-slap {
+  from {
+    opacity: 0;
+    scale: 2.6;
+    rotate: -20deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: -3deg;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cne-dish .cne-chev {
+    overflow: hidden;
+  }
+  .cne-dish .cne-chev::before,
+  .cne-dish .cne-chev::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 42%;
+    background: #fff2c9;
+  }
+  .cne-dish .cne-chev::before {
+    top: 0;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 40%,
+      88% 100%,
+      75% 40%,
+      62% 100%,
+      50% 40%,
+      38% 100%,
+      25% 40%,
+      12% 100%,
+      0 40%
+    );
+    transform: translateY(-105%);
+  }
+  .cne-dish .cne-chev::after {
+    bottom: 0;
+    clip-path: polygon(
+      0 100%,
+      100% 100%,
+      100% 60%,
+      88% 0,
+      75% 60%,
+      62% 0,
+      50% 60%,
+      38% 0,
+      25% 60%,
+      12% 0,
+      0 60%
+    );
+    transform: translateY(105%);
+  }
+  .cne-dish:hover .cne-chev::before {
+    animation: cne-bite-top 0.5s ease-in-out 2;
+  }
+  .cne-dish:hover .cne-chev::after {
+    animation: cne-bite-bottom 0.5s ease-in-out 2;
+  }
+}
+@keyframes cne-bite-top {
+  0%,
+  100% {
+    transform: translateY(-105%);
+  }
+  45%,
+  55% {
+    transform: translateY(0);
+  }
+}
+@keyframes cne-bite-bottom {
+  0%,
+  100% {
+    transform: translateY(105%);
+  }
+  45%,
+  55% {
+    transform: translateY(0);
+  }
+}

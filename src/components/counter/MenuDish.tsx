@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice } from "@/lib/otter";
+import { PattyDots } from "./PattyDots";
 
 /**
  * One menu item as a photo card (issue #206): the food on top, cropped tight
@@ -67,6 +68,7 @@ export function MenuDish({
       </span>
       <span className="cne-dish-body">
         <span className="n">{item.name}</span>
+        <PattyDots id={item.id} />
         {item.desc && <span className="d">{item.desc}</span>}
         <span className="p">{formatPrice(item.price)}</span>
         {lead ? (

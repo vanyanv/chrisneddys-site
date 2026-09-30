@@ -626,14 +626,6 @@
 /* section only adds what's genuinely new to this screen: the card grid,  */
 /* the fixed detail panel, its run/status chrome, and the loading/empty   */
 /* states' own layout.                                                    */
-/* ---------------------------------------------------------------------- */
-
-.rack-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--rack-space-md);
-  flex-wrap: wrap;
-}
 
 .rack-content {
   display: flex;

@@ -212,8 +212,8 @@ export async function updateProduct(id: string, patch: ProductPatch): Promise<Up
  * lets The Rack's "New product" button create a nameless draft with nothing
  * to write SEO from (issue #64), so those columns stay empty until the owner
  * names it — this is what catches that moment. Called after every save that
- * could be the one that names it (`saveProductAction`,
- * `updateProductFieldAction` in `actions.ts`); a no-op whenever the product
+ * could be the one that names it (`applyProductChangesAction` in
+ * `actions.ts`); a no-op whenever the product
  * still has no name, or whenever any of the four columns already holds
  * anything at all, so an owner's own words (or an earlier run of this same
  * backfill) are never overwritten. Always uses the synchronous
@@ -1203,30 +1203,6 @@ export async function updateImage(
     .where(eq(productImages.id, imageId));
 
   return { ok: true };
-}
-
-/** Swaps an image's position with its neighbour in the same product/kind group. */
-export async function moveImage(imageId: string, direction: "up" | "down"): Promise<void> {
-  const db = await getDb();
-  const row = await db.query.productImages.findFirst({ where: eq(productImages.id, imageId) });
-  if (!row) return;
-
-  const siblings = await db
-    .select({ id: productImages.id, position: productImages.position })
-    .from(productImages)
-    .where(and(eq(productImages.productId, row.productId), eq(productImages.kind, row.kind)))
-    .orderBy(asc(productImages.position));
-
-  const index = siblings.findIndex((s) => s.id === imageId);
-  const swapIndex = direction === "up" ? index - 1 : index + 1;
-  if (index === -1 || swapIndex < 0 || swapIndex >= siblings.length) return;
-
-  const a = siblings[index];
-  const b = siblings[swapIndex];
-  if (!a || !b) return;
-
-  await db.update(productImages).set({ position: b.position }).where(eq(productImages.id, a.id));
-  await db.update(productImages).set({ position: a.position }).where(eq(productImages.id, b.id));
 }
 
 /**

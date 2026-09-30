@@ -40,7 +40,6 @@
     "@vercel/speed-insights": "^2.0.0",
     "better-auth": "^1.7.5",
     "drizzle-orm": "^0.45.2",
-    "jose": "^6.2.12",
     "next": "^15.5.25",
     "openai": "^7.19.0",
     "react": "^19.0.0",

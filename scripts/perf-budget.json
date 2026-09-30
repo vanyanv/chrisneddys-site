@@ -20,14 +20,14 @@
     "iphone": {
       "document": 70.5,
       "font": 125,
-      "image": 117.5,
+      "image": 208.5,
       "script": 189.5,
       "fetch": 184.0
     },
     "desktop": {
       "document": 70.5,
       "font": 125,
-      "image": 117.5,
+      "image": 192.5,
       "script": 189.5,
       "fetch": 184.5
     }

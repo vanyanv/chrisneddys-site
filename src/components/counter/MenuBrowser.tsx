@@ -1,7 +1,16 @@
 "use client";
 
-import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
+import {
+  foodMenu,
+  categoryTitles,
+  drinkGetsPhoto,
+  itemById,
+  SECTION_LEADS,
+  type MenuCategoryKey,
+} from "@/data/menu";
 import { MenuRow } from "./MenuRow";
+import { MenuDish } from "./MenuDish";
+import { MenuLead } from "./MenuLead";
 import { MenuSectionChips } from "./MenuSectionChips";
 import { LazyItemSheet } from "./LazyItemSheet";
 import { CateringCard } from "@/components/catering/CateringCard";
@@ -9,6 +18,7 @@ import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
 import { GlyphRow, OpStamp, MenuPillar, type StampKind } from "@/components/storeart/SectionOpener";
 import "@/styles/menu-art.css";
+import "@/styles/menu-dish.css";
 
 /**
  * Sliders first (the house slider leads, not buried under a side-dish
@@ -37,6 +47,9 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
   drinks: "pink",
 };
 
+/** The item the menu opens with, above every section. */
+const SIGNATURE = itemById("chris-n-eddy-s-slider");
+
 /**
  * The whole menu, plus the sheet every row opens.
  *
@@ -54,6 +67,10 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
  * (issue #155). It used to carry its own "Asked about most" list of six links
  * here too, repeating rows a thumb-length below; the page's item links live
  * in its desktop list, which stays in the HTML at every width.
+ *
+ * Since issue #206 the photos lead: the signature slider opens the menu as a
+ * big card, each section opens with its best seller, and every item is a
+ * photo card rather than a list row with a thumbnail.
  */
 export function MenuBrowser() {
   const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
@@ -103,33 +120,42 @@ export function MenuBrowser() {
         />
 
         <div className="cne-menu-main">
-          {ORDER.map((key) => (
-            <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
-              <h2 className="cne-cat-h">
-                {categoryTitles[key]}
-                <OpStamp kind={CAT_STAMP[key]} size={40} className="cne-cat-stamp" />
-              </h2>
-              <div className="cne-cat-rule" aria-hidden="true" />
-              <div className="cne-menu-grid">
-                {foodMenu[key].map((it, i) => (
-                  /* The first rows of the first section are on screen at load,
-                     and `loading="lazy"` on an above-the-fold image just delays
-                     it past the point the browser would have fetched it. */
-                  <MenuRow
-                    key={it.id}
-                    item={it}
-                    eager={key === ORDER[0] && i < 2}
-                    // Drinks read as a compact name+price list on a phone —
-                    // thirteen photo tiles is two screens of scrolling for a
-                    // Coke. Desktop is unaffected; see `.is-compact` in
-                    // menu-art.css.
-                    compact={key === "drinks"}
-                    onOpen={openItem}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+          {SIGNATURE && <MenuLead item={SIGNATURE} onOpen={openItem} />}
+          {ORDER.map((key) => {
+            /* Issue #206: a section opens with its best seller as a wide
+               card, then every other item as a photo card. Drinks without a
+               photo worth showing (cans, water) stay a name-and-price list
+               on a phone — see `.is-compact` in menu-art.css. */
+            const leadId = SECTION_LEADS[key];
+            const lead = foodMenu[key].find((i) => i.id === leadId);
+            const rest = foodMenu[key].filter((i) => i !== lead);
+            const cards = key === "drinks" ? rest.filter(drinkGetsPhoto) : rest;
+            const listed = key === "drinks" ? rest.filter((i) => !drinkGetsPhoto(i)) : [];
+            return (
+              <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
+                <h2 className="cne-cat-h">
+                  {categoryTitles[key]}
+                  <OpStamp kind={CAT_STAMP[key]} size={40} className="cne-cat-stamp" />
+                </h2>
+                <div className="cne-cat-rule" aria-hidden="true" />
+                {lead && <MenuDish item={lead} lead onOpen={openItem} />}
+                {cards.length > 0 && (
+                  <div className={`cne-dish-grid${cards.length % 2 ? " is-odd" : ""}`}>
+                    {cards.map((it, i) => (
+                      <MenuDish key={it.id} item={it} index={i + 1} onOpen={openItem} />
+                    ))}
+                  </div>
+                )}
+                {listed.length > 0 && (
+                  <div className="cne-menu-grid">
+                    {listed.map((it) => (
+                      <MenuRow key={it.id} item={it} compact onOpen={openItem} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
           <div className="cne-sec">
             <CateringCard
               eyebrow="Same menu, bigger order"

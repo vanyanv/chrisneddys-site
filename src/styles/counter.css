@@ -983,13 +983,6 @@ body {
 .cne-row:last-child {
   border-bottom: none;
 }
-.cne-row.is-star {
-  background: var(--a-cream);
-  border: 2.5px solid var(--a-ink);
-  box-shadow: 3px 3px 0 var(--a-ink);
-  padding: 9px;
-  margin-bottom: 8px;
-}
 .cne-row-thumb {
   width: 60px;
   height: 60px;
@@ -2170,14 +2163,6 @@ body {
     gap: 16px;
     padding: 15px 0;
     border-bottom-width: 2px;
-  }
-  .cne-row.is-star {
-    padding: 15px 0;
-    margin-bottom: 0;
-    border: none;
-    border-bottom: 2px solid var(--a-line);
-    background: none;
-    box-shadow: none;
   }
   .cne-row-thumb {
     width: 76px;

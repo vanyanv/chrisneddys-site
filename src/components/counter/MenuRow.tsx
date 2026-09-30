@@ -2,8 +2,6 @@
 
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
-import { Monster } from "@/components/mascots/Monster";
-import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -14,8 +12,6 @@ import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
  */
 export function MenuRow({
   item,
-  star,
-  eager,
   /**
    * Name + price only, no photo tile — for a phone reading a long list (the
    * thirteen drinks) as fast as possible. The thumb still renders in the DOM
@@ -26,29 +22,17 @@ export function MenuRow({
   onOpen,
 }: {
   item: MenuItem;
-  star?: boolean;
-  /** The rows above the fold. Lazy is the wrong default for those. */
-  eager?: boolean;
   compact?: boolean;
   onOpen: (item: MenuItem) => void;
 }) {
   return (
     <button
       type="button"
-      className={`cne-row${star ? " is-star" : ""}${compact ? " is-compact" : ""}`}
+      className={`cne-row${compact ? " is-compact" : ""}`}
       onClick={() => onOpen(item)}
       aria-haspopup="dialog"
     >
       <span className="cne-row-thumb" style={{ position: "relative" }}>
-        {star && (
-          <Monster
-            species="classic"
-            bodyColor={MONSTER_COLORS.yellow.body}
-            irisColor={MONSTER_COLORS.yellow.iris}
-            size={20}
-            className="cne-badge-corner is-tl"
-          />
-        )}
         {item.photo ? (
           /* The name alone. The button already announces the description and
              the price, so `itemPhotoAlt` would say both a second time, 31 rows
@@ -61,7 +45,7 @@ export function MenuRow({
             alt={item.name}
             width={200}
             height={133}
-            loading={eager ? "eager" : "lazy"}
+            loading="lazy"
             decoding="async"
           />
         ) : (
@@ -69,10 +53,7 @@ export function MenuRow({
         )}
       </span>
       <span className="cne-row-name">
-        <span className="n">
-          {item.name}
-          {star ? " ★" : ""}
-        </span>
+        <span className="n">{item.name}</span>
         {item.desc && <span className="d">{item.desc}</span>}
       </span>
       <span className="cne-row-price">{formatPrice(item.price)}</span>

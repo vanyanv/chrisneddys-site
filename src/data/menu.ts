@@ -444,3 +444,26 @@ export const featuredItemIds = [
 export const featuredItems: MenuItem[] = featuredItemIds
   .map((id) => allItems.find((i) => i.id === id))
   .filter((i): i is MenuItem => Boolean(i));
+
+/**
+ * The item each menu section opens with, as a wide card with its description
+ * (issue #206). A section that isn't listed opens straight into its grid —
+ * Sliders, because the signature slider already leads the whole page.
+ *
+ * Three of these are the home page's own featured items; the shake is the
+ * drinks section's one craving item.
+ */
+export const SECTION_LEADS: Partial<Record<MenuCategoryKey, string>> = {
+  combos: "2-sliders-and-fries",
+  fries: "loaded-fries",
+  secret: "the-quad",
+  drinks: "strawberry-shake-20-oz-cup",
+};
+
+/**
+ * Drinks worth a photo on a phone. Everything else under Drinks — cans,
+ * bottles, water — reads as a name-and-price list there.
+ */
+export function drinkGetsPhoto(item: MenuItem): boolean {
+  return item.id.includes("shake");
+}

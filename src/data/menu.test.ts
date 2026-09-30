@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { allItems, foodMenu, isFoodItem, menu, type MenuCategoryKey } from "@/data/menu";
+import {
+  allItems,
+  drinkGetsPhoto,
+  foodMenu,
+  isFoodItem,
+  menu,
+  SECTION_LEADS,
+  type MenuCategoryKey,
+} from "@/data/menu";
 
 const ballCap = allItems.find((i) => i.id === "chris-n-eddy-s-ball-cap-limited-run");
 
@@ -32,6 +40,37 @@ describe("foodMenu", () => {
   it("does not otherwise change any category's items", () => {
     for (const key of Object.keys(menu) as MenuCategoryKey[]) {
       expect(foodMenu[key]).toEqual(menu[key].filter(isFoodItem));
+    }
+  });
+});
+
+describe("SECTION_LEADS", () => {
+  it("names a real food item in its own section, with a photo", () => {
+    for (const [key, id] of Object.entries(SECTION_LEADS) as [MenuCategoryKey, string][]) {
+      const item = foodMenu[key].find((i) => i.id === id);
+      expect(item, `${key} lead ${id}`).toBeDefined();
+      expect(item!.photo).toBeTruthy();
+    }
+  });
+});
+
+describe("drinkGetsPhoto", () => {
+  it("is true for the three shakes only", () => {
+    expect(foodMenu.drinks.filter(drinkGetsPhoto).map((i) => i.id)).toEqual([
+      "strawberry-shake-20-oz-cup",
+      "chocolate-shake-20-oz-cup",
+      "vanilla-shake-20-oz-cup",
+    ]);
+  });
+});
+
+describe("menu photo cards", () => {
+  it("has a photo for every item the menu draws as a card", () => {
+    for (const [key, items] of Object.entries(foodMenu) as [MenuCategoryKey, typeof allItems][]) {
+      for (const item of items) {
+        if (key === "drinks" && !drinkGetsPhoto(item) && SECTION_LEADS.drinks !== item.id) continue;
+        expect(item.photo, `${key}: ${item.id}`).toBeTruthy();
+      }
     }
   });
 });

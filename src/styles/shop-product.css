@@ -422,6 +422,13 @@
   gap: 12px;
 }
 
+/* The AVIF `<picture>` around each image is the grid cell; a `display:
+   contents` wrapper would let its `<source>` take a cell of its own. */
+.cne-auth-pic {
+  display: block;
+  min-width: 0;
+}
+
 .cne-auth-img {
   width: 100%;
   height: auto;
@@ -515,6 +522,15 @@
   .cne-pdp-main .cne-capshot {
     width: auto;
     max-height: 65vh;
+  }
+
+  /* A photo's width is set outright instead of taken from the image, which
+     the AVIF <picture> wrapper only reports once the file arrives: sized
+     from content, the frame started narrow and grew, pushing the
+     thumbnails down (CLS 0.07 at 874x402). This is the width it settled at:
+     65vh tall at the photo's own ratio (set inline by ProductShot). */
+  .cne-pdp-main .cne-capshot.is-photo {
+    width: min(100%, calc(65vh * var(--cne-shot-ratio, 1)));
   }
 }
 

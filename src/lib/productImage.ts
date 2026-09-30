@@ -98,3 +98,32 @@ export function thumbStripSrcSet(opts: {
   if (uploadMidded) return `${thumbSrc} 200w, ${midUrl} 400w, ${fullSrc} 720w`;
   return `${thumbSrc} 200w, ${fullSrc} 720w`;
 }
+
+/**
+ * The AVIF twin of a WebP `srcSet` built above, for a `<picture>` `<source>`,
+ * or `undefined` when any candidate has no AVIF file (the caller then renders
+ * the plain `<img>`, same as before AVIF shipped).
+ *
+ * Each WebP URL is matched to its twin:
+ *  - repo photography (a site-relative path ending in `.webp`) has an `.avif` file
+ *    beside it, written by `scripts/build-shop-images.mjs`;
+ *  - an upload's Blob URLs carry a random suffix, so its twins can't be
+ *    derived and come from `avif` instead, keyed by the WebP URL they
+ *    replace. An upload made before AVIF shipped has none.
+ */
+export function avifSrcSet(
+  webpSrcSet: string,
+  uploaded: Record<string, string | undefined> = {},
+): string | undefined {
+  const out: string[] = [];
+  for (const candidate of webpSrcSet.split(",")) {
+    const [url, descriptor] = candidate.trim().split(/\s+/);
+    if (!url) return undefined;
+    let twin: string | undefined;
+    if (url in uploaded) twin = uploaded[url];
+    else if (url.startsWith("/") && url.endsWith(".webp")) twin = url.replace(/\.webp$/, ".avif");
+    if (!twin) return undefined;
+    out.push(descriptor ? `${twin} ${descriptor}` : twin);
+  }
+  return out.join(", ");
+}

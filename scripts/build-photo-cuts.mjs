@@ -21,6 +21,9 @@
  * landscape box the hero uses below 600px — see the "Hero wide crop" comment
  * in `main()` and `HERO_WIDE` in `src/lib/heroImage.ts`.
  *
+ * Also produces the home Instagram row's AVIF tiles (`photos/ig-*-300.avif`,
+ * `-400.avif`, and the same for `double`) from the JPEG originals beside them.
+ *
  * Re-run after replacing either source photo (`public/hero-still.webp` at
  * 1400×1480, or `public/photos/double-16x9.jpg` at 900×506).
  */
@@ -116,6 +119,21 @@ async function main() {
   for (const w of [480, 800, 1000]) {
     await avifRegionCut(heroSrc, join(root, `public/hero-wide-${w}.avif`), wideRegion, w);
     await webpRegionCut(heroSrc, join(root, `public/hero-wide-${w}.webp`), wideRegion, w);
+  }
+
+  // Home Instagram row: six square tiles, about 130 CSS px wide on a phone
+  // (33vw) and 230 px on desktop. The WebP pair (300w `-sm`, 500w) made a 3x
+  // phone pick the 500w file for every tile: 225 KB for a row below the fold.
+  // AVIF at 300w and 400w covers the phone at 2x-3x and the desktop at up to
+  // 1.7x for about a quarter of the bytes; the WebP pair stays as the fallback.
+  for (const name of ["ig-pile", "ig-neon", "ig-monster", "ig-pyramid", "ig-stack", "double"]) {
+    for (const w of [300, 400]) {
+      await avifCut(
+        join(root, `public/photos/${name}.jpg`),
+        join(root, `public/photos/${name}-${w}.avif`),
+        w,
+      );
+    }
   }
 }
 

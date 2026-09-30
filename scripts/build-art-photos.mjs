@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Responsive AVIF/WebP cuts of the owner's photos of the Hollywood location
+ * Responsive AVIF/WebP cuts of the owner's photos of the Hollywood and Van Nuys locations
  * and Slider's murals, for the location pages and /careers.
  *
  * Same approach as `build-photo-cuts.mjs`: plain `sharp`, sources kept in
@@ -33,7 +33,9 @@ const WEBP = { quality: 74 };
 
 /**
  * `ratio` is width / height of the crop; `focusX`/`focusY` (0-1) place the
- * crop inside the source when it has to trim one side.
+ * crop inside the source when it has to trim one side. `src` names the source
+ * file when it differs from `name`, and `box` ([left, top, width], as
+ * fractions of the source) places a crop exactly instead of by focus.
  */
 const PHOTOS = [
   // The Hollywood dining room: the logo on the floor, the menu board, the walls.
@@ -51,10 +53,42 @@ const PHOTOS = [
   { name: "mural-vortex", ratio: 3 / 4, focusX: 0.5, focusY: 0.35, widths: [360, 540] },
   { name: "mural-monsters", ratio: 3 / 4, focusX: 0.5, focusY: 0.4, widths: [360, 540] },
   { name: "mural-hallway", ratio: 3 / 4, focusX: 0.47, focusY: 0.5, widths: [360, 540] },
+  // Van Nuys, from the owner's photos of that store, cropped so no people show.
+  // The triangle hallway, as the location page's hero.
+  {
+    name: "vannuys-hall-wide",
+    src: "vannuys-hallway",
+    ratio: 4 / 3,
+    focusX: 0.5,
+    focusY: 0.656,
+    widths: [480, 720, 960],
+  },
+  // Portrait crops for the Van Nuys mural strip. The sound-wave wall is cut
+  // to the red monster by an explicit box, which keeps the diners out.
+  { name: "vannuys-soundwave", ratio: 3 / 4, box: [0.033, 0.195, 0.467], widths: [360, 540] },
+  {
+    name: "vannuys-swirl-tall",
+    src: "vannuys-swirl",
+    ratio: 3 / 4,
+    focusX: 0.55,
+    focusY: 0.5,
+    widths: [360, 540],
+  },
+  { name: "vannuys-spec", ratio: 3 / 4, focusX: 0.62, focusY: 0.45, widths: [360, 540] },
 ];
 
-async function region(file, ratio, focusX, focusY) {
+async function region(file, ratio, focusX, focusY, box) {
   const { width, height } = await sharp(file).metadata();
+  if (box) {
+    const [l, t, w] = box;
+    const cw = Math.round(width * w);
+    return {
+      left: Math.round(width * l),
+      top: Math.round(height * t),
+      width: cw,
+      height: Math.round(cw / ratio),
+    };
+  }
   let w = width;
   let h = Math.round(width / ratio);
   if (h > height) {
@@ -69,8 +103,8 @@ async function region(file, ratio, focusX, focusY) {
 mkdirSync(OUT, { recursive: true });
 
 for (const p of PHOTOS) {
-  const file = join(SRC, `${p.name}.jpg`);
-  const crop = await region(file, p.ratio, p.focusX, p.focusY);
+  const file = join(SRC, `${p.src ?? p.name}.jpg`);
+  const crop = await region(file, p.ratio, p.focusX, p.focusY, p.box);
   for (const w of p.widths) {
     const base = () => sharp(file).extract(crop).resize({ width: w });
     const avif = await base()

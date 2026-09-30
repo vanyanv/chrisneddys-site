@@ -1,0 +1,78 @@
+/* The /locations page's own styles. Moved out of counter.css so the other
+   pages stop carrying them, in the order they had there. */
+
+.cne-loc h2.cne-loc-name::after {
+  content: none;
+}
+
+/* ---- locations ---------------------------------------------------------- */
+.cne-mapwrap {
+  position: relative;
+  background: var(--a-mapbg);
+  border-bottom: 3px solid var(--a-ink);
+  overflow: hidden;
+}
+.cne-mapwrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* On a phone held sideways the map keeps its 360:259 shape, so at full
+   width it would be taller than the screen and the one open store (low on
+   the map, in Hollywood) would sit under the fold. Capping its width by the
+   height left under the sticky header keeps the whole map on screen; the
+   wrap's map colour fills the sides. On an upright phone the cap is far wider
+   than the screen, so nothing changes there, and from 901px up the map sits
+   in the desktop panel's own frame (`.cne-split-frame`) instead. */
+@media (max-width: 900px) {
+  .cne-mapbox {
+    position: relative;
+    max-width: max(300px, (100svh - var(--cne-stuck) - 16px) * 360 / 259);
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 901px) {
+  .cne-locs {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: stretch;
+  }
+  /* The map keeps its own 360:259 shape, so at a width where the 1.25fr
+     column isn't wide enough to make the map as tall as the 3-card list
+     beside it (roughly 901-1300px, taller still the more the list wraps),
+     centering it in the flex row the old way just left flat, empty padding
+     above and below. Same fix as the home page's map split (`.cne-split-r` /
+     `.cne-split-frame` / `.cne-split-map`, `git show fb7b3bf`): the panel is
+     painted the map's own land colour, the map sits centred in a frame sized
+     to the full column, and `.cne-split-map > img`'s mask fades the roads
+     into that colour over the spare room instead of stopping at a hard
+     edge — so the leftover space reads as the map's own matte, not a gap.
+     `::before` guarantees the column is never shorter than the map itself
+     when the list is the short side instead. `.cne-split-frame` and
+     `.cne-split-map` are generic (defined with the home split above) and
+     `LocationsView` wraps the same `LocationsMapCanvas` in them. */
+  .cne-mapwrap {
+    border-bottom: none;
+    border-right: 4px solid var(--a-ink);
+  }
+  .cne-mapwrap::before {
+    content: "";
+    display: block;
+    aspect-ratio: 360 / 259;
+  }
+  .cne-locs-list {
+    padding: 38px 34px;
+  }
+  .cne-locs-list h1,
+  .cne-locs-list h2 {
+    font-family: var(--font-display);
+    font-size: 38px;
+    margin: 0 0 6px;
+    line-height: 0.95;
+    padding-bottom: 0;
+  }
+  .cne-locs-list h1::after {
+    content: none;
+  }
+}

@@ -44,7 +44,7 @@ export const HERO = {
   // matching, not the common case below 600px.
   //
   // The first clause is a phone held sideways (the short-landscape tier in
-  // counter.css) on a 3x screen. There the photo column is ~453px wide, so
+  // home.css) on a 3x screen. There the photo column is ~453px wide, so
   // the honest 50vw asks for ~1360 device px and the browser takes the 80 KB
   // 1400w original, which on a slow line arrives last of everything the page
   // loads: 2.7s to the home page's Largest Contentful Paint (issue #160).

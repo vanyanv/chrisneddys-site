@@ -11,7 +11,7 @@ import { HeroOrderButton } from "@/components/counter/HeroOrderButton";
  * shot, split by a checkerboard seam borrowed from the store floor, with the
  * corner monster peeking over the boundary between them. On a phone the
  * photo stacks above the panel; from 600px up they sit side by side, panel
- * left and photo right — see `.cne-hero-in` in counter.css for the shape at
+ * left and photo right — see `.cne-hero-in` in home.css for the shape at
  * each tier.
  */
 export function Hero() {
@@ -44,7 +44,7 @@ export function Hero() {
           </div>
         </div>
         {/* aria-hidden checkerboard divider between the panel and the photo —
-            see `.cne-hero-seam` in counter.css. */}
+            see `.cne-hero-seam` in home.css. */}
         <div className="cne-hero-seam" aria-hidden="true" />
         <div className="cne-heromedia">
           {/* The loop this replaces was decoration, so it was loaded conditionally and
@@ -88,7 +88,7 @@ export function Hero() {
       </div>
       {/* Idea 2: its eye tracks the pointer on fine-pointer devices. Peeking over the
           seam instead of sitting in the usual `.cne-badge-corner` spot — see
-          `.cne-hero-peek` in counter.css and the removed hero rule in home-art.css. */}
+          `.cne-hero-peek` in home.css and the removed hero rule in home-art.css. */}
       <Watcher className="cne-hero-peek" />
     </section>
   );

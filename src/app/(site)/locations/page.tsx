@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/locations.css";
 import { LocationsView } from "@/components/counter/LocationsView";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { JsonLdScript } from "@/components/shared/JsonLd";

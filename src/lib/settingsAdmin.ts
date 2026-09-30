@@ -83,8 +83,8 @@ export async function saveStoreSettings(
 
   if (!isTestEnv()) {
     after(async () => {
-      revalidateTag("catalogue");
-      revalidateTag(STORE_SETTINGS_TAG);
+      revalidateTag("catalogue", { expire: 0 });
+      revalidateTag(STORE_SETTINGS_TAG, { expire: 0 });
       revalidatePath("/shop/");
       revalidatePath("/returns/");
       revalidatePath("/terms/");

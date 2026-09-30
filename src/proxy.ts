@@ -28,6 +28,9 @@ import { SIGNED_IN_BEFORE_COOKIE } from "@/lib/adminCookies";
  * a Server Component has no way to mark `no-store` on its own response —
  * only Middleware and Route Handlers can set response headers — so this is
  * the one place that can stamp it, same reasoning as the admin pages above.
+ *
+ * Called `proxy.ts` since Next.js 16 renamed the middleware file convention;
+ * it now runs on the Node.js runtime, where the cookie check works the same.
  */
 export const config = {
   matcher: ["/admin/:path*", "/shop/thanks", "/shop/thanks/"],
@@ -47,7 +50,7 @@ function hasSessionCookie(request: NextRequest): boolean {
   return getSessionCookie(request) !== null;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith("/admin")) {

@@ -49,6 +49,11 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
   experimental: {
     inlineCss: true,
+    // Next 16 reuses Turbopack's build cache between builds by default. One
+    // local build after a branch switch shipped CSS missing a rule changed on
+    // the new branch (the hat photo rendered smaller); a clean build was fine.
+    // Vercel restores that cache between deploys, so every build starts clean.
+    turbopackFileSystemCacheForBuild: false,
   },
   // PGlite loads its WASM/data files with `fs` + `URL` in ways Next's server
   // webpack bundle mishandles (an "instance of URL" `fs` error); left as a

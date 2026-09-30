@@ -15,7 +15,7 @@ import { MascotDecor } from "@/components/mascots/MascotDecor";
  * database currently says — never static, never cached across visitors.
  * `?session_id=` alone is enough to load an order (there's no session/email
  * check), so this must never be cached or served from anywhere but this
- * request: `src/middleware.ts` also stamps `Cache-Control: private,
+ * request: `src/proxy.ts` also stamps `Cache-Control: private,
  * no-store` on every response for this route — Server Components can't set
  * response headers themselves, only Route Handlers and Middleware can — and
  * `canShowFullOrderDetails` below limits how long a stale link keeps

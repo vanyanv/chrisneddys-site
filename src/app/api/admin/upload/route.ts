@@ -143,7 +143,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const product = await getProductForAdmin(productId);
   if (product) {
-    revalidateTag("catalogue");
+    revalidateTag("catalogue", { expire: 0 });
     revalidatePath("/shop/");
     revalidatePath(`/shop/${product.slug}/`);
   }

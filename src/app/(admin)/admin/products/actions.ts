@@ -27,7 +27,7 @@ import { seoWriterConfigured, writeProductSeo, type WrittenSeo } from "@/lib/seo
  * catalogue reads (`src/lib/catalog.ts`) and the two /shop routes that could
  * be showing this product right now. */
 function revalidateStorefront(...slugs: string[]): void {
-  revalidateTag("catalogue");
+  revalidateTag("catalogue", { expire: 0 });
   revalidatePath("/shop/");
   for (const slug of new Set(slugs)) {
     revalidatePath(`/shop/${slug}/`);

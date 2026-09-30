@@ -209,7 +209,7 @@ export async function getOwnerSession(): Promise<OwnerSession | null> {
 /**
  * Like `getOwnerSession`, but redirects to sign-in (carrying `next` back to
  * the page that was requested) instead of returning null. `next` comes from
- * the `x-pathname` header `src/middleware.ts` sets on every `/admin`
+ * the `x-pathname` header `src/proxy.ts` sets on every `/admin`
  * request; falls back to `/admin` if that header is absent.
  */
 export async function requireOwner(): Promise<OwnerSession> {
@@ -218,7 +218,7 @@ export async function requireOwner(): Promise<OwnerSession> {
 
   const headerList = await headers();
   const pathname = headerList.get("x-pathname") ?? "/admin";
-  // `expired=1` here for the same reason `src/middleware.ts` sets it on its
+  // `expired=1` here for the same reason `src/proxy.ts` sets it on its
   // own sign-in redirect: reaching this branch means a cookie was present
   // (middleware let the request through) but Better Auth's own session
   // lookup came back empty — a session that expired or was revoked after

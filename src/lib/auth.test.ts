@@ -22,7 +22,7 @@ vi.mock("server-only", () => ({}));
 
 // `signIn` reads/writes the session cookie through `next/headers`, which
 // throws when called outside a real Next.js request — see the note above
-// `getSessionCookie`'s use in `src/middleware.ts`. A tiny in-memory stand-in
+// `getSessionCookie`'s use in `src/proxy.ts`. A tiny in-memory stand-in
 // lets `signIn` run end to end in a unit test; nothing here asserts on the
 // stored cookie itself; that's Better Auth's own concern.
 const cookieStore = new Map<string, string>();

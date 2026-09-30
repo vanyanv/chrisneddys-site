@@ -1,5 +1,5 @@
 /**
- * Proves `middleware` lets a signed-out visitor reach the two new
+ * Proves `proxy` (Next's middleware) lets a signed-out visitor reach the two new
  * password-recovery pages (`/admin/forgot-password`, `/admin/reset-password`)
  * exactly like `/admin/sign-in`, while every other `/admin/*` path still
  * redirects without a session cookie present. The real session cookie
@@ -14,7 +14,7 @@ import { NextRequest } from "next/server";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
-import { middleware } from "./middleware";
+import { proxy } from "./proxy";
 
 const migrationsFolder = fileURLToPath(new URL("../drizzle", import.meta.url));
 
@@ -41,11 +41,11 @@ function requestFor(pathname: string, opts: { withSession?: boolean } = {}): Nex
   return new NextRequest(new URL(pathname, "http://localhost"), { headers });
 }
 
-describe("middleware", () => {
+describe("proxy", () => {
   const GUEST_PATHS = ["/admin/sign-in", "/admin/forgot-password", "/admin/reset-password"];
 
   it.each(GUEST_PATHS)("lets a signed-out visitor reach %s", async (pathname) => {
-    const response = await middleware(requestFor(pathname));
+    const response = await proxy(requestFor(pathname));
     expect(response.status).not.toBe(307);
     expect(response.headers.get("location")).toBeNull();
   });
@@ -53,21 +53,21 @@ describe("middleware", () => {
   it.each(["/admin", "/admin/products", "/admin/orders", "/admin/settings"])(
     "still redirects a signed-out visitor away from %s",
     async (pathname) => {
-      const response = await middleware(requestFor(pathname));
+      const response = await proxy(requestFor(pathname));
       expect(response.status).toBe(307);
       expect(response.headers.get("location")).toContain("/admin/sign-in");
     },
   );
 
   it("lets a signed-in owner reach a protected admin path", async () => {
-    const response = await middleware(requestFor("/admin/products", { withSession: true }));
+    const response = await proxy(requestFor("/admin/products", { withSession: true }));
     expect(response.status).not.toBe(307);
     expect(response.headers.get("location")).toBeNull();
   });
 
   it("every matched response is marked private, no-store", async () => {
     for (const pathname of [...GUEST_PATHS, "/admin/products"]) {
-      const response = await middleware(requestFor(pathname, { withSession: true }));
+      const response = await proxy(requestFor(pathname, { withSession: true }));
       expect(response.headers.get("cache-control")).toBe("private, no-store");
     }
   });

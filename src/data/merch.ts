@@ -221,7 +221,7 @@ export const TERMS_PENDING =
  * A product's first view — the gallery's default and what card art uses.
  * Every product in the catalogue below is seeded with at least one view, but
  * a product published through /admin is not guaranteed one at the type
- * level (`setStatus` in `src/lib/catalogAdmin.ts` refuses to publish one with
+ * level (`setStatus` in `src/lib/catalogAdmin/products.ts` refuses to publish one with
  * no photo, but a draft can still reach this function) — so this returns
  * `undefined` rather than throwing, and every caller renders `CapArt` in
  * that case instead of crashing the page.

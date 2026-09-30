@@ -480,3 +480,10 @@ export function drinkGetsPhoto(item: MenuItem): boolean {
 export function photoFor(item: MenuItem, way?: WayId): string | undefined {
   return (way && item.wayPhotos?.[way]) || item.photo;
 }
+
+/** Every photo of the item, default first: for the sitemap and structured data. */
+export function allPhotosFor(item: MenuItem): string[] {
+  return Array.from(
+    new Set([item.photo, ...Object.values(item.wayPhotos ?? {})].filter((p): p is string => !!p)),
+  );
+}

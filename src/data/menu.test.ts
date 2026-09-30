@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { photoFraming } from "@/data/photoFocus";
 import {
   allItems,
+  allPhotosFor,
   drinkGetsPhoto,
   foodMenu,
   isFoodItem,
@@ -91,10 +92,26 @@ describe("photoFor", () => {
   it("has every file the site draws for each photo", () => {
     const ids = allItems.flatMap((i) => [i.photo, ...Object.values(i.wayPhotos ?? {})]);
     for (const id of ids.filter(Boolean)) {
-      for (const file of [`${id}.webp`, `${id}-thumb.webp`, `${id}-card.webp`, `${id}-card.avif`]) {
+      for (const file of [
+        `${id}.webp`,
+        `${id}.avif`,
+        `${id}-thumb.webp`,
+        `${id}-thumb.avif`,
+        `${id}-card.webp`,
+        `${id}-card.avif`,
+      ]) {
         expect(existsSync(join(process.cwd(), "public/menu", file)), file).toBe(true);
       }
       expect(photoFraming[id!], `photoFocus.ts: ${id}`).toBeDefined();
     }
+  });
+});
+
+describe("allPhotosFor", () => {
+  it("lists the default photo first, then the other Ways", () => {
+    const combo = foodMenu.combos.find((i) => i.id === "1-slider-and-fries")!;
+    expect(allPhotosFor(combo)).toEqual(["combo-1-chris", "combo-1-eddy"]);
+    const fries = foodMenu.fries.find((i) => i.id === "cheese-fries")!;
+    expect(allPhotosFor(fries)).toEqual(["cheese-fries"]);
   });
 });

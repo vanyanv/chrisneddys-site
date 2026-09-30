@@ -5,6 +5,7 @@ import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice, itemPhotoAlt } from "@/lib/otter";
 import { LazyItemSheet } from "./LazyItemSheet";
 import { useItemSheet } from "./useItemSheet";
+import { MenuPhoto } from "./MenuPhoto";
 
 export function FeaturedCards() {
   const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
@@ -28,13 +29,10 @@ export function FeaturedCards() {
                 /* A 60px square on a phone, a full-width card image on desktop.
                    Without this the phone downloaded the 720px version to draw
                    it at 60px. */
-                <img
-                  src={`/menu/${it.photo}.webp`}
-                  srcSet={`/menu/${it.photo}-thumb.webp 200w, /menu/${it.photo}.webp 720w`}
+                <MenuPhoto
+                  photo={it.photo}
                   sizes="(min-width: 901px) 440px, 60px"
                   alt={itemPhotoAlt(it)}
-                  width={720}
-                  height={479}
                   loading="lazy"
                   decoding="async"
                 />

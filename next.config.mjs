@@ -69,6 +69,20 @@ const nextConfig = {
       { source: "/catering/o/:path*", destination: "/catering/", permanent: true },
       { source: "/catering/find", destination: "/catering/", permanent: true },
       { source: "/catering/find/:path*", destination: "/catering/", permanent: true },
+      // The Otter photos the owner's own shots replaced (issue #208). Image
+      // search and the old sitemap point at them; send those to the new ones.
+      ...Object.entries({
+        "5f336391-8daf-4d23-929a-cb78c125ce0d": "combo-1-chris",
+        "6dcd14a3-7032-489a-9e66-5f4718e96af1": "combo-2-chris",
+        "0a500a4b-3624-4ea3-b99a-9a5f83f2155b": "cheese-fries",
+        "e714a53e-90be-4cc8-8692-1358c9faebb1": "loaded-fries",
+      }).flatMap(([from, to]) =>
+        [".webp", "-thumb.webp", "-card.webp", "-card.avif"].map((file) => ({
+          source: `/menu/${from}${file}`,
+          destination: `/menu/${to}${file}`,
+          permanent: true,
+        })),
+      ),
     ];
   },
   async headers() {

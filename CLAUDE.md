@@ -16,6 +16,7 @@ pnpm install
 pnpm dev             # local server
 pnpm typecheck       # tsc --noEmit
 pnpm lint            # eslint .
+pnpm knip            # unused files, exports, types and dependencies (also in CI)
 pnpm test            # vitest run
 pnpm format:check    # prettier --check (pre-commit hook formats staged files)
 pnpm build           # runs scripts/build-map-base.mjs + db-prepare.mjs, then next build -> .next/
@@ -27,7 +28,7 @@ pnpm db:studio       # drizzle-kit studio
 pnpm owner:password  # print a hash for a password, or --apply <email> <password> to set an owner's password directly (break-glass)
 ```
 
-Run `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, and `pnpm test` before
+Run `pnpm typecheck`, `pnpm lint`, `pnpm knip`, `pnpm format:check`, and `pnpm test` before
 reporting any change as done.
 
 ## Store

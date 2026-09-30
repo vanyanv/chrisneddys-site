@@ -153,39 +153,29 @@ describe("sendContactMessage", () => {
 
 describe("joinOpeningList", () => {
   it("emails the signup for a location that hasn't opened", async () => {
-    // Van Nuys opens by itself at VAN_NUYS_OPENS_AT; pin the clock before it
-    // so this keeps testing a not-yet-open store after that date.
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
     const fetchMock = mockResend();
     expect(
-      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Van Nuys" })),
+      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" })),
     ).toEqual({ ok: true });
     const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
     expect(payload.to).toBe(brand.email);
     expect(payload.reply_to).toBe("delivered@resend.dev");
-    expect(payload.subject).toBe("[Opening list — Van Nuys] delivered@resend.dev");
-    vi.useRealTimers();
+    expect(payload.subject).toBe("[Opening list — Glendale] delivered@resend.dev");
   });
 
-  it("then emails the visitor the opening date, from the store with replies to the inbox", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
+  it("then emails the visitor a confirmation, from the store with replies to the inbox", async () => {
     const fetchMock = mockResend();
-    await joinOpeningList(form({ email: "delivered@resend.dev", location: "Van Nuys" }));
+    await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" }));
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const payload = JSON.parse(fetchMock.mock.calls[1]![1].body);
     expect(payload.to).toBe("delivered@resend.dev");
     expect(payload.from).toBe("Chris N Eddy's <hello@chrisneddys.com>");
     expect(payload.reply_to).toBe(brand.email);
-    expect(payload.subject).toBe("Chris N Eddy's Van Nuys: grand opening Friday, Sept 25 at 6 PM");
-    expect(payload.text).toContain("14523 Sherman Way, Van Nuys, CA 91405");
-    vi.useRealTimers();
+    expect(payload.subject).toBe("Chris N Eddy's Glendale: you're on the list");
+    expect(payload.text).toContain("1360 E Colorado St, Glendale, CA 91205");
   });
 
   it("still says ok when only the visitor's copy fails", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-24T12:00:00-07:00"));
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(new Response("{}", { status: 200 }))
@@ -193,10 +183,9 @@ describe("joinOpeningList", () => {
     vi.stubGlobal("fetch", fetchMock);
     const err = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(
-      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Van Nuys" })),
+      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" })),
     ).toEqual({ ok: true });
     err.mockRestore();
-    vi.useRealTimers();
   });
 
   it("sends the visitor nothing when the owner's copy didn't go", async () => {
@@ -209,7 +198,7 @@ describe("joinOpeningList", () => {
 
   it("refuses a location that is already open or doesn't exist", async () => {
     const fetchMock = mockResend();
-    for (const location of ["Hollywood", "Atlantis"]) {
+    for (const location of ["Hollywood", "Van Nuys", "Atlantis"]) {
       expect(await joinOpeningList(form({ email: "delivered@resend.dev", location }))).toEqual({
         ok: false,
         reason: "invalid",

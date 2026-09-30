@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { sharedFaq } from "@/data/faq";
 import { locations } from "@/data/locations";
 import {
@@ -11,15 +11,6 @@ import {
 } from "./openLocations";
 import { orderTargetUrl } from "./orderChoice";
 
-function at(iso: string) {
-  vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date(iso));
-}
-
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 const byId = (id: string) => locations.find((l) => l.id === id)!;
 
 describe("sitewide copy names every open store, not just Hollywood (issue #178)", () => {
@@ -29,16 +20,7 @@ describe("sitewide copy names every open store, not just Hollywood (issue #178)"
     expect(joinNames(["A", "B", "C"])).toBe("A, B and C");
   });
 
-  it("speaks for Hollywood alone before Van Nuys opened", () => {
-    at("2026-09-25T12:00:00-07:00");
-    expect(openNames()).toBe("Hollywood");
-    expect(openHoursAnswer()).toMatch(/^Late\. The Hollywood location is open 10 AM/);
-    expect(closingLine()).toMatch(/^The Hollywood location serves until 1 AM/);
-    expect(deliverySentence()).toBe("DoorDash, Uber Eats and Grubhub deliver from Hollywood");
-  });
-
-  it("speaks for both once Van Nuys is open", () => {
-    at("2026-09-26T12:00:00-07:00");
+  it("speaks for both open stores", () => {
     expect(openNames("or")).toBe("Hollywood or Van Nuys");
     expect(openHoursAnswer()).toMatch(/^Late\. Hollywood and Van Nuys are both open 10 AM/);
     expect(closingLine()).toMatch(/^Hollywood and Van Nuys both serve until 1 AM/);
@@ -61,7 +43,6 @@ describe("where ORDER goes for each store", () => {
   });
 
   it("opens Van Nuys' own ordering page, never Hollywood's", () => {
-    at("2026-09-26T12:00:00-07:00");
     const url = orderTargetUrl(byId("vannuys"), "item-sheet", item);
     expect(url).toContain("14523-sherman-way");
     expect(url).not.toContain("5539");

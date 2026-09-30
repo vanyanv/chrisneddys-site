@@ -4,16 +4,13 @@ import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { brand } from "@/data/brand";
-import { locations, flagship, hasPassed, VAN_NUYS_OPENS_AT } from "@/data/locations";
+import { locations, flagship } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { closingSummary } from "@/lib/hours";
 
 const title = "Locations — Hollywood, Glendale & Van Nuys";
-// A function so it changes by itself when Van Nuys opens (`VAN_NUYS_OPENS_AT`).
 function description(): string {
-  return hasPassed(VAN_NUYS_OPENS_AT)
-    ? `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd) and Van Nuys (14523 Sherman Way), open until ${closingSummary(flagship)}. Glendale opening soon.`
-    : `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd), open until ${closingSummary(flagship)}. Van Nuys grand opening Friday, Sept 25 at 6 PM; Glendale opening soon.`;
+  return `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd) and Van Nuys (14523 Sherman Way), open until ${closingSummary(flagship)}. Glendale opening soon.`;
 }
 
 export function generateMetadata(): Metadata {

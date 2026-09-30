@@ -60,7 +60,7 @@ export function OpenStatus({
  * once, when it changes, rather than narrating every minute — only the state
  * and the closing time are in it, and neither moves between announcements.
  */
-export function StatusTag({
+function StatusTag({
   parts,
   tone = "open",
   head = false,

@@ -13,9 +13,9 @@
  */
 import { brand } from "@/data/brand";
 
-export const EMAIL_LOGO_WIDTH = 150;
+const EMAIL_LOGO_WIDTH = 150;
 /** 618x174 source, so 150 wide rounds to 42 tall. */
-export const EMAIL_LOGO_HEIGHT = 42;
+const EMAIL_LOGO_HEIGHT = 42;
 
 export function emailLogoImg(altColor: string): string {
   return `<img src="${brand.siteUrl}/email/logo.png" width="${EMAIL_LOGO_WIDTH}" height="${EMAIL_LOGO_HEIGHT}" alt="${brand.name.replace(/'/g, "&#39;")}" style="display:block;width:${EMAIL_LOGO_WIDTH}px;height:${EMAIL_LOGO_HEIGHT}px;border:0;font-family:'Arial Black',Impact,sans-serif;font-size:16px;color:${altColor}">`;

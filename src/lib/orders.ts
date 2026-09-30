@@ -288,7 +288,7 @@ function computeShippingCents(
 
 /** `nextval('order_number_seq')` formatted as `CNE-1001`. Safe under
  * concurrency — Postgres sequences never hand the same value to two callers. */
-export async function nextOrderNumber(db: Db): Promise<string> {
+async function nextOrderNumber(db: Db): Promise<string> {
   const result = (await db.execute(sql`select nextval('order_number_seq') as n`)) as unknown as {
     rows: { n: string | number }[];
   };

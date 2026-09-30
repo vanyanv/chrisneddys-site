@@ -114,7 +114,7 @@ export type RunOverview = {
  * numbered run currently live. `listProductsForAdmin`/`getProductForAdmin`
  * are the same reads `/admin/products` uses, so this can never disagree
  * with what the Products sheet shows. */
-export async function getRunOverview(): Promise<RunOverview | null> {
+async function getRunOverview(): Promise<RunOverview | null> {
   const rows = await listProductsForAdmin();
   const row = rows.find((r) => r.status === "published" && r.inventory.mode === "edition");
   if (!row || row.inventory.mode !== "edition") return null;

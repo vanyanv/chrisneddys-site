@@ -10,7 +10,7 @@ import type { MenuItem } from "@/data/menu";
  * Shape (verified against the live storefront, 2026-09-08):
  *   https://order.tryotter.com/s/{slug}/{location}/{storeId}/{item name}/{itemId}
  */
-export const otter = {
+const otter = {
   slug: "chris-n-eddys",
   location: "5539-sunset-boulevard-los-angeles",
   storeId: "8c836303-8d5d-4c32-b9d1-a1ca5325b191",

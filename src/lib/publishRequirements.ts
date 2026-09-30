@@ -76,7 +76,7 @@ export const PUBLISH_REQUIREMENT_MESSAGES: Record<PublishRequirementKey, string>
  * `PUBLISH_REQUIREMENT_MESSAGES`'s full refusal sentences: the panel reads
  * these out in a single joined sentence ("Needs a name and a photo..."),
  * `setStatus` shows only one message at a time. */
-export const PUBLISH_REQUIREMENT_NOUNS: Record<PublishRequirementKey, string> = {
+const PUBLISH_REQUIREMENT_NOUNS: Record<PublishRequirementKey, string> = {
   name: "a name",
   price: "a price",
   run: "a run size",

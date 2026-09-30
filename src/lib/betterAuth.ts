@@ -133,7 +133,7 @@ export async function captureResetSend<T>(
 }
 
 /** 12 hours, in seconds — see the design doc's "Sessions" section. */
-export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
 
 /**
  * The WebAuthn Relying Party ID for the passkey plugin below — the domain a

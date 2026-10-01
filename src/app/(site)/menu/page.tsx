@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/menu-page.css";
 import { MenuBrowser } from "@/components/counter/MenuBrowser";
 import { JsonLdScript, menuNode, restaurantLd } from "@/components/shared/JsonLd";
 import { flagship } from "@/data/locations";

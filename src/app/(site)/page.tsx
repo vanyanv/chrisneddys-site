@@ -1,3 +1,4 @@
+import "@/styles/home.css";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";

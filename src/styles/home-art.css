@@ -3,7 +3,7 @@
  * most" cards. (Idea 2's watching eye needs no CSS of its own — it only adds
  * a movable iris inside the existing `.cne-badge-corner` markup. The hero's
  * own corner monster no longer uses `.cne-badge-corner` at all — see
- * `.cne-hero-peek` in counter.css, added for "3A The Peek", issue #112.)
+ * `.cne-hero-peek` in home.css, added for "3A The Peek", issue #112.)
  */
 
 .cne-tether-wrap {

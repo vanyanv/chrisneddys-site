@@ -41,7 +41,7 @@
  *    already does, resolved against the importing file instead of
  *    `srcRoot`.
  */
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -59,7 +59,9 @@ export async function resolve(specifier, context, nextResolve) {
     const rel = specifier.slice(2);
     for (const candidateSuffix of ["", ".ts", ".tsx", "/index.ts"]) {
       const candidate = join(srcRoot, rel + candidateSuffix);
-      if (existsSync(candidate)) {
+      // A file, not a directory: `@/lib/orders` is `src/lib/orders.ts`, next
+      // to the `src/lib/orders/` folder it re-exports from.
+      if (existsSync(candidate) && statSync(candidate).isFile()) {
         return nextResolve(pathToFileURL(candidate).href, context);
       }
     }

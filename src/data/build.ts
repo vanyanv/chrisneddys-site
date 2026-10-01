@@ -26,7 +26,7 @@ export type BuildLine = {
 const PATTY = "Smashed patty";
 const CHEESE = "Slice of cheese";
 const ROLL = "Martin’s roll, buttered";
-const FRIES = "Chris-cut fries";
+const FRIES = "Side of fries";
 
 /**
  * One slider is n patties, n slices of cheese and one roll. `of` multiplies the

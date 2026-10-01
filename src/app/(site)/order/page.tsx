@@ -64,7 +64,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do you have anything vegetarian?",
-    a: "The grilled cheese — two slices of cheese in a buttered, reverse-toasted Martin's potato bun — plus chris-cut fries, cheese fries and the shakes. Everything else on the menu is beef.",
+    a: "The grilled cheese — two slices of cheese in a buttered, reverse-toasted Martin's potato bun — plus a side of fries, cheese fries and the shakes. Everything else on the menu is beef.",
   },
 ];
 

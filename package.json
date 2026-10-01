@@ -41,10 +41,10 @@
     "@vercel/speed-insights": "^2.0.0",
     "better-auth": "^1.7.5",
     "drizzle-orm": "^0.45.2",
-    "next": "^15.5.25",
+    "next": "^16.3.8",
     "openai": "^7.19.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "server-only": "^0.0.1",
     "sharp": "^0.35.4",
     "stripe": "^22.6.2"
@@ -59,7 +59,7 @@
     "@types/react-dom": "^19.0.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.15.0",
-    "eslint-config-next": "^15.0.3",
+    "eslint-config-next": "^15.5.27",
     "husky": "^9.1.7",
     "knip": "^5.88.1",
     "lint-staged": "^17.5.1",
@@ -75,7 +75,7 @@
   "packageManager": "pnpm@10.17.0",
   "lint-staged": {
     "*.{ts,tsx,mjs,js}": [
-      "eslint --max-warnings=0",
+      "eslint --max-warnings=0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.{json,css,md,yml,yaml}": "prettier --write"

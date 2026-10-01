@@ -2,7 +2,7 @@
 
 Next.js 15 App Router site on Vercel, Tailwind v4, TypeScript, pnpm. Storefront
 pages are static with revalidation; `/admin` and `/api` are server routes
-(middleware-protected sign-in, Stripe checkout/webhook). The catalogue and
+(sign-in guarded by `src/proxy.ts`, Stripe checkout/webhook). The catalogue and
 orders live in Postgres — Neon in deployed environments, PGlite locally and
 in tests — with `src/data/merch.ts` as seed source and static fallback when
 there's no database to talk to. Content lives in `src/data/*.ts`; helpers in

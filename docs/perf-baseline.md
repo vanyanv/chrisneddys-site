@@ -366,6 +366,10 @@ budgeted at 80 KB, once the hero moves to AVIF). Until those fixes land,
 the check doing its job, not a false positive; if it starts failing on a
 _different_ page or resource type, that is a real regression.
 
+The `script` budgets moved up 30 KB on 30 September 2026 with the Next.js 16
+upgrade (#216): its runtime ships about 30 KB more JavaScript per page, in
+exchange for about 30% less main-thread blocking on a throttled iPhone.
+
 CI runs `pnpm perf:budget` against a production `pnpm start` after every
 build (see `.github/workflows/ci.yml`), using Playwright's own installed
 Chromium there instead of the `/opt/pw-browsers` build used for local

@@ -71,7 +71,7 @@ async function resolveDb(db: Db | undefined): Promise<Db> {
  */
 export function catalogueChanged(slugs: string[] = []): void {
   if (isTestEnv()) return;
-  revalidateTag("catalogue");
+  revalidateTag("catalogue", { expire: 0 });
   revalidatePath("/shop/");
   for (const slug of slugs) revalidatePath(`/shop/${slug}/`);
 }

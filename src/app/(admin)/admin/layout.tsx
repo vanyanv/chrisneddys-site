@@ -13,7 +13,7 @@ function normalizePathname(pathname: string): string {
 /** Routes reachable signed out — the sign-in page itself, plus the two
  * password-recovery pages (`src/app/(admin)/admin/forgot-password`,
  * `src/app/(admin)/admin/reset-password`). Everything else falls through to
- * `requireOwner()` below. `src/middleware.ts` exempts the same three paths
+ * `requireOwner()` below. `src/proxy.ts` exempts the same three paths
  * from its own cookie-presence check; this is the second, server-side half
  * of that — without it `requireOwner()` would redirect a signed-out visitor
  * away from these pages regardless of what middleware let through. */

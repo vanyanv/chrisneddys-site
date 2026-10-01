@@ -1,8 +1,7 @@
 /**
- * Cookie names shared between `src/middleware.ts` (edge runtime) and
- * `src/lib/auth.ts` (node). Its own module precisely so the middleware can
- * import a name without dragging in Better Auth, Drizzle or the database
- * client, none of which run on the edge.
+ * Cookie names shared between `src/proxy.ts` and `src/lib/auth.ts`. Its own
+ * module so the proxy can import a name without dragging in Better Auth,
+ * Drizzle or the database client.
  */
 
 /**

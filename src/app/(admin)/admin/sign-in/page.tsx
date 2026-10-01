@@ -25,7 +25,7 @@ export default async function AdminSignInPage({
   const params = await searchParams;
   const next = safeNext(params.next);
   const justReset = wasJustReset(params.reset);
-  // Set by `src/middleware.ts` and `requireOwner()` (`src/lib/auth.ts`)
+  // Set by `src/proxy.ts` and `requireOwner()` (`src/lib/auth.ts`)
   // whenever this redirect happened because a session that used to exist
   // stopped working, rather than because nobody was ever signed in — see
   // issue #36 phase 5's "signed out" state.

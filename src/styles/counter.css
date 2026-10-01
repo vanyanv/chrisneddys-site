@@ -2590,7 +2590,8 @@ body {
     position: relative;
     width: 100%;
   }
-  .cne-split-map > img {
+  .cne-split-map > img,
+  .cne-split-map > picture {
     mask-image: linear-gradient(#0000, #000 var(--fade), #000 calc(100% - var(--fade)), #0000);
   }
   /* The whole map is a link to /locations. */

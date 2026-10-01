@@ -6,6 +6,10 @@ import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice } from "@/lib/otter";
 import { PattyDots } from "./PattyDots";
 
+const LADDER_SIZES = "(min-width: 600px) 420px, 52vw";
+const ladderSet = (base: string, ext: string) =>
+  [480, 720, 900].map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
+
 /**
  * One menu item as a photo card (issue #206): the food on top, cropped tight
  * by `scripts/build-menu-cards.mjs` so it fills the frame, then the name and
@@ -23,6 +27,7 @@ export function MenuDish({
   lead,
   index = 0,
   way,
+  ladder,
   onOpen,
 }: {
   item: MenuItem;
@@ -31,6 +36,9 @@ export function MenuDish({
   index?: number;
   /** The Way picked on the menu: an item shot both ways shows that one. */
   way?: WayId;
+  /** A bigger photo for a lead card than the item's own card cut: the base
+   * path of a 480/720/900px AVIF and WebP ladder (`<ladder>-<w>.<ext>`). */
+  ladder?: string;
   onOpen: (item: MenuItem) => void;
 }) {
   const mostOrdered = item.otterId === FEATURED_OTTER_IDS[0];
@@ -52,18 +60,33 @@ export function MenuDish({
         {/* Every item drawn as a card has a photo (menu.test.ts). The name
             alone, as the list rows had it: the button already announces the
             description and the price. */}
-        {photo && (
+        {ladder ? (
           <picture>
-            <source type="image/avif" srcSet={`/menu/${photo}-card.avif`} />
+            <source type="image/avif" srcSet={ladderSet(ladder, "avif")} sizes={LADDER_SIZES} />
+            <source type="image/webp" srcSet={ladderSet(ladder, "webp")} sizes={LADDER_SIZES} />
             <img
-              src={`/menu/${photo}-card.webp`}
+              src={`${ladder}-480.webp`}
               alt={item.name}
-              width={560}
-              height={420}
+              width={900}
+              height={675}
               loading="lazy"
               decoding="async"
             />
           </picture>
+        ) : (
+          photo && (
+            <picture>
+              <source type="image/avif" srcSet={`/menu/${photo}-card.avif`} />
+              <img
+                src={`/menu/${photo}-card.webp`}
+                alt={item.name}
+                width={560}
+                height={420}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          )
         )}
       </span>
       <span className="cne-dish-body">

@@ -60,6 +60,20 @@ describe("SECTION_LEADS", () => {
   });
 });
 
+describe("the menu's opening card", () => {
+  it("has the 16:10 photo ladder MenuLead asks for, for each Way", () => {
+    const combo = foodMenu.combos.find((i) => i.id === SECTION_LEADS.combos)!;
+    for (const way of [undefined, "chris", "eddy"] as const) {
+      for (const w of [480, 720, 900]) {
+        for (const ext of ["avif", "webp"]) {
+          const file = `public/photos/${photoFor(combo, way)}-16x10-${w}.${ext}`;
+          expect(existsSync(join(process.cwd(), file)), file).toBe(true);
+        }
+      }
+    }
+  });
+});
+
 describe("drinkGetsPhoto", () => {
   it("is true for the three shakes only", () => {
     expect(foodMenu.drinks.filter(drinkGetsPhoto).map((i) => i.id)).toEqual([

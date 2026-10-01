@@ -3,25 +3,18 @@
    photos only fill about 45% of their frame, so a burger was drawn about 25px
    wide. Now every item is a card with the food on top, cropped tight by
    `scripts/build-menu-cards.mjs`; each section opens with its best seller as
-   a wide card, and the signature slider opens the page (`.cne-lead`).
+   a wide card, and the first section's lead, 2 Sliders and Fries, is the big
+   card the page opens with (`.cne-lead`, issue #227).
 
    Square corners, ink borders and hard offset shadows, like every other card
    in DESIGN.md: a grid of photos without that is the delivery app. */
 
 /* ---- the card the page opens with ---------------------------------------- */
 .cne-lead {
-  padding-bottom: 8px;
-}
-.cne-lead-lbl {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--a-red-cta);
-  margin: 0 0 10px;
+  margin-bottom: 14px;
 }
 .cne-lead-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -34,10 +27,20 @@
   box-shadow: 4px 4px 0 var(--a-yel);
   cursor: pointer;
 }
+/* The combo is shot on white at 16:10; the card's paper shows through it the
+   way it does on every other menu photo. */
+.cne-lead-card .cne-dish-most {
+  z-index: 2;
+  left: -6px;
+  top: -10px;
+  font-size: 12px;
+  padding: 3px 8px;
+}
 .cne-lead-ph {
   display: block;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
+  background: var(--a-card);
   border-bottom: 3px solid var(--a-ink);
 }
 .cne-lead-ph picture,
@@ -50,6 +53,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  mix-blend-mode: multiply;
   transform-origin: 55% 45%;
   /* Food that moves reads as fresher: a slow push-in, back and forth. */
   animation: cne-lead-push 9s ease-in-out infinite alternate;
@@ -343,7 +347,7 @@
 
 @media (min-width: 901px) {
   .cne-menu-main .cne-lead {
-    padding: 0 0 34px;
+    margin-bottom: 20px;
   }
   .cne-lead-body .n {
     font-size: clamp(30px, 2.9vw, 42px);

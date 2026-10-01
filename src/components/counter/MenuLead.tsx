@@ -1,43 +1,53 @@
 "use client";
 
-import type { MenuItem } from "@/data/menu";
+import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
-import { PattyDots } from "./PattyDots";
 
 const CUTS = [480, 720, 900];
-const srcSet = (ext: string) => CUTS.map((w) => `/photos/double-4x3-${w}.${ext} ${w}w`).join(", ");
 const SIZES = "(min-width: 901px) 44vw, (min-width: 600px) 52vw, 100vw";
 
 /**
- * The card the menu opens with (issue #206): the signature slider, held up
- * in a hand, before any list. Someone who lands on the menu sees what to get
- * first.
+ * The card the menu opens with (issue #227): 2 Sliders and Fries, the most
+ * ordered item, as the big card at the top of the Combos section, which is
+ * the first section. Someone who lands on the menu sees what to get first.
  *
- * The photo is the stacked double from the home page's structured data, the
- * one real in-hand shot the site has, standing in for this item until there
- * is a photo of the single slider held the same way. It is the menu's Largest
- * Contentful Paint on a phone, so it loads eagerly at high priority and comes
- * in AVIF first (cuts made by `scripts/build-menu-cards.mjs`).
+ * The photo is the owner's studio shot of the combo, cut 16:10 so the fries
+ * and both sliders fill the frame, and it follows the Way picked like the
+ * combo cards do (`public/photos/<photo>-16x10-<w>`). It is the menu's
+ * Largest Contentful Paint on a phone, so it loads eagerly at high priority
+ * and comes in AVIF first (cuts made by `scripts/build-menu-cards.mjs`).
  */
-export function MenuLead({ item, onOpen }: { item: MenuItem; onOpen: (item: MenuItem) => void }) {
+export function MenuLead({
+  item,
+  way,
+  onOpen,
+}: {
+  item: MenuItem;
+  way?: WayId;
+  onOpen: (item: MenuItem) => void;
+}) {
+  const base = `/photos/${photoFor(item, way)}-16x10`;
+  const srcSet = (ext: string) => CUTS.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
   return (
-    <div className="cne-sec cne-lead">
-      <div className="cne-lead-lbl">Asked about most</div>
+    <div className="cne-lead">
       <button
         type="button"
         className="cne-lead-card"
         onClick={() => onOpen(item)}
         aria-haspopup="dialog"
       >
+        <span className="cne-dish-most" aria-hidden="true">
+          MOST ORDERED
+        </span>
         <span className="cne-lead-ph">
           <picture>
             <source type="image/avif" srcSet={srcSet("avif")} sizes={SIZES} />
             <source type="image/webp" srcSet={srcSet("webp")} sizes={SIZES} />
             <img
-              src="/photos/double-4x3-720.webp"
+              src={`${base}-720.webp`}
               alt=""
               width={900}
-              height={675}
+              height={563}
               loading="eager"
               fetchPriority="high"
               decoding="async"
@@ -46,7 +56,6 @@ export function MenuLead({ item, onOpen }: { item: MenuItem; onOpen: (item: Menu
         </span>
         <span className="cne-lead-body">
           <span className="n">{item.name}</span>
-          <PattyDots id={item.id} />
           <span className="d">{item.desc}</span>
           <span className="ft">
             <span className="p">{formatPrice(item.price)}</span>

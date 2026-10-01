@@ -455,14 +455,16 @@ export const featuredItems: MenuItem[] = featuredItemIds
 
 /**
  * The item each menu section opens with, as a wide card with its description
- * (issue #206). A section that isn't listed opens straight into its grid —
- * Sliders, because the signature slider already leads the whole page.
+ * (issue #206). Combos is the first section and its lead, 2 Sliders and
+ * Fries, is the big card the whole menu opens with (issue #227); Sliders
+ * opens with the signature slider, shown in the in-hand photo.
  *
- * Three of these are the home page's own featured items; the shake is the
- * drinks section's one craving item.
+ * The combo, the slider and The Quad are the home page's own featured items;
+ * the shake is the drinks section's one craving item.
  */
 export const SECTION_LEADS: Partial<Record<MenuCategoryKey, string>> = {
   combos: "2-sliders-and-fries",
+  sliders: "chris-n-eddy-s-slider",
   fries: "loaded-fries",
   secret: "the-quad",
   drinks: "strawberry-shake-20-oz-cup",

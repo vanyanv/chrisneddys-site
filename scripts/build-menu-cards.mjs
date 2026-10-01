@@ -16,9 +16,18 @@
  *   public/menu/<photo>.avif         (720px, the item page and card images)
  *   public/menu/<photo>-thumb.avif   (200px)
  *
- * It also cuts the photo that leads the menu ("Asked about most") from
- * `public/photos/double-4x3.jpg` into the AVIF/WebP ladder its `<picture>`
- * asks for: `public/photos/double-4x3-{480,720,900}.{avif,webp}`.
+ * It also cuts the two big photos into the AVIF/WebP ladders their
+ * `<picture>`s ask for, at 480, 720 and 900px wide:
+ *
+ *   public/photos/double-4x3-<w>.{avif,webp}         the in-hand slider that
+ *                                                    leads Sliders
+ *   public/photos/combo-2-<way>-16x10-<w>.{avif,webp} 2 Sliders and Fries, both
+ *                                                    Ways, the card the menu
+ *                                                    opens with (issue #227)
+ *
+ * from `public/photos/double-4x3.jpg` and `public/photos/combo-2-<way>-16x10.jpg`
+ * (16:10 cuts of the owner's studio shots, their near-white backdrop lifted
+ * to pure white so AVIF doesn't draw it as faint blocks).
  *
  * Run again after replacing a photo in `public/menu/`:
  *
@@ -95,16 +104,18 @@ async function avifCopies(id) {
 }
 
 async function leadCuts() {
-  const src = join(root, "public/photos/double-4x3.jpg");
-  for (const w of [480, 720, 900]) {
-    for (const [ext, opts] of [
-      ["avif", (p) => p.avif(AVIF)],
-      ["webp", (p) => p.webp({ quality: 82 })],
-    ]) {
-      const out = join(root, `public/photos/double-4x3-${w}.${ext}`);
-      const buf = await opts(sharp(src).resize({ width: w })).toBuffer();
-      writeFileSync(out, buf);
-      console.log(`${out} — ${buf.length} bytes`);
+  for (const name of ["double-4x3", "combo-2-chris-16x10", "combo-2-eddy-16x10"]) {
+    const src = join(root, `public/photos/${name}.jpg`);
+    for (const w of [480, 720, 900]) {
+      for (const [ext, opts] of [
+        ["avif", (p) => p.avif(AVIF)],
+        ["webp", (p) => p.webp({ quality: 82 })],
+      ]) {
+        const out = join(root, `public/photos/${name}-${w}.${ext}`);
+        const buf = await opts(sharp(src).resize({ width: w })).toBuffer();
+        writeFileSync(out, buf);
+        console.log(`${out} — ${buf.length} bytes`);
+      }
     }
   }
 }

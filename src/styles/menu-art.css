@@ -322,13 +322,15 @@
 
 /* ---- Little bites (issue #210) ------------------------------------------
    MOST ORDERED slaps on like a sticker hitting a wall as its section
-   arrives, and on a pointer that hovers, each card's arrow chip grows the
+   arrives (the first section isn't revealed on scroll, so its sticker
+   slaps on as the page loads), and on a pointer that hovers, each card's arrow chip grows the
    monsters' teeth and bites twice. */
 @media (prefers-reduced-motion: no-preference) {
   .js .cne-cat .cne-dish-most {
     opacity: 0;
   }
-  .js .cne-cat.is-in .cne-dish-most {
+  .js .cne-cat.is-in .cne-dish-most,
+  .js .cne-cat:not(.cne-rv) .cne-dish-most {
     animation: cne-slap 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) 0.55s both;
   }
 }

@@ -23,7 +23,22 @@ const description = `The full Chris N Eddy's menu and pickup prices: sliders fro
   COMBO_FROM_PRICE,
 )}, a side of fries, shakes and the Secret Menu. Every topping free.`;
 
-export const metadata: Metadata = pageMetadata({ title, description, path: "/menu/" });
+/**
+ * A link to the menu previews as the most ordered order, 2 Sliders and Fries
+ * (Chris's Way), rather than the sitewide monster card. Cut to 1200x630 from
+ * the owner's studio shot.
+ */
+export const metadata: Metadata = pageMetadata({
+  title,
+  description,
+  path: "/menu/",
+  image: {
+    url: "/photos/og-menu-combo-2.jpg",
+    width: 1200,
+    height: 630,
+    alt: "2 Sliders and Fries: two smashed sliders with lettuce, tomato and onion beside a side of fries",
+  },
+});
 
 export default function MenuPage() {
   return (

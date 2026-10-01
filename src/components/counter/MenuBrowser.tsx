@@ -4,7 +4,6 @@ import {
   foodMenu,
   categoryTitles,
   drinkGetsPhoto,
-  itemById,
   SECTION_LEADS,
   type MenuCategoryKey,
 } from "@/data/menu";
@@ -28,12 +27,13 @@ import "@/styles/menu-art.css";
 import "@/styles/menu-dish.css";
 
 /**
- * Sliders first (the house slider leads, not buried under a side-dish
- * heading), then the combos built from them, then fries and sides, then the
- * Secret Menu, then Drinks. Both the phone jump chips and the desktop side
- * list are built from this one array, so they can't drift out of sync.
+ * Combos first, opening on 2 Sliders and Fries, the most ordered item and the
+ * one the owner wants most people to get (issue #227); then the sliders they
+ * are built from, then fries and sides, then the Secret Menu, then Drinks.
+ * Both the phone jump chips and the desktop side list are built from this one
+ * array, so they can't drift out of sync.
  */
-const ORDER: MenuCategoryKey[] = ["sliders", "combos", "fries", "secret", "drinks"];
+const ORDER: MenuCategoryKey[] = ["combos", "sliders", "fries", "secret", "drinks"];
 
 /**
  * Short labels for the phone chip strip — a pill is a bad place for the full
@@ -54,8 +54,14 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
   drinks: "pink",
 };
 
-/** The item the menu opens with, above every section. */
-const SIGNATURE = itemById("chris-n-eddy-s-slider");
+/**
+ * Lead cards drawn from a bigger photo than their card cut: the signature
+ * slider leads Sliders in the in-hand shot, the one real photo the site has
+ * of a slider being eaten. Cut by `scripts/build-menu-cards.mjs`.
+ */
+const LEAD_LADDER: Partial<Record<string, string>> = {
+  "chris-n-eddy-s-slider": "/photos/double-4x3",
+};
 
 /**
  * The whole menu, plus the sheet every row opens.
@@ -75,9 +81,10 @@ const SIGNATURE = itemById("chris-n-eddy-s-slider");
  * here too, repeating rows a thumb-length below; the page's item links live
  * in its desktop list, which stays in the HTML at every width.
  *
- * Since issue #206 the photos lead: the signature slider opens the menu as a
- * big card, each section opens with its best seller, and every item is a
- * photo card rather than a list row with a thumbnail.
+ * Since issue #206 the photos lead: each section opens with its best seller
+ * and every item is a photo card rather than a list row with a thumbnail.
+ * Since issue #227 the first section's lead is the big card the menu opens
+ * with, 2 Sliders and Fries.
  */
 export function MenuBrowser() {
   const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
@@ -127,8 +134,7 @@ export function MenuBrowser() {
         />
 
         <div className="cne-menu-main">
-          {SIGNATURE && <MenuLead item={SIGNATURE} onOpen={openItem} />}
-          {ORDER.map((key) => {
+          {ORDER.map((key, i) => {
             /* Issue #206: a section opens with its best seller as a wide
                card, then every other item as a photo card. Drinks without a
                photo worth showing (cans, water) stay a name-and-price list
@@ -138,8 +144,14 @@ export function MenuBrowser() {
             const rest = foodMenu[key].filter((i) => i !== lead);
             const cards = key === "drinks" ? rest.filter(drinkGetsPhoto) : rest;
             const listed = key === "drinks" ? rest.filter((i) => !drinkGetsPhoto(i)) : [];
+            /* The first section holds the menu's Largest Contentful Paint, so
+               it is drawn at once rather than faded in on scroll. */
             return (
-              <section className="cne-cat cne-sec cne-rv" key={key} id={`menu-${key}`}>
+              <section
+                className={`cne-cat cne-sec${i === 0 ? "" : " cne-rv"}`}
+                key={key}
+                id={`menu-${key}`}
+              >
                 <h2 className="cne-cat-h">
                   {categoryTitles[key]}
                   {/* Issue #210: Sliders' bullseye is the one the monster smashes. */}
@@ -151,7 +163,18 @@ export function MenuBrowser() {
                 </h2>
                 <div className="cne-cat-rule" aria-hidden="true" />
                 {key === "sliders" && <PattyKey />}
-                {lead && <MenuDish item={lead} lead way={way} onOpen={openItem} />}
+                {lead &&
+                  (i === 0 ? (
+                    <MenuLead item={lead} way={way} onOpen={openItem} />
+                  ) : (
+                    <MenuDish
+                      item={lead}
+                      lead
+                      way={way}
+                      ladder={LEAD_LADDER[lead.id]}
+                      onOpen={openItem}
+                    />
+                  ))}
                 {cards.length > 0 && (
                   <div className={`cne-dish-grid${cards.length % 2 ? " is-odd" : ""}`}>
                     {cards.map((it, i) => (

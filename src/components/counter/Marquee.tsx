@@ -1,8 +1,8 @@
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
-/* We sell sliders, not burgers, and the reel says "fries" rather than the
-   prototype's "chris-cut fries" — the long form crowded the loop. */
+/* We sell sliders, not burgers, and the reel says plain "fries" — longer
+   names crowded the loop. */
 const PHONE = [
   "sliders ★",
   "shakes ★",

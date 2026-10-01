@@ -96,7 +96,7 @@ export const products = pgTable("products", {
   perOrderLimit: integer("per_order_limit").notNull().default(6),
   status: productStatusEnum("status").notNull().default("draft"),
   /** Shop/admin display order, 0-based and contiguous. `reorderProducts` in
-   * `src/lib/catalogAdmin.ts` renumbers every product's position in one
+   * `src/lib/catalogAdmin/products.ts` renumbers every product's position in one
    * transaction on a drag; `createDraft` appends at the end (max + 1). */
   position: integer("position").notNull().default(0),
   capColor: text("cap_color"),

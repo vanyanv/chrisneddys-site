@@ -20,7 +20,7 @@ const description = `The full Chris N Eddy's menu and pickup prices: sliders fro
   SLIDER_PRICE,
 )}, combos from ${formatPrice(
   COMBO_FROM_PRICE,
-)}, chris-cut fries, shakes and the Secret Menu. Every topping free.`;
+)}, a side of fries, shakes and the Secret Menu. Every topping free.`;
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/menu/" });
 

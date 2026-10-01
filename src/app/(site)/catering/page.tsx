@@ -17,7 +17,7 @@ import { MenuPhoto } from "@/components/counter/MenuPhoto";
 
 const title = "Catering — Sliders for Offices & Parties";
 const description =
-  "Chris N Eddy's catering in Los Angeles: smash burger sliders, chris-cut fries and shakes for offices, sets and parties. Send us a message and we'll set it up.";
+  "Chris N Eddy's catering in Los Angeles: smash burger sliders, a side of fries and shakes for offices, sets and parties. Send us a message and we'll set it up.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/catering/" });
 

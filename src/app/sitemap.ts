@@ -33,7 +33,7 @@ const LOCATIONS_UPDATED = "2026-09-30";
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
  */
 const HOME_UPDATED = "2026-09-24";
-const ORDER_UPDATED = "2026-09-27";
+const ORDER_UPDATED = "2026-10-01";
 const ABOUT_UPDATED = "2026-09-22";
 const CONTACT_UPDATED = "2026-09-27";
 /**
@@ -41,14 +41,14 @@ const CONTACT_UPDATED = "2026-09-27";
  * the new combo and fries photos of issue #208), which can change without
  * the prices in `MENU_UPDATED` being re-reconciled.
  */
-const MENU_PAGE_UPDATED = "2026-09-30";
+const MENU_PAGE_UPDATED = "2026-10-01";
 const latest = (...isos: string[]): string => isos.sort().at(-1)!;
 /** When /returns and /terms were added. Both also carry the store settings
  * row's own `updatedAt` as their JSON-LD `dateModified`, but the sitemap
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
 /** When /catering was added. */
-const CATERING_UPDATED = "2026-09-27";
+const CATERING_UPDATED = "2026-10-01";
 /** When /careers last changed (the store-art pass, issue #146). */
 const CAREERS_UPDATED = "2026-09-24";
 

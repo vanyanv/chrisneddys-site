@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Site: "Chris-cut fries" is gone everywhere on the site. Menu descriptions, the combos, the order and catering pages, each location page and what Google reads now say "a side of fries" instead ([#221](https://github.com/vanyanv/chrisneddys-site/issues/221))
 - Site: now runs on Next.js 16. Phones finish setting up each page a little sooner after it appears (about 50 ms less busy on an iPhone), the Locations map shows a little sooner (about 0.1 s), other photos and headlines show at the same time as before, and nothing looks different. Each page carries about 30 KB more code. Admin sign-in works as before ([#216](https://github.com/vanyanv/chrisneddys-site/issues/216))
 - Site: pages load faster on phones, with nothing looking different. The shop and hat photos (and any photo uploaded in admin from now on) and the Instagram row on the home page come as smaller AVIF files, the fonts drop extras the site never used, and unused styling is gone from every page. On a slow phone connection the shop and hat pages show their photo about 0.4 s sooner, home, menu, locations and careers about 0.1 s sooner, and home downloads about 190 KB less ([#212](https://github.com/vanyanv/chrisneddys-site/issues/212))
 

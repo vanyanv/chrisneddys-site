@@ -139,6 +139,18 @@ const nextConfig = {
         source: "/:path*.:ext(webp|jpg|jpeg|png|svg|avif)",
         headers: [{ key: "Cache-Control", value: "public, max-age=604800" }],
       },
+      {
+        // The /locations/ map's early start. React would normally put this
+        // preload in the page itself, but under Next 16 it then also rides
+        // along with every prefetch of /locations/, so every page linking
+        // here downloaded the map (see LocationsMapCanvas). A header on the
+        // HTML only (not the `RSC` prefetch requests) keeps it on this page.
+        source: "/locations",
+        missing: [{ type: "header", key: "rsc" }],
+        headers: [
+          { key: "Link", value: "</map-base.svg>; rel=preload; as=image; fetchpriority=high" },
+        ],
+      },
       // Deliberately no blanket HTML rule: server-rendered and ISR routes
       // set their own Cache-Control, and a catch-all here would override it.
     ];

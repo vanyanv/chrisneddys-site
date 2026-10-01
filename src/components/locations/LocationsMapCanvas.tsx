@@ -42,20 +42,31 @@ const letteringStyle = {
  * `eager` should be true only on /locations/, where the map is the page's own
  * subject and typically the largest thing above the fold; the home page's copy
  * is a smaller, secondary illustration further down the page and stays lazy.
+ *
+ * The `<picture>` around the image is there for Next 16's link prefetching:
+ * React attaches a preload for every eager `<img>` to the prefetched page, so
+ * any page linking to /locations/ downloaded the 31 KB map at high priority,
+ * competing with its own photos. React skips images inside `<picture>` (the
+ * home page's copy is lazy, which React skips too), so /locations/ gets its
+ * preload from a `Link` header in next.config.mjs instead.
  */
 export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
+  const image = (
+    <img
+      src="/map-base.svg"
+      alt="Map of Chris N Eddy's locations across Los Angeles, drawn from OpenStreetMap data"
+      width={mapBox.w}
+      height={mapBox.h}
+      decoding="async"
+      loading={eager ? undefined : "lazy"}
+      fetchPriority={eager ? "high" : undefined}
+      style={{ display: "block", width: "100%", height: "auto" }}
+    />
+  );
+
   return (
     <>
-      <img
-        src="/map-base.svg"
-        alt="Map of Chris N Eddy's locations across Los Angeles, drawn from OpenStreetMap data"
-        width={mapBox.w}
-        height={mapBox.h}
-        decoding="async"
-        loading={eager ? undefined : "lazy"}
-        fetchPriority={eager ? "high" : undefined}
-        style={{ display: "block", width: "100%", height: "auto" }}
-      />
+      {eager ? <picture style={{ display: "block" }}>{image}</picture> : image}
 
       <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={letteringStyle}>
         {lettering.labels.map((l) => (

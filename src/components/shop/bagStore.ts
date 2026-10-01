@@ -106,7 +106,7 @@ function persist() {
  * Blob thumbnail when the first view has one, else the `photoDir`-relative
  * thumbnail path; `null` when the product has no photo at all yet (an
  * unphotographed product can no longer reach here at all once it's
- * published — see `setStatus` in `src/lib/catalogAdmin.ts` — but a draft
+ * published — see `setStatus` in `src/lib/catalogAdmin/products.ts` — but a draft
  * previewed some other way, or the in-repo fallback copy, still might).
  */
 function buildLineImage(product: MerchProduct): BagLineImage | null {

@@ -38,8 +38,8 @@ const ABOUT_UPDATED = "2026-09-22";
 const CONTACT_UPDATED = "2026-09-27";
 /**
  * The /menu/ page's own layout and photos (the photo cards of issue #206,
- * the new combo and fries photos of issue #208, the grilled cheese and
- * straight-cut fries photos of issue #230), which can change without
+ * the new combo and fries photos of issue #208, the slider, grilled cheese
+ * and straight-cut fries photos of issue #230), which can change without
  * the prices in `MENU_UPDATED` being re-reconciled.
  */
 const MENU_PAGE_UPDATED = "2026-10-02";

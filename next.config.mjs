@@ -84,6 +84,9 @@ const nextConfig = {
         "51c416bb-c2f4-43b7-8710-5493f9d98ba3": "grilled-cheese",
         "3fafec93-49ce-41f1-b46b-db13730b8332": "2-grilled-cheeses-and-fries",
         "f4a0f2cc-ba78-4149-88b7-c2f04c81903c": "straight-cut-fries",
+        "fe9754fa-6f48-423a-a833-b52f0a9c2f89": "chris-n-eddy-s-slider-chris",
+        "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d": "single-patty-slider-chris",
+        "25f20ba6-6643-4d3d-b833-6bddbcedbfcc": "reverse-bun-chris",
       }).flatMap(([from, to]) =>
         [".webp", "-thumb.webp", "-card.webp", "-card.avif"].map((file) => ({
           source: `/menu/${from}${file}`,

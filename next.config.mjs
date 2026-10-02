@@ -85,12 +85,27 @@ const nextConfig = {
         "fe9754fa-6f48-423a-a833-b52f0a9c2f89": "chris-n-eddy-s-slider-chris",
         "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d": "single-patty-slider-chris",
         "25f20ba6-6643-4d3d-b833-6bddbcedbfcc": "reverse-bun-chris",
+        // The drinks, reshot in the same studio look as the combos.
+        "cceb4fd1-72ae-43f5-8432-8e4648f26e07": "strawberry-shake",
+        "688ed85d-8dd9-4d31-be94-5994801863be": "chocolate-shake",
+        "42b6ff6c-9e02-43da-bdeb-dd181e8ec348": "vanilla-shake",
+        "90727ef0-3fff-4e67-afd1-77d34ed83417": "coca-cola",
+        "a9ccb11e-44fa-4241-bb8c-b9ffb6288d07": "diet-coke",
+        "828b4720-c3f3-42d0-b5f6-851bb8ec6621": "sprite",
+        "914889df-3ce3-4968-9f8b-3ad1154c28c2": "orange-fanta",
+        "115c038a-7ed0-4de8-9c67-d7bf54d70f0e": "hi-c",
+        "7678a45c-dd42-4249-a148-ca575e757d3d": "minute-maid",
+        "1d36f305-06ca-4bfe-bbc7-c01aa67757f5": "mexican-sprite",
+        "6e108101-0671-4280-a3f9-69d5738349b7": "mexican-fanta",
+        "953b863c-2e2a-4d60-b1a2-436c1db3a149": "water-bottle",
       }).flatMap(([from, to]) =>
-        [".webp", "-thumb.webp", "-card.webp", "-card.avif"].map((file) => ({
-          source: `/menu/${from}${file}`,
-          destination: `/menu/${to}${file}`,
-          permanent: true,
-        })),
+        [".webp", ".avif", "-thumb.webp", "-thumb.avif", "-card.webp", "-card.avif"].map(
+          (file) => ({
+            source: `/menu/${from}${file}`,
+            destination: `/menu/${to}${file}`,
+            permanent: true,
+          }),
+        ),
       ),
     ];
   },

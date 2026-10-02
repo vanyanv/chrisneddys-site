@@ -100,7 +100,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "grilled-cheese",
       otterId: "5a6adaac-1bee-49a9-afbd-9449756a0d1e",
-      photo: "51c416bb-c2f4-43b7-8710-5493f9d98ba3",
+      photo: "grilled-cheese",
       name: "Grilled Cheese",
       desc: "Two slices of cheese in a buttered, reverse-toasted Martin’s potato bun.",
       price: 4,
@@ -140,7 +140,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "2-grilled-cheeses-and-fries",
       otterId: "ea389886-8fd5-4871-a31e-6cfc76eebdea",
-      photo: "3fafec93-49ce-41f1-b46b-db13730b8332",
+      photo: "2-grilled-cheeses-and-fries",
       name: "2 Grilled Cheeses and Fries",
       desc: "Two grilled cheeses with a side of fries.",
       price: 11.69,
@@ -150,7 +150,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "straight-cut-fries",
       otterId: "2736f0a2-a7c8-4901-8a3d-3f074367b70a",
-      photo: "f4a0f2cc-ba78-4149-88b7-c2f04c81903c",
+      photo: "straight-cut-fries",
       name: "Straight-Cut Fries",
       desc: "A side of fries.",
       price: 4.49,

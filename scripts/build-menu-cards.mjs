@@ -49,9 +49,38 @@ const WEBP = { quality: 80 };
 // Same settings as scripts/build-photo-cuts.mjs, for the same reasons.
 const AVIF = { quality: 50, effort: 6, chromaSubsampling: "4:2:0" };
 
+/**
+ * The drinks' studio shots: `add-menu-photo.mjs` already centred each frame
+ * on the drink, and their long shadow off to the left would pull a trimmed
+ * cut off-centre, so these take the middle 4:3 of the frame instead.
+ */
+const CENTRED = new Set([
+  "strawberry-shake",
+  "chocolate-shake",
+  "vanilla-shake",
+  "coca-cola",
+  "diet-coke",
+  "sprite",
+  "orange-fanta",
+  "hi-c",
+  "minute-maid",
+  "mexican-sprite",
+  "mexican-fanta",
+  "water-bottle",
+]);
+
 async function cardCut(id) {
   const src = join(MENU, `${id}.webp`);
   const meta = await sharp(src).metadata();
+  if (CENTRED.has(id)) {
+    const w = Math.round(meta.height * RATIO);
+    return writeCard(id, src, {
+      left: Math.round((meta.width - w) / 2),
+      top: 0,
+      width: w,
+      height: meta.height,
+    });
+  }
   // `trim` reports the box it kept as negative offsets into the original.
   const { info } = await sharp(src).trim({ threshold: 18 }).toBuffer({ resolveWithObject: true });
   const l = -(info.trimOffsetLeft ?? 0);
@@ -75,6 +104,10 @@ async function cardCut(id) {
     width: Math.round(w),
     height: Math.round(h),
   };
+  return writeCard(id, src, region);
+}
+
+async function writeCard(id, src, region) {
   const cut = () =>
     sharp(src)
       .extract(region)

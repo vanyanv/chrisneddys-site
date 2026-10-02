@@ -43,14 +43,14 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "feaff547-96d8-4bf5-abe1-6d597acc02fb": [78, 132],
   "hi-c": [100, 100],
   "loaded-fries": [90, 107],
-  "mexican-fanta": [50, 100],
+  "mexican-fanta": [83, 100],
   "mexican-sprite": [50, 100],
-  "minute-maid": [88, 100],
-  "orange-fanta": [50, 100],
+  "minute-maid": [85, 100],
+  "orange-fanta": [100, 100],
   sprite: [50, 100],
-  "strawberry-shake": [58, 100],
-  "vanilla-shake": [82, 100],
-  "water-bottle": [48, 100],
+  "strawberry-shake": [60, 100],
+  "vanilla-shake": [80, 100],
+  "water-bottle": [50, 100],
 };
 
 /** Framing for a photo, or a safe all-photo compromise when one is missing. */

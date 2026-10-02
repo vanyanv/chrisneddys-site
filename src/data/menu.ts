@@ -240,7 +240,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "strawberry-shake-20-oz-cup",
       otterId: "931c2d0b-54c2-420b-b5eb-fbb2201fa223",
-      photo: "cceb4fd1-72ae-43f5-8432-8e4648f26e07",
+      photo: "strawberry-shake",
       name: "Strawberry Shake (20 oz cup)",
       desc: "20oz. A quiet legend.",
       price: 4.49,
@@ -248,7 +248,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "chocolate-shake-20-oz-cup",
       otterId: "0de9cdf0-14b6-49b7-bba8-753950e48f6f",
-      photo: "688ed85d-8dd9-4d31-be94-5994801863be",
+      photo: "chocolate-shake",
       name: "Chocolate Shake (20 oz cup)",
       desc: "20oz. Rich.",
       price: 4.49,
@@ -256,7 +256,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "vanilla-shake-20-oz-cup",
       otterId: "e7e9803f-644d-4598-bf80-2032de2966f3",
-      photo: "42b6ff6c-9e02-43da-bdeb-dd181e8ec348",
+      photo: "vanilla-shake",
       name: "Vanilla Shake (20 oz cup)",
       desc: "20oz. Classic.",
       price: 4.49,
@@ -264,7 +264,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "coca-cola-20-oz-cup",
       otterId: "85984a1b-6a80-4038-acb0-7243d4739566",
-      photo: "90727ef0-3fff-4e67-afd1-77d34ed83417",
+      photo: "coca-cola",
       name: "Coca Cola (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -272,7 +272,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "diet-coke-20-oz-cup",
       otterId: "c5dbe882-3600-413a-aae7-bd22dd1ecb2c",
-      photo: "a9ccb11e-44fa-4241-bb8c-b9ffb6288d07",
+      photo: "diet-coke",
       name: "Diet Coke (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -280,7 +280,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "coke-zero-20-oz-cup",
       otterId: "69307336-d6a0-4694-89b5-4c47b31d6b3a",
-      photo: "a9ccb11e-44fa-4241-bb8c-b9ffb6288d07",
+      photo: "diet-coke",
       name: "Coke Zero (20 oz cup)",
       desc: "",
       price: 2.89,
@@ -288,7 +288,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "sprite-20-oz-cup",
       otterId: "1d78e878-eae1-488f-a6a8-5829194c7282",
-      photo: "828b4720-c3f3-42d0-b5f6-851bb8ec6621",
+      photo: "sprite",
       name: "Sprite (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -296,7 +296,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "orange-fanta-20-oz-cup",
       otterId: "1d9e0d63-4326-4ec5-8708-839c730171d0",
-      photo: "914889df-3ce3-4968-9f8b-3ad1154c28c2",
+      photo: "orange-fanta",
       name: "Orange Fanta (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -304,7 +304,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "hi-c-20-oz-cup",
       otterId: "b007e9bd-fd56-4d9f-a414-996a5f419bac",
-      photo: "115c038a-7ed0-4de8-9c67-d7bf54d70f0e",
+      photo: "hi-c",
       name: "Hi-C (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -312,7 +312,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "minute-maid-20-oz-cup",
       otterId: "bcb86e49-ab7e-49d6-a580-169207b548d3",
-      photo: "7678a45c-dd42-4249-a148-ca575e757d3d",
+      photo: "minute-maid",
       name: "Minute Maid (20 oz cup)",
       desc: "",
       price: 2.99,
@@ -320,7 +320,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "mexican-sprite-500ml",
       otterId: "5cfc1be8-1861-4b8a-8acd-0a7d2cb1a6a5",
-      photo: "1d36f305-06ca-4bfe-bbc7-c01aa67757f5",
+      photo: "mexican-sprite",
       name: "Mexican Sprite 500ml",
       desc: "",
       price: 4.2,
@@ -328,7 +328,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "mexican-fanta-500ml",
       otterId: "bf389591-c2c2-4d35-8ae0-66544c8f2fb2",
-      photo: "6e108101-0671-4280-a3f9-69d5738349b7",
+      photo: "mexican-fanta",
       name: "Mexican Fanta 500ml",
       desc: "",
       price: 4.2,
@@ -336,7 +336,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "bottle-of-water",
       otterId: "59a1a9fe-283b-46ec-92a1-6af650139cf2",
-      photo: "953b863c-2e2a-4d60-b1a2-436c1db3a149",
+      photo: "water-bottle",
       name: "Bottle of Water",
       desc: "",
       price: 2.85,

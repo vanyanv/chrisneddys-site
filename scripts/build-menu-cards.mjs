@@ -19,14 +19,16 @@
  * It also cuts the two big photos into the AVIF/WebP ladders their
  * `<picture>`s ask for, at 480, 720 and 900px wide:
  *
- *   public/photos/double-4x3-<w>.{avif,webp}         the in-hand slider that
- *                                                    leads Sliders
+ *   public/photos/slider-<way>-4x3-<w>.{avif,webp}   Chris N Eddy's Slider,
+ *                                                    both Ways, the card that
+ *                                                    leads Sliders (issue #230)
  *   public/photos/combo-2-<way>-16x10-<w>.{avif,webp} 2 Sliders and Fries, both
  *                                                    Ways, the card the menu
  *                                                    opens with (issue #227)
  *
- * from `public/photos/double-4x3.jpg` and `public/photos/combo-2-<way>-16x10.jpg`
- * (16:10 cuts of the owner's studio shots, their near-white backdrop lifted
+ * from `public/photos/slider-<way>-4x3.jpg` and
+ * `public/photos/combo-2-<way>-16x10.jpg` (4:3 and 16:10 cuts of the owner's
+ * studio shots, their near-white backdrop lifted
  * to pure white so AVIF doesn't draw it as faint blocks).
  *
  * Run again after replacing a photo in `public/menu/`:
@@ -137,7 +139,12 @@ async function avifCopies(id) {
 }
 
 async function leadCuts() {
-  for (const name of ["double-4x3", "combo-2-chris-16x10", "combo-2-eddy-16x10"]) {
+  for (const name of [
+    "slider-chris-4x3",
+    "slider-eddy-4x3",
+    "combo-2-chris-16x10",
+    "combo-2-eddy-16x10",
+  ]) {
     const src = join(root, `public/photos/${name}.jpg`);
     for (const w of [480, 720, 900]) {
       for (const [ext, opts] of [

@@ -85,6 +85,8 @@ const nextConfig = {
         "fe9754fa-6f48-423a-a833-b52f0a9c2f89": "chris-n-eddy-s-slider-chris",
         "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d": "single-patty-slider-chris",
         "25f20ba6-6643-4d3d-b833-6bddbcedbfcc": "reverse-bun-chris",
+        "3d70c8eb-c5d5-42c9-b018-1923e1a352f1": "triple-pack-eddy",
+        "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa": "family-box-eddy",
         // The drinks, reshot in the same studio look as the combos.
         "cceb4fd1-72ae-43f5-8432-8e4648f26e07": "strawberry-shake",
         "688ed85d-8dd9-4d31-be94-5994801863be": "chocolate-shake",

@@ -20,10 +20,8 @@
  */
 export const photoFraming: Record<string, readonly [focus: number, zoom: number]> = {
   "0fa97f11-898b-440d-b40e-dddb1e6fc897": [57, 132],
-  "3d70c8eb-c5d5-42c9-b018-1923e1a352f1": [78, 132],
   "3fafec93-49ce-41f1-b46b-db13730b8332": [50, 132],
   "51c416bb-c2f4-43b7-8710-5493f9d98ba3": [58, 132],
-  "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa": [87, 132],
   "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf": [53, 132],
   "bef909bc-3438-482b-af96-4a1dcd28886b": [49, 132],
   "c6748e47-aa70-4aee-938b-91108530bb84": [65, 132],
@@ -40,6 +38,7 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "diet-coke": [100, 100],
   "feaff547-96d8-4bf5-abe1-6d597acc02fb": [78, 132],
   "hi-c": [100, 100],
+  "family-box-eddy": [68, 100],
   "loaded-fries": [90, 107],
   "mexican-fanta": [83, 100],
   "mexican-sprite": [50, 100],
@@ -52,6 +51,7 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   sprite: [50, 100],
   "straight-cut-fries": [53, 132],
   "strawberry-shake": [60, 100],
+  "triple-pack-eddy": [62, 100],
   "vanilla-shake": [80, 100],
   "water-bottle": [50, 100],
 };

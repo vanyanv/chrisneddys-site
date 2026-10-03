@@ -67,9 +67,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({ title, description, path: "/shop/", keywords });
 }
 
-/** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
- * admin) invalidates it immediately regardless of this window. */
-export const revalidate = 60;
+/** Refreshed on demand: every change to a product or its stock (admin saves,
+ * a checkout hold, Stripe's paid/expired webhooks, a refund that releases
+ * numbers) calls `revalidateTag("catalogue")`. The hour is only a backstop.
+ * It used to be a minute, and because every page prefetches /shop/ (see
+ * `PrefetchNav`), that re-rendered and re-wrote this page to Vercel's ISR
+ * cache up to 1,440 times a day whether anyone shopped or not. */
+export const revalidate = 3600;
 
 /**
  * The shop index.

@@ -762,12 +762,13 @@
 }
 
 /* ---- the full spread (issue #250) ------------------------------------------
-   The overhead photo, edge to edge. Its box is 21:9 and 3:2 on phones; the
-   photo is wider than either, so it is centred and cropped at the sides. */
+   The overhead photo, edge to edge, its paint drips ending on the page's paper
+   colour. The whole photo on desktop; 3:2 on phones, centred and cropped at the
+   sides. */
 .cne-spread {
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 2752 / 1410;
   overflow: hidden;
-  background: var(--color-cne-red);
+  background: var(--color-cne-paper);
 }
 .cne-spread picture,
 .cne-spread img {

@@ -231,6 +231,13 @@
   border-bottom: 0;
   border-right: 2.5px solid var(--a-ink);
 }
+/* A phone draws the lead's photo (and a wide odd-last card's) in a pane
+   taller than the 4:3 cut; `contain` keeps the whole of the food in view,
+   centred, and the multiply blend hides the white above and below it. */
+.cne-dish.is-lead .cne-dish-ph img,
+.cne-dish-grid.is-odd > .cne-dish:last-child .cne-dish-ph img {
+  object-fit: contain;
+}
 .cne-dish.is-lead .cne-dish-body {
   gap: 6px;
   padding: 12px;

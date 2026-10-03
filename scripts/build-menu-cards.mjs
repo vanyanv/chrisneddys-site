@@ -22,7 +22,7 @@
  *   public/menu/<photo>-1280     1280px   the item sheet on a 3x phone
  *
  * and the menu card, a 4:3 frame cut tight around the food so it fills the
- * card (the white sweep trimmed, 7% margin added back), at 400, 560 (the
+ * card (the white sweep trimmed, the food centred with a margin added back), at 400, 560 (the
  * original `-card` URL) and 900px:
  *
  *   public/menu/<photo>-card-400, <photo>-card, <photo>-card-900
@@ -87,9 +87,11 @@ const CARD = [
   [900, "-card-900"],
 ];
 
-/** The card frame: 4:3, the food plus 7% of its size on each side. */
+/** The card frame: 4:3, the food plus 18% of its width on each side and
+ * 30% of its height above and below, whichever is the bigger frame. */
 const RATIO = 4 / 3;
-const PAD = 1.14;
+const PAD = 1.36;
+const PAD_Y = 1.6;
 
 /**
  * The drinks' studio shots: `add-menu-photo.mjs` already centred each frame
@@ -111,14 +113,6 @@ const CENTRED = new Set([
   "water-bottle",
 ]);
 
-/**
- * The packs and 2 Grilled Cheeses and Fries (issue #230) spread wider than a
- * 4:3 at the photo's full height can hold, so a plain cut loses the food at
- * the edge. These keep the whole spread and pad the frame out with the white
- * sweep instead.
- */
-const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy", "2-grilled-cheeses-and-fries"]);
-
 /** The previous run's manifest and hashes, so unchanged photos can be skipped. */
 function readJson(path) {
   return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
@@ -131,42 +125,48 @@ async function cardRegion(id, src, meta) {
     return { left: Math.round((meta.width - w) / 2), top: 0, width: w, height: meta.height };
   }
   // `trim` reports the box it kept as negative offsets into the original. The
-  // threshold is in pixel values, so it reads the same on any size of master.
-  const { info } = await sharp(src).trim({ threshold: 18 }).toBuffer({ resolveWithObject: true });
+  // threshold is in pixel values, so it reads the same on any size of master,
+  // and it is high enough to drop the soft grey shadow the studio shots throw
+  // to the left: the card centres the food itself, not food and shadow.
+  const { info } = await sharp(src).trim({ threshold: 70 }).toBuffer({ resolveWithObject: true });
   const l = -(info.trimOffsetLeft ?? 0);
   const t = -(info.trimOffsetTop ?? 0);
   const cx = l + info.width / 2;
   const cy = t + info.height / 2;
 
-  let w = Math.max(info.width * PAD, info.height * PAD * RATIO);
-  let h = w / RATIO;
-  if (WHOLE.has(id)) {
-    const width = Math.round(w);
-    const height = Math.round(h);
-    const left = Math.round(cx - width / 2);
-    const top = Math.round(cy - height / 2);
-    const pad = {
-      left: Math.max(0, -left),
-      top: Math.max(0, -top),
-      right: Math.max(0, left + width - meta.width),
-      bottom: Math.max(0, top + height - meta.height),
-    };
-    return { left: left + pad.left, top: top + pad.top, width, height, pad };
-  }
-  if (w > meta.width) {
-    w = meta.width;
-    h = w / RATIO;
-  }
-  if (h > meta.height) {
-    h = meta.height;
-    w = h * RATIO;
-  }
-  return {
-    left: Math.round(Math.max(0, Math.min(meta.width - w, cx - w / 2))),
-    top: Math.round(Math.max(0, Math.min(meta.height - h, cy - h / 2))),
-    width: Math.round(w),
-    height: Math.round(h),
+  // Every card shows the whole of the food, centred, with the same margin
+  // round it (more above and below, so a tall slider doesn't crowd the frame).
+  // Where that frame runs past the photo's edge it is padded out with the
+  // white sweep rather than cutting the food off (issue #230).
+  const width = Math.round(Math.max(info.width * PAD, info.height * PAD_Y * RATIO));
+  const height = Math.round(width / RATIO);
+  const left = Math.round(cx - width / 2);
+  const top = Math.round(cy - height / 2);
+  const pad = {
+    left: Math.max(0, -left),
+    top: Math.max(0, -top),
+    right: Math.max(0, left + width - meta.width),
+    bottom: Math.max(0, top + height - meta.height),
   };
+  const padded = Object.values(pad).some(Boolean);
+  return { left: left + pad.left, top: top + pad.top, width, height, ...(padded && { pad }) };
+}
+
+/** The sweep's near-whites (every channel from 232 up) eased to pure white;
+ * the food, all well below that, is untouched. */
+const LIFT_FROM = 232;
+const LIFT_TO = 246;
+async function liftWhite(pipeline) {
+  const { data, info } = await pipeline.removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 3) {
+    const m = Math.min(data[i], data[i + 1], data[i + 2]);
+    if (m < LIFT_FROM) continue;
+    const t = Math.min(1, (m - LIFT_FROM) / (LIFT_TO - LIFT_FROM));
+    for (let c = 0; c < 3; c++) data[i + c] = Math.round(data[i + c] + (255 - data[i + c]) * t);
+  }
+  return sharp(data, { raw: { width: info.width, height: info.height, channels: 3 } })
+    .png()
+    .toBuffer();
 }
 
 /** Encode one size in both formats; returns the bytes written. */
@@ -208,13 +208,21 @@ async function cutPhoto(id, masterPath, isLegacy) {
   }
 
   const { pad, ...region } = await cardRegion(id, src, meta);
-  // A frame that runs past the photo's edge is padded out with white first.
-  const cardSrc = pad
-    ? await sharp(src)
-        .extend({ ...pad, background: "#ffffff" })
-        .png()
-        .toBuffer()
-    : src;
+  // A frame that runs past the photo's edge is padded out with white first,
+  // and the near-white sweep is lifted to pure white so the pad doesn't show
+  // as a faint box (AVIF draws a 253-against-255 edge as visible blocks).
+  const cardSrc = CENTRED.has(id)
+    ? await sharp(src).extract(region).png().toBuffer()
+    : await liftWhite(
+        sharp(
+          pad
+            ? await sharp(src)
+                .extend({ ...pad, background: "#ffffff" })
+                .png()
+                .toBuffer()
+            : src,
+        ).extract(region),
+      );
   const card = [];
   for (const [w, suffix] of CARD) {
     // Never upscale. A small master still gets its `-card`, at the size of
@@ -222,12 +230,7 @@ async function cutPhoto(id, masterPath, isLegacy) {
     const width = suffix === "-card" ? Math.min(w, region.width) : w;
     if (width > region.width) continue;
     const h = Math.round(width / RATIO);
-    const s = await writeCut(
-      sharp(cardSrc).extract(region),
-      width,
-      h,
-      join(MENU, `${id}${suffix}`),
-    );
+    const s = await writeCut(sharp(cardSrc), width, h, join(MENU, `${id}${suffix}`));
     console.log(`  ${id}${suffix} ${width}w`, s);
     card.push(width);
   }

@@ -20,7 +20,7 @@
  */
 export const photoFraming: Record<string, readonly [focus: number, zoom: number]> = {
   "0fa97f11-898b-440d-b40e-dddb1e6fc897": [57, 132],
-  "2-grilled-cheeses-and-fries": [65, 100],
+  "2-grilled-cheeses-and-fries": [55, 110],
   "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf": [53, 132],
   "bef909bc-3438-482b-af96-4a1dcd28886b": [49, 132],
   "c6748e47-aa70-4aee-938b-91108530bb84": [65, 132],
@@ -30,10 +30,10 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "chris-n-eddy-s-slider-chris": [87, 109],
   "chris-n-eddy-s-slider-eddy": [69, 132],
   "coca-cola": [50, 100],
-  "combo-1-chris": [98, 100],
-  "combo-1-eddy": [97, 100],
-  "combo-2-chris": [90, 100],
-  "combo-2-eddy": [90, 100],
+  "combo-1-chris": [69, 110],
+  "combo-1-eddy": [69, 107],
+  "combo-2-chris": [65, 110],
+  "combo-2-eddy": [65, 110],
   "diet-coke": [100, 100],
   "family-box-eddy": [58, 107],
   "feaff547-96d8-4bf5-abe1-6d597acc02fb": [78, 132],

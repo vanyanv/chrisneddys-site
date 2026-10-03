@@ -13,3 +13,5 @@ tsconfig.tsbuildinfo
 # and `d: "..."` entries, so it must not be reflowed.
 src/data/laGeoPaths.ts
 .claude/worktrees/
+# Written by scripts/build-menu-cards.mjs, one key per line so diffs stay readable.
+src/data/menuPhotoCuts.json

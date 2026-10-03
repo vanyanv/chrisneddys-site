@@ -4,9 +4,17 @@ import type { CSSProperties } from "react";
 import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice } from "@/lib/otter";
+import { menuCardSrcSet } from "@/lib/menuPhoto";
 import { PattyDots } from "./PattyDots";
 
 const LADDER_SIZES = "(min-width: 600px) 420px, 52vw";
+/**
+ * The cards sit in auto-fit grids whose column count depends on how many
+ * cards a section has, so their width is only known after layout. Every card
+ * photo is lazy, which is what lets `auto` use that real width (Chrome and
+ * Edge); Safari skips `auto` and takes the estimate after it.
+ */
+const CARD_SIZES = "auto, (min-width: 901px) 320px, (min-width: 600px) 30vw, 50vw";
 const ladderSet = (base: string, ext: string) =>
   [480, 720, 900].map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
 
@@ -76,9 +84,11 @@ export function MenuDish({
         ) : (
           photo && (
             <picture>
-              <source type="image/avif" srcSet={`/menu/${photo}-card.avif`} />
+              <source type="image/avif" srcSet={menuCardSrcSet(photo, "avif")} sizes={CARD_SIZES} />
               <img
                 src={`/menu/${photo}-card.webp`}
+                srcSet={menuCardSrcSet(photo, "webp")}
+                sizes={CARD_SIZES}
                 alt={item.name}
                 width={560}
                 height={420}

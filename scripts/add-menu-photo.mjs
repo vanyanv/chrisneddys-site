@@ -1,23 +1,25 @@
 #!/usr/bin/env node
 /**
- * Adds a new menu photograph from a full-size original (issue #208).
+ * Adds a new menu photograph from a full-size original (issues #208, #237).
  *
  *     node scripts/add-menu-photo.mjs <original.png|jpg> <photo-id>
  *
- * Writes the two files every other menu photo has, in the same frame as the
- * Otter shots (3:2, centred on the food):
+ * Cuts the original to the menu's frame (3:2, full height, slid sideways to
+ * centre the food) and keeps that at full resolution as the photo's master:
  *
- *   public/menu/<photo-id>.webp        720x480, the item sheet and item page
- *   public/menu/<photo-id>-thumb.webp  200x133, list rows and small cards
+ *   assets/menu/<photo-id>.jpg   at most 2160px wide, JPEG quality 95 with
+ *                                full-resolution colour: one careful encode,
+ *                                so every size cut from it starts clean
  *
- * and prints the `[focus, zoom]` framing to add to `src/data/photoFocus.ts`.
- * Then point the item's `photo` (or `wayPhotos`) in `src/data/menu.ts` at the
- * id and run `node scripts/build-menu-cards.mjs` for its menu card.
+ * then runs `scripts/build-menu-cards.mjs`, which cuts every size the site
+ * serves from it (200px to 1280px, the 4:3 card, AVIF and WebP), and prints
+ * the `[focus, zoom]` framing to add to `src/data/photoFocus.ts`. Point the
+ * item's `photo` (or `wayPhotos`) in `src/data/menu.ts` at the id.
  *
- * The original stays out of the repo: 720px is the largest size the site
- * draws a menu photo at.
+ * The original itself stays out of the repo; keep it with the owner's files.
  */
 import sharp from "sharp";
+import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -56,16 +58,25 @@ const region = {
   height: h,
 };
 
-const full = await sharp(src)
+// A transparent original (some arrive as RGBA PNGs) sits on the white sweep.
+const master = await sharp(src)
+  .flatten({ background: "#ffffff" })
   .extract(region)
-  .resize(720, 480)
-  .webp({ quality: 80, effort: 6 })
+  .resize({ width: Math.min(2160, region.width), kernel: "lanczos3" })
+  .jpeg({ quality: 95, chromaSubsampling: "4:4:4", mozjpeg: true })
   .toBuffer();
+writeFileSync(join(root, "assets/menu", `${id}.jpg`), master);
+console.log(`assets/menu/${id}.jpg — ${master.length} bytes`);
+if (region.width < 1280) {
+  console.warn(
+    `Only ${region.width}px wide: the site will draw it soft on phones and Retina screens. Ask for a bigger original.`,
+  );
+}
+// The 720px WebP is the file the cutter looks for (and the URL search engines
+// know), so write it first; the cutter then re-cuts it and every other size.
+const full = await sharp(master).resize(720, 480).webp({ quality: 90 }).toBuffer();
 writeFileSync(join(root, "public/menu", `${id}.webp`), full);
-const thumb = await sharp(full).resize(200, 133).webp({ quality: 80, effort: 6 }).toBuffer();
-writeFileSync(join(root, "public/menu", `${id}-thumb.webp`), thumb);
-console.log(`public/menu/${id}.webp — ${full.length} bytes`);
-console.log(`public/menu/${id}-thumb.webp — ${thumb.length} bytes`);
+execFileSync(process.execPath, [join(root, "scripts/build-menu-cards.mjs")], { stdio: "inherit" });
 
 // Framing for the item sheet's 16:10 hero (see photoFocus.ts): the zoom is
 // capped at 132% and at whatever still shows the whole food, and the focus

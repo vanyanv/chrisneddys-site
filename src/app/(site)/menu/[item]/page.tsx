@@ -12,6 +12,7 @@ import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
 import { clampToWord } from "@/lib/text";
 import { MenuPhoto } from "@/components/counter/MenuPhoto";
+import { menuPhotoLargest } from "@/lib/menuPhoto";
 
 type Params = { params: Promise<{ item: string }> };
 
@@ -74,7 +75,7 @@ export default async function MenuItemPage({ params }: Params) {
     description: item.desc,
     url: `${brand.siteUrl}/menu/${item.id}/`,
     ...(item.photo
-      ? { image: allPhotosFor(item).map((photo) => `${brand.siteUrl}/menu/${photo}.webp`) }
+      ? { image: allPhotosFor(item).map((photo) => `${brand.siteUrl}${menuPhotoLargest(photo)}`) }
       : {}),
     offers: {
       "@type": "Offer",
@@ -140,10 +141,15 @@ export default async function MenuItemPage({ params }: Params) {
               overflow: "hidden",
             }}
           >
+            {/* The page's LCP. Capped at 1080px: a 3x phone draws it about
+                1100 device px wide, and the 1280 cut cost a slow phone
+                connection 0.1 s more for no difference you can see. */}
             <MenuPhoto
               photo={item.photo}
-              sizes="(min-width: 901px) 520px, calc(100vw - 36px)"
+              max={1080}
+              sizes="(min-width: 556px) 514px, calc(100vw - 36px)"
               alt={itemPhotoAlt(item)}
+              fetchPriority="high"
               decoding="async"
               className="cne-item-photo-img"
             />

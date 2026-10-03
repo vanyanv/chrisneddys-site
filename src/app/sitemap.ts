@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
-import { allLocationSlugs } from "@/lib/locationSlug";
+import { slugFor } from "@/lib/locationSlug";
+import { locations } from "@/data/locations";
+import { storeArtImages } from "@/data/storeArt";
+import { menuPhotoLargest } from "@/lib/menuPhoto";
 import {
   allPhotosFor,
   foodMenu,
@@ -57,7 +60,7 @@ const CAREERS_UPDATED = "2026-09-24";
 const menuImages = (Object.keys(foodMenu) as MenuCategoryKey[])
   .flatMap((key) => foodMenu[key])
   .flatMap(allPhotosFor)
-  .map((photo) => `${brand.siteUrl}/menu/${photo}.webp`);
+  .map((photo) => `${brand.siteUrl}${menuPhotoLargest(photo)}`);
 
 /** Deduplicated: several items share a photograph. */
 const uniqueMenuImages = Array.from(new Set(menuImages));
@@ -107,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
       updated: latest(MENU_UPDATED, MENU_PAGE_UPDATED),
       images: i.photo
-        ? allPhotosFor(i).map((photo) => `${brand.siteUrl}/menu/${photo}.webp`)
+        ? allPhotosFor(i).map((photo) => `${brand.siteUrl}${menuPhotoLargest(photo)}`)
         : undefined,
     })),
     { path: "/order/", priority: 0.9, updated: ORDER_UPDATED },
@@ -128,17 +131,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       images: [productSocialImage(p)],
     })),
     { path: "/locations/", priority: 0.8, updated: LOCATIONS_UPDATED },
-    ...allLocationSlugs().map((slug) => ({
-      path: `/locations/${slug}/`,
-      priority: 0.7,
-      updated: LOCATIONS_UPDATED,
-    })),
+    // Each store's own photos (the room and its walls), from the page that
+    // shows them. Glendale has none yet.
+    ...locations.map((loc) => {
+      const images = storeArtImages(loc.id).map((src) => `${brand.siteUrl}${src}`);
+      return {
+        path: `/locations/${slugFor(loc)}/`,
+        priority: 0.7,
+        updated: LOCATIONS_UPDATED,
+        ...(images.length ? { images } : {}),
+      };
+    }),
     { path: "/about/", priority: 0.5, updated: ABOUT_UPDATED },
     { path: "/contact/", priority: 0.5, updated: CONTACT_UPDATED },
     // A page for people, not customers — never the answer to a search someone
     // orders from, so it sits with /about/ and /contact/ rather than up with
     // the menu or the shop.
-    { path: "/careers/", priority: 0.4, updated: CAREERS_UPDATED },
+    {
+      path: "/careers/",
+      priority: 0.4,
+      updated: CAREERS_UPDATED,
+      images: [`${brand.siteUrl}/photos/art/hollywood-wall-900.webp`],
+    },
     // Listed, but at the floor: it is a page that has to be findable and is
     // never the answer to a search. Its own `lastmod` comes from the policy
     // itself, so a crawler is told the terms moved only when they did.

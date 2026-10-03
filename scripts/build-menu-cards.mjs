@@ -135,8 +135,9 @@ const BOXES = {
  * The standing object's box, in master pixels. Everything that isn't the
  * white sweep (a low threshold, so a clear cup's rim counts) is the object
  * plus its shadow; the shadow lies on the floor, so the object's sides are the
- * columns filled in the top 30% of that, and its height is the run of rows
- * filled between those sides.
+ * columns filled in the top 30% of that. Its top is the first row with any
+ * of it between those sides; its base is the last row at least half filled,
+ * since the shadow pooled under a cup only fills part of the width.
  */
 async function standingBox(id, src) {
   if (BOXES[id]) return BOXES[id];
@@ -166,7 +167,8 @@ async function standingBox(id, src) {
   const [left, right] = span(cols, (bandEnd - y0) * 0.05);
   const inside = new Array(H).fill(0);
   for (let y = 0; y < H; y++) for (let x = left; x < right; x++) inside[y] += on[y * W + x];
-  const [top, bottom] = span(inside, (right - left) * 0.15);
+  const [top] = span(inside, (right - left) * 0.15);
+  const [, bottom] = span(inside, (right - left) * 0.5);
   return { left, top, right, bottom };
 }
 
@@ -379,6 +381,22 @@ async function main() {
   };
   await Promise.all([worker(), worker(), worker()]);
   await leadCuts(prevHashes, hashes);
+
+  // Each photo's version: a hash of the files it serves, added to its URLs as
+  // `?v=`. The files keep their names when a photo is recut, and browsers keep
+  // images for a week (next.config.mjs), so without it a returning visitor
+  // would go on seeing the old photo.
+  for (const id of ids) {
+    const sum = createHash("sha1");
+    for (const f of readdirSync(MENU)
+      .filter((f) => f.startsWith(`${id}`))
+      .sort()) {
+      if (f.slice(id.length).match(/^(-(thumb|card|card-\d+|360|1080|1280))?\.(webp|avif)$/)) {
+        sum.update(f).update(readFileSync(join(MENU, f)));
+      }
+    }
+    next[id] = { ...next[id], v: sum.digest("hex").slice(0, 8) };
+  }
 
   const sorted = (o) =>
     Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.localeCompare(b)));

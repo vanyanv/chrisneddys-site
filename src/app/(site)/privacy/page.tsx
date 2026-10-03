@@ -15,10 +15,9 @@ export const metadata: Metadata = pageMetadata({ title, description, path: "/pri
 
 const UPDATED_HUMAN = "26 September 2026";
 
-/** Re-checked at most once a minute, like the rest of the shop — the support
- * email in the Contact section comes from the same `store_settings` row
- * `/admin/settings` writes to. */
-export const revalidate = 60;
+/* No `revalidate` of its own: the support email in the Contact section comes
+ * from the `store_settings` row `/admin/settings` writes to, and
+ * `saveStoreSettings` re-renders every storefront page on a save. */
 
 /**
  * The privacy policy.

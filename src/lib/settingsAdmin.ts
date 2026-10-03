@@ -85,6 +85,10 @@ export async function saveStoreSettings(
     after(async () => {
       revalidateTag("catalogue", { expire: 0 });
       revalidateTag(STORE_SETTINGS_TAG, { expire: 0 });
+      // Every storefront page: the layout puts `shopOpen`, `pickupEnabled`
+      // and the shipping line on all of them, and only re-renders once a day
+      // on its own.
+      revalidatePath("/", "layout");
       revalidatePath("/shop/");
       revalidatePath("/returns/");
       revalidatePath("/terms/");

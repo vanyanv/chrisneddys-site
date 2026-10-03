@@ -12,6 +12,10 @@ export function generateStaticParams() {
   return allLocationSlugs().map((slug) => ({ slug }));
 }
 
+/** Every location is known at build time. Any other slug is a plain 404
+ * instead of a fresh render that Vercel would also store in its ISR cache. */
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const loc = locationBySlug(slug);

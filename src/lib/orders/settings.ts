@@ -42,9 +42,12 @@ export async function getStoreSettings(db?: Db): Promise<StoreSettings> {
   return row;
 }
 
-/** Matches the `revalidate = 60` the storefront pages that read these
- * settings already declare, and `src/lib/catalog.ts`'s own window. */
-const REVALIDATE_SECONDS = 60;
+/** Matches the storefront layout's one-day window. A cached read's
+ * `revalidate` also caps the window of every page that makes it, and the
+ * layout makes it on every page, so a shorter value here would quietly pull
+ * the whole site back to it. `saveStoreSettings` clears the tag on every
+ * save, so this is a safety net, never what makes a change appear. */
+const REVALIDATE_SECONDS = 86400;
 
 /** Tag for the cached storefront settings read below. Every write to
  * `store_settings` has to clear it — see `saveStoreSettings`. */
@@ -76,12 +79,12 @@ export function reviveStoreSettings(row: StoreSettings): StoreSettings {
  * `src/app/(site)/layout.tsx` calls it on *every* storefront page and the
  * page underneath then calls it again, so a page whose product data was
  * entirely cached still made two database round trips before it could
- * render. This is that same read, cached for a minute the way
- * `src/lib/catalog.ts` caches the catalogue, and wrapped in React's `cache`
+ * render. This is that same read, cached (for a day; see
+ * `REVALIDATE_SECONDS`) the way `src/lib/catalog.ts` caches the catalogue, and wrapped in React's `cache`
  * so the layout and the page share one call within a single render instead
  * of two.
  *
- * Owners never wait the minute out: `saveStoreSettings` clears
+ * Owners never wait for that window: `saveStoreSettings` clears
  * `STORE_SETTINGS_TAG` on every save, so a change is live on the storefront
  * as soon as it is saved. Anything that must read the row as it stands right
  * now — checkout's open/paused gate, the admin's own screens — keeps calling

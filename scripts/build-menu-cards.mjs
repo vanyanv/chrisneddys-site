@@ -27,9 +27,12 @@
  *
  *   public/menu/<photo>-card-400, <photo>-card, <photo>-card-900
  *
- * plus the 480/720/900px ladders of the two big menu photos, the in-hand
- * slider (`public/photos/double-4x3-<w>`) and 2 Sliders and Fries in both Ways
- * (`public/photos/combo-2-<way>-16x10-<w>`), from the `.jpg` beside them.
+ * plus the 480/720/900px ladders of the two big menu cards, Chris N Eddy's
+ * Slider leading Sliders (`public/photos/slider-<way>-4x3-<w>`, issue #230)
+ * and 2 Sliders and Fries opening the menu
+ * (`public/photos/combo-2-<way>-16x10-<w>`, issue #227), both Ways, from the
+ * `.jpg` beside them (cuts of the owner's studio shots, their near-white
+ * backdrop lifted to pure white so AVIF doesn't draw it as faint blocks).
  *
  * Every file is encoded at the lowest quality that still measures as the
  * master at that size (see `scripts/lib/photo-quality.mjs`), so a plain shot
@@ -108,6 +111,13 @@ const CENTRED = new Set([
   "water-bottle",
 ]);
 
+/**
+ * The packs (issue #230) spread wider than a 4:3 at the photo's full height
+ * can hold, so a plain cut loses the slider at the edge. These keep the whole
+ * spread and pad the frame out with the white sweep instead.
+ */
+const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy"]);
+
 /** The previous run's manifest and hashes, so unchanged photos can be skipped. */
 function readJson(path) {
   return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
@@ -129,6 +139,19 @@ async function cardRegion(id, src, meta) {
 
   let w = Math.max(info.width * PAD, info.height * PAD * RATIO);
   let h = w / RATIO;
+  if (WHOLE.has(id)) {
+    const width = Math.round(w);
+    const height = Math.round(h);
+    const left = Math.round(cx - width / 2);
+    const top = Math.round(cy - height / 2);
+    const pad = {
+      left: Math.max(0, -left),
+      top: Math.max(0, -top),
+      right: Math.max(0, left + width - meta.width),
+      bottom: Math.max(0, top + height - meta.height),
+    };
+    return { left: left + pad.left, top: top + pad.top, width, height, pad };
+  }
   if (w > meta.width) {
     w = meta.width;
     h = w / RATIO;
@@ -183,7 +206,14 @@ async function cutPhoto(id, masterPath, isLegacy) {
     full.push(w);
   }
 
-  const region = await cardRegion(id, src, meta);
+  const { pad, ...region } = await cardRegion(id, src, meta);
+  // A frame that runs past the photo's edge is padded out with white first.
+  const cardSrc = pad
+    ? await sharp(src)
+        .extend({ ...pad, background: "#ffffff" })
+        .png()
+        .toBuffer()
+    : src;
   const card = [];
   for (const [w, suffix] of CARD) {
     // Never upscale. A small master still gets its `-card`, at the size of
@@ -191,16 +221,26 @@ async function cutPhoto(id, masterPath, isLegacy) {
     const width = suffix === "-card" ? Math.min(w, region.width) : w;
     if (width > region.width) continue;
     const h = Math.round(width / RATIO);
-    const s = await writeCut(sharp(src).extract(region), width, h, join(MENU, `${id}${suffix}`));
+    const s = await writeCut(
+      sharp(cardSrc).extract(region),
+      width,
+      h,
+      join(MENU, `${id}${suffix}`),
+    );
     console.log(`  ${id}${suffix} ${width}w`, s);
     card.push(width);
   }
   return { full, card };
 }
 
-/** The 480/720/900 ladders of the two big menu photos. */
+/** The 480/720/900 ladders of the two big menu cards. */
 async function leadCuts(prevHashes, hashes) {
-  for (const name of ["double-4x3", "combo-2-chris-16x10", "combo-2-eddy-16x10"]) {
+  for (const name of [
+    "slider-chris-4x3",
+    "slider-eddy-4x3",
+    "combo-2-chris-16x10",
+    "combo-2-eddy-16x10",
+  ]) {
     const srcPath = join(root, `public/photos/${name}.jpg`);
     const src = readFileSync(srcPath);
     const hash = createHash("sha1").update(src).digest("hex").slice(0, 12);

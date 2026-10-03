@@ -124,12 +124,22 @@ export const viewport: Viewport = {
 };
 
 /**
- * Re-checked at most once a minute, the same window the shop pages use for
- * the catalogue — `shopOpen` and `pickupEnabled` below can go stale for up
- * to 60s after an admin flips a setting, never longer, and never requires a
- * redeploy to pick up.
+ * Re-rendered at most once a day. Every page under this layout is static
+ * content from the repo (a deploy rebuilds it) plus `shopOpen`,
+ * `pickupEnabled` and `shippingNote` below, which only change when an owner
+ * saves `/admin/settings` — and `saveStoreSettings` re-renders every page
+ * under this layout the moment that happens. Nothing here reads the clock on
+ * the server (open/closed status is computed in the browser), so a shorter
+ * window bought no freshness.
+ *
+ * It used to be one minute. On Vercel every re-render writes the page's
+ * HTML, its RSC payload and (since Next 16) its per-segment prefetch files to
+ * the ISR cache — about 0.6 MB a page — so a one-minute window turned
+ * ordinary traffic into up to 1,440 writes per page per day. Pages that need
+ * a shorter window (`/shop/`, product pages) still declare their own; Next
+ * uses the shortest one on the route.
  */
-export const revalidate = 60;
+export const revalidate = 86400;
 
 /**
  * The storefront's root layout — everything under the `(site)` route group

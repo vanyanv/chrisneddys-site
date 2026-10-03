@@ -15,6 +15,7 @@ import { orderItems, orders, variants, type ShipTo } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
 import * as email from "@/lib/email";
 import {
+  catalogueChanged,
   getOrder,
   listOrders,
   markPickedUp as transitionPickedUp,
@@ -385,6 +386,8 @@ export async function markRefunded(
   });
   if (!result.ok) return result;
 
+  // Numbers going back into the run change the shop's "N left" count.
+  if (result.releasedEditionNumbers.length > 0) catalogueChanged();
   await notifyBestEffort("refunded", orderId, result.releasedEditionNumbers.length > 0);
   return { ok: true };
 }

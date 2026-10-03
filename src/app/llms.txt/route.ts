@@ -11,8 +11,9 @@ import { buildLlmsTxt } from "@/lib/llmsTxt";
  * `DATABASE_URL` set too.
  */
 export const dynamic = "force-static";
-// Regenerated every minute like the storefront pages.
-export const revalidate = 60;
+// Matches the catalogue cache it reads (`src/lib/catalog.ts`), which would cap
+// any longer window anyway. The file is a few KB, so each refresh is cheap.
+export const revalidate = 3600;
 
 export async function GET() {
   const products = await listPublishedProducts();

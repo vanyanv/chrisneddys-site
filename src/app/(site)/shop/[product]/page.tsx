@@ -25,9 +25,12 @@ import { resolveProductSeo } from "@/lib/productSeo";
 
 type Params = { product: string };
 
-/** Re-checked at most once a minute; `revalidateTag("catalogue")` (phase 2's
- * admin) invalidates it immediately regardless of this window. */
-export const revalidate = 60;
+/** Refreshed on demand: every change to a product or its stock (admin saves,
+ * a checkout hold, Stripe's paid/expired webhooks, a refund that releases
+ * numbers) calls `revalidateTag("catalogue")`. The hour is only a backstop;
+ * a one-minute window re-wrote this page to Vercel's ISR cache up to 1,440
+ * times a day for no change. Same window as `/shop/`. */
+export const revalidate = 3600;
 
 /** One product today, and the route already handles the second one. */
 export async function generateStaticParams(): Promise<Params[]> {

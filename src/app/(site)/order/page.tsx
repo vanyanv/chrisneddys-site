@@ -11,7 +11,8 @@ import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLoca
 import { LocationCard } from "@/components/locations/LocationCard";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
-import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
 
 const title = "Order Now — Pickup, Open Late";
 // Built per request of the metadata rather than at import, so a store that
@@ -21,7 +22,7 @@ function description(): string {
 }
 
 export function generateMetadata(): Metadata {
-  return pageMetadata({ title, description: description(), path: "/order/" });
+  return pageMetadata({ title, description: description(), path: "/order/", image: OG_SPREAD });
 }
 
 /**
@@ -124,6 +125,21 @@ export default function OrderPage() {
           and every topping free, at every location. Rather talk to someone? Call the location
           you&rsquo;re picking up from.
         </p>
+        {/* Above the fold, so it ships eagerly. `sizes` is the figure's inner
+            box (counter.css: 15px section gutters to 900px, 44px above, plus
+            its 3px borders); on phones the 2:1 crop is wider than the box, so
+            the photo is drawn about 118% of the box's width. */}
+        <figure className="cne-order-spread">
+          <ArtPhoto
+            name="spread-order"
+            widths={[480, 720, 1080, 1440]}
+            width={1440}
+            height={611}
+            sizes="(max-width: 600px) calc(118vw - 50px), (max-width: 900px) calc(100vw - 36px), calc(100vw - 94px)"
+            alt="Side-on view of a Chris N Eddy’s spread on a white table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes."
+            priority
+          />
+        </figure>
         <CateringCard
           eyebrow="Feeding a group?"
           title="Catering."

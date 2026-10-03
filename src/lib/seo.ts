@@ -27,6 +27,21 @@ export const OG_IMAGE = {
 };
 
 /**
+ * The full-spread food photo shown when the home, order, catering and Our
+ * Story pages are shared (issue #250). The other pages keep `OG_IMAGE`.
+ */
+export const OG_SPREAD = {
+  url: "/photos/og-spread.jpg",
+  width: 1200,
+  height: 630,
+  alt: "A Chris N Eddy's spread: sliders, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes on a table",
+};
+
+/** The home page's title, and the line link previews show. Kept under ~60 characters
+ * so Google shows it whole; other pages use the layout's title template. */
+export const SITE_TITLE = `${brand.name} | ${brand.tagline}: Sliders, Shakes & Fries`;
+
+/**
  * The home page's description, and the sitewide Organization's in the JSON-LD,
  * so search snippets and the structured data describe the business the same
  * way. No single address here: this is sitewide and there is more than one

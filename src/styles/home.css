@@ -760,3 +760,28 @@
 .cne-br-desk {
   display: none;
 }
+
+/* ---- the full spread (issue #250) ------------------------------------------
+   The overhead photo, edge to edge, its paint drips ending on the page's paper
+   colour. The whole photo on desktop; 3:2 on phones, centred and cropped at the
+   sides. */
+.cne-spread {
+  aspect-ratio: 2752 / 1576;
+  overflow: hidden;
+  background: var(--color-cne-paper);
+}
+.cne-spread picture,
+.cne-spread img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.cne-spread img {
+  object-fit: cover;
+  object-position: center;
+}
+@media (max-width: 600px) {
+  .cne-spread {
+    aspect-ratio: 3 / 2;
+  }
+}

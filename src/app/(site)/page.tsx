@@ -1,4 +1,5 @@
 import "@/styles/home.css";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
@@ -12,10 +13,30 @@ import { MapPins } from "@/components/locations/MapPins";
 import { MapCallout } from "@/components/locations/MapCallout";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { Vortex } from "@/components/storeart/Vortex";
-import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
 import { WelcomeIntro } from "@/components/storeart/WelcomeIntro";
 import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
+import { OG_SPREAD, SITE_TITLE, openGraphFor, siteDescription, twitterFor } from "@/lib/seo";
+
+/**
+ * Everything but the link-preview image is the sitewide default from
+ * `(site)/layout.tsx` (a page's `openGraph` replaces the layout's wholesale, so
+ * the title, description and url are restated here, from the same sources).
+ */
+export const metadata: Metadata = {
+  openGraph: openGraphFor({
+    title: SITE_TITLE,
+    description: siteDescription(),
+    path: "/",
+    image: OG_SPREAD,
+  }),
+  twitter: twitterFor({
+    title: SITE_TITLE,
+    description: siteDescription(),
+    image: OG_SPREAD.url,
+  }),
+};
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -100,8 +121,19 @@ export default function HomePage() {
           <FeaturedCards />
         </div>
       </section>
-      {/* Idea 3: paint drips off this band's own cream. */}
-      <DripEdge color="var(--color-cne-cream)" seed={1} />
+      {/* The full spread, edge to edge. Its red table runs off the bottom of
+          the photo as real paint drips onto the page's own paper colour
+          (generated in Higgsfield, issue #250), so no drawn drip edge follows. */}
+      <div className="cne-spread">
+        <ArtPhoto
+          name="spread-home"
+          widths={[720, 1080, 1600, 2400]}
+          width={2400}
+          height={1374}
+          sizes="(max-width: 600px) 117vw, 100vw"
+          alt="Overhead of a Chris N Eddy’s spread on a red table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes, with red paint dripping off the table’s edge."
+        />
+      </div>
 
       <section className="cne-split">
         <div className="cne-split-l cne-sec cne-rv cne-op-tag">

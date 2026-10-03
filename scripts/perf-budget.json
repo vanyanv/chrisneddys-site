@@ -88,14 +88,14 @@
     "iphone": {
       "document": 67.0,
       "font": 125,
-      "image": 86.0,
+      "image": 112.0,
       "script": 219.5,
       "fetch": 184.0
     },
     "desktop": {
       "document": 67.0,
       "font": 125,
-      "image": 53.0,
+      "image": 68.0,
       "script": 219.5,
       "fetch": 184.0
     }
@@ -138,14 +138,14 @@
     "iphone": {
       "document": 66.0,
       "font": 125,
-      "image": 40.0,
+      "image": 70.0,
       "script": 219.5,
       "fetch": 221.5
     },
     "desktop": {
       "document": 66.0,
       "font": 125,
-      "image": 70.0,
+      "image": 100.0,
       "script": 219.5,
       "fetch": 221.5
     }

@@ -10,9 +10,9 @@ const description = "The terms of sale for orders placed through the Chris N Edd
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/terms/" });
 
-/** Re-checked at most once a minute; `saveStoreSettings` (the /admin/settings
- * action) revalidates this path immediately on a save, same as `/shop/`. */
-export const revalidate = 60;
+/* No `revalidate` of its own: the storefront layout's one-day window applies,
+ * and `saveStoreSettings` (the /admin/settings action) revalidates this path
+ * immediately on a save, same as `/shop/`. */
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",

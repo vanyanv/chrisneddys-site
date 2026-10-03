@@ -30,6 +30,10 @@ export function generateStaticParams() {
   return featuredItems.map((i) => ({ item: i.id }));
 }
 
+/** Every item page is known at build time. Any other id is a plain 404
+ * instead of a fresh render that Vercel would also store in its ISR cache. */
+export const dynamicParams = false;
+
 /**
  * Google prints about 155 characters of a description and cuts the rest
  * mid-word. The tail below is fixed, so the item's own line gets whatever is

@@ -141,8 +141,12 @@ export default async function MenuItemPage({ params }: Params) {
               overflow: "hidden",
             }}
           >
+            {/* The page's LCP. Capped at 1080px: a 3x phone draws it about
+                1100 device px wide, and the 1280 cut cost a slow phone
+                connection 0.1 s more for no difference you can see. */}
             <MenuPhoto
               photo={item.photo}
+              max={1080}
               sizes="(min-width: 556px) 514px, calc(100vw - 36px)"
               alt={itemPhotoAlt(item)}
               fetchPriority="high"

@@ -25,10 +25,11 @@ export function menuPhotoCuts(photo: string): Cuts {
   return MANIFEST[photo] ?? NO_CUTS;
 }
 
-/** `srcset` of the 3:2 frame, in `ext`. */
-export function menuPhotoSrcSet(photo: string, ext: "avif" | "webp"): string {
+/** `srcset` of the 3:2 frame, in `ext`, up to `max` px wide. */
+export function menuPhotoSrcSet(photo: string, ext: "avif" | "webp", max = Infinity): string {
   return menuPhotoCuts(photo)
-    .full.map((w) => `/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext} ${w}w`)
+    .full.filter((w) => w <= max)
+    .map((w) => `/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext} ${w}w`)
     .join(", ");
 }
 

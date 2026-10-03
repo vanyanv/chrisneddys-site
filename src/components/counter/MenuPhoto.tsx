@@ -14,17 +14,21 @@ export function MenuPhoto({
   photo,
   sizes,
   alt,
+  max,
   ...img
-}: { photo: string; sizes: string; alt: string } & Omit<
-  ImgHTMLAttributes<HTMLImageElement>,
-  "src" | "alt"
->) {
+}: {
+  photo: string;
+  sizes: string;
+  alt: string;
+  /** The widest cut to offer, for a photo that is a page's LCP. */
+  max?: number;
+} & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt">) {
   return (
     <picture style={{ display: "contents" }}>
-      <source type="image/avif" srcSet={menuPhotoSrcSet(photo, "avif")} sizes={sizes} />
+      <source type="image/avif" srcSet={menuPhotoSrcSet(photo, "avif", max)} sizes={sizes} />
       <img
         src={`/menu/${photo}.webp`}
-        srcSet={menuPhotoSrcSet(photo, "webp")}
+        srcSet={menuPhotoSrcSet(photo, "webp", max)}
         sizes={sizes}
         width={720}
         height={480}

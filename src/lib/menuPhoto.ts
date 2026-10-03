@@ -6,7 +6,7 @@ import cuts from "@/data/menuPhotoCuts.json";
  * offers sizes that exist: a photo with a full-resolution master goes up to
  * 1280px, an old 720px Otter shot stops at 720.
  */
-type Cuts = { full: number[]; card: number[] };
+type Cuts = { full: number[]; card: number[]; v?: string };
 const MANIFEST = cuts as Record<string, Cuts>;
 
 /** File suffix of each width in the 3:2 frame. 720 is the bare, indexed URL. */
@@ -25,11 +25,21 @@ export function menuPhotoCuts(photo: string): Cuts {
   return MANIFEST[photo] ?? NO_CUTS;
 }
 
+/**
+ * The `?v=` that ties a photo's URLs to its current cut. A recut photo keeps
+ * its file names, and browsers keep images for a week, so the version is what
+ * makes a returning visitor fetch the new one.
+ */
+export function menuPhotoVersion(photo: string): string {
+  const v = MANIFEST[photo]?.v;
+  return v ? `?v=${v}` : "";
+}
+
 /** `srcset` of the 3:2 frame, in `ext`, up to `max` px wide. */
 export function menuPhotoSrcSet(photo: string, ext: "avif" | "webp", max = Infinity): string {
   return menuPhotoCuts(photo)
     .full.filter((w) => w <= max)
-    .map((w) => `/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext} ${w}w`)
+    .map((w) => `/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext}${menuPhotoVersion(photo)} ${w}w`)
     .join(", ");
 }
 
@@ -38,7 +48,10 @@ export function menuPhotoSrcSet(photo: string, ext: "avif" | "webp", max = Infin
 export function menuCardSrcSet(photo: string, ext: "avif" | "webp"): string {
   const ws = menuPhotoCuts(photo).card;
   const base = Math.max(...ws.filter((w) => w <= 560));
-  return ws.map((w) => `/menu/${photo}-card${w === base ? "" : `-${w}`}.${ext} ${w}w`).join(", ");
+  const v = menuPhotoVersion(photo);
+  return ws
+    .map((w) => `/menu/${photo}-card${w === base ? "" : `-${w}`}.${ext}${v} ${w}w`)
+    .join(", ");
 }
 
 /** The largest WebP of the 3:2 frame: what search engines are pointed at. */
@@ -55,7 +68,9 @@ export function menuPhotoLargest(photo: string): string {
  */
 export function menuPhotoImageSet(photo: string): string {
   const big = Math.max(...menuPhotoCuts(photo).full);
-  const url = (w: number, ext: string) => `url(/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext})`;
+  const v = menuPhotoVersion(photo);
+  const url = (w: number, ext: string) =>
+    `url(/menu/${photo}${FULL_SUFFIX[w] ?? `-${w}`}.${ext}${v})`;
   const entries = [`${url(720, "avif")} type("image/avif") 1x`];
   if (big > 720) entries.push(`${url(big, "avif")} type("image/avif") 2x`);
   entries.push(`${url(720, "webp")} type("image/webp") 1x`);

@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { formatPrice } from "@/lib/otter";
-import { menuCardSrcSet } from "@/lib/menuPhoto";
+import { menuCardSrcSet, menuPhotoVersion } from "@/lib/menuPhoto";
 import { PattyDots } from "./PattyDots";
 
 const LADDER_SIZES = "(min-width: 600px) 420px, 52vw";
@@ -86,7 +86,7 @@ export function MenuDish({
             <picture>
               <source type="image/avif" srcSet={menuCardSrcSet(photo, "avif")} sizes={CARD_SIZES} />
               <img
-                src={`/menu/${photo}-card.webp`}
+                src={`/menu/${photo}-card.webp${menuPhotoVersion(photo)}`}
                 srcSet={menuCardSrcSet(photo, "webp")}
                 sizes={CARD_SIZES}
                 alt={item.name}

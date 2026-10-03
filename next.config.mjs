@@ -109,13 +109,13 @@ const nextConfig = {
         "bef909bc-3438-482b-af96-4a1dcd28886b": "yellow-chilies",
         "feaff547-96d8-4bf5-abe1-6d597acc02fb": "chris-n-eddy-s-sauce",
       }).flatMap(([from, to]) =>
-        [".webp", ".avif", "-thumb.webp", "-thumb.avif", "-card.webp", "-card.avif"].map(
-          (file) => ({
+        ["", "-thumb", "-360", "-card", "-card-400"]
+          .flatMap((size) => [`${size}.webp`, `${size}.avif`])
+          .map((file) => ({
             source: `/menu/${from}${file}`,
             destination: `/menu/${to}${file}`,
             permanent: true,
-          }),
-        ),
+          })),
       ),
     ];
   },

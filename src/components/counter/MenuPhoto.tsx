@@ -1,5 +1,5 @@
 import type { ImgHTMLAttributes } from "react";
-import { menuPhotoSrcSet } from "@/lib/menuPhoto";
+import { menuPhotoSrcSet, menuPhotoVersion } from "@/lib/menuPhoto";
 
 /**
  * A menu photograph in its 3:2 frame, AVIF first (issue #208), at every size
@@ -27,7 +27,7 @@ export function MenuPhoto({
     <picture style={{ display: "contents" }}>
       <source type="image/avif" srcSet={menuPhotoSrcSet(photo, "avif", max)} sizes={sizes} />
       <img
-        src={`/menu/${photo}.webp`}
+        src={`/menu/${photo}.webp${menuPhotoVersion(photo)}`}
         srcSet={menuPhotoSrcSet(photo, "webp", max)}
         sizes={sizes}
         width={720}

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Site: the Mexican Coke now lines up with the Mexican Sprite and Mexican Fanta in the drinks list, and every cup and the sauce stand at the same height in their cards (the shadow under a cup no longer counts as part of it). Anyone who visited before sees the new photos straight away instead of the old ones their browser kept ([#248](https://github.com/vanyanv/chrisneddys-site/issues/248))
+
 ### Added
 
 - Site: every drink on the menu now stands centred at the same height in its card, so the row lines up the way it will on Otter and Uber Eats. The yellow chilies and the extra sauce have new studio photos in the same look, Mexican Coke has its photo, and The Reverse Bun's Eddy's Way photo shows both buns flipped. The Triple Pack and The Family Box are now cut from your full-size photos, so they're sharp on phones and Retina screens. Where a shadow ran off the edge of a photo, it now fades out instead of stopping at a hard line ([#246](https://github.com/vanyanv/chrisneddys-site/issues/246))

@@ -133,7 +133,8 @@ describe("photoFor", () => {
       expect(menuPhotoCuts(id).full).toContain(720);
       for (const ext of ["avif", "webp"] as const) {
         for (const url of [...files(menuPhotoSrcSet(id, ext)), ...files(menuCardSrcSet(id, ext))]) {
-          expect(existsSync(join(process.cwd(), "public", url)), url).toBe(true);
+          const file = url.split("?")[0] ?? "";
+          expect(existsSync(join(process.cwd(), "public", file)), url).toBe(true);
         }
       }
     }

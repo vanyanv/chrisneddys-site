@@ -72,7 +72,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "chris-n-eddy-s-slider",
       otterId: "de38e42c-7600-473f-913f-acb6b2a45aa8",
-      photo: "fe9754fa-6f48-423a-a833-b52f0a9c2f89",
+      photo: "chris-n-eddy-s-slider-chris",
+      wayPhotos: { eddy: "chris-n-eddy-s-slider-eddy" },
       name: "Chris N Eddy's Slider",
       desc: "Two smashed patties, two slices of cheese, buttered and toasted Martin’s potato roll.",
       price: 8.49,
@@ -82,7 +83,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "single-patty-slider",
       otterId: "9f342712-de8e-4a0f-9680-c55fbc60bc2e",
-      photo: "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d",
+      photo: "single-patty-slider-chris",
+      wayPhotos: { eddy: "single-patty-slider-eddy" },
       name: "Single Patty Slider",
       desc: "One smashed patty and a slice of cheese on a buttered, toasted Martin’s roll.",
       price: 6.49,
@@ -150,7 +152,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "straight-cut-fries",
       otterId: "2736f0a2-a7c8-4901-8a3d-3f074367b70a",
-      photo: "f4a0f2cc-ba78-4149-88b7-c2f04c81903c",
+      photo: "straight-cut-fries",
       name: "Straight-Cut Fries",
       desc: "A side of fries.",
       price: 4.49,
@@ -220,7 +222,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "the-reverse-bun",
       otterId: "e6bc7175-79e2-4813-abca-d1618df90ba8",
-      photo: "25f20ba6-6643-4d3d-b833-6bddbcedbfcc",
+      photo: "reverse-bun-chris",
+      wayPhotos: { eddy: "reverse-bun-eddy" },
       name: "The Reverse Bun",
       desc: "The Slider, but the toasted buns go on upside down.",
       price: 7.92,

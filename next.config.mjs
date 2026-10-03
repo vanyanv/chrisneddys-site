@@ -74,13 +74,17 @@ const nextConfig = {
       { source: "/catering/o/:path*", destination: "/catering/", permanent: true },
       { source: "/catering/find", destination: "/catering/", permanent: true },
       { source: "/catering/find/:path*", destination: "/catering/", permanent: true },
-      // The Otter photos the owner's own shots replaced (issue #208). Image
+      // The Otter photos the owner's own shots replaced (issues #208, #230). Image
       // search and the old sitemap point at them; send those to the new ones.
       ...Object.entries({
         "5f336391-8daf-4d23-929a-cb78c125ce0d": "combo-1-chris",
         "6dcd14a3-7032-489a-9e66-5f4718e96af1": "combo-2-chris",
         "0a500a4b-3624-4ea3-b99a-9a5f83f2155b": "cheese-fries",
         "e714a53e-90be-4cc8-8692-1358c9faebb1": "loaded-fries",
+        "f4a0f2cc-ba78-4149-88b7-c2f04c81903c": "straight-cut-fries",
+        "fe9754fa-6f48-423a-a833-b52f0a9c2f89": "chris-n-eddy-s-slider-chris",
+        "3bbad078-abd7-4c5a-9fd1-6c93497c3e9d": "single-patty-slider-chris",
+        "25f20ba6-6643-4d3d-b833-6bddbcedbfcc": "reverse-bun-chris",
         // The drinks, reshot in the same studio look as the combos.
         "cceb4fd1-72ae-43f5-8432-8e4648f26e07": "strawberry-shake",
         "688ed85d-8dd9-4d31-be94-5994801863be": "chocolate-shake",

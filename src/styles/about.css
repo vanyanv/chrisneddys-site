@@ -583,3 +583,35 @@
     transition: none !important;
   }
 }
+
+/* ---- the spread (issue #250) ---------------------------------------------- */
+/* Framed like the order page's photo, above the pool's heading. The photo is
+   wider than the 21:9 box (2:1 on phones), so it is centred and cropped. */
+.cne-drip-spread {
+  width: min(100% - 30px, 980px);
+  margin: 0 0 30px;
+  border: 3px solid var(--color-cne-ink);
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  background: var(--a-red-cta);
+}
+
+.cne-drip-spread picture,
+.cne-drip-spread img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cne-drip-spread img {
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 699px) {
+  .cne-drip-spread {
+    margin-bottom: 22px;
+    aspect-ratio: 2 / 1;
+  }
+}

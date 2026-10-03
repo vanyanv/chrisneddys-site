@@ -75,6 +75,40 @@ const PHOTOS = [
     widths: [360, 540],
   },
   { name: "vannuys-spec", ratio: 3 / 4, focusX: 0.62, focusY: 0.45, widths: [360, 540] },
+  // The full-spread food photos (issue #250), kept whole at their 3168x1344
+  // ratio: the pages crop them with `object-fit: cover`, so nothing is cut here.
+  // The overhead on red, the home page's band.
+  {
+    name: "spread-home",
+    ratio: 3168 / 1344,
+    focusX: 0.5,
+    focusY: 0.5,
+    widths: [720, 1080, 1600, 2400],
+  },
+  // Side-on on white, the order page's card.
+  {
+    name: "spread-order",
+    ratio: 3168 / 1344,
+    focusX: 0.5,
+    focusY: 0.5,
+    widths: [480, 720, 1080, 1440],
+  },
+  // Side-on on red, the catering page's band.
+  {
+    name: "spread-catering",
+    ratio: 3168 / 1344,
+    focusX: 0.5,
+    focusY: 0.5,
+    widths: [720, 1080, 1600, 2400],
+  },
+  // Side-on on red with both Ways, the Our Story page's photo.
+  {
+    name: "spread-about",
+    ratio: 3168 / 1344,
+    focusX: 0.5,
+    focusY: 0.5,
+    widths: [480, 720, 1080, 1440],
+  },
 ];
 
 async function region(file, ratio, focusX, focusY, box) {

@@ -16,7 +16,7 @@ import { RevealRoot } from "@/components/counter/Reveal";
 import { BagDrawer } from "@/components/shop/BagDrawer";
 import { brand } from "@/data/brand";
 import { JsonLd } from "@/components/shared/JsonLd";
-import { OG_IMAGE, siteDescription } from "@/lib/seo";
+import { OG_IMAGE, SITE_TITLE, siteDescription } from "@/lib/seo";
 import { Analytics } from "@/components/shared/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -55,10 +55,6 @@ const marker = localFont({
   adjustFontFallback: "Arial",
   variable: "--font-marker",
 });
-
-// Home page title, and the line link previews show. Kept under ~60 characters
-// so Google shows it whole; other pages use the template below.
-const SITE_TITLE = `${brand.name} | ${brand.tagline}: Sliders, Shakes & Fries`;
 
 export function generateMetadata(): Metadata {
   const description = siteDescription();

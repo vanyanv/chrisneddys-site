@@ -35,9 +35,9 @@ const LOCATIONS_UPDATED = "2026-09-30";
  * When each page's own copy or structure last changed. Bump the one you touch:
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
  */
-const HOME_UPDATED = "2026-09-24";
-const ORDER_UPDATED = "2026-10-01";
-const ABOUT_UPDATED = "2026-09-22";
+const HOME_UPDATED = "2026-10-03";
+const ORDER_UPDATED = "2026-10-03";
+const ABOUT_UPDATED = "2026-10-03";
 const CONTACT_UPDATED = "2026-09-27";
 /**
  * The /menu/ page's own layout and photos (the photo cards of issue #206,
@@ -52,7 +52,7 @@ const latest = (...isos: string[]): string => isos.sort().at(-1)!;
  * itself only tracks changes to the route, not to the policy text. */
 const RETURNS_TERMS_ADDED = "2026-09-14";
 /** When /catering was added. */
-const CATERING_UPDATED = "2026-10-01";
+const CATERING_UPDATED = "2026-10-03";
 /** When /careers last changed (the store-art pass, issue #146). */
 const CAREERS_UPDATED = "2026-09-24";
 

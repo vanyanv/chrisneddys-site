@@ -1,4 +1,5 @@
 import "@/styles/home.css";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { Hero } from "@/components/counter/Hero";
@@ -16,6 +17,27 @@ import { DripEdge } from "@/components/storeart/DripEdge";
 import { WallTethers } from "@/components/storeart/WallTethers";
 import { WelcomeIntro } from "@/components/storeart/WelcomeIntro";
 import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
+import { OG_SPREAD, SITE_TITLE, openGraphFor, siteDescription, twitterFor } from "@/lib/seo";
+
+/**
+ * Everything but the link-preview image is the sitewide default from
+ * `(site)/layout.tsx` (a page's `openGraph` replaces the layout's wholesale, so
+ * the title, description and url are restated here, from the same sources).
+ */
+export const metadata: Metadata = {
+  openGraph: openGraphFor({
+    title: SITE_TITLE,
+    description: siteDescription(),
+    path: "/",
+    image: OG_SPREAD,
+  }),
+  twitter: twitterFor({
+    title: SITE_TITLE,
+    description: siteDescription(),
+    image: OG_SPREAD.url,
+  }),
+};
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
 const PRESS = [
@@ -100,8 +122,20 @@ export default function HomePage() {
           <FeaturedCards />
         </div>
       </section>
-      {/* Idea 3: paint drips off this band's own cream. */}
-      <DripEdge color="var(--color-cne-cream)" seed={1} />
+      {/* The full spread, edge to edge. The picture is a red table, so the
+          drips below it are red: the table runs down into the next section. */}
+      <div className="cne-spread">
+        <ArtPhoto
+          name="spread-home"
+          widths={[720, 1080, 1600, 2400]}
+          width={2400}
+          height={1018}
+          sizes="(max-width: 600px) 157vw, 100vw"
+          alt="Overhead of a Chris N Eddy’s spread on a red table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes."
+        />
+      </div>
+      {/* Idea 3: paint drips off the red table above. */}
+      <DripEdge color="var(--color-cne-red)" seed={1} />
 
       <section className="cne-split">
         <div className="cne-split-l cne-sec cne-rv cne-op-tag">

@@ -2,14 +2,19 @@ import type { Metadata } from "next";
 import "@/styles/about.css";
 import { DripStory } from "@/components/about/DripStory";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
 import { brand } from "@/data/brand";
 
 const title = "Our Story — A Parking Lot to Sunset Blvd";
 const description =
   "Two childhood friends turned a 2020 parking-lot pop-up into a permanent spot on Sunset Blvd. Nine months of testing, one smashed slider.";
 
-export const metadata: Metadata = pageMetadata({ title, description, path: "/about/" });
+export const metadata: Metadata = pageMetadata({
+  title,
+  description,
+  path: "/about/",
+  image: OG_SPREAD,
+});
 
 /**
  * The founders are half of what people search when they search the brand, and

@@ -7,7 +7,8 @@ import { allItems, type MenuItem } from "@/data/menu";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { CATERING_HREF } from "@/data/catering";
 import { itemPhotoAlt } from "@/lib/otter";
-import { breadcrumbLd, pageMetadata, ID } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
@@ -19,7 +20,12 @@ const title = "Catering — Sliders for Offices & Parties";
 const description =
   "Chris N Eddy's catering in Los Angeles: smash burger sliders, a side of fries and shakes for offices, sets and parties. Send us a message and we'll set it up.";
 
-export const metadata: Metadata = pageMetadata({ title, description, path: "/catering/" });
+export const metadata: Metadata = pageMetadata({
+  title,
+  description,
+  path: "/catering/",
+  image: OG_SPREAD,
+});
 
 type Color = keyof typeof MONSTER_COLORS;
 
@@ -161,6 +167,20 @@ export default function CateringPage() {
         </ul>
       </section>
       <div className="cne-cat-floor" aria-hidden="true" />
+
+      {/* On the first phone screen, so it ships eagerly. On phones the 2:1 crop
+          is wider than the screen, so the photo is drawn about 118vw wide. */}
+      <div className="cne-cat-spread">
+        <ArtPhoto
+          name="spread-catering"
+          widths={[720, 1080, 1600, 2400]}
+          width={2400}
+          height={1018}
+          sizes="(max-width: 600px) 118vw, 100vw"
+          alt="Side-on view of a Chris N Eddy’s spread on a red table: sliders, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes."
+          priority
+        />
+      </div>
 
       <section className="cne-sec is-band cne-op-glyph cne-cat-food" aria-labelledby="cat-food">
         <GlyphRow />

@@ -370,6 +370,13 @@ The `script` budgets moved up 30 KB on 30 September 2026 with the Next.js 16
 upgrade (#216): its runtime ships about 30 KB more JavaScript per page, in
 exchange for about 30% less main-thread blocking on a throttled iPhone.
 
+The `/catering/` `image` budgets moved up 30 KB on 3 October 2026 (#250): the
+owner asked for the full-spread photo under the catering hero. It is on the
+first phone screen, so it ships eagerly (about 24 KB of AVIF on iPhone) and
+becomes the page's LCP on phones; `/order/` gets the same kind of photo and has
+no budget entry of its own. The throttled `pnpm perf --compare` moved iPhone LCP
+on both pages from about 0.6 s to about 1.1-1.3 s; desktop LCP did not change.
+
 CI runs `pnpm perf:budget` against a production `pnpm start` after every
 build (see `.github/workflows/ci.yml`), using Playwright's own installed
 Chromium there instead of the `/opt/pw-browsers` build used for local

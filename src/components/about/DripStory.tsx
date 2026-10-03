@@ -15,6 +15,7 @@ import { slugFor } from "@/lib/locationSlug";
 import { ways } from "@/data/menu";
 import { press } from "@/data/press";
 import { OrderLink } from "@/components/order/OrderLink";
+import { ArtPhoto } from "@/components/art/ArtPhoto";
 
 /** A `<svg style>` that also carries the nine-grid's stamp-in stagger index. */
 type NineStyle = CSSProperties & { "--i"?: number };
@@ -299,6 +300,20 @@ export function DripStory(): ReactElement {
             fill="var(--a-red-cta)"
           />
         </svg>
+        {/* Below the fold, so lazy. `sizes` is the figure's inner box, which is
+            the pool's width less a 15px gutter each side, up to 980px
+            (about.css), less its 3px borders; on phones the 2:1 crop is wider
+            than the box, so the photo is drawn about 118% of the box's width. */}
+        <figure className="cne-drip-spread">
+          <ArtPhoto
+            name="spread-about"
+            widths={[480, 720, 1080, 1440]}
+            width={1440}
+            height={611}
+            sizes="(max-width: 699px) calc(118vw - 50px), (max-width: 1010px) calc(100vw - 36px), 974px"
+            alt="Side-on view of a Chris N Eddy’s spread on a red table with Chris’s Way and Eddy’s Way sliders side by side, a grilled cheese, fries, cheese fries and three shakes."
+          />
+        </figure>
         <h2>WHOSE SIDE ARE YOU ON?</h2>
         <p>
           They never settled it, so both Ways went on the menu. Pick one and the menu opens with it

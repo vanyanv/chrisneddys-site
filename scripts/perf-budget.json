@@ -138,14 +138,14 @@
     "iphone": {
       "document": 66.0,
       "font": 125,
-      "image": 40.0,
+      "image": 70.0,
       "script": 219.5,
       "fetch": 221.5
     },
     "desktop": {
       "document": 66.0,
       "font": 125,
-      "image": 70.0,
+      "image": 100.0,
       "script": 219.5,
       "fetch": 221.5
     }

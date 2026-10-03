@@ -105,6 +105,9 @@ const nextConfig = {
         "1d36f305-06ca-4bfe-bbc7-c01aa67757f5": "mexican-sprite",
         "6e108101-0671-4280-a3f9-69d5738349b7": "mexican-fanta",
         "953b863c-2e2a-4d60-b1a2-436c1db3a149": "water-bottle",
+        // The chilies and the sauce, reshot in the same studio look.
+        "bef909bc-3438-482b-af96-4a1dcd28886b": "yellow-chilies",
+        "feaff547-96d8-4bf5-abe1-6d597acc02fb": "chris-n-eddy-s-sauce",
       }).flatMap(([from, to]) =>
         [".webp", ".avif", "-thumb.webp", "-thumb.avif", "-card.webp", "-card.avif"].map(
           (file) => ({

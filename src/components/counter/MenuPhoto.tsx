@@ -1,11 +1,12 @@
 import type { ImgHTMLAttributes } from "react";
+import { menuPhotoSrcSet } from "@/lib/menuPhoto";
 
 /**
- * A menu photograph at thumbnail or full size, AVIF first (issue #208).
+ * A menu photograph in its 3:2 frame, AVIF first (issue #208), at every size
+ * `scripts/build-menu-cards.mjs` cut it (issue #237): 200px for a phone's
+ * small square up to 1280px for a 3x phone drawing it full width.
  *
- * The AVIF cuts (`<photo>-thumb.avif`, `<photo>.avif`, from
- * `scripts/build-menu-cards.mjs`) are about half the WebP's bytes; the WebP
- * stays as the `<img>` for browsers without AVIF. The `<picture>` is
+ * The WebP stays as the `<img>` for browsers without AVIF. The `<picture>` is
  * `display: contents`, so every style that targets the `<img>` still lays it
  * out exactly as before.
  */
@@ -20,17 +21,13 @@ export function MenuPhoto({
 >) {
   return (
     <picture style={{ display: "contents" }}>
-      <source
-        type="image/avif"
-        srcSet={`/menu/${photo}-thumb.avif 200w, /menu/${photo}.avif 720w`}
-        sizes={sizes}
-      />
+      <source type="image/avif" srcSet={menuPhotoSrcSet(photo, "avif")} sizes={sizes} />
       <img
         src={`/menu/${photo}.webp`}
-        srcSet={`/menu/${photo}-thumb.webp 200w, /menu/${photo}.webp 720w`}
+        srcSet={menuPhotoSrcSet(photo, "webp")}
         sizes={sizes}
         width={720}
-        height={479}
+        height={480}
         alt={alt}
         {...img}
       />

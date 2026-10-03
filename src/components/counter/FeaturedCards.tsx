@@ -26,12 +26,13 @@ export function FeaturedCards() {
           >
             <span className="cne-card-img">
               {it.photo && (
-                /* A 60px square on a phone, a full-width card image on desktop.
+                /* A 60px square on a phone (the 3:2 photo drawn 90px wide to
+                   cover it), a 16:10 card image on a tablet and a computer.
                    Without this the phone downloaded the 720px version to draw
                    it at 60px. */
                 <MenuPhoto
                   photo={it.photo}
-                  sizes="(min-width: 901px) 440px, 60px"
+                  sizes="(min-width: 901px) 440px, (min-width: 600px) 260px, 90px"
                   alt={itemPhotoAlt(it)}
                   loading="lazy"
                   decoding="async"

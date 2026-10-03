@@ -2,6 +2,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { photoFraming } from "@/data/photoFocus";
+import { menuCardSrcSet, menuPhotoCuts, menuPhotoSrcSet } from "@/lib/menuPhoto";
+import cuts from "./menuPhotoCuts.json";
 import {
   allItems,
   allPhotosFor,
@@ -118,6 +120,22 @@ describe("photoFor", () => {
         expect(existsSync(join(process.cwd(), "public/menu", file)), file).toBe(true);
       }
       expect(photoFraming[id!], `photoFocus.ts: ${id}`).toBeDefined();
+    }
+  });
+
+  it("has every size its srcset offers, cut by build-menu-cards.mjs", () => {
+    const ids = allItems.flatMap((i) => [i.photo, ...Object.values(i.wayPhotos ?? {})]);
+    const files = (srcset: string) => srcset.split(", ").map((c) => c.split(" ")[0] ?? "");
+    for (const id of ids.filter((x): x is string => !!x)) {
+      // A photo added without running the cutter would fall back to two sizes
+      // and never get its sharper ones.
+      expect((cuts as Record<string, unknown>)[id], `menuPhotoCuts.json: ${id}`).toBeDefined();
+      expect(menuPhotoCuts(id).full).toContain(720);
+      for (const ext of ["avif", "webp"] as const) {
+        for (const url of [...files(menuPhotoSrcSet(id, ext)), ...files(menuCardSrcSet(id, ext))]) {
+          expect(existsSync(join(process.cwd(), "public", url)), url).toBe(true);
+        }
+      }
     }
   });
 });

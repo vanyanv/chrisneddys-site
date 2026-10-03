@@ -5,6 +5,7 @@ import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras, photoFor } from "@/data/menu";
 import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
+import { menuPhotoImageSet } from "@/lib/menuPhoto";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { comboFor } from "@/data/upsell";
 import { formatPrice, itemPhotoAlt, priceString } from "@/lib/otter";
@@ -243,7 +244,11 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
                     style={
                       photo
                         ? ({
-                            backgroundImage: `url(/menu/${photo}.webp)`,
+                            /* The 720 WebP for every browser, and the
+                               sharpest cut that exists, AVIF first, where
+                               `image-set()` takes `type()` (item-sheet.css). */
+                            "--cne-shot-url": `url(/menu/${photo}.webp)`,
+                            "--cne-shot-set": menuPhotoImageSet(photo),
                             /* Per-photo framing — see photoFocus.ts. The CSS
                                carries a fallback for both, so a photo missing
                                from that map still renders sensibly. */

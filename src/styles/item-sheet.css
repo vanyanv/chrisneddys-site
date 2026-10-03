@@ -190,10 +190,19 @@
 /* The white sweep becomes paper by multiplying against it. Only when there is
    a photograph — paper on paper would leave nothing to look at. */
 .cne-sheet-shot.is-photo {
+  background-image: var(--cne-shot-url);
   background-color: var(--a-bg);
   background-blend-mode: multiply;
   background-size: var(--cne-shot-zoom, 132%) auto;
   background-position: center var(--cne-shot-focus, 62%);
+}
+/* Zoomed to 132% on a 3x phone the photo is drawn about 1250 device pixels
+   wide, so where `image-set()` can pick by type and density it gets the
+   1280px AVIF instead of the 720px WebP. */
+@supports (background-image: image-set(url("x.avif") type("image/avif") 1x)) {
+  .cne-sheet-shot.is-photo {
+    background-image: var(--cne-shot-set);
+  }
 }
 /* The home page's MOST ORDERED label, slapped on as a sticker. */
 .cne-board-most {

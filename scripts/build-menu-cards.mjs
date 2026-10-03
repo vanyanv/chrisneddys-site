@@ -94,9 +94,12 @@ const PAD = 1.36;
 const PAD_Y = 1.6;
 
 /**
- * The drinks' studio shots: `add-menu-photo.mjs` already centred each frame
- * on the drink, and their long shadow off to the left would pull a trimmed
- * cut off-centre, so these take the middle 4:3 of the frame instead.
+ * The drinks and the two sides in a cup: things that stand up and throw a long
+ * shadow off to the left. A plain trim takes the shadow for part of the food
+ * and pulls the cut off-centre, and a clear cup is too faint for it, so these
+ * are framed on the object itself (see `standingBox`): centred, and sized so
+ * every one stands the same height in its card, the way they line up on
+ * Otter and Uber Eats.
  */
 const CENTRED = new Set([
   "strawberry-shake",
@@ -110,8 +113,62 @@ const CENTRED = new Set([
   "minute-maid",
   "mexican-sprite",
   "mexican-fanta",
+  "mexican-coke",
   "water-bottle",
+  "chris-n-eddy-s-sauce",
+  "yellow-chilies",
 ]);
+
+/** How much of a standing card's height the object fills. */
+const STAND = 0.74;
+
+/**
+ * The chilies' cup is clear plastic and the two chilies lean out of it, so
+ * nothing in the pixels marks the cup's edge; its box is measured by eye on
+ * the master, in master pixels.
+ */
+const BOXES = {
+  "yellow-chilies": { left: 912, top: 320, right: 1640, bottom: 1200 },
+};
+
+/**
+ * The standing object's box, in master pixels. Everything that isn't the
+ * white sweep (a low threshold, so a clear cup's rim counts) is the object
+ * plus its shadow; the shadow lies on the floor, so the object's sides are the
+ * columns filled in the top 30% of that, and its height is the run of rows
+ * filled between those sides.
+ */
+async function standingBox(id, src) {
+  if (BOXES[id]) return BOXES[id];
+  const { data, info } = await sharp(src).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: W, height: H } = info;
+  const on = new Uint8Array(W * H);
+  for (let i = 0, p = 0; p < W * H; i += 3, p++) {
+    on[p] = 255 - Math.min(data[i], data[i + 1], data[i + 2]) > 28 ? 1 : 0;
+  }
+  const span = (counts, min) => {
+    let a = -1;
+    let b = -1;
+    counts.forEach((c, i) => {
+      if (c > min) {
+        if (a < 0) a = i;
+        b = i + 1;
+      }
+    });
+    return [a, b];
+  };
+  const rows = new Array(H).fill(0);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) rows[y] += on[y * W + x];
+  const [y0, y1] = span(rows, W * 0.004);
+  const bandEnd = y0 + Math.floor((y1 - y0) * 0.3);
+  const cols = new Array(W).fill(0);
+  for (let y = y0; y < bandEnd; y++) for (let x = 0; x < W; x++) cols[x] += on[y * W + x];
+  const [left, right] = span(cols, (bandEnd - y0) * 0.05);
+  const inside = new Array(H).fill(0);
+  for (let y = 0; y < H; y++) for (let x = left; x < right; x++) inside[y] += on[y * W + x];
+  const [top, bottom] = span(inside, (right - left) * 0.15);
+  return { left, top, right, bottom };
+}
 
 /** The previous run's manifest and hashes, so unchanged photos can be skipped. */
 function readJson(path) {
@@ -120,25 +177,33 @@ function readJson(path) {
 
 /** The card's 4:3 region of the master, in master pixels. */
 async function cardRegion(id, src, meta) {
+  let width;
+  let cx;
+  let cy;
   if (CENTRED.has(id)) {
-    const w = Math.round(meta.height * RATIO);
-    return { left: Math.round((meta.width - w) / 2), top: 0, width: w, height: meta.height };
-  }
-  // `trim` reports the box it kept as negative offsets into the original. The
-  // threshold is in pixel values, so it reads the same on any size of master,
-  // and it is high enough to drop the soft grey shadow the studio shots throw
-  // to the left: the card centres the food itself, not food and shadow.
-  const { info } = await sharp(src).trim({ threshold: 70 }).toBuffer({ resolveWithObject: true });
-  const l = -(info.trimOffsetLeft ?? 0);
-  const t = -(info.trimOffsetTop ?? 0);
-  const cx = l + info.width / 2;
-  const cy = t + info.height / 2;
+    // The object centred, standing the same height in every card, a touch
+    // above the middle so its shadow has room.
+    const b = await standingBox(id, src);
+    width = Math.round(((b.bottom - b.top) / STAND) * RATIO);
+    cx = (b.left + b.right) / 2;
+    cy = (b.top + b.bottom) / 2 + 0.01 * (width / RATIO);
+  } else {
+    // `trim` reports the box it kept as negative offsets into the original. The
+    // threshold is in pixel values, so it reads the same on any size of master,
+    // and it is high enough to drop the soft grey shadow the studio shots throw
+    // to the left: the card centres the food itself, not food and shadow.
+    const { info } = await sharp(src).trim({ threshold: 70 }).toBuffer({ resolveWithObject: true });
+    const l = -(info.trimOffsetLeft ?? 0);
+    const t = -(info.trimOffsetTop ?? 0);
+    cx = l + info.width / 2;
+    cy = t + info.height / 2;
 
-  // Every card shows the whole of the food, centred, with the same margin
-  // round it (more above and below, so a tall slider doesn't crowd the frame).
-  // Where that frame runs past the photo's edge it is padded out with the
-  // white sweep rather than cutting the food off (issue #230).
-  const width = Math.round(Math.max(info.width * PAD, info.height * PAD_Y * RATIO));
+    // Every card shows the whole of the food, centred, with the same margin
+    // round it (more above and below, so a tall slider doesn't crowd the frame).
+    // Where that frame runs past the photo's edge it is padded out with the
+    // white sweep rather than cutting the food off (issue #230).
+    width = Math.round(Math.max(info.width * PAD, info.height * PAD_Y * RATIO));
+  }
   const height = Math.round(width / RATIO);
   const left = Math.round(cx - width / 2);
   const top = Math.round(cy - height / 2);
@@ -165,6 +230,34 @@ async function liftWhite(pipeline) {
     for (let c = 0; c < 3; c++) data[i + c] = Math.round(data[i + c] + (255 - data[i + c]) * t);
   }
   return sharp(data, { raw: { width: info.width, height: info.height, channels: 3 } })
+    .png()
+    .toBuffer();
+}
+
+/** How far in from a padded edge the photo fades to white, as a share of its
+ * height: a shadow or a grey corner that runs off the photo melts into the
+ * pad instead of stopping at a hard line. */
+const FEATHER = 0.06;
+async function featherEdges(src, pad) {
+  const { data, info } = await sharp(src).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: W, height: H } = info;
+  const f = Math.round(H * FEATHER);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const d = Math.min(
+        pad.left ? x : f,
+        pad.right ? W - 1 - x : f,
+        pad.top ? y : f,
+        pad.bottom ? H - 1 - y : f,
+      );
+      if (d >= f) continue;
+      const t = 1 - d / f;
+      const i = (y * W + x) * 3;
+      for (let c = 0; c < 3; c++)
+        data[i + c] = Math.round(data[i + c] + (255 - data[i + c]) * t * t);
+    }
+  }
+  return sharp(data, { raw: { width: W, height: H, channels: 3 } })
     .png()
     .toBuffer();
 }
@@ -211,18 +304,16 @@ async function cutPhoto(id, masterPath, isLegacy) {
   // A frame that runs past the photo's edge is padded out with white first,
   // and the near-white sweep is lifted to pure white so the pad doesn't show
   // as a faint box (AVIF draws a 253-against-255 edge as visible blocks).
-  const cardSrc = CENTRED.has(id)
-    ? await sharp(src).extract(region).png().toBuffer()
-    : await liftWhite(
-        sharp(
-          pad
-            ? await sharp(src)
-                .extend({ ...pad, background: "#ffffff" })
-                .png()
-                .toBuffer()
-            : src,
-        ).extract(region),
-      );
+  const cardSrc = await liftWhite(
+    sharp(
+      pad
+        ? await sharp(await featherEdges(src, pad))
+            .extend({ ...pad, background: "#ffffff" })
+            .png()
+            .toBuffer()
+        : src,
+    ).extract(region),
+  );
   const card = [];
   for (const [w, suffix] of CARD) {
     // Never upscale. A small master still gets its `-card`, at the size of

@@ -176,7 +176,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "side-of-yellow-chilies",
       otterId: "4e0c491a-57b0-44ac-9964-a22ce05670e6",
-      photo: "bef909bc-3438-482b-af96-4a1dcd28886b",
+      photo: "yellow-chilies",
       name: "Side of Yellow Chilies",
       desc: "2–3 yellow chilies in a 2oz cup.",
       price: 0.25,
@@ -184,7 +184,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "extra-chris-n-eddy-s-sauce",
       otterId: "ece67cf5-f628-4562-a2a0-7f445403a650",
-      photo: "feaff547-96d8-4bf5-abe1-6d597acc02fb",
+      photo: "chris-n-eddy-s-sauce",
       name: "Extra Chris N Eddy's Sauce",
       desc: "The signature sauce, in a 4oz cup.",
       price: 0.75,
@@ -339,6 +339,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "mexican-coke-500ml",
       otterId: "22dd949c-bf73-434a-b93b-96a472f7f59d",
+      photo: "mexican-coke",
       name: "Mexican Coke 500ml",
       desc: "",
       price: 5,

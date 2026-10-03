@@ -93,7 +93,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "triple-patty-slider",
       otterId: "123dd31f-36a8-48ff-9f6e-40aeb7b4c3d9",
-      photo: "cb39bdad-a744-46f1-b004-f78ac93596ff",
+      photo: "triple-patty-slider-chris",
+      wayPhotos: { eddy: "triple-patty-slider-eddy" },
       name: "Triple Patty Slider",
       desc: "Three smashed patties on three slices of cheese.",
       price: 9.49,
@@ -133,7 +134,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "2-triples-and-fries",
       otterId: "c191ef14-1142-4b82-a230-8fe5850bbb7f",
-      photo: "c6748e47-aa70-4aee-938b-91108530bb84",
+      photo: "2-triples-and-fries-chris",
+      wayPhotos: { eddy: "2-triples-and-fries-eddy" },
       name: "2 Triples and Fries",
       desc: "Two triples — three patties, three slices of cheese each — and a side of fries.",
       price: 19.49,
@@ -194,7 +196,8 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "the-quad",
       otterId: "43d72be5-d38f-459d-9306-4c45f512715a",
-      photo: "0fa97f11-898b-440d-b40e-dddb1e6fc897",
+      photo: "the-quad-chris",
+      wayPhotos: { eddy: "the-quad-eddy" },
       name: "The Quad",
       desc: "Four smashed patties on four slices of cheese, one roll. Exactly what it says.",
       price: 11.28,

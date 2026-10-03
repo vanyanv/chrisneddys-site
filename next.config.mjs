@@ -89,6 +89,9 @@ const nextConfig = {
         "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa": "family-box-eddy",
         "51c416bb-c2f4-43b7-8710-5493f9d98ba3": "grilled-cheese",
         "3fafec93-49ce-41f1-b46b-db13730b8332": "2-grilled-cheeses-and-fries",
+        "cb39bdad-a744-46f1-b004-f78ac93596ff": "triple-patty-slider-chris",
+        "c6748e47-aa70-4aee-938b-91108530bb84": "2-triples-and-fries-chris",
+        "0fa97f11-898b-440d-b40e-dddb1e6fc897": "the-quad-chris",
         // The drinks, reshot in the same studio look as the combos.
         "cceb4fd1-72ae-43f5-8432-8e4648f26e07": "strawberry-shake",
         "688ed85d-8dd9-4d31-be94-5994801863be": "chocolate-shake",

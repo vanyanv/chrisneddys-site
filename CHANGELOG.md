@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: The Triple Pack and The Family Box use your new studio photos, the Eddy's Way shots with one slider up front and the rest grouped behind it, until the Chris's Way pair is ready. Links to the two old photos go to the new ones ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))
 - Site: the menu uses your new studio photos for Chris N Eddy's Slider, Single Patty Slider, The Reverse Bun and Straight-Cut Fries, on the same white set and sunlight as your combo shots. The three sliders follow the Way someone picks, like the combos: Chris's Way shows lettuce, tomato and onion, and Eddy's Way shows grilled onions and pickles. Links to the four old photos go to the new ones ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))
 - Site: every drink on the menu has a new photo in the same studio look as your combo and fries photos: the three shakes, the seven fountain drinks, the two Mexican bottles and the water, each cold with condensation in your own cup or its real bottle. Diet Coke and Coke Zero still share one photo. Links to the old drink photos go to the new ones ([#229](https://github.com/vanyanv/chrisneddys-site/issues/229))
 - Site: a link to the menu shared in a text, on Instagram or anywhere else now previews with the photo of 2 Sliders and Fries instead of the monster card. Every other page's preview is unchanged ([#225](https://github.com/vanyanv/chrisneddys-site/issues/225))
@@ -84,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: the big Chris N Eddy's Slider card at the top of Sliders on the menu now shows your new studio photo in the Way someone picks, like its item sheet, instead of the old in-hand photo ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))
 - Site: Van Nuys is now simply an open store everywhere, like Hollywood. The grand-opening date, the timed opening switch, the "Sept 25, 6 PM" tag on the contact page and the dated opening-list email are gone for good, so nothing on the site can say Van Nuys is still to open. Glendale still shows as coming soon ([#199](https://github.com/vanyanv/chrisneddys-site/issues/199))
 - Admin: saving a product that was created without a name now fills in its search-engine fields the moment it gets one, as it did before the new product panel. Since the panel arrived, a named draft kept those fields blank unless Write with AI was pressed ([#201](https://github.com/vanyanv/chrisneddys-site/issues/201))
 - Emails: the site's emails (contact form, opening list and order emails) now have their own dark version. In dark mode they show black and cream with the real ORDER yellow button and red label, instead of Outlook repainting them dark brown with a mustard button ([#187](https://github.com/vanyanv/chrisneddys-site/issues/187))

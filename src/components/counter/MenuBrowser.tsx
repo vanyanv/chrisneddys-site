@@ -6,6 +6,7 @@ import {
   drinkGetsPhoto,
   SECTION_LEADS,
   type MenuCategoryKey,
+  type WayId,
 } from "@/data/menu";
 import { MenuRow } from "./MenuRow";
 import { MenuDish } from "./MenuDish";
@@ -56,11 +57,11 @@ const CAT_STAMP: Record<MenuCategoryKey, StampKind> = {
 
 /**
  * Lead cards drawn from a bigger photo than their card cut: the signature
- * slider leads Sliders in the in-hand shot, the one real photo the site has
- * of a slider being eaten. Cut by `scripts/build-menu-cards.mjs`.
+ * slider leads Sliders in the owner's studio shot of the Way picked, the same
+ * photo as its own card. Cut by `scripts/build-menu-cards.mjs`.
  */
-const LEAD_LADDER: Partial<Record<string, string>> = {
-  "chris-n-eddy-s-slider": "/photos/double-4x3",
+const LEAD_LADDER: Partial<Record<string, Record<WayId, string>>> = {
+  "chris-n-eddy-s-slider": { chris: "/photos/slider-chris-4x3", eddy: "/photos/slider-eddy-4x3" },
 };
 
 /**
@@ -171,7 +172,7 @@ export function MenuBrowser() {
                       item={lead}
                       lead
                       way={way}
-                      ladder={LEAD_LADDER[lead.id]}
+                      ladder={LEAD_LADDER[lead.id]?.[way]}
                       onOpen={openItem}
                     />
                   ))}

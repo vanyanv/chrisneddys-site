@@ -204,7 +204,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "the-triple-pack",
       otterId: "b5fa7b7a-c1bf-4516-885d-02aac4571cfe",
-      photo: "3d70c8eb-c5d5-42c9-b018-1923e1a352f1",
+      photo: "triple-pack-eddy",
       name: "The Triple Pack",
       desc: "Three doubles with a side of fries.",
       price: 28.08,
@@ -213,7 +213,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
     {
       id: "the-family-box",
       otterId: "283855c8-4586-4f3e-9457-aa2528f6dad9",
-      photo: "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa",
+      photo: "family-box-eddy",
       name: "The Family Box",
       desc: "Four doubles with two sides of fries.",
       price: 37.2,

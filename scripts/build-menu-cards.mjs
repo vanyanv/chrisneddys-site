@@ -19,14 +19,16 @@
  * It also cuts the two big photos into the AVIF/WebP ladders their
  * `<picture>`s ask for, at 480, 720 and 900px wide:
  *
- *   public/photos/double-4x3-<w>.{avif,webp}         the in-hand slider that
- *                                                    leads Sliders
+ *   public/photos/slider-<way>-4x3-<w>.{avif,webp}   Chris N Eddy's Slider,
+ *                                                    both Ways, the card that
+ *                                                    leads Sliders (issue #230)
  *   public/photos/combo-2-<way>-16x10-<w>.{avif,webp} 2 Sliders and Fries, both
  *                                                    Ways, the card the menu
  *                                                    opens with (issue #227)
  *
- * from `public/photos/double-4x3.jpg` and `public/photos/combo-2-<way>-16x10.jpg`
- * (16:10 cuts of the owner's studio shots, their near-white backdrop lifted
+ * from `public/photos/slider-<way>-4x3.jpg` and
+ * `public/photos/combo-2-<way>-16x10.jpg` (4:3 and 16:10 cuts of the owner's
+ * studio shots, their near-white backdrop lifted
  * to pure white so AVIF doesn't draw it as faint blocks).
  *
  * Run again after replacing a photo in `public/menu/`:
@@ -69,6 +71,13 @@ const CENTRED = new Set([
   "water-bottle",
 ]);
 
+/**
+ * The packs (issue #230) spread wider than a 4:3 at the photo's full height
+ * can hold, so a plain cut loses the slider at the edge. These keep the whole
+ * spread and pad the frame out with the white sweep instead.
+ */
+const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy"]);
+
 async function cardCut(id) {
   const src = join(MENU, `${id}.webp`);
   const meta = await sharp(src).metadata();
@@ -90,6 +99,28 @@ async function cardCut(id) {
 
   let w = Math.max(info.width * PAD, info.height * PAD * RATIO);
   let h = w / RATIO;
+  if (WHOLE.has(id)) {
+    const fw = Math.round(w);
+    const fh = Math.round(h);
+    const left = Math.round(cx - fw / 2);
+    const top = Math.round(cy - fh / 2);
+    const pad = {
+      left: Math.max(0, -left),
+      top: Math.max(0, -top),
+      right: Math.max(0, left + fw - meta.width),
+      bottom: Math.max(0, top + fh - meta.height),
+    };
+    const padded = await sharp(src)
+      .extend({ ...pad, background: "#ffffff" })
+      .png()
+      .toBuffer();
+    return writeCard(id, padded, {
+      left: left + pad.left,
+      top: top + pad.top,
+      width: fw,
+      height: fh,
+    });
+  }
   if (w > meta.width) {
     w = meta.width;
     h = w / RATIO;
@@ -137,7 +168,12 @@ async function avifCopies(id) {
 }
 
 async function leadCuts() {
-  for (const name of ["double-4x3", "combo-2-chris-16x10", "combo-2-eddy-16x10"]) {
+  for (const name of [
+    "slider-chris-4x3",
+    "slider-eddy-4x3",
+    "combo-2-chris-16x10",
+    "combo-2-eddy-16x10",
+  ]) {
     const src = join(root, `public/photos/${name}.jpg`);
     for (const w of [480, 720, 900]) {
       for (const [ext, opts] of [

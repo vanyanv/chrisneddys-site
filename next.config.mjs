@@ -87,6 +87,8 @@ const nextConfig = {
         "25f20ba6-6643-4d3d-b833-6bddbcedbfcc": "reverse-bun-chris",
         "3d70c8eb-c5d5-42c9-b018-1923e1a352f1": "triple-pack-eddy",
         "53ca84a1-1e6e-490a-be24-48ae7ad7a5fa": "family-box-eddy",
+        "51c416bb-c2f4-43b7-8710-5493f9d98ba3": "grilled-cheese",
+        "3fafec93-49ce-41f1-b46b-db13730b8332": "2-grilled-cheeses-and-fries",
         // The drinks, reshot in the same studio look as the combos.
         "cceb4fd1-72ae-43f5-8432-8e4648f26e07": "strawberry-shake",
         "688ed85d-8dd9-4d31-be94-5994801863be": "chocolate-shake",

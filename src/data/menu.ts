@@ -340,6 +340,13 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       price: 4.2,
     },
     {
+      id: "mexican-coke-500ml",
+      otterId: "22dd949c-bf73-434a-b93b-96a472f7f59d",
+      name: "Mexican Coke 500ml",
+      desc: "",
+      price: 5,
+    },
+    {
       id: "bottle-of-water",
       otterId: "59a1a9fe-283b-46ec-92a1-6af650139cf2",
       photo: "water-bottle",

@@ -19,12 +19,11 @@
  * Regenerate when the photography changes. Keyed by `MenuItem.photo`.
  */
 export const photoFraming: Record<string, readonly [focus: number, zoom: number]> = {
-  "0fa97f11-898b-440d-b40e-dddb1e6fc897": [57, 132],
   "2-grilled-cheeses-and-fries": [55, 110],
+  "2-triples-and-fries-chris": [51, 127],
+  "2-triples-and-fries-eddy": [53, 117],
   "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf": [53, 132],
   "bef909bc-3438-482b-af96-4a1dcd28886b": [49, 132],
-  "c6748e47-aa70-4aee-938b-91108530bb84": [65, 132],
-  "cb39bdad-a744-46f1-b004-f78ac93596ff": [69, 132],
   "cheese-fries": [61, 113],
   "chocolate-shake": [100, 100],
   "chris-n-eddy-s-slider-chris": [87, 109],
@@ -51,7 +50,11 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   sprite: [50, 100],
   "straight-cut-fries": [53, 132],
   "strawberry-shake": [60, 100],
+  "the-quad-chris": [50, 124],
+  "the-quad-eddy": [50, 125],
   "triple-pack-eddy": [54, 110],
+  "triple-patty-slider-chris": [50, 125],
+  "triple-patty-slider-eddy": [50, 124],
   "vanilla-shake": [80, 100],
   "water-bottle": [50, 100],
 };

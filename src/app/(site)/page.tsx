@@ -127,9 +127,10 @@ export default function HomePage() {
       <div className="cne-spread">
         <ArtPhoto
           name="spread-home"
-          widths={[720, 1080, 1600, 2400]}
-          width={2400}
-          height={1374}
+          widths={[720, 1080, 1600, 2200, 2752]}
+          phoneWidths={[720, 1080]}
+          width={2752}
+          height={1576}
           sizes="(max-width: 600px) 117vw, 100vw"
           alt="Overhead of a Chris N Eddy’s spread on a red table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes, with red paint dripping off the table’s edge."
         />

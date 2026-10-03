@@ -13,7 +13,8 @@
  *
  *     pnpm images:art
  *
- * Re-run after replacing a source in `assets/photos/`.
+ * Re-run after replacing a source in `assets/photos/`. Name photos to cut
+ * only those (`pnpm images:art spread-home`).
  */
 import sharp from "sharp";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -36,6 +37,7 @@ const WEBP = { quality: 74 };
  * crop inside the source when it has to trim one side. `src` names the source
  * file when it differs from `name`, and `box` ([left, top, width], as
  * fractions of the source) places a crop exactly instead of by focus.
+ * `quality` and `webpQuality` override the AVIF and WebP quality for one photo.
  */
 const PHOTOS = [
   // The Hollywood dining room: the logo on the floor, the menu board, the walls.
@@ -77,13 +79,18 @@ const PHOTOS = [
   { name: "vannuys-spec", ratio: 3 / 4, focusX: 0.62, focusY: 0.45, widths: [360, 540] },
   // The full-spread food photos (issue #250), kept whole at their 3168x1344
   // ratio: the pages crop them with `object-fit: cover`, so nothing is cut here.
-  // The overhead on red, the home page's band.
+  // The overhead on red, the home page's band. The owner asked for this one at
+  // the best quality the page can carry: it sits below the fold, so its bytes
+  // never touch LCP. Quality 60 keeps the red table's grain, which 34 smears,
+  // and the top cut is the master's own 2752px.
   {
     name: "spread-home",
     ratio: 2752 / 1576,
     focusX: 0.5,
     focusY: 0.5,
-    widths: [720, 1080, 1600, 2400],
+    widths: [720, 1080, 1600, 2200, 2752],
+    quality: 60,
+    webpQuality: 88,
   },
   // Side-on on white, the order page's card.
   {
@@ -136,7 +143,9 @@ async function region(file, ratio, focusX, focusY, box) {
 
 mkdirSync(OUT, { recursive: true });
 
-for (const p of PHOTOS) {
+const only = process.argv.slice(2);
+
+for (const p of PHOTOS.filter((p) => only.length === 0 || only.includes(p.name))) {
   const file = join(SRC, `${p.src ?? p.name}.jpg`);
   const crop = await region(file, p.ratio, p.focusX, p.focusY, p.box);
   for (const w of p.widths) {
@@ -145,7 +154,9 @@ for (const p of PHOTOS) {
       .avif({ quality: p.quality ?? AVIF_QUALITY, effort: 6 })
       .toBuffer();
     writeFileSync(join(OUT, `${p.name}-${w}.avif`), avif);
-    const webp = await base().webp(WEBP).toBuffer();
+    const webp = await base()
+      .webp(p.webpQuality ? { quality: p.webpQuality } : WEBP)
+      .toBuffer();
     writeFileSync(join(OUT, `${p.name}-${w}.webp`), webp);
     console.log(`${p.name}-${w}: avif ${avif.length} B, webp ${webp.length} B`);
   }

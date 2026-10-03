@@ -382,6 +382,15 @@ not change. The `/about/` `image` budgets moved to 112 KB (iPhone) and 68 KB
 (desktop), from CI's own reading, for the lazy spread photo above "Whose side
 are you on?": CI's newer Chromium starts it on first load.
 
+The home page's spread photo is cut at AVIF quality 60 rather than the art
+photos' 34, with a full-size 2752px cut, on 3 October 2026 (#252): the owner
+asked for it at the best quality the page can carry, accepting some cost on
+desktop. It is lazy and below the fold, so `pnpm perf --compare` on `/` showed
+no LCP change on any profile (all within ±40 ms). Image bytes on `/` went from
+104 to 118 KB (iPhone, which gets a 1080px phone ladder), 116 to 163 KB
+(desktop), 193 to 343 KB (iPhone landscape, which asks for the 2752px cut) and
+75 to 100 KB (baseline mobile), all inside the existing budgets.
+
 CI runs `pnpm perf:budget` against a production `pnpm start` after every
 build (see `.github/workflows/ci.yml`), using Playwright's own installed
 Chromium there instead of the `/opt/pw-browsers` build used for local

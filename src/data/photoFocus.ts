@@ -20,8 +20,8 @@
  */
 export const photoFraming: Record<string, readonly [focus: number, zoom: number]> = {
   "2-grilled-cheeses-and-fries": [55, 110],
-  "2-triples-and-fries-chris": [51, 127],
-  "2-triples-and-fries-eddy": [53, 117],
+  "2-triples-and-fries-chris": [50, 131],
+  "2-triples-and-fries-eddy": [50, 119],
   "6cff1a91-e6d5-4bad-adc6-e62bc26f19cf": [53, 132],
   "bef909bc-3438-482b-af96-4a1dcd28886b": [49, 132],
   "cheese-fries": [61, 113],

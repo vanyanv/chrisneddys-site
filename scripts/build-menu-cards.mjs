@@ -71,6 +71,13 @@ const CENTRED = new Set([
   "water-bottle",
 ]);
 
+/**
+ * The packs (issue #230) spread wider than a 4:3 at the photo's full height
+ * can hold, so a plain cut loses the slider at the edge. These keep the whole
+ * spread and pad the frame out with the white sweep instead.
+ */
+const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy"]);
+
 async function cardCut(id) {
   const src = join(MENU, `${id}.webp`);
   const meta = await sharp(src).metadata();
@@ -92,6 +99,28 @@ async function cardCut(id) {
 
   let w = Math.max(info.width * PAD, info.height * PAD * RATIO);
   let h = w / RATIO;
+  if (WHOLE.has(id)) {
+    const fw = Math.round(w);
+    const fh = Math.round(h);
+    const left = Math.round(cx - fw / 2);
+    const top = Math.round(cy - fh / 2);
+    const pad = {
+      left: Math.max(0, -left),
+      top: Math.max(0, -top),
+      right: Math.max(0, left + fw - meta.width),
+      bottom: Math.max(0, top + fh - meta.height),
+    };
+    const padded = await sharp(src)
+      .extend({ ...pad, background: "#ffffff" })
+      .png()
+      .toBuffer();
+    return writeCard(id, padded, {
+      left: left + pad.left,
+      top: top + pad.top,
+      width: fw,
+      height: fh,
+    });
+  }
   if (w > meta.width) {
     w = meta.width;
     h = w / RATIO;

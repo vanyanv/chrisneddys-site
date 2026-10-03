@@ -38,7 +38,7 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   "diet-coke": [100, 100],
   "feaff547-96d8-4bf5-abe1-6d597acc02fb": [78, 132],
   "hi-c": [100, 100],
-  "family-box-eddy": [68, 100],
+  "family-box-eddy": [58, 107],
   "loaded-fries": [90, 107],
   "mexican-fanta": [83, 100],
   "mexican-sprite": [50, 100],
@@ -51,7 +51,7 @@ export const photoFraming: Record<string, readonly [focus: number, zoom: number]
   sprite: [50, 100],
   "straight-cut-fries": [53, 132],
   "strawberry-shake": [60, 100],
-  "triple-pack-eddy": [62, 100],
+  "triple-pack-eddy": [54, 110],
   "vanilla-shake": [80, 100],
   "water-bottle": [50, 100],
 };

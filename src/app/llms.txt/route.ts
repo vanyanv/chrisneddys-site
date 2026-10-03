@@ -13,7 +13,7 @@ import { buildLlmsTxt } from "@/lib/llmsTxt";
 export const dynamic = "force-static";
 // Matches the catalogue cache it reads (`src/lib/catalog.ts`), which would cap
 // any longer window anyway. The file is a few KB, so each refresh is cheap.
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function GET() {
   const products = await listPublishedProducts();

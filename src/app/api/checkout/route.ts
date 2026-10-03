@@ -24,6 +24,7 @@ import { getProductBySlug } from "@/lib/catalog";
 import { productImage } from "@/lib/merchLd";
 import {
   attachStripeSession,
+  catalogueChanged,
   createPendingOrder,
   getProductLimits,
   getStoreSettings,
@@ -344,6 +345,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const graceExpiresAt = new Date((session.expires_at + EXPIRY_GRACE_MINUTES * 60) * 1000);
     await setOrderExpiry(pending.orderId, graceExpiresAt);
   }
+
+  // The hold just took numbers out of the shop's "N left" count. The shop
+  // pages refresh on events like this one rather than on a short timer, so
+  // tell them now; Stripe's expired/completed webhooks do the same when the
+  // hold ends.
+  catalogueChanged();
 
   return NextResponse.json({ url: session.url });
 }

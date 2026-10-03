@@ -13,7 +13,7 @@
  * `src/db/client.ts` is the shared rule behind all of this.
  *
  * Reads are cached with `unstable_cache`, tagged `"catalogue"`, `revalidate:
- * 60`. That is the stable Next 15 API for this: the newer `"use cache"` /
+ * 3600`. That is the stable Next 15 API for this: the newer `"use cache"` /
  * `cacheTag()` pair needs the `experimental.dynamicIO` flag, which this repo
  * does not enable (phase 1 is not the place to turn on an experimental
  * rendering mode). Phase 2's admin can call `revalidateTag("catalogue")`
@@ -27,7 +27,11 @@ import { merch, MERCH_UPDATED, type MerchProduct, type MerchView } from "@/data/
 import { shopperAlt } from "@/lib/productImage";
 
 const CACHE_TAGS = ["catalogue"];
-const REVALIDATE_SECONDS = 60;
+// A backstop only: every write that changes the catalogue or its stock calls
+// `revalidateTag("catalogue")` (see `catalogueChanged` in `src/lib/orders.ts`).
+// It also caps every route that reads it, so it must stay at least as long as
+// the shop pages' own window.
+const REVALIDATE_SECONDS = 3600;
 
 function isTestEnv(): boolean {
   return process.env.VITEST === "true" || process.env.NODE_ENV === "test";

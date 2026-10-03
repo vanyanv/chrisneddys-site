@@ -173,7 +173,7 @@ export default function CateringPage() {
                 {it.photo && (
                   <MenuPhoto
                     photo={it.photo}
-                    sizes="(min-width: 901px) 440px, 60px"
+                    sizes="(min-width: 901px) 440px, (min-width: 600px) 260px, 90px"
                     alt={itemPhotoAlt(it)}
                     loading="lazy"
                     decoding="async"

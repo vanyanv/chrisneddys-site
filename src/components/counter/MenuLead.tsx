@@ -45,7 +45,7 @@ export function MenuLead({
             <source type="image/webp" srcSet={srcSet("webp")} sizes={SIZES} />
             <img
               src={`${base}-720.webp`}
-              alt=""
+              alt={item.name}
               width={900}
               height={563}
               loading="eager"

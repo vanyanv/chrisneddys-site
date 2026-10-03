@@ -2,6 +2,7 @@
 
 import type { MenuItem } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
+import { MenuPhoto } from "./MenuPhoto";
 
 /**
  * One menu row: photo, name, two lines of description, price, chevron.
@@ -40,11 +41,10 @@ export function MenuRow({
              the image sitemap with no text on the site associating them with
              anything. The full helper is still right in the sheet and on the
              featured cards, where the photograph is the only account of itself. */
-          <img
-            src={`/menu/${item.photo}-thumb.webp`}
+          <MenuPhoto
+            photo={item.photo}
+            sizes="105px"
             alt={item.name}
-            width={200}
-            height={133}
             loading="lazy"
             decoding="async"
           />

@@ -766,7 +766,7 @@
    colour. The whole photo on desktop; 3:2 on phones, centred and cropped at the
    sides. */
 .cne-spread {
-  aspect-ratio: 2752 / 1410;
+  aspect-ratio: 2752 / 1576;
   overflow: hidden;
   background: var(--color-cne-paper);
 }

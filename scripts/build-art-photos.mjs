@@ -80,7 +80,7 @@ const PHOTOS = [
   // The overhead on red, the home page's band.
   {
     name: "spread-home",
-    ratio: 2752 / 1410,
+    ratio: 2752 / 1576,
     focusX: 0.5,
     focusY: 0.5,
     widths: [720, 1080, 1600, 2400],

@@ -112,11 +112,12 @@ const CENTRED = new Set([
 ]);
 
 /**
- * The packs (issue #230) spread wider than a 4:3 at the photo's full height
- * can hold, so a plain cut loses the slider at the edge. These keep the whole
- * spread and pad the frame out with the white sweep instead.
+ * The packs and 2 Grilled Cheeses and Fries (issue #230) spread wider than a
+ * 4:3 at the photo's full height can hold, so a plain cut loses the food at
+ * the edge. These keep the whole spread and pad the frame out with the white
+ * sweep instead.
  */
-const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy"]);
+const WHOLE = new Set(["triple-pack-eddy", "family-box-eddy", "2-grilled-cheeses-and-fries"]);
 
 /** The previous run's manifest and hashes, so unchanged photos can be skipped. */
 function readJson(path) {

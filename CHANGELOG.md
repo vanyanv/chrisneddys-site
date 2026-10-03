@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: Mexican Coke 500ml is on the menu under Drinks, next to Mexican Sprite and Mexican Fanta, at $5. Tapping ORDER opens it on your Otter page ([#243](https://github.com/vanyanv/chrisneddys-site/issues/243))
 - Site: Grilled Cheese and 2 Grilled Cheeses and Fries use your new studio photos, cut open with the cheese melting out, on the same white set and sunlight as the rest of the menu. Links to the two old photos go to the new ones ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))
 - Site: The Triple Pack and The Family Box use your new studio photos, the Eddy's Way shots with one slider up front and the rest grouped behind it, until the Chris's Way pair is ready. Links to the two old photos go to the new ones ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))
 - Site: the menu uses your new studio photos for Chris N Eddy's Slider, Single Patty Slider, The Reverse Bun and Straight-Cut Fries, on the same white set and sunlight as your combo shots. The three sliders follow the Way someone picks, like the combos: Chris's Way shows lettuce, tomato and onion, and Eddy's Way shows grilled onions and pickles. Links to the four old photos go to the new ones ([#230](https://github.com/vanyanv/chrisneddys-site/issues/230))

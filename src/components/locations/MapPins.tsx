@@ -58,9 +58,9 @@ export function MapPinArt({ loc }: { loc: Location }) {
       <rect
         className="cne-pin-plate"
         x={-plateW / 2}
-        y={PIN.capY - 7.5}
+        y={PIN.capY + PIN.plateTop}
         width={plateW}
-        height={10}
+        height={PIN.plateH}
         rx={2}
       />
       <text className="cap" y={PIN.capY} textAnchor="middle">

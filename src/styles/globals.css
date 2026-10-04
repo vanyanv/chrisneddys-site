@@ -249,7 +249,8 @@ body .cne-quote a {
 }
 .cne-map-pin .cap {
   font-family: var(--font-mono);
-  font-size: 8px;
+  /* PIN.capSize in mapLayout.ts, which reserves the room for it. */
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.9px;
   fill: var(--a-fg);

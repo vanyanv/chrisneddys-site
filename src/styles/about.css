@@ -17,7 +17,7 @@
  * 390px is 10.53px — the phone layout's own scale) in the same rule that
  * swaps every other phone-only value.
  *
- * Body copy and `<h3>`s get a floor (15px / 18px) between 700 and 1440px so
+ * Body copy and chapter `<h2>`s get a floor (15px / 18px) between 700 and 1440px so
  * an iPhone in landscape (844 or 932px wide — the two-column layout, not the
  * phone one, since that only starts below 700px) and a tablet don't shrink
  * type below a readable size just because the viewport briefly reads

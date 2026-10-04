@@ -10,7 +10,7 @@ const RED = { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.
 const YELLOW = { bodyColor: MONSTER_COLORS.yellow.body, irisColor: MONSTER_COLORS.yellow.iris };
 const BLUE = { bodyColor: MONSTER_COLORS.blue.body, irisColor: MONSTER_COLORS.blue.iris };
 import { brand } from "@/data/brand";
-import { flagship, locations } from "@/data/locations";
+import { flagship } from "@/data/locations";
 import { ways } from "@/data/menu";
 import { press } from "@/data/press";
 import { OrderLink } from "@/components/order/OrderLink";
@@ -22,7 +22,6 @@ type NineStyle = CSSProperties & { "--i"?: number };
 const [chris, eddy] = ways;
 const ktla = press.find((p) => p.pub === "KTLA 5");
 const eaterLa = press.find((p) => p.pub === "Eater LA");
-const vanNuys = locations.find((l) => l.id === "vannuys");
 
 /**
  * "The Drip" — a red paint line runs down the middle of the timeline and
@@ -268,15 +267,16 @@ export function DripStory(): ReactElement {
           </div>
         ) : null}
 
-        {/* Van Nuys opened on 2026-09-25 (issue #265); this chapter used to say it
-            was still on the way. Glendale is the one that's next. */}
-        {eaterLa && vanNuys ? (
+        {/* Van Nuys opened on 2026-09-25, so this chapter is Glendale's alone
+            (issue #265); it used to read "GLENDALE + VAN NUYS / Two more
+            locations on the way." */}
+        {eaterLa ? (
           <div className="cne-drip-st cne-drip-rv">
             <i className="cne-drip-dot" aria-hidden="true" />
             <div className="cne-drip-txt">
-              <span className="cne-drip-yr">2026</span>
-              <h2>VAN NUYS</h2>
-              <p>The second location opens at {vanNuys.address}. Glendale is next.</p>
+              <span className="cne-drip-yr">next</span>
+              <h2>GLENDALE</h2>
+              <p>One more location on the way.</p>
             </div>
             <div className="cne-drip-med">
               <div className="cne-drip-qstk is-wide" style={{ "--r": "2deg" } as CSSProperties}>

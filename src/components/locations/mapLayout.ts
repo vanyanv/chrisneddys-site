@@ -33,11 +33,16 @@ export const PIN = {
   /** Half the head's width once `.is-selected` scales it up by 1.22. */
   headHalf: 15,
   capY: -38,
-  capSize: 8,
+  /** Read on a phone, where the map is about 400px for its 360 units: 9.5
+      units is ~10.5px there, and the "· SOON" tail ~8px (issue #261; they
+      were 8 and 6, under 9px and 7px). */
+  capSize: 9.5,
   capSpacing: 0.9,
-  soonSize: 6,
-  /** The name plate's padding around its text. */
+  soonSize: 7.5,
+  /** The name plate's padding around its text, and its top and height. */
   platePadX: 2.5,
+  plateTop: -9,
+  plateH: 12,
   /** Tap target: centred on the head, 44pt across on the narrowest phone. */
   hitY: -18,
   hitR: 22,
@@ -65,7 +70,7 @@ export function pinBoxes(loc: Location): Box[] {
   const half = capWidth(loc) / 2 + PIN.platePadX + 3;
   return [
     { x0: x - PIN.headHalf, y0: y + PIN.headTop - 4, x1: x + PIN.headHalf, y1: y + 7 },
-    { x0: x - half, y0: y + PIN.capY - 9, x1: x + half, y1: y + PIN.capY + 3 },
+    { x0: x - half, y0: y + PIN.capY + PIN.plateTop - 2, x1: x + half, y1: y + PIN.capY + 3 },
   ];
 }
 
@@ -75,10 +80,10 @@ export function pinBoxes(loc: Location): Box[] {
  * hasn't opened says so in its own name label instead.
  */
 export const TAG = {
-  size: 6.5,
+  size: 7.5,
   spacing: 0.4,
   padX: 5,
-  h: 15,
+  h: 17,
   /** From the pin's centre line to the tag's near edge, pointer included. */
   gap: 20,
   pointer: 5,

@@ -144,7 +144,9 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
         <section className="cne-sec cne-locd cne-lp-walls cne-rv" aria-labelledby="lp-walls">
           <div className="cne-eyebrow">Art by {art.artist}</div>
           <h2 id="lp-walls">The walls.</h2>
-          <ul className="cne-lp-murals">
+          {/* The row scrolls sideways, so it takes focus: that is what lets
+              the arrow keys scroll it (WCAG 2.1.1, issue #261). */}
+          <ul className="cne-lp-murals" tabIndex={0} aria-label="Wall art photos">
             {art.walls.map((m) => (
               <li key={m.name}>
                 <ArtPhoto

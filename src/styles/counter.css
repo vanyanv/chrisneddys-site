@@ -773,8 +773,8 @@ body {
   padding-bottom: 0;
 }
 
-/* The "details & directions" link: 9px type gives a 14px tap target, under the
-   24px minimum. The padding buys the height without moving the text. */
+/* The "details & directions" link: its small type alone gives a tap target
+   under the 24px minimum. The padding buys the height without moving the text. */
 .cne-loc-more {
   display: inline-block;
   text-decoration: underline;
@@ -818,7 +818,7 @@ body {
 }
 .cne-loc-note {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -833,7 +833,9 @@ body {
 .cne-mini {
   flex: 1;
   font-family: var(--font-display);
-  font-size: 10px;
+  /* 12px is the phone floor for a label someone has to read before they tap
+     it (issue #261; was 10px). Desktop steps up to 13px below. */
+  font-size: 12px;
   letter-spacing: 0.05em;
   border: 2px solid var(--a-ink);
   padding: 10px 6px;
@@ -1090,6 +1092,14 @@ body {
 .cne-foot-brand p {
   margin: 0;
   max-width: 34ch;
+}
+/* The @chrisneddys link is one line of small type, an 18px tap on its own.
+   The padding makes it 24px+ without moving the text (WCAG 2.5.8, issue
+   #261). */
+.cne-foot-brand > a[href^="https://"] {
+  display: inline-block;
+  padding: 4px 0;
+  margin: -4px 0;
 }
 .cne-foot-mark {
   display: block;
@@ -1569,7 +1579,7 @@ body {
     margin-top: 12px;
   }
   .cne-loc-note {
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 9px;
   }
   .cne-loc-btns {

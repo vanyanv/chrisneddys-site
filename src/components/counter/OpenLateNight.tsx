@@ -83,7 +83,7 @@ export function OpenLateNight({ loc, hood }: { loc: Location; hood: string }) {
         </p>
         <p className="cne-lede">
           The full menu runs the whole time. Nothing is pulled at midnight, and the fries are cut
-          the same right up to close — {closingSummary(loc)} — as they are at noon.
+          the same right up to close as they are at noon.
         </p>
       </div>
     </section>

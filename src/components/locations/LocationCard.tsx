@@ -29,6 +29,7 @@ export function LocationCard({
   children,
   showButtonsWhenClosed = false,
   footer,
+  nameButton,
 }: {
   loc: Location;
   /** Tags the ORDER link so it reports back to Otter which surface sent it. */
@@ -46,6 +47,8 @@ export function LocationCard({
   showButtonsWhenClosed?: boolean;
   /** Content after the button row, rendered regardless of open state. */
   footer?: ReactNode;
+  /** Makes the store's name a toggle button (the /locations map's "pick this store"). */
+  nameButton?: { pressed: boolean; onPress: () => void };
 }) {
   const showButtons = loc.isOpen || showButtonsWhenClosed;
 
@@ -60,7 +63,22 @@ export function LocationCard({
         }}
       >
         <Heading className={headingClassName} style={headingStyle}>
-          {loc.name.toUpperCase()}
+          {nameButton ? (
+            <button
+              type="button"
+              className="cne-loc-pick"
+              aria-pressed={nameButton.pressed}
+              onClick={(e) => {
+                // The card's own click handler would only repeat this.
+                e.stopPropagation();
+                nameButton.onPress();
+              }}
+            >
+              {loc.name.toUpperCase()}
+            </button>
+          ) : (
+            loc.name.toUpperCase()
+          )}
         </Heading>
         {status}
       </div>

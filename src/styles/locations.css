@@ -76,3 +76,18 @@
     content: none;
   }
 }
+
+/* The store's name on a /locations/ card is the button that picks it on the
+   map (`LocationCard`'s `nameButton`). It looks like the heading it is. */
+.cne-loc-pick {
+  all: unset;
+  cursor: pointer;
+  /* At least a 24px tap, without moving the name. */
+  display: inline-block;
+  padding: 4px 0;
+  margin: -4px 0;
+}
+.cne-loc-pick:focus-visible {
+  outline: 3px solid var(--a-ink);
+  outline-offset: 3px;
+}

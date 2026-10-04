@@ -14,6 +14,11 @@ import { GlyphRow } from "@/components/storeart/SectionOpener";
 
 type LocationId = Location["id"];
 
+/** Open stores first, so the list never makes a visitor scroll past a store
+    that isn't serving yet to reach one that is (issue #261). The map, the
+    footer and every other list keep `locations`' own order. */
+const listed = [...locations].sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
+
 /**
  * Map plus store cards, as in the prototype: pick a pin or a card and the other
  * follows. `mapCanvas` is the static geometry, built by a Server Component so
@@ -95,7 +100,13 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
         <GlyphRow />
         <div className="cne-eyebrow">Three locations</div>
         <h1>Find us.</h1>
-        {locations.map((loc) => (
+        {listed.map((loc) => (
+          /* A pointer tap anywhere on the card picks the store, as a shortcut.
+             The card itself is not a button: it holds the ORDER, DIRECTIONS
+             and CALL links, and a button cannot contain links (screen readers
+             read the whole card as one button and can skip them, issue #261).
+             Keyboard and screen-reader users pick the store with the button
+             on its name instead (`nameButton` below). */
           <div
             key={loc.id}
             data-location={slugFor(loc)}
@@ -107,24 +118,13 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
               .filter(Boolean)
               .join(" ")}
             onClick={() => setSel(loc.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              // Only a key pressed on the card itself selects it. Enter on a
-              // link inside (ORDER, DIRECTIONS, CALL, details) bubbles up here,
-              // and cancelling it would stop that link from opening.
-              if (e.target !== e.currentTarget) return;
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setSel(loc.id);
-              }
-            }}
           >
             <LocationCard
               loc={loc}
               surface="locations-map"
               headingTag="h2"
               headingClassName="cne-loc-name"
+              nameButton={{ pressed: loc.id === sel, onPress: () => setSel(loc.id) }}
               status={loc.isOpen ? <OpenStatus locationId={loc.id} /> : <ComingSoonTag />}
               footer={
                 loc.isOpen ? (

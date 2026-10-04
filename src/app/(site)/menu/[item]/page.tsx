@@ -1,5 +1,7 @@
+import "@/styles/menu-item.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 import Link from "next/link";
 import { brand } from "@/data/brand";
 import { openLocations, openNames } from "@/lib/openLocations";
@@ -106,66 +108,53 @@ export default async function MenuItemPage({ params }: Params) {
         <JsonLdScript key={loc.id} data={restaurantLd(loc)} />
       ))}
 
-      <nav className="cne-sec" aria-label="Breadcrumb" style={{ paddingBottom: 0 }}>
-        <div className="cne-eyebrow">
-          <Link prefetch={false} href="/menu/" style={{ color: "inherit" }}>
+      <nav className="cne-sec cne-item-crumbs" aria-label="Breadcrumb">
+        <div className="cne-eyebrow cne-item-crumb">
+          <Link prefetch={false} href="/menu/">
             Menu
           </Link>{" "}
-          / {item.name}
+          / <span aria-current="page">{item.name}</span>
         </div>
       </nav>
 
       <section className="cne-sec cne-rv">
-        <h1>{item.name}</h1>
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 26,
-            margin: "6px 0 0",
-            color: "var(--a-red)",
-          }}
-        >
-          {formatPrice(item.price)}
-        </p>
-        <p style={{ maxWidth: "62ch", fontSize: 14, lineHeight: 1.6, marginTop: 10 }}>
-          {item.desc}
-        </p>
-
-        {item.photo && (
-          <div
-            style={{
-              marginTop: 16,
-              maxWidth: 520,
-              border: "3px solid #1a1612",
-              boxShadow: "6px 6px 0 #1a1612",
-              overflow: "hidden",
-            }}
-          >
-            {/* The page's LCP. Capped at 1080px: a 3x phone draws it about
-                1100 device px wide, and the 1280 cut cost a slow phone
-                connection 0.1 s more for no difference you can see. */}
-            <MenuPhoto
-              photo={item.photo}
-              max={1080}
-              sizes="(min-width: 556px) 514px, calc(100vw - 36px)"
-              alt={itemPhotoAlt(item)}
-              fetchPriority="high"
-              decoding="async"
-              className="cne-item-photo-img"
-            />
+        <div className="cne-item-top">
+          <div className="cne-item-head">
+            <h1 className="cne-item-name">{item.name}</h1>
+            <p className="cne-item-price">{formatPrice(item.price)}</p>
+            <p className="cne-item-desc">{item.desc}</p>
           </div>
-        )}
 
-        <div className="cne-loc-btns" style={{ marginTop: 18 }} data-surface="menu-item">
-          <OrderLink className="cne-mini is-red" surface="menu-item" item={item}>
-            ADD TO ORDER · {formatPrice(item.price)}
-          </OrderLink>
+          {item.photo && (
+            <div className="cne-item-photo">
+              {/* The page's LCP. Capped at 1080px: a 3x phone draws it about
+                  1100 device px wide, and the 1280 cut cost a slow phone
+                  connection 0.1 s more for no difference you can see. */}
+              <MenuPhoto
+                photo={item.photo}
+                max={1080}
+                sizes="(min-width: 556px) 514px, calc(100vw - 36px)"
+                alt={itemPhotoAlt(item)}
+                fetchPriority="high"
+                decoding="async"
+                className="cne-item-photo-img"
+              />
+            </div>
+          )}
+
+          <div className="cne-item-buy">
+            <div className="cne-loc-btns" data-surface="menu-item">
+              <OrderLink className="cne-mini is-red" surface="menu-item" item={item}>
+                ADD TO ORDER · {formatPrice(item.price)}
+              </OrderLink>
+            </div>
+            <p className="cne-item-note">
+              {item.takesToppings
+                ? "Opens your location's ordering page. Tick your Way's toppings there, all free."
+                : "Opens your location's ordering page."}
+            </p>
+          </div>
         </div>
-        <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8 }}>
-          {item.takesToppings
-            ? "Opens your location's ordering page. Tick your Way's toppings there, all free."
-            : "Opens your location's ordering page."}
-        </p>
       </section>
 
       {item.takesToppings && (
@@ -176,25 +165,25 @@ export default async function MenuItemPage({ params }: Params) {
             Order it one of the two house ways, or build it yourself from the same list — the price
             on this page does not change either way.
           </p>
-          <div className="cne-loc-hrs" style={{ marginTop: 12, maxWidth: "42ch" }}>
+          <dl className="cne-item-ways">
             {ways.map((w) => (
-              <div className="r" key={w.id}>
-                <span>{w.name.toUpperCase()}</span>
-                <b>{w.summary}</b>
-              </div>
+              <Fragment key={w.id}>
+                <dt>{w.name.toUpperCase()}</dt>
+                <dd>{w.summary}</dd>
+              </Fragment>
             ))}
-          </div>
-          <p style={{ maxWidth: "62ch", fontSize: 13, lineHeight: 1.6, marginTop: 12 }}>
+          </dl>
+          <p className="cne-item-free">
             All free: {toppings.map((t) => t.name).join(", ")}. The only paid additions are{" "}
             {extras.map((e) => `${e.name} +${formatPrice(e.price)}`).join(" and ")}.
           </p>
         </section>
       )}
 
-      <section className="cne-sec cne-rv" style={{ paddingBottom: 40 }}>
+      <section className="cne-sec cne-rv cne-item-where">
         <div className="cne-eyebrow">Where to get it</div>
         <h2>Pick your location.</h2>
-        <div style={{ marginTop: 12 }}>
+        <div className="cne-item-cards">
           <OpenLocationCards surface="menu-item" />
         </div>
         <div className="cne-loc-btns" data-surface="menu-item">

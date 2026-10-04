@@ -198,6 +198,18 @@
     min-height: 0;
   }
 
+  /* When the text column runs taller than the photo, the photo sits in the
+     middle of the cell on the same white, so no strip shows under it. */
+  .cne-drop-art:has(.cne-capshot.is-photo) {
+    display: flex;
+    align-items: center;
+    background: var(--a-photo);
+  }
+
+  .cne-drop-art:has(.cne-capshot.is-photo) .cne-capshot {
+    width: 100%;
+  }
+
   .cne-drop-art .cne-cap {
     width: 58%;
     max-width: 340px;

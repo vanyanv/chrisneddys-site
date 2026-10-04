@@ -17,7 +17,7 @@
  * 390px is 10.53px — the phone layout's own scale) in the same rule that
  * swaps every other phone-only value.
  *
- * Body copy and `<h3>`s get a floor (15px / 18px) between 700 and 1440px so
+ * Body copy and chapter `<h2>`s get a floor (15px / 18px) between 700 and 1440px so
  * an iPhone in landscape (844 or 932px wide — the two-column layout, not the
  * phone one, since that only starts below 700px) and a tablet don't shrink
  * type below a readable size just because the viewport briefly reads
@@ -51,7 +51,9 @@
 .cne-drip-tagl {
   font-family: var(--font-marker), var(--font-display);
   font-size: calc(var(--u) * 2.4);
-  color: var(--color-cne-red);
+  /* The deeper red: under 24px on phones and tablets this is small text, and
+     Signal Red is 4.1:1 on paper (issue #265). */
+  color: var(--color-cne-red-deep);
   transform: rotate(-4deg);
 }
 
@@ -175,7 +177,7 @@
   display: inline-block;
 }
 
-.cne-drip-st h3 {
+.cne-drip-st h2 {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: max(calc(var(--u) * 1.9), 18px);
@@ -315,7 +317,7 @@
 .cne-drip-tp figcaption {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: max(calc(var(--u) * 0.7), 10px);
+  font-size: max(calc(var(--u) * 0.7), 12px);
   letter-spacing: 0.12em;
   padding: calc(var(--u) * 0.4) calc(var(--u) * 0.6);
 }
@@ -360,7 +362,7 @@
   display: block;
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: max(calc(var(--u) * 0.72), 11px);
+  font-size: max(calc(var(--u) * 0.72), 12px);
   letter-spacing: 0.14em;
   color: var(--color-cne-muted);
   margin-top: calc(var(--u) * 0.5);
@@ -410,7 +412,7 @@
 /* ---- the pool ------------------------------------------------------------- */
 .cne-drip-pool {
   position: relative;
-  margin: calc(var(--u) * 2) calc(var(--u) * -4) 0;
+  margin: calc(var(--u) * 2) 0 0;
   background: var(--a-red-cta);
   color: var(--color-cne-cream);
   padding: calc(var(--u) * 3) calc(var(--u) * 4) calc(var(--u) * 4);
@@ -450,7 +452,6 @@
   font-size: max(calc(var(--u) * 0.85), 12px);
   letter-spacing: 0.04em;
   color: var(--color-cne-cream);
-  opacity: 0.88;
   display: flex;
   align-items: center;
   gap: calc(var(--u) * 0.6);
@@ -459,6 +460,11 @@
 }
 
 .cne-drip-quiet a {
+  /* 44px tall to tap; the text itself stays where it was (issue #265). */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -476,7 +482,10 @@
   color: var(--color-cne-ink);
   text-align: center;
   white-space: nowrap;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   text-decoration: none;
   transition:
     transform 0.12s,
@@ -501,7 +510,9 @@
 
 .cne-drip-cta {
   display: flex;
-  gap: calc(var(--u) * 1.2);
+  /* Wide enough that the two monsters, each 10px over its own button's
+     inner edge, don't bump into each other (issue #265). */
+  gap: max(calc(var(--u) * 1.2), 26px);
 }
 
 /* Chris's (red) and Eddy's (blue) monster, perched at the inner corner of
@@ -530,7 +541,8 @@
 
 @media (min-width: 700px) {
   .cne-drip-btn {
-    font-size: min(1.2vw, 17.28px);
+    /* Floored so an iPad or a phone on its side doesn't shrink it to 10px. */
+    font-size: clamp(14px, 1.2vw, 17.28px);
     padding: min(1.25vw, 18px) min(2vw, 28.8px);
     border-width: min(0.28vw, 4.03px);
     box-shadow: min(0.45vw, 6.48px) min(0.45vw, 6.48px) 0 var(--color-cne-ink);
@@ -545,7 +557,7 @@
 
 @media (max-width: 699px) {
   .cne-drip-btn {
-    font-size: 3.4vw;
+    font-size: max(3.4vw, 13px);
     padding: 3.4vw 2.4vw;
     border-width: 0.65vw;
     box-shadow: 1vw 1vw 0 var(--color-cne-ink);
@@ -556,10 +568,14 @@
   .cne-drip-btn:active {
     box-shadow: 0 0 0 var(--color-cne-ink);
   }
+  /* The red runs edge to edge; what's on it keeps the page's side margin. */
+  .cne-drip-pool {
+    padding-inline: 18px;
+  }
   .cne-drip-cta {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3vw;
+    gap: max(3vw, 26px);
     width: 100%;
   }
 }
@@ -588,7 +604,7 @@
 /* Framed like the order page's photo, above the pool's heading. The photo is
    wider than the 21:9 box (2:1 on phones), so it is centred and cropped. */
 .cne-drip-spread {
-  width: min(100% - 30px, 980px);
+  width: min(100%, 980px);
   margin: 0 0 30px;
   border: 3px solid var(--color-cne-ink);
   border-radius: 18px;

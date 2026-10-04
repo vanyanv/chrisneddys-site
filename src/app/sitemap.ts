@@ -37,7 +37,7 @@ const LOCATIONS_UPDATED = "2026-09-30";
  */
 const HOME_UPDATED = "2026-10-03";
 const ORDER_UPDATED = "2026-10-03";
-const ABOUT_UPDATED = "2026-10-03";
+const ABOUT_UPDATED = "2026-10-04";
 const CONTACT_UPDATED = "2026-09-27";
 /**
  * The /menu/ page's own layout and photos (the photo cards of issue #206,

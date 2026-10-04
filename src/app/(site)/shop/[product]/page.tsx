@@ -411,7 +411,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <div className="cne-eyebrow">While you’re here</div>
           <h2>Come eat.</h2>
           <p>
-            Every drop is made by the people behind the sliders: two smashed patties, two slices of
+            Every drop comes out of our kitchens — smashed sliders, two patties, two slices of
             cheese.{" "}
             <Link prefetch={false} href="/menu/">
               See the menu

@@ -208,7 +208,10 @@ export default function HomePage() {
       <div className="cne-ig cne-rv">
         {GRAM.map((g) => (
           <span key={g.src}>
-            {/* 3 columns on a phone (~130px), 6 on desktop (~230px). AVIF at
+            {/* 3 columns on a phone (~130px), 6 on a tablet (~16vw) and on
+                desktop (~230px). Without the tablet clause an iPad took the
+                33vw phone figure and downloaded the 400w cut for a ~125px
+                tile; 300w still covers it at 2x. AVIF at
                 300w/400w covers a 3x phone for a quarter of the bytes the
                 500w WebP cost; the WebP pair stays as the fallback. Cuts
                 come from scripts/build-photo-cuts.mjs. */}
@@ -216,12 +219,12 @@ export default function HomePage() {
               <source
                 type="image/avif"
                 srcSet={`${g.src.replace(".webp", "-300.avif")} 300w, ${g.src.replace(".webp", "-400.avif")} 400w`}
-                sizes="(min-width: 901px) 230px, 33vw"
+                sizes="(min-width: 901px) 230px, (min-width: 600px) 16vw, 33vw"
               />
               <img
                 src={g.src}
                 srcSet={`${g.src.replace(".webp", "-sm.webp")} 300w, ${g.src} 500w`}
-                sizes="(min-width: 901px) 230px, 33vw"
+                sizes="(min-width: 901px) 230px, (min-width: 600px) 16vw, 33vw"
                 alt={g.alt}
                 width={500}
                 height={500}

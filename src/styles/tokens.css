@@ -72,4 +72,11 @@
   --a-lime: #c6ff2b;
   --a-blue: #007fee;
   --a-pink: #ff4fa3;
+  /* The footer's own quiet greys on the ink ground: secondary text and the
+     hairline above the legal row. */
+  --a-foot-sub: #a99a78;
+  --a-foot-rule: #2b2620;
+  /* DESIGN.md's Muted Ink, where a solid (not translucent) muted text is
+     needed. */
+  --a-muted: #7a6f5e;
 }

@@ -10,7 +10,7 @@ import { openLocations } from "@/lib/openLocations";
 import { flagship } from "@/data/locations";
 import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { MapPins } from "@/components/locations/MapPins";
-import { MapCallout } from "@/components/locations/MapCallout";
+import { DesktopMapCallouts } from "@/components/locations/DesktopMapCallouts";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
 import { Vortex } from "@/components/storeart/Vortex";
 import { WallTethers } from "@/components/storeart/WallTethers";
@@ -113,7 +113,6 @@ export default function HomePage() {
             <div className="cne-eyebrow">★ The three we sell most</div>
             <h2>Start here.</h2>
           </div>
-          <div className="cne-sec-note">Every topping free.</div>
         </div>
         {/* Idea 6: squiggly tethers behind the three cards, desktop only. */}
         <div className="cne-tether-wrap">
@@ -156,9 +155,7 @@ export default function HomePage() {
             >
               <LocationsMapCanvas />
               <MapPins />
-              {openLocations().map((loc) => (
-                <MapCallout key={loc.id} locationId={loc.id} />
-              ))}
+              <DesktopMapCallouts locationIds={openLocations().map((loc) => loc.id)} />
             </Link>
           </div>
         </div>

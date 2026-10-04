@@ -213,9 +213,13 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+/* The button floats over paper and over the ink footer alike, so the ring is
+   two-tone: a cream band fills the offset gap and an ink ring sits outside
+   it, which reads on either (the ink ring alone vanished on the footer). */
 .cne-backtop:focus-visible {
   outline: 3px solid var(--color-cne-ink);
   outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--a-cream);
   border-radius: 999px;
 }
 .cne-backtop.is-hop svg {
@@ -254,6 +258,6 @@
 .cne-foot-numbers text {
   font-family: var(--font-marker), var(--font-bowlby), cursive;
   font-size: 11px;
-  fill: #c6ff2b;
+  fill: var(--a-lime);
   opacity: 0.3;
 }

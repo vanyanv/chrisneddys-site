@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: the three items the home page leads with now match the Popular section on your Otter page: 2 Sliders and Fries, 1 Slider and Fries and 2 Triples and Fries, in that order. The catering page shows the same three ([#254](https://github.com/vanyanv/chrisneddys-site/issues/254))
 - Site: the Mexican Coke now lines up with the Mexican Sprite and Mexican Fanta in the drinks list, and every cup and the sauce stand at the same height in their cards (the shadow under a cup no longer counts as part of it). Anyone who visited before sees the new photos straight away instead of the old ones their browser kept ([#248](https://github.com/vanyanv/chrisneddys-site/issues/248))
 
 ### Added

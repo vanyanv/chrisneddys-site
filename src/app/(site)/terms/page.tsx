@@ -87,12 +87,15 @@ export default async function TermsPage() {
         </section>
       )}
 
-      <section className="cne-lg-sec" aria-labelledby="tm-contact">
-        <h2 id="tm-contact">Contact</h2>
-        <p className="cne-lg-contact">
-          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-        </p>
-      </section>
+      {/* The not-published notice above already ends with this address. */}
+      {terms && (
+        <section className="cne-lg-sec" aria-labelledby="tm-contact">
+          <h2 id="tm-contact">Contact</h2>
+          <p className="cne-lg-contact">
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+          </p>
+        </section>
+      )}
     </div>
   );
 }

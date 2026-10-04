@@ -101,7 +101,7 @@ export function MenuBrowser() {
           <div className="cne-only-desk">
             <GlyphRow />
             <div className="cne-eyebrow" id="cne-way-label">
-              Pick a way — free
+              Pick a way: free
             </div>
           </div>
           <h1>Everything we make.</h1>

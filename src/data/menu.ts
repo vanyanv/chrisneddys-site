@@ -137,7 +137,7 @@ export const menu: Record<MenuCategoryKey, MenuItem[]> = {
       photo: "2-triples-and-fries-chris",
       wayPhotos: { eddy: "2-triples-and-fries-eddy" },
       name: "2 Triples and Fries",
-      desc: "Two triples — three patties, three slices of cheese each — and a side of fries.",
+      desc: "Two triples (three patties, three slices of cheese each) and a side of fries.",
       price: 19.49,
       takesToppings: true,
     },

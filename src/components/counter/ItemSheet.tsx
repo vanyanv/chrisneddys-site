@@ -384,7 +384,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
               </OrderLink>
               <p className="cne-fine">
                 {item.takesToppings
-                  ? "Opens your location's ordering page. Tick your Way's toppings there — all free."
+                  ? "Opens your location's ordering page. Tick your Way's toppings there, all free."
                   : "Opens your location's ordering page."}
               </p>
             </>

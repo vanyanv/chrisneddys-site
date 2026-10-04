@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { bowlby, inter, jetbrains } from "@/lib/fonts";
+import { barlow, barlowSemi, bowlby } from "@/lib/fonts";
 import "@/styles/globals.css";
 import { brand } from "@/data/brand";
 import { MascotDefs } from "@/components/mascots/MascotDefs";
@@ -29,7 +29,7 @@ import { NotFoundEvent } from "@/components/shared/NotFoundEvent";
  */
 export default function RootNotFound() {
   return (
-    <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${bowlby.variable} ${barlow.variable} ${barlowSemi.variable}`}>
       <body style={{ margin: 0 }}>
         {/* React hoists this into <head>; the page has no layout to set one. */}
         <title>{`Page not found · ${brand.name}`}</title>

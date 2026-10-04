@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { bowlby, inter, jetbrains } from "@/lib/fonts";
+import { barlow, barlowSemi, bowlby } from "@/lib/fonts";
 import "@/styles/globals.css";
 import "@/styles/counter.css";
 import "@/styles/mascots.css";
@@ -114,7 +114,7 @@ export function generateMetadata(): Metadata {
 const REVEAL_ABOVE_FOLD = `(function(){try{var n=document.querySelectorAll('.cne-rv'),h=window.innerHeight,t=[],i;for(i=0;i<n.length;i++)t.push(n[i].getBoundingClientRect().top);for(i=0;i<n.length;i++){if(t[i]<h){n[i].style.transitionDelay=(i%4)*60+'ms';n[i].classList.add('is-in')}}}catch(_){}})()`;
 
 export const viewport: Viewport = {
-  themeColor: "#E63027",
+  themeColor: "#D0281C",
   width: "device-width",
   initialScale: 1,
 };
@@ -178,7 +178,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="en"
-      className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable} ${marker.variable}`}
+      className={`${bowlby.variable} ${barlow.variable} ${barlowSemi.variable} ${marker.variable}`}
     >
       <body>
         {/* First focusable element on every page, so a keyboard or

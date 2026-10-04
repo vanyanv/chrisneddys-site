@@ -20,9 +20,68 @@ export type Box = { x0: number; y0: number; x1: number; y1: number };
 export const overlaps = (a: Box, b: Box): boolean =>
   a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
 
-/** Every glyph in JetBrains Mono advances 0.6em, so a label's width is arithmetic. */
-export const monoWidth = (text: string, size: number, spacing: number): number =>
-  text.length * (size * 0.6 + spacing);
+/**
+ * Advance widths, in ems, of Barlow Semi Condensed Bold (the map's label face,
+ * `--font-mono` at weight 700) for the characters map labels use, read from
+ * src/fonts/barlow-semi-condensed-latin-700.woff2. The face is proportional,
+ * so a label's width is the sum of its letters; anything not listed counts as
+ * 0.6em, a little wider than a typical capital.
+ */
+const ADVANCE: Record<string, number> = {
+  " ": 0.2,
+  "·": 0.23,
+  ".": 0.247,
+  ",": 0.238,
+  "'": 0.169,
+  "’": 0.196,
+  "-": 0.37,
+  "&": 0.654,
+  ":": 0.319,
+  "0": 0.511,
+  "1": 0.319,
+  "2": 0.499,
+  "3": 0.487,
+  "4": 0.544,
+  "5": 0.488,
+  "6": 0.488,
+  "7": 0.451,
+  "8": 0.49,
+  "9": 0.482,
+  A: 0.577,
+  B: 0.545,
+  C: 0.536,
+  D: 0.547,
+  E: 0.511,
+  F: 0.49,
+  G: 0.54,
+  H: 0.554,
+  I: 0.246,
+  J: 0.518,
+  K: 0.558,
+  L: 0.499,
+  M: 0.631,
+  N: 0.59,
+  O: 0.547,
+  P: 0.531,
+  Q: 0.527,
+  R: 0.543,
+  S: 0.52,
+  T: 0.526,
+  U: 0.554,
+  V: 0.555,
+  W: 0.783,
+  X: 0.553,
+  Y: 0.546,
+  Z: 0.485,
+};
+const ADVANCE_FALLBACK = 0.6;
+
+/** A label's drawn width at `size` with `spacing` letter-spacing after each character. */
+export const labelWidth = (text: string, size: number, spacing: number): number =>
+  [...text.toUpperCase()].reduce(
+    (w, ch) => w + (ADVANCE[ch] ?? ADVANCE_FALLBACK) * size + spacing,
+    0,
+  );
 
 export const TWO_MILES = 3.2187 * pxPerKm;
 
@@ -52,8 +111,8 @@ export const SOON_SUFFIX = " · SOON";
 
 /** The name label's full width, including the "· SOON" tail a location that isn't open carries. */
 export function capWidth(loc: Location): number {
-  const name = monoWidth(loc.name, PIN.capSize, PIN.capSpacing);
-  return loc.isOpen ? name : name + monoWidth(SOON_SUFFIX, PIN.soonSize, PIN.capSpacing);
+  const name = labelWidth(loc.name, PIN.capSize, PIN.capSpacing);
+  return loc.isOpen ? name : name + labelWidth(SOON_SUFFIX, PIN.soonSize, PIN.capSpacing);
 }
 
 export function pinPoint(loc: Location): { x: number; y: number } {
@@ -87,26 +146,26 @@ export const TAG = {
   /** From the pin's centre line to the tag's near edge, pointer included. */
   gap: 20,
   pointer: 5,
-  /** Room reserved for the longest status line, "CLOSED · OPENS 10 AM". */
-  reserveChars: 20,
+  /** Room reserved for the longest status line. */
+  reserveText: "CLOSED · OPENS 10 AM",
 } as const;
 
 export type TagSide = "right" | "left";
 
-function tagWidth(chars: number): number {
-  return chars * (TAG.size * 0.6 + TAG.spacing) + TAG.padX * 2;
+function tagWidth(text: string): number {
+  return labelWidth(text, TAG.size, TAG.spacing) + TAG.padX * 2;
 }
 
 /** Right of the pin unless the longest status would run off the map. */
 export function tagSide(loc: Location): TagSide {
   const { x } = pinPoint(loc);
-  return x + TAG.gap + tagWidth(TAG.reserveChars) <= mapBox.w - 4 ? "right" : "left";
+  return x + TAG.gap + tagWidth(TAG.reserveText) <= mapBox.w - 4 ? "right" : "left";
 }
 
 /** The tag's rectangle for `text`, or for the longest possible status when omitted. */
 export function tagBox(loc: Location, text?: string): Box {
   const { x, y } = pinPoint(loc);
-  const w = tagWidth(text ? text.length : TAG.reserveChars);
+  const w = tagWidth(text || TAG.reserveText);
   const cy = y + PIN.headTop + 12;
   const near = TAG.gap - TAG.pointer;
   return tagSide(loc) === "right"

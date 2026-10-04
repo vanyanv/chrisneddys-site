@@ -59,7 +59,7 @@ export function orderTimeline(input: TimelineInput): TimelineStep[] | null {
       paid,
       {
         label: "Ready for pickup",
-        detail: ready ? "Ready at the counter" : "Not packed yet",
+        detail: ready ? "Ready at the location" : "Not packed yet",
         done: ready,
       },
       {

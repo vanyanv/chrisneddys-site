@@ -243,3 +243,68 @@
   font-size: 11px;
   color: var(--a-sub);
 }
+
+/* The lookup's labels sit at the site's 11px phone floor. Scoped to this
+   form: the contact page draws the same ruled line and sizes its own. */
+.cne-ord-form .cne-ck-label {
+  font-size: 11px;
+}
+
+/* ---- /shop/thanks ---------------------------------------------------------
+   The after-checkout page draws its receipt with the lookup's own item list
+   and number chip, so a shopper sees the same order twice in the same hand. */
+
+/* Left-aligned with the rest of the page, and far enough above the headline
+   that the drip ends before the type starts. */
+.cne-thanks-mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 0 0 18px;
+}
+
+.cne-thanks-num {
+  display: block;
+}
+
+.cne-thanks-receipt {
+  max-width: 34rem;
+  margin: 22px 0;
+}
+
+.cne-thanks-receipt .cne-ord-items {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cne-thanks-line-end {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cne-thanks-receipt .cne-price {
+  font-size: 15px;
+}
+
+.cne-thanks-total {
+  padding-top: 12px;
+  border-top: 1px solid var(--a-line);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* The page's only next step, at a size that reads: left-aligned with the
+   copy, 44px tall to tap, instead of the bag drawer's 10.5px centred line. */
+.cne-thanks .cne-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  min-height: 44px;
+  padding: 0;
+  font-size: 13px;
+  color: var(--a-ink);
+}

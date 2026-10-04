@@ -21,11 +21,12 @@
 
 .cne-lg-eyebrow {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--a-red);
+  /* The text cut of the red: the display red is a fill and sits at 4.1:1 here. */
+  color: var(--a-red-cta);
   margin: 0 0 8px;
 }
 
@@ -41,7 +42,7 @@
 .cne-lg-date {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--a-sub);
 }
 
@@ -74,12 +75,12 @@
 
 .cne-lg-sec h2 {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 20px;
   line-height: 1.1;
   margin: 0 0 12px;
   color: var(--a-ink);
   /* Clears the sticky header when a heading is jumped to from the table of
-     contents a longer policy would grow, and from any anchor shared into it. */
+     contents (the privacy jump list), and from any anchor shared into it. */
   scroll-margin-top: var(--cne-stuck);
 }
 
@@ -109,7 +110,12 @@
 
 .cne-lg-sec a {
   color: var(--a-red-cta);
-  text-underline-offset: 2px;
+  /* The same pink underline every other page draws under a link in running
+     text (globals.css), so a link here is not told apart by colour alone. */
+  text-decoration: underline;
+  text-decoration-color: var(--a-pink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .cne-lg-sec code {
@@ -117,15 +123,15 @@
   font-size: 13px;
   background: var(--a-cream);
   border: 1px solid var(--a-line);
-  border-radius: 3px;
   padding: 1px 5px;
 }
 
 /* The one paragraph on the page making a claim about the code rather than about
-   policy, so it is marked as a statement of fact rather than of intent. */
+   policy, so it is marked as a statement of fact rather than of intent: boxed
+   the way the short version is, one weight lighter. */
 .cne-lg-note {
-  border-left: 4px solid var(--a-yel);
-  background: var(--a-card);
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-cream);
   padding: 12px 14px;
   margin: 0 0 12px;
 }
@@ -133,7 +139,66 @@
 .cne-lg-contact {
   font-family: var(--font-mono);
   font-size: 14px;
-  line-height: 1.9;
+}
+
+/* Each address is its own 44px row, the size every other call and email link
+   on the site gets, rather than a 20px line of text. */
+.cne-lg-contact a {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+}
+
+/* Jump links to the privacy policy's own section headings, so a reader on a
+   phone can reach "Your choices" without seven screens of scrolling. */
+.cne-lg-toc {
+  margin: -8px 0 34px;
+}
+
+.cne-lg-toc h2 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-sub);
+  margin: 0 0 6px;
+}
+
+.cne-lg-toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 2px solid var(--a-ink);
+}
+
+.cne-lg-toc li {
+  border-bottom: 1px solid var(--a-line);
+}
+
+.cne-lg-toc a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--a-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--a-pink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .cne-lg-toc ol {
+    columns: 2;
+    column-gap: 28px;
+  }
+
+  .cne-lg-toc li {
+    break-inside: avoid;
+  }
 }
 
 @media (min-width: 768px) {
@@ -146,6 +211,6 @@
   }
 
   .cne-lg-sec h2 {
-    font-size: 24px;
+    font-size: 23px;
   }
 }

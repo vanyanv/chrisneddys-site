@@ -243,7 +243,7 @@ export default async function ShopPage() {
               <Link prefetch={false} href="/contact/">
                 Get in touch
               </Link>{" "}
-              or call {brand.phone}.
+              or call Hollywood at {brand.phone}.
             </p>
           </>
         )}

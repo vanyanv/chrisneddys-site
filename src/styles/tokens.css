@@ -18,6 +18,9 @@
   --a-cream: #fff2c9;
   --a-line: #e3d8bc;
   --a-card: #fffdf6;
+  /* The white the product photos are shot on, so a frame that shows the whole
+     shot (the shop card) has no seam where the photo ends. */
+  --a-photo: #fff;
   --a-ink: #1a1612;
   --a-sub: rgba(26, 22, 18, 0.62);
   --a-nav: #e63027;

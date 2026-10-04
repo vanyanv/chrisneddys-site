@@ -44,7 +44,7 @@
 /* Smaller cut for the shop index card, under the price rather than the buy
    row — same information, less room. */
 .cne-inv.is-sm .cne-inv-text {
-  font-size: 9.5px;
+  font-size: 11px;
 }
 
 .cne-inv.is-sm .cne-inv-bar {

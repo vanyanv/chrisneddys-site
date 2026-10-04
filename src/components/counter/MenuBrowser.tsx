@@ -122,9 +122,7 @@ export function MenuBrowser() {
           </nav>
 
           <p className="cne-menu-fine">
-            <span className="cne-only-phone">
-              Every topping is free. Extra cheese +$1, halal +$2.
-            </span>
+            <span className="cne-only-phone">Extra cheese +$1, halal +$2.</span>
             <span className="cne-only-desk">Extra cheese +$1 · halal +$2.</span>
           </p>
           <MenuPillar />

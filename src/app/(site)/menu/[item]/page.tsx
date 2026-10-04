@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!item) return {};
 
   const title = `${item.name} — ${formatPrice(item.price)}`;
-  const tail = `${formatPrice(item.price)}, pickup in ${openNames()}. Every topping free.`;
+  const tail = `${formatPrice(item.price)}, pickup in ${openNames()}.`;
   const description = `${clampToWord(item.desc, DESC_LIMIT - tail.length - 1)} ${tail}`;
 
   return pageMetadata({ title, description, path: `/menu/${item.id}/` });
@@ -173,8 +173,8 @@ export default async function MenuItemPage({ params }: Params) {
           <div className="cne-eyebrow">Free either way</div>
           <h2>Pick a way.</h2>
           <p className="cne-lede">
-            Every topping is free. Order it one of the two house ways, or build it yourself from the
-            same list — the price on this page does not change either way.
+            Order it one of the two house ways, or build it yourself from the same list — the price
+            on this page does not change either way.
           </p>
           <div className="cne-loc-hrs" style={{ marginTop: 12, maxWidth: "42ch" }}>
             {ways.map((w) => (

@@ -412,7 +412,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <h2>Come eat.</h2>
           <p>
             Every drop comes out of our kitchens — smashed sliders, two patties, two slices of
-            cheese, every topping free.{" "}
+            cheese.{" "}
             <Link prefetch={false} href="/menu/">
               See the menu
             </Link>{" "}

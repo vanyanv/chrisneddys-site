@@ -42,7 +42,7 @@ const FAQ: FaqEntry[] = [
   ...sharedFaq,
   {
     q: "What is a Chris N Eddy's slider?",
-    a: "Two smashed patties and two slices of cheese in a buttered, toasted Martin's potato roll. Order it Chris's Way with lettuce, tomato, sauce and raw onion, or Eddy's Way with sauce and grilled onion — every topping is free either way.",
+    a: "Two smashed patties and two slices of cheese in a buttered, toasted Martin's potato roll. Order it Chris's Way with lettuce, tomato, sauce and raw onion, or Eddy's Way with sauce and grilled onion.",
   },
   {
     q: "How late are you open?",
@@ -52,7 +52,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do the toppings cost extra?",
-    a: "No. Every topping is free — CNE sauce, lettuce, tomato, raw onions, grilled onions and pickles. Order it Chris's Way or Eddy's Way and you pay the price on the menu. Extra cheese is $1 and making it halal is $2; nothing else is a surcharge.",
+    a: "No. Order it Chris's Way or Eddy's Way and you pay the price on the menu. Extra cheese is $1 and making it halal is $2; nothing else is a surcharge.",
   },
   {
     q: "Do you cater?",
@@ -122,8 +122,7 @@ export default function OrderPage() {
             our menu
           </Link>{" "}
           — sliders from {formatPrice(SLIDER_PRICE)}, combos from {formatPrice(COMBO_FROM_PRICE)},
-          and every topping free, at every location. Rather talk to someone? Call the location
-          you&rsquo;re picking up from.
+          at every location. Rather talk to someone? Call the location you&rsquo;re picking up from.
         </p>
         {/* Above the fold, so it ships eagerly. `sizes` is the figure's inner
             box (counter.css: 15px section gutters to 900px, 44px above, plus

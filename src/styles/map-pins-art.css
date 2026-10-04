@@ -46,5 +46,5 @@
   font-size: 6.5px;
   font-weight: 700;
   letter-spacing: 0.4px;
-  fill: #fff2c9;
+  fill: var(--a-cream);
 }

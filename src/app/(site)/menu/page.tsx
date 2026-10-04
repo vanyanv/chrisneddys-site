@@ -19,9 +19,7 @@ const title = "Menu & Prices — Sliders, Combos & Fries";
  */
 const description = `The full Chris N Eddy's menu and pickup prices: sliders from ${formatPrice(
   SLIDER_PRICE,
-)}, combos from ${formatPrice(
-  COMBO_FROM_PRICE,
-)}, a side of fries, shakes and the Secret Menu. Every topping free.`;
+)}, combos from ${formatPrice(COMBO_FROM_PRICE)}, a side of fries, shakes and the Secret Menu.`;
 
 /**
  * A link to the menu previews as the most ordered order, 2 Sliders and Fries

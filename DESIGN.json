@@ -357,7 +357,7 @@
       "kind": "card",
       "refersTo": "card-location",
       "description": "A store. Square, heavy ink border, offset shadow. Unopened stores use the same border dashed and drop the shadow entirely.",
-      "html": "<article class=\"ds-card\"><h3>HOLLYWOOD</h3><p class=\"ds-card-meta\">5539 W. SUNSET BLVD</p><p class=\"ds-card-body\">Open til 2AM Friday and Saturday. Every topping free.</p></article>",
+      "html": "<article class=\"ds-card\"><h3>HOLLYWOOD</h3><p class=\"ds-card-meta\">5539 W. SUNSET BLVD</p><p class=\"ds-card-body\">Open til 2AM Friday and Saturday.</p></article>",
       "css": ".ds-card { display: block; background: #fffdf6; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px; box-shadow: 6px 6px 0 #1a1612; transition: transform 0.2s, box-shadow 0.2s, border-color 0.25s; } .ds-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #e63027; border-color: #e63027; } .ds-card h3 { font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; line-height: 1; margin: 0 0 8px; } .ds-card-meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; color: #7a6f5e; margin: 0 0 10px; } .ds-card-body { font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.6; margin: 0; }"
     },
     {

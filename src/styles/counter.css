@@ -97,7 +97,7 @@ body {
   font-size: 11px;
   letter-spacing: 0.05em;
   background: var(--a-yel);
-  color: #1a1612;
+  color: var(--a-ink);
   border: 2px solid var(--a-ink);
   padding: 8px 11px;
   line-height: 1;
@@ -125,13 +125,13 @@ body {
    Tone is set once, on the tag, and read back through custom properties, so
    every cell switches state together and no rule has to name a color twice.  */
 .cne-stat {
-  --stat-fill: #fff2c9;
-  --stat-text: #1a1612;
+  --stat-fill: var(--a-cream);
+  --stat-text: var(--a-ink);
   --stat-dot: #2f6b3f;
   /* The fact cell runs inverted, which is what puts the closing time at the
      highest contrast in the header after the order button itself. */
-  --stat-inv-fill: #1a1612;
-  --stat-inv-text: #fff2c9;
+  --stat-inv-fill: var(--a-ink);
+  --stat-inv-text: var(--a-cream);
   --stat-rule: var(--a-ink);
 
   display: inline-flex;
@@ -145,19 +145,19 @@ body {
   transition: box-shadow 0.3s;
 }
 .cne-stat.is-shut {
-  --stat-fill: #1a1612;
-  --stat-text: #fff2c9;
-  --stat-dot: #e63027;
-  --stat-inv-fill: #fff2c9;
-  --stat-inv-text: #1a1612;
+  --stat-fill: var(--a-ink);
+  --stat-text: var(--a-cream);
+  --stat-dot: var(--a-red);
+  --stat-inv-fill: var(--a-cream);
+  --stat-inv-text: var(--a-ink);
   /* The divider has to change hands too, or it disappears into the ink cell. */
-  --stat-rule: #fff2c9;
+  --stat-rule: var(--a-cream);
 }
 .cne-stat.is-last {
   --stat-fill: var(--a-yel);
-  --stat-text: #1a1612;
-  --stat-dot: #b41d14;
-  --stat-inv-fill: #1a1612;
+  --stat-text: var(--a-ink);
+  --stat-dot: var(--a-red-deep);
+  --stat-inv-fill: var(--a-ink);
   --stat-inv-text: var(--a-yel-ink);
 }
 
@@ -248,7 +248,7 @@ body {
      than as a silently taller bar. */
   white-space: nowrap;
   text-align: center;
-  color: #fff2c9;
+  color: var(--a-cream);
   cursor: pointer;
   border: none;
   background: none;
@@ -262,7 +262,7 @@ body {
 /* The yellow indicator under the strip is the state; this is the second cue. */
 .cne-tab[aria-current="page"] {
   opacity: 1;
-  color: #fffdf6;
+  color: var(--a-card);
 }
 /* The display yellow reads 2.94:1 on Signal Red, just under the 3:1 a focus
    ring owes its surface. This is exactly the case --a-yel-ink exists for —
@@ -360,7 +360,7 @@ body {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.14em;
-  color: #7a6f5e;
+  color: var(--a-muted);
   white-space: nowrap;
 }
 .cne-header.is-shop .cne-tab {
@@ -434,12 +434,12 @@ body {
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.05em;
-  border: 2.5px solid #1a1612;
+  border: 2.5px solid var(--a-ink);
   padding: 13px 10px;
   text-align: center;
   cursor: pointer;
   line-height: 1;
-  box-shadow: 4px 4px 0 #1a1612;
+  box-shadow: 4px 4px 0 var(--a-ink);
   transition:
     transform 0.12s,
     box-shadow 0.12s;
@@ -450,11 +450,11 @@ body {
 }
 .cne-big:active {
   transform: translate(3px, 3px);
-  box-shadow: 1px 1px 0 #1a1612;
+  box-shadow: 1px 1px 0 var(--a-ink);
 }
 .cne-big.is-primary {
   background: var(--a-yel);
-  color: #1a1612;
+  color: var(--a-ink);
   flex: 1.7;
 }
 /* The menu link used to be a second `.cne-big` button (`.is-secondary`); now
@@ -465,7 +465,7 @@ body {
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.05em;
-  color: #fff2c9;
+  color: var(--a-cream);
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
@@ -520,10 +520,10 @@ body {
 /* ---- marquee ------------------------------------------------------------ */
 .cne-mq {
   position: relative;
-  background: #1a1612;
+  background: var(--a-ink);
   color: var(--a-yel);
-  border-top: 3px solid #1a1612;
-  border-bottom: 3px solid #1a1612;
+  border-top: 3px solid var(--a-ink);
+  border-bottom: 3px solid var(--a-ink);
   overflow: hidden;
   padding: 7px 0;
 }
@@ -624,8 +624,8 @@ body {
   font-size: 13px;
   letter-spacing: normal;
   text-transform: none;
-  color: #1a1612;
-  background: #c6ff2b;
+  color: var(--a-ink);
+  background: var(--a-lime);
   padding: 3px 10px 5px;
   border-radius: 3px;
   transform: rotate(-3deg);
@@ -680,7 +680,7 @@ body {
 }
 .cne-way[aria-checked="true"] {
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
 }
 .cne-way[aria-checked="true"] .s {
   color: rgba(255, 242, 201, 0.72);
@@ -805,7 +805,9 @@ body {
 }
 .cne-loc-hrs {
   font-family: var(--font-mono);
-  font-size: 10px;
+  /* Hours are one of the three facts a phone visitor came for; 12px is the
+     floor for them (they were 10px). Desktop steps up to 12.5px below. */
+  font-size: 12px;
   line-height: 1.9;
   margin-top: 8px;
   color: var(--a-sub);
@@ -816,7 +818,7 @@ body {
 }
 .cne-loc-note {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -835,11 +837,16 @@ body {
   letter-spacing: 0.05em;
   border: 2px solid var(--a-ink);
   padding: 10px 6px;
+  /* A 44px tap, centred: ORDER, DIRECTIONS and CALL are the card's whole
+     job on a phone. Desktop's 13px label and padding already clear it. */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   cursor: pointer;
   line-height: 1;
   text-decoration: none;
-  display: block;
   color: var(--a-fg);
   /* A phone number or a price is one token — "544-3600" breaking after the
      dash reads as a typo, not a line wrap. Keep every label on one line; the
@@ -851,7 +858,7 @@ body {
 }
 .cne-mini.is-red {
   background: var(--a-red-cta);
-  color: #fff2c9;
+  color: var(--a-cream);
 }
 .cne-mini.is-plain {
   background: var(--a-card);
@@ -860,7 +867,7 @@ body {
 /* ---- last-call banner + sticky dock ------------------------------------- */
 .cne-lastcall {
   background: var(--a-yel);
-  color: #1a1612;
+  color: var(--a-ink);
   border-bottom: 3px solid var(--a-ink);
   padding: 9px 15px;
   font-family: var(--font-mono);
@@ -891,7 +898,7 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e63027;
+  background: var(--a-red);
   flex: none;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -909,7 +916,7 @@ body {
   gap: 9px;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   border-top: 3px solid var(--a-ink);
 }
 .cne-dock-msg {
@@ -918,7 +925,7 @@ body {
 }
 .cne-dock-msg .t {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 11px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   font-weight: 700;
@@ -936,9 +943,10 @@ body {
   font-size: 11px;
   letter-spacing: 0.05em;
   background: var(--a-yel);
-  color: #1a1612;
+  color: var(--a-ink);
   border: 2px solid var(--a-yel);
-  padding: 11px 14px;
+  /* 44px tall: the dock is the phone's order button. */
+  padding: 14.5px 14px;
   cursor: pointer;
   line-height: 1;
   white-space: nowrap;
@@ -1025,7 +1033,7 @@ body {
   position: relative;
   overflow: hidden;
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 26px 15px;
   display: flex;
   flex-direction: column;
@@ -1059,6 +1067,13 @@ body {
    lived in an inline style on each anchor. 9.4:1 on the ink ground. */
 .cne-foot a {
   color: var(--a-yel);
+}
+/* A phone number is a tap on a phone; at its text height it was 14px tall,
+   under WCAG 2.2's 24px floor. The padding makes the tap 24px+ without
+   moving the address lines apart by more than the padding itself. */
+.cne-foot address a[href^="tel:"] {
+  display: inline-block;
+  padding-block: 5px;
 }
 
 /* Phone stacks; the desktop block turns this into three columns. */
@@ -1094,7 +1109,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #a99a78;
+  color: var(--a-foot-sub);
 }
 .cne-foot-group ul,
 .cne-foot-group li {
@@ -1116,7 +1131,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 20px;
-  border-top: 1px solid #2b2620;
+  border-top: 1px solid var(--a-foot-rule);
   padding-top: 20px;
 }
 .cne-foot-counter address {
@@ -1125,7 +1140,7 @@ body {
 }
 .cne-foot-soon {
   margin: 0;
-  color: #a99a78;
+  color: var(--a-foot-sub);
 }
 .cne-foot-hours {
   display: grid;
@@ -1135,14 +1150,14 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .cne-foot-hours span:nth-child(odd) {
-  color: #a99a78;
+  color: var(--a-foot-sub);
 }
 
 .cne-foot-legal {
-  border-top: 1px solid #2b2620;
+  border-top: 1px solid var(--a-foot-rule);
   padding-top: 14px;
-  color: #a99a78;
-  font-size: 10px;
+  color: var(--a-foot-sub);
+  font-size: 12px;
   /* Wraps rather than crushing on a 320px handset, where the copyright line and
      the policy link together outrun the column. */
   display: flex;
@@ -1151,7 +1166,7 @@ body {
   gap: 6px 16px;
 }
 .cne-foot-legal a {
-  color: #a99a78;
+  color: var(--a-foot-sub);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -1435,7 +1450,7 @@ body {
     transform: translateY(-2px);
   }
   .cne-tab[aria-current="page"] {
-    background: #fff2c9;
+    background: var(--a-cream);
     color: var(--a-red-cta);
     border-color: var(--a-ink);
     box-shadow: 4px 4px 0 var(--a-ink);
@@ -1444,7 +1459,7 @@ body {
     font-size: 19px;
     padding: 22px 34px;
     border-width: 4px;
-    box-shadow: 7px 7px 0 #1a1612;
+    box-shadow: 7px 7px 0 var(--a-ink);
     transition:
       transform 0.14s,
       box-shadow 0.14s;
@@ -1452,7 +1467,7 @@ body {
   }
   .cne-big:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 #1a1612;
+    box-shadow: 10px 10px 0 var(--a-ink);
   }
   .cne-hero-menu {
     font-size: 15px;
@@ -1659,7 +1674,9 @@ body {
   display: block;
   mix-blend-mode: multiply;
 }
-.cne-card h3 {
+.cne-card h3,
+.cne-card-name {
+  display: block;
   grid-column: 2;
   grid-row: 1;
   font-family: var(--font-body);
@@ -1668,7 +1685,8 @@ body {
   line-height: 1.22;
   margin: 0;
 }
-.cne-card p {
+.cne-card p,
+.cne-card-desc {
   grid-column: 2;
   grid-row: 2;
   font-size: 12px;
@@ -1741,13 +1759,15 @@ body {
   .cne-card-img img {
     transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
   }
-  .cne-card h3 {
+  .cne-card h3,
+  .cne-card-name {
     font-family: var(--font-display);
     font-size: 20px;
     line-height: 1.08;
     font-weight: 700;
   }
-  .cne-card p {
+  .cne-card p,
+  .cne-card-desc {
     font-size: 14px;
     line-height: 1.45;
     flex: 1;
@@ -1761,7 +1781,7 @@ body {
     top: 12px;
     left: -2px;
     background: var(--a-yel);
-    color: #1a1612;
+    color: var(--a-ink);
     border: 3px solid var(--a-ink);
     font-family: var(--font-display);
     font-size: 12px;
@@ -1843,13 +1863,15 @@ body {
   .cne-card:hover .cne-card-img {
     transform: none;
   }
-  .cne-card h3 {
+  .cne-card h3,
+  .cne-card-name {
     font-family: var(--font-display);
     font-size: 16px;
     line-height: 1.1;
     font-weight: 700;
   }
-  .cne-card p {
+  .cne-card p,
+  .cne-card-desc {
     font-size: 12.5px;
     line-height: 1.4;
     flex: 1;
@@ -1863,7 +1885,7 @@ body {
     top: 9px;
     left: -2px;
     background: var(--a-yel);
-    color: #1a1612;
+    color: var(--a-ink);
     border: 2px solid var(--a-ink);
     font-family: var(--font-display);
     font-size: 10px;
@@ -2231,7 +2253,7 @@ h3 {
 .cne-capshot-dots {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(#1a1612 1.7px, transparent 1.9px);
+  background-image: radial-gradient(var(--a-ink) 1.7px, transparent 1.9px);
   background-size: 19px 19px;
   opacity: 0.1;
 }
@@ -2242,7 +2264,7 @@ h3 {
   width: 62%;
   max-width: 230px;
   aspect-ratio: 2 / 1.35;
-  --cne-cap-c: #1a1612;
+  --cne-cap-c: var(--a-ink);
   --cne-cap-m: var(--a-yel);
   transform: var(--cne-cap-t, none);
   transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
@@ -2258,7 +2280,7 @@ h3 {
   width: 84%;
   height: 74%;
   background: var(--cne-cap-c);
-  border: 2.5px solid #1a1612;
+  border: 2.5px solid var(--a-ink);
   border-radius: 50% 50% 12% 12% / 62% 62% 18% 18%;
   overflow: hidden;
 }
@@ -2282,7 +2304,7 @@ h3 {
   width: 100%;
   height: 30%;
   background: var(--cne-cap-c);
-  border: 2.5px solid #1a1612;
+  border: 2.5px solid var(--a-ink);
   border-radius: 50% / 100% 100% 34% 34%;
   transform: rotate(-2deg);
 }
@@ -2295,7 +2317,7 @@ h3 {
   height: 11px;
   border-radius: 50%;
   background: var(--cne-cap-c);
-  border: 2.5px solid #1a1612;
+  border: 2.5px solid var(--a-ink);
   transform: translateX(-50%);
   z-index: 3;
 }
@@ -2336,7 +2358,7 @@ h3 {
   font-weight: 700;
   text-transform: uppercase;
   background: rgba(26, 22, 18, 0.82);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 4px 7px;
 }
 
@@ -2362,7 +2384,7 @@ h3 {
   font-family: var(--font-display);
   font-size: 13px;
   letter-spacing: 0.05em;
-  color: #fff2c9;
+  color: var(--a-cream);
   background: var(--a-red-cta);
   border: 3px solid var(--a-ink);
   box-shadow: 5px 5px 0 var(--a-shadow);
@@ -2450,10 +2472,10 @@ h3 {
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #1a1612;
+  color: var(--a-ink);
   background: var(--a-yel);
-  border: 2px solid #1a1612;
-  box-shadow: 2px 2px 0 #1a1612;
+  border: 2px solid var(--a-ink);
+  box-shadow: 2px 2px 0 var(--a-ink);
   padding: 7px 9px;
   line-height: 1;
   cursor: pointer;
@@ -2465,7 +2487,7 @@ h3 {
 
 .cne-bagbtn:active {
   transform: translate(2px, 2px);
-  box-shadow: 0 0 0 #1a1612;
+  box-shadow: 0 0 0 var(--a-ink);
 }
 
 .cne-bagbtn svg {
@@ -2479,7 +2501,7 @@ h3 {
 }
 
 .cne-bagbtn-c {
-  background: #1a1612;
+  background: var(--a-ink);
   color: var(--a-yel);
   padding: 0 5px;
   font-size: 9px;
@@ -2789,8 +2811,8 @@ h3 {
   pointer-events: none;
   width: 56px;
   height: 56px;
-  border: 2.5px solid #1a1612;
-  background: #fff2c9;
+  border: 2.5px solid var(--a-ink);
+  background: var(--a-cream);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2928,7 +2950,7 @@ h3 {
   .cne-bagbtn {
     font-size: 10px;
     padding: 8px 11px;
-    box-shadow: 2px 2px 0 #1a1612;
+    box-shadow: 2px 2px 0 var(--a-ink);
   }
 
   .cne-bagbtn-t {
@@ -3045,7 +3067,7 @@ h3 {
   padding: 12px 14px;
   border: 2.5px solid var(--a-ink);
   background: var(--a-yel);
-  color: #1a1612;
+  color: var(--a-ink);
   box-shadow: 4px 4px 0 var(--a-ink);
   text-decoration: none;
   transition:

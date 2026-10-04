@@ -141,7 +141,7 @@ export function buildLlmsTxt(products: MerchProduct[]): string {
     `${brand.name} is a Los Angeles smash-burger restaurant (${brand.tagline}), open now ` +
     `on Sunset Blvd in Hollywood and on Sherman Way in Van Nuys. ` +
     `The signature order is the slider: two smashed patties, two ` +
-    `slices of cheese, a buttered Martin's roll, every topping free. Order pickup direct ` +
+    `slices of cheese, a buttered Martin's roll. Order pickup direct ` +
     `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. ` +
     `Glendale is opening soon.`;
 

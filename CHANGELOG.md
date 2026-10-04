@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: "Every topping free" is gone from the whole site: the home page, the menu, the order page, the location pages, the shop and the text shared in link previews. Someone tabbing through the site with a keyboard can now see which button they're on over the red header and hero, where the blue outline used to disappear. On phones the store hours, the order bar's label, the press credits and the footer links are bigger. The ORDER, DIRECTIONS and CALL buttons on the location cards, the order bar's ORDER and the footer phone numbers are now easier to tap ([#256](https://github.com/vanyanv/chrisneddys-site/issues/256))
 - Site: the three items the home page leads with now match the Popular section on your Otter page: 2 Sliders and Fries, 1 Slider and Fries and 2 Triples and Fries, in that order. The catering page shows the same three ([#254](https://github.com/vanyanv/chrisneddys-site/issues/254))
 - Site: the Mexican Coke now lines up with the Mexican Sprite and Mexican Fanta in the drinks list, and every cup and the sauce stand at the same height in their cards (the shadow under a cup no longer counts as part of it). Anyone who visited before sees the new photos straight away instead of the old ones their browser kept ([#248](https://github.com/vanyanv/chrisneddys-site/issues/248))
 

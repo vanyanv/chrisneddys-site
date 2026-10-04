@@ -45,8 +45,10 @@ export function FeaturedCards() {
               )}
             </span>
             <span className="cne-card-body">
-              <h3>{it.name}</h3>
-              <p>{it.desc}</p>
+              {/* Spans, not h3/p: headings and paragraphs aren't allowed inside a
+                  <button>, and screen readers drop their roles there anyway. */}
+              <span className="cne-card-name">{it.name}</span>
+              <span className="cne-card-desc">{it.desc}</span>
               <span className="cne-card-ft">
                 <span className="cne-card-pr">{formatPrice(it.price)}</span>
                 <span className="cne-card-cta" aria-hidden="true">

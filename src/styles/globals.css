@@ -54,6 +54,15 @@ body {
   outline: 3px solid var(--a-blue);
   outline-offset: 3px;
 }
+/* The artist's blue clears 3:1 on paper (3.8:1) and ink (4.4:1) but only
+   1.3:1 on the reds, which is where the header ORDER and the hero buttons
+   sit. On those two red surfaces the ring takes the yellow that exists for
+   reading on red (--a-yel-ink, 3.7:1 on Signal Red), as the tab strip does.
+   The shop's header is cream, so it keeps the blue. */
+.cne-header:not(.is-shop) .cne-nav :focus-visible,
+.cne-hero-copy :focus-visible {
+  outline-color: var(--a-yel-ink);
+}
 
 /* The mural artist's colors in the small places: a lime highlight and a hot
    pink underline on body-copy links, text itself stays ink. See DESIGN.md /
@@ -201,7 +210,7 @@ body .cne-quote a {
   font-family: var(--font-mono);
   font-size: 5.6px;
   font-weight: 800;
-  fill: #fff2c9;
+  fill: var(--a-cream);
   text-anchor: middle;
 }
 
@@ -224,7 +233,7 @@ body .cne-quote a {
 }
 .cne-map-pin .head {
   fill: var(--a-red);
-  stroke: #fff2c9;
+  stroke: var(--a-cream);
   stroke-width: 2.4;
   transition: transform 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
   transform-box: fill-box;

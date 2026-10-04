@@ -30,7 +30,7 @@
      tops out at 4.35:1 on #E63027, so nothing set on it at body size passes.
      At #D0281C the subtitle, the fact strip and the address all clear 4.5:1. */
   background: var(--a-navsurf);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 16px 15px 18px;
 }
 /* The panel is plain red, with no halftone dots: the owner asked for them to
@@ -57,7 +57,7 @@
   text-transform: uppercase;
   /* Cream, not yellow: yellow on this red is 3.7:1, under the 4.5:1 that
      text this small needs (issue #154). Cream is the sub-copy's colour. */
-  color: #fff2c9;
+  color: var(--a-cream);
 }
 .cne-hero-open-dot {
   width: 6px;
@@ -84,7 +84,7 @@
   line-height: 0.86;
   margin: 0;
   letter-spacing: 0.4px;
-  text-shadow: 3px 3px 0 #1a1612;
+  text-shadow: 3px 3px 0 var(--a-ink);
   /* Centred on a phone, where the headline is the whole width and the CTA row
      below it is already symmetric. Desktop puts it back left, against the
      column edge the subtitle and buttons share. */
@@ -106,7 +106,7 @@
   margin-top: 11px;
 }
 .cne-hero-sub b {
-  color: #fffdf6;
+  color: var(--a-card);
   font-weight: 700;
 }
 
@@ -120,10 +120,10 @@
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fff2c9;
+  color: var(--a-cream);
 }
 .cne-hero-meta b {
-  color: #fff2c9;
+  color: var(--a-cream);
   font-weight: 700;
 }
 .cne-cta {
@@ -140,10 +140,10 @@
 .cne-hero-seam {
   flex: none;
   height: 18px;
-  background-image: repeating-conic-gradient(#1a1612 0% 25%, #fff2c9 0% 50%);
+  background-image: repeating-conic-gradient(var(--a-ink) 0% 25%, var(--a-cream) 0% 50%);
   background-size: 18px 18px;
-  border-top: 2px solid #1a1612;
-  border-bottom: 2px solid #1a1612;
+  border-top: 2px solid var(--a-ink);
+  border-bottom: 2px solid var(--a-ink);
 }
 
 /* The order button while the store is closed: "ORDER ONLINE" stays the main
@@ -172,7 +172,7 @@
      `heroImage.ts` for the art-directed crop this box actually downloads. */
   height: 76vw;
   overflow: hidden;
-  background: #1a1612;
+  background: var(--a-ink);
 }
 .cne-heromedia picture {
   display: block;
@@ -257,7 +257,7 @@
     font-size: clamp(34px, 5.6vw, 54px);
     text-align: left;
     letter-spacing: 0.6px;
-    text-shadow: 4px 4px 0 #1a1612;
+    text-shadow: 4px 4px 0 var(--a-ink);
   }
   .cne-hero-sub {
     font-size: 15px;
@@ -278,8 +278,8 @@
     background-size: 16px 16px;
     border-top: none;
     border-bottom: none;
-    border-left: 2px solid #1a1612;
-    border-right: 2px solid #1a1612;
+    border-left: 2px solid var(--a-ink);
+    border-right: 2px solid var(--a-ink);
   }
   .cne-heromedia {
     height: 100%;
@@ -341,7 +341,7 @@
 }
 .cne-quote cite {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--a-sub);
   font-style: normal;
@@ -407,7 +407,7 @@
     line-height: 1.35;
   }
   .cne-quote cite {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.15em;
     margin-top: 8px;
   }
@@ -470,7 +470,7 @@
     text-align: left;
     line-height: 0.84;
     letter-spacing: 1px;
-    text-shadow: 6px 6px 0 #1a1612;
+    text-shadow: 6px 6px 0 var(--a-ink);
     animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
   }
   .cne-hero-sub {
@@ -512,8 +512,8 @@
     background-size: 24px 24px;
     border-top: none;
     border-bottom: none;
-    border-left: 2px solid #1a1612;
-    border-right: 2px solid #1a1612;
+    border-left: 2px solid var(--a-ink);
+    border-right: 2px solid var(--a-ink);
   }
 
   .cne-heromedia {
@@ -596,7 +596,7 @@
   flex: none;
   border-radius: 50%;
   background: var(--a-red-cta);
-  color: #fff2c9;
+  color: var(--a-cream);
   border: 2px solid var(--a-ink);
   font-size: 13px;
   font-weight: 700;
@@ -686,22 +686,6 @@
   }
 }
 
-/* The right-hand note beside a section heading — desktop only, as in the
-   prototype, where it explains the pricing under "Start here." */
-.cne-sec-note {
-  display: none;
-}
-@media (min-width: 901px) {
-  .cne-sec-note {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--a-sub);
-    max-width: 34ch;
-    text-align: right;
-    line-height: 1.5;
-  }
-}
 /* On a phone the split is one column and the map is decoration we can drop. */
 @media (max-width: 900px) {
   .cne-split-r {

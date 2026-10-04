@@ -203,8 +203,8 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
           Every Chris N Eddy&rsquo;s runs the same short menu: a slider is two smashed patties on
           two slices of cheese in a buttered, toasted Martin&rsquo;s potato roll. Order it
           Chris&rsquo;s Way with lettuce, tomato, sauce and raw onion, or Eddy&rsquo;s Way with
-          sauce and grilled onion — every topping is free either way. Alongside them, a side of
-          fries, cheese fries, loaded fries, shakes, and the Secret Menu.
+          sauce and grilled onion. Alongside them, a side of fries, cheese fries, loaded fries,
+          shakes, and the Secret Menu.
         </p>
         <div className="cne-loc-btns cne-lp-menu-btns">
           <Link prefetch={false} className="cne-mini is-red" href="/menu/">

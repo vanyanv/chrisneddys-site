@@ -27,37 +27,39 @@
      on a phone and half of it from 600px. */
   container-type: inline-size;
   background: var(--a-red-cta);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 18px 15px 22px;
 }
 
+/* The breadcrumb and the eyebrow are small type on --a-red-cta, so both are
+   full-strength cream (4.7:1) at 12px: the yellow cut (3.7:1) and a faded
+   cream (3.75:1) both fell short of 4.5:1 there (issue #261). */
 .cne-lp-crumb {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #fff2c9;
-  opacity: 0.85;
+  color: var(--a-cream);
   margin: 0 0 14px;
 }
 .cne-lp-crumb a {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 3px;
-  /* 10px type, so the padding buys the 24px tap target. */
+  /* Small type, so the padding buys the 24px tap target. */
   display: inline-block;
-  padding: 7px 0;
-  margin: -7px 0;
+  padding: 6px 0;
+  margin: -6px 0;
 }
 
 .cne-lp-eyebrow {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--a-yel-ink);
+  color: var(--a-cream);
   margin: 0 0 4px;
 }
 
@@ -70,7 +72,7 @@
   letter-spacing: 0.5px;
   margin: 0 0 16px;
   padding: 0;
-  color: #fff2c9;
+  color: var(--a-cream);
   text-shadow: 4px 4px 0 var(--a-ink);
 }
 .cne-lp-hero h1::after {
@@ -90,14 +92,14 @@
   font-size: 13px;
   line-height: 1.5;
   letter-spacing: 0.04em;
-  color: #fff2c9;
+  color: var(--a-cream);
 }
 
 .cne-lp-hrs {
   margin: 16px 0 0;
   padding: 10px 12px;
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   border: 2.5px solid var(--a-ink);
   font-family: var(--font-mono);
   font-size: 12px;
@@ -124,7 +126,7 @@
   display: inline-block;
   margin: 16px 0 0;
   padding: 10px 14px;
-  background: #fff2c9;
+  background: var(--a-cream);
   color: var(--a-ink);
   border: 2.5px dashed var(--a-ink);
   font-family: var(--font-display);
@@ -151,7 +153,7 @@
   gap: 8px;
 }
 .cne-lp-minis .cne-mini {
-  font-size: 11px;
+  font-size: 12px;
   padding: 11px 6px;
   box-shadow: 3px 3px 0 var(--a-ink);
 }
@@ -162,7 +164,7 @@
 
 .cne-lp-note {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 12px 0 0;
@@ -172,10 +174,10 @@
 .cne-lp-seam {
   flex: none;
   height: 18px;
-  background-image: repeating-conic-gradient(#1a1612 0% 25%, #fff2c9 0% 50%);
+  background-image: repeating-conic-gradient(var(--a-ink) 0% 25%, var(--a-cream) 0% 50%);
   background-size: 18px 18px;
-  border-top: 2px solid #1a1612;
-  border-bottom: 2px solid #1a1612;
+  border-top: 2px solid var(--a-ink);
+  border-bottom: 2px solid var(--a-ink);
 }
 
 .cne-lp-media {
@@ -207,7 +209,7 @@
 /* ---- the tunnel (stores without a photo yet) ---------------------------- */
 .cne-tunnel {
   position: relative;
-  background: #fff2c9;
+  background: var(--a-cream);
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -274,7 +276,7 @@
   position: relative;
   overflow: hidden;
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   border-top: 3px solid var(--a-ink);
   border-bottom: 3px solid var(--a-ink);
   padding: 34px 15px 38px;
@@ -289,14 +291,18 @@
   color: var(--a-yel-ink);
 }
 .cne-lp-night h2 {
-  color: #fff2c9;
+  color: var(--a-cream);
   margin-right: 90px;
 }
 .cne-lp-night .cne-lede {
-  color: #fff2c9;
+  color: var(--a-cream);
   opacity: 0.9;
   max-width: 62ch;
   font-size: 15px;
+}
+/* Two paragraphs: without this they ran together as one block. */
+.cne-lp-night .cne-lede + .cne-lede {
+  margin-top: 0.9em;
 }
 .cne-lp-night-mon {
   position: absolute;
@@ -321,7 +327,7 @@
 .cne-lp-night-numbers text {
   font-family: var(--font-marker), var(--font-bowlby), cursive;
   font-size: 13px;
-  fill: #c6ff2b;
+  fill: var(--a-lime);
   --num-op: 0.18;
   opacity: var(--num-op);
 }
@@ -428,8 +434,8 @@
     height: auto;
     border-top: 0;
     border-bottom: 0;
-    border-left: 2px solid #1a1612;
-    border-right: 2px solid #1a1612;
+    border-left: 2px solid var(--a-ink);
+    border-right: 2px solid var(--a-ink);
   }
   .cne-lp-media {
     aspect-ratio: auto;
@@ -481,7 +487,7 @@
     justify-content: center;
   }
   .cne-lp-crumb {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 22px;
   }
   .cne-lp-eyebrow {
@@ -661,10 +667,15 @@
 }
 
 /* The wave plays. Before it scrolls into view the bars lie flat; on arrival
-   they rise left to right, then keep bouncing like a level meter, each bar
-   at its own period and dipping to its own floor (`--t`, `--lo`), while the
+   they rise left to right, then bounce like a level meter, each bar at its
+   own period and dipping to its own floor (`--t`, `--lo`), while the
    monsters pop in and bob and the speaker's arcs pulse. Transforms and
-   opacity only, so it all runs on the compositor. */
+   opacity only, so it all runs on the compositor.
+
+   It plays for about five seconds and then settles into the still wall:
+   motion that runs on beside text needs a way to stop (WCAG 2.2.2, issue
+   #261). Every count is even, so each `alternate` loop ends on its `from`
+   frame, the wall's resting pose, with no jump. */
 @media (prefers-reduced-motion: no-preference) {
   .js .cne-lp-wave-bars span {
     transform: scaleY(0.06);
@@ -672,7 +683,7 @@
   .js .cne-lp-wave.is-in .cne-lp-wave-bars span {
     animation:
       cne-lp-wave-rise 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.15s + var(--i) * 45ms) both,
-      cne-lp-wave-eq var(--t) ease-in-out calc(0.75s + var(--i) * 45ms) infinite alternate;
+      cne-lp-wave-eq var(--t) ease-in-out calc(0.75s + var(--i) * 45ms) 6 alternate;
   }
   .js .cne-lp-wave-mon {
     transform: scale(0);
@@ -680,14 +691,14 @@
   .js .cne-lp-wave.is-in .cne-lp-wave-mon {
     animation:
       cne-lp-wave-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both,
-      cne-lp-wave-bob 0.62s ease-in-out 1s infinite alternate;
+      cne-lp-wave-bob 0.62s ease-in-out 1s 8 alternate;
   }
   .js .cne-lp-wave.is-in .cne-lp-wave-mon.is-yel {
     animation-delay: 0.85s, 1.35s;
     animation-duration: 0.5s, 0.7s;
   }
   .cne-lp-wave-arc {
-    animation: cne-lp-wave-arc 1.2s ease-in-out infinite;
+    animation: cne-lp-wave-arc 1.2s ease-in-out 4;
   }
   .cne-lp-wave-arc.is-far {
     animation-delay: 0.2s;
@@ -729,9 +740,9 @@
 @keyframes cne-lp-wave-arc {
   0%,
   100% {
-    opacity: 0.2;
+    opacity: 1;
   }
   50% {
-    opacity: 1;
+    opacity: 0.2;
   }
 }

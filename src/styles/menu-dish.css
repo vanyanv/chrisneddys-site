@@ -217,48 +217,43 @@
   rotate: -3deg;
 }
 
-/* The section's lead: photo beside name, description, price, PICK YOURS. */
+/* The section's lead: photo, name, description, price, PICK YOURS. On a
+   phone the photo runs the full width of the card on top: beside the text it
+   got half the width, and drew the section's best seller smaller than the
+   cards under it (issue #257). From 600px up it sits beside the text. */
 .cne-dish.is-lead {
-  flex-direction: row;
-  align-items: stretch;
   margin-bottom: 14px;
 }
 .cne-dish.is-lead .cne-dish-ph {
   flex: none;
-  width: 52%;
-  aspect-ratio: auto;
-  min-height: 176px;
-  border-bottom: 0;
-  border-right: 2.5px solid var(--a-ink);
 }
-/* A phone draws the lead's photo (and a wide odd-last card's) in a pane
-   taller than the 4:3 cut; `contain` keeps the whole of the food in view,
-   centred, and the multiply blend hides the white above and below it. */
-.cne-dish.is-lead .cne-dish-ph img,
+/* A wide odd-last card's photo sits in a pane taller than the 4:3 cut;
+   `contain` keeps the whole of the food in view, centred, and the multiply
+   blend hides the white above and below it. */
 .cne-dish-grid.is-odd > .cne-dish:last-child .cne-dish-ph img {
   object-fit: contain;
 }
 .cne-dish.is-lead .cne-dish-body {
   gap: 6px;
-  padding: 12px;
+  padding: 12px 14px 14px;
   min-width: 0;
 }
 .cne-dish.is-lead .n {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 1.05;
   text-wrap: balance;
 }
 .cne-dish.is-lead .d {
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .cne-dish.is-lead .p {
-  font-size: 17px;
+  font-size: 19px;
   padding-right: 0;
 }
 .cne-dish.is-lead .cne-dish-cta {
@@ -290,10 +285,18 @@
   .cne-dish-grid {
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   }
+  .cne-dish.is-lead {
+    flex-direction: row;
+    align-items: stretch;
+  }
   .cne-dish.is-lead .cne-dish-ph {
     width: min(46%, 420px);
-    aspect-ratio: 4 / 3;
-    min-height: 0;
+    border-bottom: 0;
+    border-right: 2.5px solid var(--a-ink);
+  }
+  /* Beside a long description the pane can grow taller than 4:3. */
+  .cne-dish.is-lead .cne-dish-ph img {
+    object-fit: contain;
   }
   .cne-dish.is-lead .cne-dish-body {
     justify-content: center;

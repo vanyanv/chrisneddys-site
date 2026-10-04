@@ -54,9 +54,10 @@
   display: none;
 }
 .cne-menu-chip {
+  position: relative;
   flex: none;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -68,6 +69,14 @@
   text-decoration: none;
   white-space: nowrap;
   scroll-snap-align: start;
+}
+/* The pill is drawn about 35px tall so the sticky strip stays slim; the tap
+   area reaches 44px into the strip's own padding and the gaps between pills
+   (issue #257). */
+.cne-menu-chip::after {
+  content: "";
+  position: absolute;
+  inset: -5px -4px;
 }
 .cne-menu-chip.is-active {
   background: var(--a-red-cta);

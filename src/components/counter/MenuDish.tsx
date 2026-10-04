@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/otter";
 import { menuCardSrcSet, menuPhotoVersion } from "@/lib/menuPhoto";
 import { PattyDots } from "./PattyDots";
 
-const LADDER_SIZES = "(min-width: 600px) 420px, 52vw";
+const LADDER_SIZES = "(min-width: 600px) 420px, 100vw";
 /**
  * The cards sit in auto-fit grids whose column count depends on how many
  * cards a section has, so their width is only known after layout. Every card
@@ -15,6 +15,9 @@ const LADDER_SIZES = "(min-width: 600px) 420px, 52vw";
  * Edge); Safari skips `auto` and takes the estimate after it.
  */
 const CARD_SIZES = "auto, (min-width: 901px) 320px, (min-width: 600px) 30vw, 50vw";
+/** A section's lead card: the whole card width on a phone, beside the text
+ * (at most 420px) from 600px up. */
+const LEAD_SIZES = "auto, (min-width: 600px) 420px, 100vw";
 const ladderSet = (base: string, ext: string) =>
   [480, 720, 900].map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
 
@@ -84,11 +87,15 @@ export function MenuDish({
         ) : (
           photo && (
             <picture>
-              <source type="image/avif" srcSet={menuCardSrcSet(photo, "avif")} sizes={CARD_SIZES} />
+              <source
+                type="image/avif"
+                srcSet={menuCardSrcSet(photo, "avif")}
+                sizes={lead ? LEAD_SIZES : CARD_SIZES}
+              />
               <img
                 src={`/menu/${photo}-card.webp${menuPhotoVersion(photo)}`}
                 srcSet={menuCardSrcSet(photo, "webp")}
-                sizes={CARD_SIZES}
+                sizes={lead ? LEAD_SIZES : CARD_SIZES}
                 alt={item.name}
                 width={560}
                 height={420}

@@ -18,6 +18,10 @@ import type { MenuCategoryKey } from "@/data/menu";
  * and reading the bar's real position keeps this correct everywhere without
  * having to know any of those numbers.
  */
+/** How far under the chip bar a heading may sit and still count as the
+ * section you're in. More than the 10px a tap leaves it at. */
+const SLACK = 24;
+
 export function MenuSectionChips({
   sections,
 }: {
@@ -27,6 +31,11 @@ export function MenuSectionChips({
   const chipRefs = useRef<Partial<Record<MenuCategoryKey, HTMLAnchorElement>>>({});
   const [active, setActive] = useState<MenuCategoryKey | undefined>(sections[0]?.key);
 
+  /* The section a tap asked for, held until the page stops scrolling. The
+     smooth scroll passes every section in between, and without this the
+     chip strip flickers through each of them on the way. */
+  const heldRef = useRef<MenuCategoryKey | null>(null);
+
   useEffect(() => {
     const ids = sections.map((s) => s.key);
     const els = ids
@@ -35,22 +44,44 @@ export function MenuSectionChips({
     const bar = barRef.current;
     if (!bar || els.length === 0) return;
 
-    const onScroll = () => {
-      // The bar's own bottom edge is the line a section's heading has to clear
-      // to count as "current" — it is exactly where the sticky bar stops and
-      // the page's own content starts, at whatever height that is right now.
-      const line = bar.getBoundingClientRect().bottom;
+    const pick = () => {
+      // A heading counts as "current" once it is within SLACK of the bar's
+      // bottom edge. A tap parks the heading 10px under the bar, and a line
+      // at the bar itself left every tapped section one short of counting,
+      // so the chip above it stayed lit (issue #257).
+      const line = bar.getBoundingClientRect().bottom + SLACK;
+      // At the very bottom the last section can't scroll up to the line —
+      // Drinks is shorter than the screen — so the bottom of the page is it.
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       let current = els[0]!.id.replace("menu-", "");
       for (const el of els) {
-        if (el.getBoundingClientRect().top - line <= 0) current = el.id.replace("menu-", "");
+        if (el.getBoundingClientRect().top <= line) current = el.id.replace("menu-", "");
       }
+      if (atBottom) current = els[els.length - 1]!.id.replace("menu-", "");
       setActive(current as MenuCategoryKey);
     };
 
-    onScroll();
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      if (heldRef.current) {
+        // Release the tapped chip once the scroll has settled, then let the
+        // page decide, which by then agrees with it.
+        clearTimeout(idle);
+        idle = setTimeout(() => {
+          heldRef.current = null;
+          pick();
+        }, 150);
+        return;
+      }
+      pick();
+    };
+
+    pick();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      clearTimeout(idle);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
@@ -64,11 +95,14 @@ export function MenuSectionChips({
     // the strip scrolls sideways, so the current chip can drift off either
     // edge as you read down the page.
     const chip = active ? chipRefs.current[active] : undefined;
-    if (!chip) return;
+    const bar = barRef.current;
+    if (!chip || !bar) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    chip.scrollIntoView({
-      inline: "center",
-      block: "nearest",
+    // Scroll the strip itself, not `chip.scrollIntoView()`: that also counts
+    // as scrolling the page, and starting it mid-jump cut a tap on Drinks
+    // short of the Drinks heading (issue #257).
+    bar.scrollTo({
+      left: chip.offsetLeft - (bar.clientWidth - chip.offsetWidth) / 2,
       behavior: reduced ? "auto" : "smooth",
     });
   }, [active]);
@@ -82,9 +116,15 @@ export function MenuSectionChips({
     // hash jump only clears the sticky *header* (see `scroll-padding-top` in
     // counter.css), which is what this bar sits below and would otherwise
     // cover the heading it just jumped to.
-    const offset = bar.getBoundingClientRect().bottom;
+    // Where the bar's bottom edge will be once it is stuck, not where it is
+    // now: tapped from the top of the page the bar hasn't stuck yet, and its
+    // current position sent Drinks 92px short (issue #257).
+    const offset = parseFloat(getComputedStyle(bar).top) + bar.offsetHeight;
     const top = target.getBoundingClientRect().top + window.scrollY - offset - 10;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // No scroll is coming when the page is already there, so nothing to hold.
+    const reachable = Math.min(top, document.documentElement.scrollHeight - window.innerHeight);
+    if (Math.abs(reachable - window.scrollY) > 2) heldRef.current = key;
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
     setActive(key);
   };

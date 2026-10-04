@@ -163,7 +163,7 @@ export default async function MenuItemPage({ params }: Params) {
         </div>
         <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8 }}>
           {item.takesToppings
-            ? "Opens your location's ordering page. Tick your Way's toppings there — all free."
+            ? "Opens your location's ordering page. Tick your Way's toppings there, all free."
             : "Opens your location's ordering page."}
         </p>
       </section>

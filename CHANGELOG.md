@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: on the menu, tapping a section button at the top of a phone screen now lights up that section (it used to light the one above, and Drinks never lit up), and a tap on Drinks from the top of the page lands on Drinks. On phones each section's first item now shows its photo across the whole card instead of squeezed beside the text, section names are set in the big headline letters instead of small print, and the section buttons, item details and catering note use larger text with easier-to-hit buttons. The footer's hand-written tag no longer animates for people who turn motion off on their phone, and the menu's long dashes are now commas, a colon and brackets ([#257](https://github.com/vanyanv/chrisneddys-site/issues/257))
 - Site: the three items the home page leads with now match the Popular section on your Otter page: 2 Sliders and Fries, 1 Slider and Fries and 2 Triples and Fries, in that order. The catering page shows the same three ([#254](https://github.com/vanyanv/chrisneddys-site/issues/254))
 - Site: the Mexican Coke now lines up with the Mexican Sprite and Mexican Fanta in the drinks list, and every cup and the sauce stand at the same height in their cards (the shadow under a cup no longer counts as part of it). Anyone who visited before sees the new photos straight away instead of the old ones their browser kept ([#248](https://github.com/vanyanv/chrisneddys-site/issues/248))
 

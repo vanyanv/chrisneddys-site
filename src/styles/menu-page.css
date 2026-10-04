@@ -384,3 +384,19 @@
     font-size: 11px;
   }
 }
+
+/* Phone and iPad section headings in the display face, the size of the
+   design's headline step. As 11px mono they were the smallest words in each
+   section, under item names set at 15px, so five screens of food ran
+   together (issue #257). Desktop's rule in counter.css is untouched. */
+@media (max-width: 900px) {
+  .cne-menu .cne-cat h2.cne-cat-h {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--a-fg);
+    line-height: 1;
+    margin: 0 0 8px;
+  }
+}

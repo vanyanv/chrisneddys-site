@@ -112,7 +112,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cne-foot-tag-ink {
+  /* Names the written state too: that rule is more specific than a bare
+     `.cne-foot-tag-ink`, so on its own this lost and the tag still wiped in
+     (issue #257). */
+  .cne-foot-tag-ink,
+  .cne-foot-tag.is-written .cne-foot-tag-ink {
     clip-path: none;
     animation: none;
   }

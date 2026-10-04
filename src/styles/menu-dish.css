@@ -248,7 +248,7 @@
 .cne-dish.is-lead .d {
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  line-clamp: 4;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -306,6 +306,8 @@
     font-size: 28px;
   }
   .cne-dish.is-lead .d {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
     font-size: 14.5px;
     max-width: 48ch;
   }

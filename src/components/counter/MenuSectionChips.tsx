@@ -123,8 +123,17 @@ export function MenuSectionChips({
     const top = target.getBoundingClientRect().top + window.scrollY - offset - 10;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // No scroll is coming when the page is already there, so nothing to hold.
-    const reachable = Math.min(top, document.documentElement.scrollHeight - window.innerHeight);
-    if (Math.abs(reachable - window.scrollY) > 2) heldRef.current = key;
+    const reachable = Math.max(
+      0,
+      Math.min(top, document.documentElement.scrollHeight - window.innerHeight),
+    );
+    if (Math.abs(reachable - window.scrollY) > 2) {
+      heldRef.current = key;
+      // A backstop in case no scroll event ever comes to release it.
+      setTimeout(() => {
+        if (heldRef.current === key) heldRef.current = null;
+      }, 1500);
+    }
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
     setActive(key);
   };

@@ -45,7 +45,13 @@ export function OrderDock() {
   const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel();
 
   return (
-    <div className="cne-dock" data-location={onLocationPage ? loc.id : undefined}>
+    // An <aside> so screen readers can find the bar as its own landmark; it sits
+    // outside <main> on every page (issue #265).
+    <aside
+      className="cne-dock"
+      aria-label="Order"
+      data-location={onLocationPage ? loc.id : undefined}
+    >
       {choosing ? (
         <button
           type="button"
@@ -95,6 +101,6 @@ export function OrderDock() {
           </DirectionsLink>
         </span>
       )}
-    </div>
+    </aside>
   );
 }

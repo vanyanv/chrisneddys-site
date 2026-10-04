@@ -10,8 +10,7 @@ const RED = { bodyColor: MONSTER_COLORS.red.body, irisColor: MONSTER_COLORS.red.
 const YELLOW = { bodyColor: MONSTER_COLORS.yellow.body, irisColor: MONSTER_COLORS.yellow.iris };
 const BLUE = { bodyColor: MONSTER_COLORS.blue.body, irisColor: MONSTER_COLORS.blue.iris };
 import { brand } from "@/data/brand";
-import { flagship } from "@/data/locations";
-import { slugFor } from "@/lib/locationSlug";
+import { flagship, locations } from "@/data/locations";
 import { ways } from "@/data/menu";
 import { press } from "@/data/press";
 import { OrderLink } from "@/components/order/OrderLink";
@@ -23,6 +22,7 @@ type NineStyle = CSSProperties & { "--i"?: number };
 const [chris, eddy] = ways;
 const ktla = press.find((p) => p.pub === "KTLA 5");
 const eaterLa = press.find((p) => p.pub === "Eater LA");
+const vanNuys = locations.find((l) => l.id === "vannuys");
 
 /**
  * "The Drip" — a red paint line runs down the middle of the timeline and
@@ -97,8 +97,6 @@ export function DripStory(): ReactElement {
     };
   }, []);
 
-  const hollywoodHref = `/locations/${slugFor(flagship)}/`;
-
   return (
     <div className="cne-drip" ref={rootRef}>
       <div className="cne-drip-top">
@@ -116,7 +114,7 @@ export function DripStory(): ReactElement {
           <svg viewBox="0 0 40 60">
             <path
               d="M20,2 C28,20 34,32 34,42 A14,14 0 1 1 6,42 C6,32 12,20 20,2 Z"
-              fill="#e63027"
+              fill="var(--a-red)"
             />
           </svg>
         </div>
@@ -125,7 +123,7 @@ export function DripStory(): ReactElement {
           <i className="cne-drip-dot" aria-hidden="true" />
           <div className="cne-drip-txt">
             <span className="cne-drip-yr">age 13</span>
-            <h3>BEST FRIENDS FIRST</h3>
+            <h2>BEST FRIENDS FIRST</h2>
             <p>
               Chris and Eddy met when they were about thirteen, and they&rsquo;ve been arguing ever
               since.
@@ -147,7 +145,7 @@ export function DripStory(): ReactElement {
           <i className="cne-drip-dot" aria-hidden="true" />
           <div className="cne-drip-txt">
             <span className="cne-drip-yr">spring 2020</span>
-            <h3>THE CALL</h3>
+            <h2>THE CALL</h2>
             <p>
               Eddy called Chris with an idea. Chris was in San Francisco. He packed up that week.
             </p>
@@ -165,7 +163,7 @@ export function DripStory(): ReactElement {
           <i className="cne-drip-dot" aria-hidden="true" />
           <div className="cne-drip-txt">
             <span className="cne-drip-yr">9 months</span>
-            <h3>A TASTING A DAY</h3>
+            <h2>A TASTING A DAY</h2>
             <p>
               Two patties, smashed thin, on two slices of American and a buttered Martin&rsquo;s
               roll. Nothing has changed it since.
@@ -182,21 +180,21 @@ export function DripStory(): ReactElement {
                 >
                   <path
                     d="M4 16 Q4 3 20 3 Q36 3 36 16 Z"
-                    fill="#f5b82e"
-                    stroke="#1a1612"
+                    fill="var(--a-yel)"
+                    stroke="var(--a-ink)"
                     strokeWidth="2.2"
                   />
                   <path
                     d="M3 16 H37 L33 21 L28 18 L22 22 L16 18 L10 21 L6 18 Z"
-                    fill="#ffd633"
-                    stroke="#1a1612"
+                    fill="var(--a-yel-ink)"
+                    stroke="var(--a-ink)"
                     strokeWidth="2"
                   />
-                  <rect x="4" y="19" width="32" height="5" rx="2" fill="#1a1612" />
+                  <rect x="4" y="19" width="32" height="5" rx="2" fill="var(--a-ink)" />
                   <path
                     d="M5 24 H35 V27 Q35 30 31 30 H9 Q5 30 5 27 Z"
-                    fill="#f5b82e"
-                    stroke="#1a1612"
+                    fill="var(--a-yel)"
+                    stroke="var(--a-ink)"
                     strokeWidth="2.2"
                   />
                 </svg>
@@ -209,7 +207,7 @@ export function DripStory(): ReactElement {
           <i className="cne-drip-dot" aria-hidden="true" />
           <div className="cne-drip-txt">
             <span className="cne-drip-yr">late {brand.founded}</span>
-            <h3>THE PARKING LOT</h3>
+            <h2>THE PARKING LOT</h2>
             <p>The first sliders went out of a pop-up in a Hollywood parking lot.</p>
           </div>
           <div className="cne-drip-med">
@@ -233,7 +231,7 @@ export function DripStory(): ReactElement {
           <i className="cne-drip-dot" aria-hidden="true" />
           <div className="cne-drip-txt">
             <span className="cne-drip-yr">2021</span>
-            <h3>SUNSET BLVD</h3>
+            <h2>SUNSET BLVD</h2>
             <p>The flagship opens at {flagship.address}, and the monsters move onto the walls.</p>
           </div>
           <div className="cne-drip-med">
@@ -258,7 +256,7 @@ export function DripStory(): ReactElement {
             <i className="cne-drip-dot" aria-hidden="true" />
             <div className="cne-drip-txt">
               <span className="cne-drip-yr">2023</span>
-              <h3>ON THE ROAD</h3>
+              <h2>ON THE ROAD</h2>
               <p>About {brand.festivalsPerYear} festival dates a year.</p>
             </div>
             <div className="cne-drip-med">
@@ -270,13 +268,15 @@ export function DripStory(): ReactElement {
           </div>
         ) : null}
 
-        {eaterLa ? (
+        {/* Van Nuys opened on 2026-09-25 (issue #265); this chapter used to say it
+            was still on the way. Glendale is the one that's next. */}
+        {eaterLa && vanNuys ? (
           <div className="cne-drip-st cne-drip-rv">
             <i className="cne-drip-dot" aria-hidden="true" />
             <div className="cne-drip-txt">
-              <span className="cne-drip-yr">next</span>
-              <h3>GLENDALE + VAN NUYS</h3>
-              <p>Two more locations on the way.</p>
+              <span className="cne-drip-yr">2026</span>
+              <h2>VAN NUYS</h2>
+              <p>The second location opens at {vanNuys.address}. Glendale is next.</p>
             </div>
             <div className="cne-drip-med">
               <div className="cne-drip-qstk is-wide" style={{ "--r": "2deg" } as CSSProperties}>
@@ -301,8 +301,8 @@ export function DripStory(): ReactElement {
           />
         </svg>
         {/* Below the fold, so lazy. `sizes` is the figure's inner box, which is
-            the pool's width less a 15px gutter each side, up to 980px
-            (about.css), less its 3px borders; on phones the 2:1 crop is wider
+            the pool's width less its side padding (18px on phones, 4u
+            above), up to 980px (about.css), less its 3px borders; on phones the 2:1 crop is wider
             than the box, so the photo is drawn about 118% of the box's width. */}
         <figure className="cne-drip-spread">
           <ArtPhoto
@@ -310,7 +310,7 @@ export function DripStory(): ReactElement {
             widths={[480, 720, 1080, 1440]}
             width={1440}
             height={611}
-            sizes="(max-width: 699px) calc(118vw - 50px), (max-width: 1010px) calc(100vw - 36px), 974px"
+            sizes="(max-width: 699px) calc(118vw - 50px), (max-width: 1070px) calc(92vw - 6px), 974px"
             alt="Side-on view of a Chris N Eddy’s spread on a red table with Chris’s Way and Eddy’s Way sliders side by side, a grilled cheese, fries, cheese fries and three shakes."
           />
         </figure>
@@ -336,8 +336,8 @@ export function DripStory(): ReactElement {
         <p className="cne-drip-quiet" data-surface="about">
           <OrderLink surface="about">ORDER ONLINE</OrderLink>
           <span aria-hidden="true">&middot;</span>
-          <Link prefetch={false} href={hollywoodHref}>
-            {flagship.address}
+          <Link prefetch={false} href="/locations/">
+            LOCATIONS
           </Link>
         </p>
       </div>

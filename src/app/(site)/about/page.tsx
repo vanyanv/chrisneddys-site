@@ -5,7 +5,7 @@ import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
 import { brand } from "@/data/brand";
 
-const title = "Our Story — A Parking Lot to Sunset Blvd";
+const title = "Our Story: A Parking Lot to Sunset Blvd";
 const description =
   "Two childhood friends turned a 2020 parking-lot pop-up into a permanent spot on Sunset Blvd. Nine months of testing, one smashed slider.";
 

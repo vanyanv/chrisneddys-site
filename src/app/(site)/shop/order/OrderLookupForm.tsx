@@ -68,11 +68,17 @@ function formatWhen(iso: string): string {
 
 export function OrderLookupForm() {
   const [state, formAction, pending] = useActionState(lookupOrderAction, initialState);
+  // The one message speaks for both fields: a miss never says which of the
+  // two was wrong (see `actions.ts`), so both point at it.
+  const invalid = state.error
+    ? { "aria-invalid": true as const, "aria-describedby": "order-lookup-err" }
+    : {};
+  const fieldClass = `cne-ck-field${state.error ? " is-bad" : ""}`;
 
   return (
     <div className={`cne-ord${state.result ? " has-result" : ""}`}>
       <form action={formAction} noValidate className="cne-ord-form">
-        <div className="cne-ck-field">
+        <div className={fieldClass}>
           <label className="cne-ck-label" htmlFor="order-number">
             Order number
           </label>
@@ -85,12 +91,13 @@ export function OrderLookupForm() {
               autoComplete="off"
               required
               className="cne-ck-input"
+              {...invalid}
             />
             <span className="cne-ck-underline" aria-hidden="true" />
           </span>
         </div>
 
-        <div className="cne-ck-field">
+        <div className={fieldClass}>
           <label className="cne-ck-label" htmlFor="order-email">
             Email used at checkout
           </label>
@@ -103,13 +110,14 @@ export function OrderLookupForm() {
               autoComplete="email"
               required
               className="cne-ck-input"
+              {...invalid}
             />
             <span className="cne-ck-underline" aria-hidden="true" />
           </span>
         </div>
 
         {state.error && (
-          <p className="cne-ck-err" role="alert">
+          <p className="cne-ck-err" id="order-lookup-err" role="alert">
             {state.error}
           </p>
         )}
@@ -119,7 +127,11 @@ export function OrderLookupForm() {
         </button>
       </form>
 
-      {state.result && <OrderResult result={state.result} />}
+      {/* The live region is on the page before any answer arrives, so the
+          result is announced when it lands rather than missed. */}
+      <div role="status" aria-live="polite">
+        {state.result && <OrderResult result={state.result} />}
+      </div>
     </div>
   );
 }
@@ -129,7 +141,7 @@ function OrderResult({ result }: { result: OrderLookupResult }) {
   const badge = statusBadge(result);
 
   return (
-    <article className="cne-ord-result" role="status" aria-live="polite">
+    <article className="cne-ord-result">
       <header className="cne-ord-head">
         <div>
           <div className="cne-eyebrow">Order</div>

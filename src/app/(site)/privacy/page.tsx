@@ -13,7 +13,33 @@ const description =
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/privacy/" });
 
-const UPDATED_HUMAN = "26 September 2026";
+/** The page's own date, printed from the one constant the sitemap also reads
+ * so the two can never disagree. UTC, since the constant is a bare date. */
+const UPDATED_HUMAN = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(PRIVACY_UPDATED));
+
+/** Every section, in page order: the headings below and the jump list under
+ * the short version both read from here, so a renamed heading can't leave a
+ * stale link behind. */
+const SECTIONS = {
+  "p-send": "What you send us on purpose",
+  "p-order": "What placing an order collects",
+  "p-share": "Who order information goes to",
+  "p-retain": "How long we keep order records",
+  "p-auto": "What gets measured automatically",
+  "p-browser": "What stays in your browser",
+  "p-cookies": "Cookies",
+  "p-leaving": "When you leave this site",
+  "p-never": "What we do not do",
+  "p-rights": "Your choices",
+  "p-kids": "Children",
+  "p-changes": "Changes",
+  "p-contact": "Contact",
+} as const;
 
 /* No `revalidate` of its own: the support email in the Contact section comes
  * from the `store_settings` row `/admin/settings` writes to, and
@@ -88,8 +114,19 @@ export default async function PrivacyPage() {
           </p>
         </div>
 
+        <nav className="cne-lg-toc" aria-labelledby="p-toc">
+          <h2 id="p-toc">On this page</h2>
+          <ol>
+            {Object.entries(SECTIONS).map(([id, text]) => (
+              <li key={id}>
+                <a href={`#${id}`}>{text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
         <section className="cne-lg-sec" aria-labelledby="p-send">
-          <h2 id="p-send">What you send us on purpose</h2>
+          <h2 id="p-send">{SECTIONS["p-send"]}</h2>
           <p>Two forms on this site send us anything, and both only when you submit them.</p>
           <p>
             The <a href="/contact/">contact form</a> collects your <strong>name</strong>,{" "}
@@ -110,7 +147,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-order">
-          <h2 id="p-order">What placing an order collects</h2>
+          <h2 id="p-order">{SECTIONS["p-order"]}</h2>
           <p>
             When you buy something from the{" "}
             <Link prefetch={false} href="/shop/">
@@ -131,7 +168,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-share">
-          <h2 id="p-share">Who order information goes to</h2>
+          <h2 id="p-share">{SECTIONS["p-share"]}</h2>
           <p>Placing an order shares what it takes to fill it with:</p>
           <ul>
             <li>
@@ -159,7 +196,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-retain">
-          <h2 id="p-retain">How long we keep order records</h2>
+          <h2 id="p-retain">{SECTIONS["p-retain"]}</h2>
           <p>
             We keep an order&rsquo;s record for as long as we need it — to fulfil it, to handle a
             return, and because tax law requires a business to keep sales records. We don&rsquo;t
@@ -168,7 +205,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-auto">
-          <h2 id="p-auto">What gets measured automatically</h2>
+          <h2 id="p-auto">{SECTIONS["p-auto"]}</h2>
           <p>
             We use three analytics tools to understand which pages people read, which buttons they
             press and how fast pages load — how many, not who.
@@ -211,7 +248,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-browser">
-          <h2 id="p-browser">What stays in your browser</h2>
+          <h2 id="p-browser">{SECTIONS["p-browser"]}</h2>
           <p>
             Before you check out, whatever is in the shop bag — the item and the quantity — lives
             only in your own browser&rsquo;s local storage, so the bag survives a reload. It is
@@ -222,7 +259,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-cookies">
-          <h2 id="p-cookies">Cookies</h2>
+          <h2 id="p-cookies">{SECTIONS["p-cookies"]}</h2>
           <p>
             This site sets one cookie of its own: a sign-in cookie for the small team that runs the
             store, set only when one of us signs in at /admin to manage products and orders.
@@ -235,7 +272,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-leaving">
-          <h2 id="p-leaving">When you leave this site</h2>
+          <h2 id="p-leaving">{SECTIONS["p-leaving"]}</h2>
           <p>
             Food ordering, delivery and our social links hand you to companies that are not us, each
             with its own privacy policy and none of which we control: <strong>Otter</strong> for
@@ -253,7 +290,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-never">
-          <h2 id="p-never">What we do not do</h2>
+          <h2 id="p-never">{SECTIONS["p-never"]}</h2>
           <ul>
             <li>
               We do not sell or rent your personal information, and we do not share it for
@@ -269,7 +306,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-rights">
-          <h2 id="p-rights">Your choices</h2>
+          <h2 id="p-rights">{SECTIONS["p-rights"]}</h2>
           <p>
             You can opt out of Google Analytics everywhere with{" "}
             <a
@@ -300,7 +337,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-kids">
-          <h2 id="p-kids">Children</h2>
+          <h2 id="p-kids">{SECTIONS["p-kids"]}</h2>
           <p>
             This is a restaurant website, not a service for children, and we do not knowingly
             collect personal information from anyone under 13. If you believe a child has sent us
@@ -309,7 +346,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-changes">
-          <h2 id="p-changes">Changes</h2>
+          <h2 id="p-changes">{SECTIONS["p-changes"]}</h2>
           <p>
             If this policy changes, the date at the top of the page changes with it. There is no
             mailing list to be notified through, because we do not keep one.
@@ -317,7 +354,7 @@ export default async function PrivacyPage() {
         </section>
 
         <section className="cne-lg-sec" aria-labelledby="p-contact">
-          <h2 id="p-contact">Contact</h2>
+          <h2 id="p-contact">{SECTIONS["p-contact"]}</h2>
           <p>
             Questions about any of this, a request about your own data, or a question about an order
             go to the same place:

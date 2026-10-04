@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "@/styles/shop-order.css";
 import { brand } from "@/data/brand";
 import { getEditionSizes, getOrderBySessionId, getPublicStoreSettings } from "@/lib/orders";
 import { formatPrice } from "@/lib/otter";
@@ -9,6 +10,7 @@ import { PurchaseOnce } from "@/components/shop/PurchaseOnce";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 import { MascotDecor } from "@/components/mascots/MascotDecor";
+import { ConfirmingRefresh } from "./ConfirmingRefresh";
 
 /**
  * Reads a live order by a query-string session id and shows whatever the
@@ -39,7 +41,7 @@ type SearchParams = { session_id?: string; try?: string };
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <section className="cne-sec">
+    <section className="cne-sec cne-thanks">
       <div className="cne-eyebrow">Shop</div>
       {children}
     </section>
@@ -85,10 +87,11 @@ export default async function ThanksPage({
       const next = `/shop/thanks/?session_id=${encodeURIComponent(sessionId)}&try=${tryCount + 1}`;
       return (
         <Shell>
-          {/* React 19 hoists a <meta> rendered anywhere in the tree into
-              <head> — this is a real refresh, not a client-side timer, so
-              it still works with JavaScript off. */}
-          <meta httpEquiv="refresh" content={`${REFRESH_SECONDS};url=${next}`} />
+          {/* Checks again in place rather than reloading the page, so a
+              screen reader isn't sent back to the top every few seconds
+              (WCAG 2.2.1). With JavaScript off it falls back to a real
+              refresh inside <noscript>. */}
+          <ConfirmingRefresh href={next} seconds={REFRESH_SECONDS} />
           <h1>Confirming your payment…</h1>
           <p className="cne-shop-lede">
             This usually takes a few seconds. Don&rsquo;t close this tab.
@@ -136,7 +139,7 @@ export default async function ThanksPage({
   if (!canShowFullOrderDetails(order)) {
     return (
       <Shell>
-        <h1>Thanks — order {order.number}</h1>
+        <h1>Thanks: order {order.number}</h1>
         <p className="cne-shop-lede">
           Check your confirmation email for the details, or{" "}
           <Link prefetch={false} href="/shop/order/">
@@ -175,41 +178,60 @@ export default async function ThanksPage({
           })),
         }}
       />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+      <div className="cne-thanks-mascot" aria-hidden="true">
         <Monster
           species="classic"
           bodyColor={MONSTER_COLORS.yellow.body}
           irisColor={MONSTER_COLORS.yellow.iris}
           size={52}
         />
-        <MascotDecor kind="drip" colorA="#e63027" size={14} />
+        <MascotDecor kind="drip" colorA="var(--a-red)" size={14} />
       </div>
       <h1>
-        Thanks — order {order.number}
-        {single?.editionNumber != null && (
+        Thanks: order {order.number}
+        {single?.editionNumber != null ? (
           <>
             {" "}
-            · Your number is #{single.editionNumber}
-            {sizes.get(single.variantId) ? ` of ${sizes.get(single.variantId)}` : ""}
+            <span className="cne-thanks-num">
+              Your number is #{single.editionNumber}
+              {sizes.get(single.variantId) ? ` of ${sizes.get(single.variantId)}` : ""}.
+            </span>
           </>
+        ) : (
+          "."
         )}
-        .
       </h1>
 
-      <ul className="cne-order-items">
-        {order.items.map((item) => (
-          <li key={item.id}>
-            {item.productName}
-            {item.editionNumber != null
-              ? ` — #${item.editionNumber}${sizes.get(item.variantId) ? ` of ${sizes.get(item.variantId)}` : ""}`
-              : ` × ${item.quantity}`}
-            {" — "}
-            {formatPrice((item.unitPriceCents * item.quantity) / 100)}
+      <div className="cne-ord-result cne-thanks-receipt">
+        <ul className="cne-ord-items">
+          {order.items.map((item) => (
+            <li key={item.id}>
+              <span className="cne-ord-item-name">
+                {item.productName}
+                {item.editionNumber == null && ` × ${item.quantity}`}
+              </span>
+              <span className="cne-thanks-line-end">
+                {item.editionNumber != null && (
+                  <span className="cne-ord-numchip">
+                    <span className="eyebrow">No.</span>
+                    {item.editionNumber}
+                    {sizes.get(item.variantId) ? (
+                      <span className="of"> / {sizes.get(item.variantId)}</span>
+                    ) : null}
+                  </span>
+                )}
+                <span className="cne-price">
+                  {formatPrice((item.unitPriceCents * item.quantity) / 100)}
+                </span>
+              </span>
+            </li>
+          ))}
+          <li className="cne-thanks-total">
+            <span>Total</span>
+            <span className="cne-price">{formatPrice(order.totalCents / 100)}</span>
           </li>
-        ))}
-      </ul>
-
-      <p className="cne-shop-lede">Total {formatPrice(order.totalCents / 100)}.</p>
+        </ul>
+      </div>
 
       <p className="cne-shop-lede">
         {order.fulfilment === "pickup"

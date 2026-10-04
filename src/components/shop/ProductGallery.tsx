@@ -52,14 +52,13 @@ export function ProductGallery({
       </div>
 
       {hasStrip && (
-        <div className="cne-pdp-thumbs" role="tablist" aria-label="Product views">
+        <div className="cne-pdp-thumbs" role="group" aria-label="Product views">
           {product.views.map((v, i) => (
             <button
               key={v.id}
               type="button"
-              role="tab"
               className="cne-pdp-t"
-              aria-selected={i === active}
+              aria-pressed={i === active}
               /* Starts with the visible label so the accessible name contains
                  it — WCAG 2.5.3, and why a voice-control user can say it. */
               aria-label={`${v.label} — ${v.caption}`}

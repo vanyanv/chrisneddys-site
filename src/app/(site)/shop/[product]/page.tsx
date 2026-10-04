@@ -135,7 +135,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       />
 
       {/* Only things that are true about the product go past on the reel. */}
-      <div className="cne-mq" aria-hidden="true">
+      <div className="cne-mq cne-pdp-mq" aria-hidden="true">
         <div className="cne-mq-track">
           {[...Array(2)].flatMap((_, pass) =>
             reel
@@ -411,7 +411,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           <div className="cne-eyebrow">While you’re here</div>
           <h2>Come eat.</h2>
           <p>
-            Every drop comes out of our kitchens — smashed sliders, two patties, two slices of
+            Every drop is made by the people behind the sliders: two smashed patties, two slices of
             cheese.{" "}
             <Link prefetch={false} href="/menu/">
               See the menu
@@ -424,7 +424,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             <Link prefetch={false} href="/contact/">
               the contact page
             </Link>
-            , or call {brand.phone}.
+            , or call Hollywood at {brand.phone}.
           </p>
         </section>
 

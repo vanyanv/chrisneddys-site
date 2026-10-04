@@ -52,8 +52,15 @@
   aspect-ratio: 4 / 3;
 }
 
+/* The whole hat, never cropped: the shot sits inside the frame on the white
+   it was photographed on, so the crown and the brim both stay in. */
 .cne-drop-art .cne-capshot.is-photo {
-  aspect-ratio: 720 / 411;
+  aspect-ratio: 4 / 3;
+  background: var(--a-photo);
+}
+
+.cne-drop-art .cne-capshot.is-photo img {
+  object-fit: contain;
 }
 
 .cne-drop-b {
@@ -94,7 +101,7 @@
 .cne-drop-go {
   margin-top: 8px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.14em;
   color: var(--a-red-cta);
@@ -117,10 +124,10 @@
   top: 12px;
   z-index: 6;
   font-family: var(--font-display);
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.05em;
   background: var(--a-red-cta);
-  color: #fff2c9;
+  color: var(--a-cream);
   border: 2px solid var(--a-ink);
   padding: 6px 8px;
   line-height: 1;
@@ -203,11 +210,11 @@
   }
 
   .cne-drop-b h2 {
-    font-size: 25px;
+    font-size: 34px;
   }
 
   .cne-drop-price {
-    font-size: 22px;
+    font-size: 26px;
   }
 
   .cne-drop-b p {
@@ -215,7 +222,7 @@
   }
 
   .cne-drop-flag {
-    font-size: 10.5px;
+    font-size: 11px;
     padding: 7px 9px;
     top: 16px;
     right: -8px;

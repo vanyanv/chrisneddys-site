@@ -10,7 +10,7 @@
 
 .cne-pdp-crumb {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -21,6 +21,10 @@
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
+  /* A 44px tap target around a one-word link, without moving the line. */
+  display: inline-block;
+  padding: 15px 8px;
+  margin: -15px -8px;
 }
 
 .cne-pdp-crumb a:hover {
@@ -68,7 +72,7 @@
   cursor: pointer;
 }
 
-.cne-pdp-t[aria-selected="true"] {
+.cne-pdp-t[aria-pressed="true"] {
   border-color: var(--a-ink);
 }
 
@@ -107,7 +111,7 @@
 
 .cne-pdp-price .s {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--a-sub);
   font-weight: 500;
 }
@@ -125,10 +129,10 @@
 
 .cne-limited .tag {
   font-family: var(--font-display);
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   background: var(--a-red-cta);
-  color: #fff2c9;
+  color: var(--a-cream);
   border: 2px solid var(--a-ink);
   padding: 5px 7px;
   line-height: 1;
@@ -145,7 +149,7 @@
 
 .cne-pdp-lab {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 700;
@@ -165,12 +169,12 @@
 .cne-chip {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   border: 2px solid var(--a-ink);
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 8px 11px;
   line-height: 1;
 }
@@ -402,7 +406,7 @@
 
 .cne-auth-facts dt {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 700;
@@ -534,6 +538,31 @@
   }
 }
 
+/* The ticker rolls for about five seconds and then holds still (WCAG 2.2.2:
+   nothing moves for longer than that without a way to stop it). A fraction
+   of one 24s/30s loop, held on its last frame. */
+@media (prefers-reduced-motion: no-preference) {
+  .cne-pdp-mq .cne-mq-track {
+    animation-iteration-count: 0.2;
+    animation-fill-mode: forwards;
+  }
+}
+
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .cne-pdp-mq .cne-mq-track {
+    animation-iteration-count: 0.16;
+  }
+}
+
+/* A phone on its side has about 400px of height, and the header and nav take
+   most of it. The ticker repeats facts the page states anyway, so it goes and
+   the hat moves up into the first screen. */
+@media (max-width: 900px) and (max-height: 500px) {
+  .cne-pdp-mq {
+    display: none;
+  }
+}
+
 /* ---- desktop ------------------------------------------------------------ */
 @media (min-width: 901px) {
   .cne-pdp-crumb {
@@ -589,11 +618,11 @@
   }
 
   .cne-limited .txt {
-    font-size: 10.5px;
+    font-size: 11px;
   }
 
   .cne-pending {
-    font-size: 10.5px;
+    font-size: 11px;
   }
 
   .cne-pdp-more {
@@ -664,7 +693,7 @@
   border: 2px solid var(--a-line);
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -716,12 +745,12 @@
   top: 10px;
   left: 10px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: var(--a-ink);
-  color: #fff2c9;
+  color: var(--a-cream);
   padding: 5px 9px;
   z-index: 1;
 }

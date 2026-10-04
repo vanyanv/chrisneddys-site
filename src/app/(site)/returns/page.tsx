@@ -88,12 +88,15 @@ export default async function ReturnsPage() {
         </section>
       )}
 
-      <section className="cne-lg-sec" aria-labelledby="rt-contact">
-        <h2 id="rt-contact">Contact</h2>
-        <p className="cne-lg-contact">
-          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-        </p>
-      </section>
+      {/* The not-published notice above already ends with this address. */}
+      {policy && (
+        <section className="cne-lg-sec" aria-labelledby="rt-contact">
+          <h2 id="rt-contact">Contact</h2>
+          <p className="cne-lg-contact">
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+          </p>
+        </section>
+      )}
     </div>
   );
 }

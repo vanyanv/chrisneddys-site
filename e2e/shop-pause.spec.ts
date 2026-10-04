@@ -140,7 +140,9 @@ test.describe.serial("shop pause (issue #43)", () => {
 
     // Only the buy control and its pill/card changed: the pause pill, the
     // owner's note in the pause card, and a disabled button carrying that
-    // same note — on both the desktop row and the phone's sticky bar.
+    // same note in the buy row. The phone's sticky bar is not drawn at all
+    // while paused (issue #263): a dead button pinned to the screen says
+    // nothing the row doesn't.
     await expect(page.locator(".cne-status-pill.is-paused")).toContainText("Shop paused");
     await expect(page.locator(".cne-pause-card")).toContainText(PAUSE_NOTE);
 
@@ -149,9 +151,7 @@ test.describe.serial("shop pause (issue #43)", () => {
     await expect(buyButton).toBeDisabled();
     await expect(buyButton).toHaveText(PAUSE_NOTE.toUpperCase());
 
-    const stickyButton = page.locator(".cne-pdp-sticky .cne-btn-primary.is-paused");
-    await expect(stickyButton).toBeDisabled();
-    await expect(stickyButton).toHaveText(PAUSE_NOTE.toUpperCase());
+    await expect(page.locator(".cne-pdp-sticky")).toHaveCount(0);
   });
 
   test("3. the shop index still lists the product and the link to it still works", async () => {

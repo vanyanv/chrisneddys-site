@@ -242,7 +242,7 @@ export function BuyRow() {
  * a media query in JS, so it is correct in the first frame and on resize.
  */
 export function StickyBuy() {
-  const { product, add, added, qty, soldOut, paused, pauseLabel, closed } = useBuy();
+  const { product, add, added, qty, soldOut, paused, closed } = useBuy();
 
   // Sold out replaces the whole bar rather than sitting a dead button next
   // to a price for a run that isn't selling at it any more — the same
@@ -257,18 +257,17 @@ export function StickyBuy() {
     );
   }
 
+  // Closed or paused, the bar would be a dead button pinned over the bottom of
+  // the screen, saying what the notice and the buy row already say. It comes
+  // back on its own the moment the shop takes orders again.
+  if (paused || closed) return null;
+
   return (
     <div className="cne-pdp-sticky">
       <span className="cne-price p">{formatPrice(product.price * qty)}</span>
-      {paused || closed ? (
-        <button type="button" className="cne-btn-primary is-paused" disabled>
-          {paused ? pauseLabel : CLOSED_BUTTON_LABEL}
-        </button>
-      ) : (
-        <button type="button" className="cne-btn-primary" onClick={add}>
-          {added ? "ADDED ✓" : "ADD TO BAG"}
-        </button>
-      )}
+      <button type="button" className="cne-btn-primary" onClick={add}>
+        {added ? "ADDED ✓" : "ADD TO BAG"}
+      </button>
     </div>
   );
 }

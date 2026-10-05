@@ -216,6 +216,10 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 - **Label** (Barlow Semi Condensed 700, 9.5px to 13px, letter-spacing 0.16em to 0.2em, uppercase): eyebrows, field labels, the status tag's time cell, chips, character counts. Always uppercase, always tracked out.
 - **Meta** (Barlow Semi Condensed 500, 12px to 15px, letter-spacing 0.08em): prices, addresses, hours, map annotations. Uses `font-variant-numeric: tabular-nums` wherever figures can change. Emphasis inside this role is carried by weight, never by a second color.
 
+**Weights that exist.** Only four font files ship: Barlow 400 and 700, Barlow Semi Condensed 500 and 700. Any other weight a stylesheet asks for snaps to the nearest file: body 500 renders as 400, body 600 and 800 as 700, label 400 as 500, label 800 as 700. So two levels told apart only by 500 against 400, or 800 against 700, look the same; separate them by size or by a step to 700. Adding a weight file costs page speed on phones (each preloaded weight delayed the menu and careers photos by about 0.2 s), so measure before adding one.
+
+The merch social-card renderer (`scripts/render-merch-og.mjs` with `scripts/merch-og-card.html`) still sets its labels in JetBrains Mono, as do the order and contact emails. Those are rendered images and customer emails, left as they were on purpose; change them separately.
+
 ### Named Rules
 
 **The Three Jobs Rule.** Bowlby One shouts, Barlow explains, Barlow Semi Condensed annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in body Barlow.

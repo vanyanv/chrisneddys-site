@@ -54,15 +54,7 @@
   height: 100%;
   object-fit: cover;
   mix-blend-mode: multiply;
-  transform-origin: 55% 45%;
-  /* Food that moves reads as fresher: a slow push-in, back and forth. */
-  animation: cne-lead-push 9s ease-in-out infinite alternate;
-}
-@keyframes cne-lead-push {
-  to {
-    scale: 1.08;
-    translate: -1.5% -1%;
-  }
+  /* Held still on purpose: the owner wants no zoom on this photo. */
 }
 .cne-lead-body {
   display: flex;
@@ -408,9 +400,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cne-lead-ph img {
-    animation: none;
-  }
   .cne-dish,
   .cne-dish-ph img {
     transition: none !important;

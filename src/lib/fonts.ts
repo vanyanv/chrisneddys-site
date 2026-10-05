@@ -4,9 +4,10 @@ import localFont from "next/font/local";
  * The site's three typefaces, self-hosted from `src/fonts/` so a build never
  * has to reach Google Fonts: `next/font/google` fetched them at build time,
  * and when Google answered a build server with an unexpected file list the
- * whole build failed (PR #168). These are the same latin files Google serves,
- * so pages look and weigh the same. Shared by the site, admin and root 404
- * layouts, which each put the `variable` classes on their `<html>`.
+ * whole build failed (PR #168). These are the latin files Google serves,
+ * slimmed by scripts/slim-fonts.sh (every character kept). Shared by the
+ * site, admin and root 404 layouts, which each put the `variable` classes on
+ * their `<html>`.
  */
 
 export const bowlby = localFont({
@@ -19,33 +20,39 @@ export const bowlby = localFont({
 });
 
 /**
- * The same latin Inter file next/font/google serves, with its weight axis
- * pinned to the 400-800 the site actually uses instead of 100-900, and its
- * unused stylistic sets dropped (scripts/slim-fonts.sh): 48 KB -> 33 KB, no
- * visible change. It is preloaded on every page, and on a slow phone
- * connection it downloads alongside the home hero photo, the page's Largest
- * Contentful Paint. See scripts/instance-inter-font.sh.
+ * Body text. Barlow is drawn from California's highway and street signs.
+ * Two static files, 400 and 700. The storefront also asks for 600 (the skip
+ * link, the About page's pull quotes) and 800 (the home page's Start here
+ * card names, drink names on the menu); those render at 700. Every font here
+ * is preloaded, and on a throttled phone each extra weight pushed the menu
+ * and careers photos back by about 0.2 s, so four Barlow files in all (about
+ * 57 KB) stand where Inter and JetBrains Mono (48 KB) did.
  */
-export const inter = localFont({
-  src: "../fonts/inter-latin-400-800.woff2",
-  weight: "400 800",
-  style: "normal",
+export const barlow = localFont({
+  src: [
+    { path: "../fonts/barlow-latin-400.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/barlow-latin-700.woff2", weight: "700", style: "normal" },
+  ],
   display: "optional",
   preload: true,
   adjustFontFallback: "Arial",
-  variable: "--font-inter",
+  variable: "--font-barlow",
 });
 
 /**
- * One variable file covers both weights the site uses (400 and 500). Its
- * programming ligatures are stripped (scripts/slim-fonts.sh), since the site
- * sets labels and prices in it, never code: 31 KB -> 15 KB.
+ * Labels, prices, hours and times (the `--font-mono` role, which used to be
+ * JetBrains Mono). The semi-condensed cut of Barlow keeps tracked capitals
+ * reading like a sign. Two weights cover every label: a 400 or 500 label
+ * renders at 500, a 700 or 800 label at 700. Proportional, so anything that
+ * measures label text does it with `labelWidth` in
+ * `components/locations/mapLayout.ts`, not a fixed advance.
  */
-export const jetbrains = localFont({
-  src: "../fonts/jetbrains-mono-latin.woff2",
-  weight: "400 500",
-  style: "normal",
+export const barlowSemi = localFont({
+  src: [
+    { path: "../fonts/barlow-semi-condensed-latin-500.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/barlow-semi-condensed-latin-700.woff2", weight: "700", style: "normal" },
+  ],
   display: "optional",
   adjustFontFallback: "Arial",
-  variable: "--font-mono-jb",
+  variable: "--font-barlow-semi",
 });

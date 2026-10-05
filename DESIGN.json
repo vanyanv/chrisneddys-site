@@ -342,7 +342,7 @@
       "refersTo": "status-tag",
       "description": "Live open/closed state in the header: a two-cell punch card. The state in the display face on cream with the pulsing dot, the fact it implies reversed out on ink in the mono. Square, ruled and shadowed like every other object here.",
       "html": "<span class=\"ds-stat\"><span class=\"ds-stat-a\"><i class=\"ds-stat-dot\"></i>OPEN</span><span class=\"ds-stat-b\">TILL 1 AM</span></span>",
-      "css": ".ds-stat { display: inline-flex; align-items: stretch; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; border: 2px solid #1a1612; border-radius: 0; box-shadow: 2px 2px 0 #1a1612; } .ds-stat-a { display: inline-flex; align-items: center; gap: 5px; padding: 10px 8px; background: #fff2c9; color: #1a1612; font-family: 'Bowlby One', Impact, sans-serif; font-size: 9.5px; letter-spacing: 0.02em; } .ds-stat-b { display: inline-flex; align-items: center; padding: 10px 8px; border-left: 2px solid #1a1612; background: #1a1612; color: #fff2c9; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; } .ds-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b43; flex: none; animation: ds-stat-pulse 2.2s ease-in-out infinite; } @keyframes ds-stat-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } } @media (prefers-reduced-motion: reduce) { .ds-stat-dot { animation: none; } }"
+      "css": ".ds-stat { display: inline-flex; align-items: stretch; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; border: 2px solid #1a1612; border-radius: 0; box-shadow: 2px 2px 0 #1a1612; } .ds-stat-a { display: inline-flex; align-items: center; gap: 5px; padding: 10px 8px; background: #fff2c9; color: #1a1612; font-family: 'Bowlby One', Impact, sans-serif; font-size: 9.5px; letter-spacing: 0.02em; } .ds-stat-b { display: inline-flex; align-items: center; padding: 10px 8px; border-left: 2px solid #1a1612; background: #1a1612; color: #fff2c9; font-family: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; } .ds-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: #2f6b43; flex: none; animation: ds-stat-pulse 2.2s ease-in-out infinite; } @keyframes ds-stat-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } } @media (prefers-reduced-motion: reduce) { .ds-stat-dot { animation: none; } }"
     },
     {
       "name": "Topic Chip",
@@ -350,7 +350,7 @@
       "refersTo": "chip-topic",
       "description": "Radio group as pills on the contact check. Selection lands like a rubber stamp, with rotation.",
       "html": "<label class=\"ds-chip\"><input type=\"radio\" name=\"ds-topic\" checked><span>CATERING</span></label><label class=\"ds-chip\"><input type=\"radio\" name=\"ds-topic\"><span>PRESS</span></label>",
-      "css": ".ds-chip { position: relative; display: inline-flex; margin-right: 8px; } .ds-chip input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; } .ds-chip span { display: inline-flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; padding: 8px 12px; border: 2px solid #e3d8bc; border-radius: 999px; color: #7a6f5e; cursor: pointer; transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s, color 0.18s, background 0.18s; } .ds-chip input:focus-visible + span { outline: 3px solid #1a1612; outline-offset: 3px; } .ds-chip input:checked + span { background: #d0281c; border-color: #d0281c; color: #fff2c9; box-shadow: 3px 3px 0 #1a1612; animation: ds-chip-stamp 0.34s cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-chip input:checked + span::before { content: '\\2713'; font-size: 11px; } @keyframes ds-chip-stamp { 0% { transform: scale(1.16) rotate(-3.5deg); } 60% { transform: scale(0.97) rotate(1.2deg); } 100% { transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-chip input:checked + span { animation: none; } }"
+      "css": ".ds-chip { position: relative; display: inline-flex; margin-right: 8px; } .ds-chip input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; } .ds-chip span { display: inline-flex; align-items: center; gap: 5px; font-family: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; padding: 8px 12px; border: 2px solid #e3d8bc; border-radius: 999px; color: #7a6f5e; cursor: pointer; transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.18s, color 0.18s, background 0.18s; } .ds-chip input:focus-visible + span { outline: 3px solid #1a1612; outline-offset: 3px; } .ds-chip input:checked + span { background: #d0281c; border-color: #d0281c; color: #fff2c9; box-shadow: 3px 3px 0 #1a1612; animation: ds-chip-stamp 0.34s cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-chip input:checked + span::before { content: '\\2713'; font-size: 11px; } @keyframes ds-chip-stamp { 0% { transform: scale(1.16) rotate(-3.5deg); } 60% { transform: scale(0.97) rotate(1.2deg); } 100% { transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-chip input:checked + span { animation: none; } }"
     },
     {
       "name": "Location Card",
@@ -358,7 +358,7 @@
       "refersTo": "card-location",
       "description": "A store. Square, heavy ink border, offset shadow. Unopened stores use the same border dashed and drop the shadow entirely.",
       "html": "<article class=\"ds-card\"><h3>HOLLYWOOD</h3><p class=\"ds-card-meta\">5539 W. SUNSET BLVD</p><p class=\"ds-card-body\">Open til 2AM Friday and Saturday.</p></article>",
-      "css": ".ds-card { display: block; background: #fffdf6; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px; box-shadow: 6px 6px 0 #1a1612; transition: transform 0.2s, box-shadow 0.2s, border-color 0.25s; } .ds-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #e63027; border-color: #e63027; } .ds-card h3 { font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; line-height: 1; margin: 0 0 8px; } .ds-card-meta { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; color: #7a6f5e; margin: 0 0 10px; } .ds-card-body { font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.6; margin: 0; }"
+      "css": ".ds-card { display: block; background: #fffdf6; color: #1a1612; border: 4px solid #1a1612; border-radius: 0; padding: 22px; box-shadow: 6px 6px 0 #1a1612; transition: transform 0.2s, box-shadow 0.2s, border-color 0.25s; } .ds-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #e63027; border-color: #e63027; } .ds-card h3 { font-family: 'Bowlby One', Impact, sans-serif; font-size: 19px; line-height: 1; margin: 0 0 8px; } .ds-card-meta { font-family: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-size: 12px; letter-spacing: 0.08em; color: #7a6f5e; margin: 0 0 10px; } .ds-card-body { font-family: Barlow, system-ui, sans-serif; font-size: 14px; line-height: 1.6; margin: 0; }"
     },
     {
       "name": "Ruled Input",
@@ -366,7 +366,7 @@
       "refersTo": "input-ruled",
       "description": "No box. A mono label over a ruled line, with a red underline that wipes in from the left on focus.",
       "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-name\">Name</label><span class=\"ds-field-line\"><input class=\"ds-field-input\" id=\"ds-name\" type=\"text\" placeholder=\"Who should we ask for?\"><span class=\"ds-field-rule\"></span></span></div>",
-      "css": ".ds-field { position: relative; display: grid; gap: 5px; max-width: 420px; } .ds-field-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7a6f5e; transition: color 0.2s; } .ds-field:focus-within .ds-field-label { color: #d0281c; } .ds-field-line { position: relative; display: block; } .ds-field-input { font-family: Inter, system-ui, sans-serif; font-size: 16px; color: #1a1612; background: transparent; border: 0; border-bottom: 2px solid #e3d8bc; border-radius: 0; padding: 8px 2px; width: 100%; appearance: none; } .ds-field-input::placeholder { color: #7a6f5e; opacity: 0.75; } .ds-field-input:focus { outline: none; border-bottom-color: transparent; } .ds-field-rule { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #d0281c; transform: scaleX(0); transform-origin: left; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1); pointer-events: none; } .ds-field:focus-within .ds-field-rule { transform: scaleX(1); } @media (prefers-reduced-motion: reduce) { .ds-field-rule { transition: none; } }"
+      "css": ".ds-field { position: relative; display: grid; gap: 5px; max-width: 420px; } .ds-field-label { font-family: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7a6f5e; transition: color 0.2s; } .ds-field:focus-within .ds-field-label { color: #d0281c; } .ds-field-line { position: relative; display: block; } .ds-field-input { font-family: Barlow, system-ui, sans-serif; font-size: 16px; color: #1a1612; background: transparent; border: 0; border-bottom: 2px solid #e3d8bc; border-radius: 0; padding: 8px 2px; width: 100%; appearance: none; } .ds-field-input::placeholder { color: #7a6f5e; opacity: 0.75; } .ds-field-input:focus { outline: none; border-bottom-color: transparent; } .ds-field-rule { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #d0281c; transform: scaleX(0); transform-origin: left; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1); pointer-events: none; } .ds-field:focus-within .ds-field-rule { transform: scaleX(1); } @media (prefers-reduced-motion: reduce) { .ds-field-rule { transition: none; } }"
     },
     {
       "name": "Tab Strip",
@@ -392,7 +392,7 @@
       "One palette, one light. No theme switch, no dark variant, no time-of-day behavior.",
       "Zero rounding by default. Sharp corners everywhere except pills.",
       "Shadows with no blur: solid ink offsets that read as printed registration, not lighting.",
-      "Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.",
+      "Three typefaces with three non-overlapping jobs: Bowlby One shouts, Barlow explains, Barlow Semi Condensed annotates.",
       "Flat spot color. No gradients, no tints, no glass. A surface is one color.",
       "Every interactive element travels physically on press."
     ],
@@ -409,7 +409,7 @@
       },
       {
         "name": "The Three Jobs Rule",
-        "body": "Bowlby One shouts, Inter explains, JetBrains Mono annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in Inter.",
+        "body": "Bowlby One shouts, Barlow explains, Barlow Semi Condensed annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in body Barlow.",
         "section": "typography"
       },
       {
@@ -448,7 +448,7 @@
       "Do make the travel distance on :active equal the shadow offset, so the element lands flat.",
       "Do swap Counter Red for Signal Red (#d0281c) the moment text sits on it, and Marquee Yellow for #ffd633 the moment yellow becomes text on red.",
       "Do set every input at 16px minimum.",
-      "Do keep Bowlby One for shouting, Inter for explaining, JetBrains Mono for annotating.",
+      "Do keep Bowlby One for shouting, Barlow for explaining, Barlow Semi Condensed for annotating.",
       "Do use tabular-nums on any figure that changes: prices, counts, hours, distances.",
       "Do give every motion a prefers-reduced-motion exit.",
       "Do carry state on two cues, not one.",

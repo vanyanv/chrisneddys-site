@@ -37,25 +37,25 @@ typography:
     lineHeight: 1
     letterSpacing: "normal"
   body:
-    fontFamily: "Inter, system-ui, sans-serif"
+    fontFamily: "Barlow, system-ui, sans-serif"
     fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: "normal"
   body-lede:
-    fontFamily: "Inter, system-ui, sans-serif"
+    fontFamily: "Barlow, system-ui, sans-serif"
     fontSize: "clamp(13px, 2.2vw, 24px)"
     fontWeight: 400
     lineHeight: 1.4
     letterSpacing: "normal"
   label:
-    fontFamily: "JetBrains Mono, ui-monospace, monospace"
+    fontFamily: "Barlow Semi Condensed, Arial Narrow, sans-serif"
     fontSize: "9.5px"
     fontWeight: 700
     lineHeight: 1
     letterSpacing: "0.16em"
   meta:
-    fontFamily: "JetBrains Mono, ui-monospace, monospace"
+    fontFamily: "Barlow Semi Condensed, Arial Narrow, sans-serif"
     fontSize: "clamp(12px, 1.4vw, 15px)"
     fontWeight: 400
     lineHeight: 1
@@ -158,7 +158,7 @@ What this system explicitly rejects: the delivery-app aesthetic it links out to,
 - One palette, one light. No theme switch, no dark variant, no time-of-day behavior.
 - Zero rounding by default. Sharp corners everywhere except pills.
 - Shadows with no blur: solid ink offsets that read as printed registration, not lighting.
-- Three typefaces with three non-overlapping jobs: Bowlby One shouts, Inter explains, JetBrains Mono annotates.
+- Three typefaces with three non-overlapping jobs: Bowlby One shouts, Barlow explains, Barlow Semi Condensed annotates.
 - Flat spot color. No gradients, no tints, no glass. A surface is one color.
 - Every interactive element travels physically on press.
 
@@ -168,7 +168,7 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 
 ### Primary
 
-- **Counter Red** (`#e63027`): the brand's display red. The header bar, map pins, the accent on selected location cards. This is a fill color, not a text color, and not a background for anything smaller than a headline.
+- **Counter Red** (`#e63027`): the brand's display red. Map pins, the accent on selected location cards. This is a fill color, not a text color, and not a background for anything smaller than a headline.
 - **Signal Red** (`#d0281c`): the same red taken one step deeper so cream text clears 4.5:1 on it. Every red that carries text uses this: the hero panel, the tab strip, section eyebrows, the focused input underline, selected topic chips, the order button. Both edges of the tab strip and the hero are ink rules, which is what makes the step down from Counter Red invisible.
 
 ### Secondary
@@ -201,24 +201,28 @@ Two flat spot colors and a near-black, used the way a sign painter uses them: on
 ## 3. Typography
 
 **Display Font:** Bowlby One (with Impact, sans-serif)
-**Body Font:** Inter (with system-ui, sans-serif)
-**Label/Mono Font:** JetBrains Mono (with ui-monospace, monospace)
+**Body Font:** Barlow (with system-ui, sans-serif)
+**Label Font:** Barlow Semi Condensed (with Arial Narrow, sans-serif)
 
-**Character:** Bowlby One is a fat, closed, uncompromising display face that only exists at one weight, which is the point: there is no dial to turn down. Inter carries every sentence that needs to be read rather than seen. JetBrains Mono handles anything that behaves like data, and its presence is what keeps the system from reading as pure poster: prices, hours, addresses, distances and map labels all look measured rather than shouted.
+**Character:** Bowlby One is a fat, closed, uncompromising display face that only exists at one weight, which is the point: there is no dial to turn down. Barlow, drawn from California's highway and street signs, carries every sentence that needs to be read rather than seen. Its semi-condensed cut handles anything that behaves like data, set in tracked capitals the way a street sign sets a name: prices, hours, addresses, distances and map labels all look like signage rather than shouting. (Until October 2026 these roles were Inter and JetBrains Mono; the impeccable review found that pairing read as generic.)
 
 ### Hierarchy
 
 - **Display** (Bowlby One 400, 38px phone to 88px desktop, line-height 0.86 to 0.84, letter-spacing 0.4px to 1px): hero headline only, one per page. Carries a hard 3px to 6px ink text-shadow.
 - **Headline** (Bowlby One 400, 23px to 52px, line-height 1 to 0.95): section titles. Always followed by the yellow underline that wipes out to 46px on scroll.
 - **Title** (Bowlby One 400, 19px to 20px, line-height 1): location names, item sheet titles, card headings.
-- **Body** (Inter 400, 14px, line-height 1.6): the document baseline. Prose is capped at 32ch in the hero lede and should not exceed 65ch to 75ch anywhere else.
-- **Lede** (Inter 400, 13px phone to 24px desktop, line-height 1.45 to 1.4): the hero subtitle and shop introduction. The 24px desktop size is not decorative: it is the WCAG large-text threshold.
-- **Label** (JetBrains Mono 700, 9.5px to 13px, letter-spacing 0.16em to 0.2em, uppercase): eyebrows, field labels, the status tag's time cell, chips, character counts. Always uppercase, always tracked out.
-- **Meta** (JetBrains Mono 400, 12px to 15px, letter-spacing 0.08em): prices, addresses, hours, map annotations. Uses `font-variant-numeric: tabular-nums` wherever figures can change. Emphasis inside this role is carried by weight, never by a second color.
+- **Body** (Barlow 400, 14px, line-height 1.6): the document baseline. Prose is capped at 32ch in the hero lede and should not exceed 65ch to 75ch anywhere else.
+- **Lede** (Barlow 400, 13px phone to 24px desktop, line-height 1.45 to 1.4): the hero subtitle and shop introduction. The 24px desktop size is not decorative: it is the WCAG large-text threshold.
+- **Label** (Barlow Semi Condensed 700, 9.5px to 13px, letter-spacing 0.16em to 0.2em, uppercase): eyebrows, field labels, the status tag's time cell, chips, character counts. Always uppercase, always tracked out.
+- **Meta** (Barlow Semi Condensed 500, 12px to 15px, letter-spacing 0.08em): prices, addresses, hours, map annotations. Uses `font-variant-numeric: tabular-nums` wherever figures can change. Emphasis inside this role is carried by weight, never by a second color.
+
+**Weights that exist.** Only four font files ship: Barlow 400 and 700, Barlow Semi Condensed 500 and 700. Any other weight a stylesheet asks for snaps to the nearest file: body 500 renders as 400, body 600 and 800 as 700, label 400 as 500, label 800 as 700. So two levels told apart only by 500 against 400, or 800 against 700, look the same; separate them by size or by a step to 700. Adding a weight file costs page speed on phones (each preloaded weight delayed the menu and careers photos by about 0.2 s), so measure before adding one.
+
+The merch social-card renderer (`scripts/render-merch-og.mjs` with `scripts/merch-og-card.html`) still sets its labels in JetBrains Mono, as do the order and contact emails. Those are rendered images and customer emails, left as they were on purpose; change them separately.
 
 ### Named Rules
 
-**The Three Jobs Rule.** Bowlby One shouts, Inter explains, JetBrains Mono annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in Inter.
+**The Three Jobs Rule.** Bowlby One shouts, Barlow explains, Barlow Semi Condensed annotates. A typeface used outside its job is a bug. Never set a sentence in Bowlby One. Never set a price in body Barlow.
 
 **The 16px Floor Rule.** Any input a user types into is 16px minimum, because iOS Safari zooms the viewport below that and never zooms back. Everything else on the page may be smaller.
 
@@ -261,9 +265,9 @@ _Exception: the blacklight hallway._ The Open late section is printed in the hal
 
 ### Chips
 
-- **Style:** Pill (`999px`), 2px rule-colored border, transparent fill, JetBrains Mono 700 at 10.5px uppercase with 0.09em tracking, 8px 12px padding, muted ink text.
+- **Style:** Pill (`999px`), 2px rule-colored border, transparent fill, Barlow Semi Condensed 700 at 10.5px uppercase with 0.09em tracking, 8px 12px padding, muted ink text.
 - **Selected:** fills with Signal Red, text goes cream, gains a Raised shadow, prepends a check glyph, and plays a 0.34s stamp animation that overshoots to 1.16 scale with a 3.5-degree rotation before settling. The rotation is the character: it lands like a rubber stamp, not like a toggle.
-- **Status Tag:** a two-cell punch card, square like everything else. The left cell names the state in Bowlby One on Counter Cream and carries the pulsing dot; the right cell carries the fact that state implies — the closing time, the minutes left, the hour it opens — in JetBrains Mono reversed out on Griddle Ink, so the number people came for is the highest-contrast thing in the header after the order button. An ink rule divides the cells and swaps to cream when the tag goes dark. Ink border and hard offset shadow one step under the button beside it: 2px and 2px on a card, 3px and 3px in the header, against the button's 3px and 5px. State is carried three ways — dot color, fill and the words — so it survives greyscale. The tag sits at exactly the order button's height at every breakpoint: 31px on a phone, 48.8px from 901 to 1339, 58px above that.
+- **Status Tag:** a two-cell punch card, square like everything else. The left cell names the state in Bowlby One on Counter Cream and carries the pulsing dot; the right cell carries the fact that state implies — the closing time, the minutes left, the hour it opens — in Barlow Semi Condensed reversed out on Griddle Ink, so the number people came for is the highest-contrast thing in the header after the order button. An ink rule divides the cells and swaps to cream when the tag goes dark. Ink border and hard offset shadow one step under the button beside it: 2px and 2px on a card, 3px and 3px in the header, against the button's 3px and 5px. State is carried three ways — dot color, fill and the words — so it survives greyscale. The tag sits at exactly the order button's height at every breakpoint: 31px on a phone, 48.8px from 901 to 1339, 58px above that.
 - **How the tag narrows:** by giving up words, never by shrinking type past reading size. The connective ("TILL", "OPENS") goes first, then the qualifier ("LAST CALL" to "LAST"), then the state word itself once the dot and the fill are already saying it. What it may occupy is half the viewport less half the wordmark — 127px at 375, 91px at 320 — and the widest state is the closed one. Only the header's tag steps down; the tags on location cards have a card to sit in and keep their words at every size.
 
 ### Cards / Containers
@@ -277,16 +281,16 @@ _Exception: the blacklight hallway._ The Open late section is printed in the hal
 
 ### Inputs / Fields
 
-- **Style:** No box. Each field is a single 2px ruled line under a transparent input, with an uppercase mono label above it. Inter at 16px, 8px 2px padding, zero radius.
+- **Style:** No box. Each field is a single 2px ruled line under a transparent input, with an uppercase mono label above it. Barlow at 16px, 8px 2px padding, zero radius.
 - **Focus:** the 2px rule goes transparent and a 3px Signal Red underline wipes in from the left over 0.3s. The label above simultaneously shifts from muted ink to Signal Red. No outline, no glow, no box: the ruled line is the entire affordance.
 - **Error:** the same underline stays at full width in Counter Red, with a 12px semibold message below it in Signal Red.
 - The underline lives in its own wrapper element pinned to the input's bottom edge, so an error message appearing below does not drag the rule down with it.
 
 ### Navigation
 
-- **Style:** a two-row sticky header. The top row is Counter Red with a 3px ink bottom rule, the status tag hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the tag's label changes.
+- **Style:** a two-row sticky header. The top row is the same deeper red as the tab strip (`--a-nav`, `#d0281c`, matched in October 2026 so the header, tab strip and home hero panel are one red) with a 3px ink bottom rule, the status tag hard left, the order button hard right, and the wordmark absolutely centered on the row rather than flexed between them, so it does not drift as the tag's label changes.
 - **Tab Strip:** below it, on Signal Red, full-width equal tabs in Bowlby One at 10px with 0.11em tracking. State is carried twice: a 4px Marquee Yellow indicator that slides on a `cubic-bezier(0.35, 1.3, 0.4, 1)` overshoot, and full opacity on the current label.
-- **Shop pages:** on `/shop/` and everything under it both rows run on the admin's cream (`#fff8e7`) instead of red, with ink tab labels, the current tab in red (a yellow box on desktop), and the wordmark set as the admin's lockup: the mark without its drop shadow and STORE in JetBrains Mono, centred as a pair. STORE sits beside the mark where the row has room and under it below 481px and from 901px to 1439px, so the pair never costs the status tag its width. The rest of the site keeps the red header.
+- **Shop pages:** on `/shop/` and everything under it both rows run on the admin's cream (`#fff8e7`) instead of red, with ink tab labels, the current tab in red (a yellow box on desktop), and the wordmark set as the admin's lockup: the mark without its drop shadow and STORE in Barlow Semi Condensed, centred as a pair. STORE sits beside the mark where the row has room and under it below 481px and from 901px to 1439px, so the pair never costs the status tag its width. The rest of the site keeps the red header.
 - **Focus:** 3px outline at 3px offset in the artist's blue (`--a-blue`, 3.8:1 on paper, 4.4:1 on ink), switching to Marquee Yellow Ink (`--a-yel-ink`, 3.7:1) on the red surfaces: the header bar, the tab strip and the hero panel, where the blue drops to 1.3:1.
 - **Mobile:** identical structure. This system is phone-first and the desktop layout is the variant, not the reverse.
 
@@ -306,7 +310,7 @@ Every section heading carries a 4px Marquee Yellow bar that animates from 0 to 4
 - **Do** make the travel distance on `:active` equal the shadow offset, so the element lands flat.
 - **Do** swap Counter Red for Signal Red (`#d0281c`) the moment text sits on it, and Marquee Yellow for `#ffd633` the moment yellow becomes text on red.
 - **Do** set every input at 16px minimum.
-- **Do** keep Bowlby One for shouting, Inter for explaining, JetBrains Mono for annotating.
+- **Do** keep Bowlby One for shouting, Barlow for explaining, Barlow Semi Condensed for annotating.
 - **Do** use `tabular-nums` on any figure that changes: prices, counts, hours, distances.
 - **Do** lift a figure inside a mono row with weight, not with a second color.
 - **Do** give every motion a `prefers-reduced-motion` exit. The site honors it for animation, hover transforms, parallax, the marquee and the map ring, and any new motion must join that block.

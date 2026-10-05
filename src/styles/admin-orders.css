@@ -50,7 +50,7 @@ a.adm-filter-chip {
   border-top: 1px solid var(--a-line);
   border-bottom: 1px solid var(--a-line);
   color: var(--a-sub);
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -68,12 +68,12 @@ a.adm-filter-chip {
   background: rgba(26, 22, 18, 0.02);
 }
 .ord-cell-num {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 13px;
   font-weight: 700;
 }
 .ord-cell-placed {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 11.5px;
   color: var(--a-sub);
 }
@@ -91,7 +91,7 @@ a.adm-filter-chip {
   text-overflow: ellipsis;
 }
 .ord-customer-email {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 11px;
   color: var(--a-sub);
   white-space: nowrap;
@@ -118,7 +118,7 @@ a.adm-filter-chip {
   color: var(--a-sub);
 }
 .ord-fulfil-tag {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -195,7 +195,7 @@ a.adm-filter-chip {
   margin: 0 0 4px;
 }
 .ord-mono {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 12px;
 }
 
@@ -239,13 +239,13 @@ a.adm-filter-chip {
   font-size: 13.5px;
 }
 .ord-item-edition {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 11px;
   font-weight: 400;
   color: var(--a-sub);
 }
 .ord-item-qty {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 11.5px;
   color: var(--a-sub);
 }
@@ -272,7 +272,7 @@ a.adm-filter-chip {
   margin-bottom: 0;
 }
 .ord-action-heading {
-  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-family: var(--font-barlow-semi), "Arial Narrow", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;

@@ -1,6 +1,6 @@
 import { mapBox } from "@/data/laGeo";
 import { namedStreets, shields } from "@/data/laGeoPaths";
-import { monoWidth, overlaps, reservedBoxes, type Box } from "@/components/locations/mapLayout";
+import { labelWidth, overlaps, reservedBoxes, type Box } from "@/components/locations/mapLayout";
 
 /**
  * Which street names and freeway shields the map prints, and where.
@@ -34,7 +34,7 @@ export function labelBox(name: string, x: number, baseline: number): Box {
   return {
     x0: x - LABEL.halo,
     y0: baseline - LABEL.size * 0.8 - LABEL.halo,
-    x1: x + monoWidth(name, LABEL.size, LABEL.spacing) + LABEL.halo,
+    x1: x + labelWidth(name, LABEL.size, LABEL.spacing) + LABEL.halo,
     y1: baseline + LABEL.halo + 0.4,
   };
 }

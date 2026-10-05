@@ -5,7 +5,8 @@
  *     node scripts/add-menu-photo.mjs <original.png|jpg> <photo-id>
  *
  * Cuts the original to the menu's frame (3:2, full height, slid sideways to
- * centre the food) and keeps that at full resolution as the photo's master:
+ * centre the food; white added above and below when the food is wider than
+ * that) and keeps that at full resolution as the photo's master:
  *
  *   assets/menu/<photo-id>.jpg   at most 2160px wide, JPEG quality 95 with
  *                                full-resolution colour: one careful encode,
@@ -42,26 +43,46 @@ async function foodBox(input) {
 const meta = await sharp(src).metadata();
 const box = await foodBox(src);
 
-// 3:2 at full height, slid sideways to centre the food.
+// 3:2 at full height, slid sideways to centre the food. Food too wide for
+// that window (a spread on a wide original) gets white added above and below
+// instead, so nothing is cut off.
 let h = meta.height;
 let w = Math.round((h * 3) / 2);
 if (w > meta.width) {
   w = meta.width;
   h = Math.round((w * 2) / 3);
 }
+const margin = Math.round(meta.height * 0.04);
+if (box.width + 2 * margin > w) {
+  w = box.width + 2 * margin;
+  h = Math.round((w * 2) / 3);
+}
 const cx = box.left + box.width / 2;
 const cy = box.top + box.height / 2;
+const place = (size, span, c) =>
+  Math.round(size <= span ? Math.max(0, Math.min(span - size, c - size / 2)) : c - size / 2);
 const region = {
-  left: Math.round(Math.max(0, Math.min(meta.width - w, cx - w / 2))),
-  top: Math.round(Math.max(0, Math.min(meta.height - h, cy - h / 2))),
+  left: place(w, meta.width, cx),
+  top: place(h, meta.height, cy),
   width: w,
   height: h,
 };
+const pad = {
+  left: Math.max(0, -region.left),
+  top: Math.max(0, -region.top),
+  right: Math.max(0, region.left + w - meta.width),
+  bottom: Math.max(0, region.top + h - meta.height),
+};
 
 // A transparent original (some arrive as RGBA PNGs) sits on the white sweep.
-const master = await sharp(src)
+// (Two passes: within one pipeline sharp extracts before it extends.)
+const padded = await sharp(src)
   .flatten({ background: "#ffffff" })
-  .extract(region)
+  .extend({ ...pad, background: "#ffffff" })
+  .png()
+  .toBuffer();
+const master = await sharp(padded)
+  .extract({ ...region, left: region.left + pad.left, top: region.top + pad.top })
   .resize({ width: Math.min(2160, region.width), kernel: "lanczos3" })
   .jpeg({ quality: 95, chromaSubsampling: "4:4:4", mozjpeg: true })
   .toBuffer();

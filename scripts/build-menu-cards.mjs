@@ -94,6 +94,17 @@ const PAD = 1.36;
 const PAD_Y = 1.6;
 
 /**
+ * Cards framed wider than the rule above. One slider and fries is less food
+ * than the other combos, so framed by the same rule it fills the card and its
+ * slider reads bigger than the 2 Sliders' and 2 Triples' next to it; this
+ * widens its frame so the burgers stand the same size in all three.
+ */
+const LOOSER = {
+  "combo-1-chris": 1.25,
+  "combo-1-eddy": 1.25,
+};
+
+/**
  * The drinks and the two sides in a cup: things that stand up and throw a long
  * shadow off to the left. A plain trim takes the shadow for part of the food
  * and pulls the cut off-centre, and a clear cup is too faint for it, so these
@@ -204,7 +215,7 @@ async function cardRegion(id, src, meta) {
     // round it (more above and below, so a tall slider doesn't crowd the frame).
     // Where that frame runs past the photo's edge it is padded out with the
     // white sweep rather than cutting the food off (issue #230).
-    width = Math.round(Math.max(info.width * PAD, info.height * PAD_Y * RATIO));
+    width = Math.round(Math.max(info.width * PAD, info.height * PAD_Y * RATIO) * (LOOSER[id] ?? 1));
   }
   const height = Math.round(width / RATIO);
   const left = Math.round(cx - width / 2);

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: the Triple Pack and Family Box photos show the whole pack again, no fries or burger cut off at the edges, on the menu and in the Uber Eats photo set ([#275](https://github.com/vanyanv/chrisneddys-site/issues/275))
 - Site: the 1 Slider and Fries photo is zoomed out, so its slider stands the same size as the burgers in 2 Sliders and Fries and 2 Triples and Fries beside it on the home page, the menu and the catering page. The food in the photo is the same ([#285](https://github.com/vanyanv/chrisneddys-site/issues/285))
 - Site: the big food photos on the home page, the order page, the catering page and Our Story, and the picture shown when those pages are shared, now show straight-cut cheese fries like the menu's Cheese Fries photo instead of crinkle-cut ones. The photos have also been reworked to look more like real camera shots, with calmer colour and more natural textures on the food ([#283](https://github.com/vanyanv/chrisneddys-site/issues/283))
 - Site: the Loaded Fries and Cheese Fries photos now show the same straight-cut fries as the regular fries, instead of crinkle-cut fries the store doesn't serve. The cheese, sauce, grilled onions and portion are the same as before. Anyone who visited before sees the new photos straight away ([#277](https://github.com/vanyanv/chrisneddys-site/issues/277))

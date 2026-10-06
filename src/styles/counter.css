@@ -1637,7 +1637,11 @@ body {
   grid-template-rows: auto auto;
   column-gap: 11px;
   align-items: center;
-  padding: 11px 0;
+  /* Inset by the star card's border plus padding (2.5px + 9px) so the photo,
+     name and price of every row sit on the same lines as the boxed card's.
+     With 0 here the first card's contents started 11.5px further in and its
+     price sat 11.5px left of the two below it. */
+  padding: 11px 11.5px;
   border-bottom: 1.5px solid var(--a-line);
   width: 100%;
   text-align: left;

@@ -1,0 +1,680 @@
+/**
+ * Closing (issue #288): the owner's nightly-checklist pages under
+ * /admin/closing. Built on The Rack's tokens (`admin-rack.css`) and the
+ * `.adm-*` field-error primitives; every class here is `clo-*`. Phone first:
+ * the owner uses an iPhone, so nothing scrolls sideways at 402px and every
+ * tap target is at least 44px tall.
+ */
+
+.clo-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rack-space-lg);
+  padding: 0 var(--rack-space-xl) 40px;
+  max-width: 1040px;
+}
+.clo-body > * {
+  min-width: 0;
+}
+@media (max-width: 720px) {
+  .clo-body {
+    padding: 0 var(--rack-space-lg) 40px;
+  }
+}
+.clo-body p {
+  margin: 0;
+}
+.clo-muted {
+  color: var(--rack-muted);
+}
+.clo-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.clo-h2 {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  margin: 12px 0 0;
+}
+.clo-lab {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: var(--rack-text-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rack-muted);
+}
+.clo-lab.is-red {
+  color: var(--rack-red-deep);
+}
+
+/* ---- sub navigation ---------------------------------------------------- */
+.clo-subnav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.clo-subtab {
+  flex: 1 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: var(--rack-border);
+  background: var(--rack-card);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.clo-subtab[aria-current="page"] {
+  background: var(--rack-ink);
+  border-color: var(--rack-ink);
+  color: var(--rack-paper);
+}
+
+/* ---- buttons, inputs, status ------------------------------------------- */
+.rack-root .clo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--rack-ink);
+  background: var(--rack-card);
+  color: var(--rack-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rack-root .clo-btn:hover {
+  background: var(--rack-cream);
+  color: var(--rack-ink);
+}
+.rack-root .clo-btn.is-primary {
+  background: var(--rack-red-cta);
+  border-color: var(--rack-red-deep);
+  color: #fff;
+}
+.rack-root .clo-btn.is-primary:hover {
+  background: var(--rack-red-deep);
+  color: #fff;
+}
+.rack-root .clo-btn.is-danger {
+  background: var(--rack-red-cta);
+  border-color: var(--rack-red-deep);
+  color: #fff;
+}
+.rack-root .clo-btn.is-wide {
+  width: 100%;
+}
+.rack-root .clo-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.rack-root .clo-btn-link {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: var(--rack-red-deep);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.clo-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--rack-ink);
+  background: #fff;
+  color: var(--rack-ink);
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS zooming the page on focus */
+  border-radius: 0;
+}
+.clo-status {
+  padding: 12px 14px;
+  border: 1px solid var(--rack-green);
+  background: #e8f1ea;
+  color: #1d4a2e;
+  font-weight: 600;
+}
+.clo-card {
+  border: var(--rack-border);
+  background: var(--rack-card);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.clo-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ---- Nights ------------------------------------------------------------- */
+.clo-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.clo-big {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-size: 22px;
+  line-height: 1.2;
+}
+.clo-line {
+  overflow-wrap: anywhere;
+}
+.clo-count {
+  font-size: 13px;
+}
+.clo-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid var(--rack-ink);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.clo-pill.is-ok {
+  background: var(--rack-green);
+  border-color: var(--rack-green);
+  color: #fff;
+}
+.clo-pill.is-miss {
+  background: var(--rack-red-cta);
+  border-color: var(--rack-red-deep);
+  color: #fff;
+}
+.clo-pill.is-over {
+  background: var(--rack-yellow);
+  border-color: var(--rack-yellow-deep);
+}
+.clo-pill.is-none,
+.clo-pill.is-wait {
+  background: transparent;
+  color: var(--rack-muted);
+  border-color: var(--rack-muted);
+}
+.clo-temp.is-over {
+  color: var(--rack-red-deep);
+  font-weight: 700;
+}
+
+.clo-ranks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--rack-border);
+}
+.clo-rank {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  padding: 12px 0;
+  border-bottom: var(--rack-border);
+}
+.clo-rank-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.clo-rank-count {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+}
+.clo-rank-count.is-red {
+  color: var(--rack-red-deep);
+  font-weight: 700;
+}
+.clo-dots {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.clo-rank-cap {
+  grid-column: 1 / -1;
+  font-size: 13px;
+}
+.clo-dot {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  flex: none;
+}
+.clo-dot.is-done {
+  background: var(--rack-green);
+}
+.clo-dot.is-missed {
+  background: var(--rack-red);
+}
+.clo-dot.is-over {
+  background: var(--rack-yellow);
+  border-color: var(--rack-yellow-deep);
+}
+.clo-dot.is-none {
+  border-color: var(--rack-muted);
+  background: repeating-linear-gradient(45deg, transparent 0 2px, var(--rack-rule) 2px 4px);
+}
+.clo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 13px;
+  color: var(--rack-muted);
+}
+.clo-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.clo-nights {
+  border-top: var(--rack-border);
+}
+.clo-night {
+  border-bottom: var(--rack-border);
+}
+.clo-night > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.clo-night > summary::-webkit-details-marker {
+  display: none;
+}
+.clo-night > summary > span:first-child {
+  min-width: 0;
+}
+.clo-night-date {
+  display: block;
+  font-weight: 700;
+}
+.clo-night-sub {
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.clo-detail {
+  padding: 4px 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.clo-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.clo-checklist li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.clo-mark {
+  font-weight: 800;
+}
+.clo-mark.is-yes {
+  color: var(--rack-green);
+}
+.clo-mark.is-no {
+  color: var(--rack-red-deep);
+}
+
+/* ---- Edit the list ------------------------------------------------------ */
+.clo-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.clo-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--rack-border);
+}
+.clo-rows > li {
+  border-bottom: var(--rack-border);
+}
+.rack-root .clo-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 0;
+  color: var(--rack-ink);
+  text-decoration: none;
+}
+.clo-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.clo-row-en {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.clo-row-es {
+  font-size: 14px;
+  color: var(--rack-muted);
+  overflow-wrap: anywhere;
+}
+.clo-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  background: var(--rack-yellow);
+  border: 1px solid var(--rack-yellow-deep);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.clo-chev {
+  font-size: 26px;
+  color: var(--rack-muted);
+  padding: 0 4px;
+}
+.clo-row-acts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.clo-code {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+.clo-row.is-crew {
+  grid-template-columns: 1fr;
+  padding: 10px 0;
+}
+@media (min-width: 560px) {
+  .clo-row.is-crew {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+/* ---- the editor sheet (a <dialog>, server-rendered open) ----------------- */
+.clo-sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: 0;
+  border: 1px solid var(--rack-ink);
+  border-bottom: 0;
+  background: var(--rack-paper);
+  color: var(--rack-ink);
+  box-shadow: 0 0 0 100vmax rgba(26, 22, 18, 0.5); /* the scrim, with or without script */
+  z-index: 50;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.clo-sheet::backdrop {
+  background: transparent;
+}
+.clo-sheet * {
+  box-sizing: border-box;
+}
+.clo-sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 16px 24px;
+}
+.clo-grab {
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--rack-rule);
+  align-self: center;
+}
+.clo-sheet-title {
+  margin: 0;
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+}
+.clo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.clo-field > label,
+.clo-field > legend,
+.clo-temprow > label {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rack-muted);
+  padding: 0;
+}
+.clo-hint {
+  font-size: 13px;
+  color: var(--rack-muted);
+}
+.clo-newarea {
+  display: none;
+}
+.clo-field-area:has(option[value="__new"]:checked) .clo-newarea {
+  display: block;
+}
+.clo-seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.clo-seg label {
+  position: relative;
+  display: block;
+}
+.clo-seg input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.clo-seg span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid var(--rack-ink);
+  background: var(--rack-card);
+  font-weight: 600;
+}
+.clo-seg label + label span {
+  border-left: 0;
+}
+.clo-seg input:checked + span {
+  background: var(--rack-ink);
+  color: var(--rack-paper);
+}
+.clo-seg input:focus-visible + span {
+  outline: 2px solid var(--rack-yellow-deep);
+  outline-offset: 2px;
+}
+.clo-temprow {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.clo-field-type:has(input[value="temp"]:checked) .clo-temprow {
+  display: flex;
+}
+.clo-maxinput {
+  width: 96px;
+}
+.clo-acts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.clo-acts form {
+  display: contents;
+}
+
+/* ---- QR & crew codes ---------------------------------------------------- */
+.clo-signwrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rack-space-xl);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .clo-signwrap {
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  }
+}
+.clo-qrsign {
+  border: 3px solid var(--rack-ink);
+  background: #fff;
+  color: var(--rack-ink);
+  width: 100%;
+  max-width: 420px;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.clo-qrsign-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  background: var(--rack-red);
+  color: #fff;
+}
+.clo-qrsign-head b {
+  font-family: var(--font-bowlby), Impact, sans-serif;
+  font-weight: 400;
+  font-size: 1.9em;
+  line-height: 1.1;
+}
+.clo-qrsign-head span {
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 0.75em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.clo-qrsign-box {
+  padding: 18px;
+}
+.clo-qrsign-box svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.clo-qrsign-foot {
+  padding: 4px 12px 18px;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.clo-qrsign-foot span {
+  color: var(--rack-muted);
+}
+.clo-url {
+  display: block;
+  padding: 10px 12px;
+  border: var(--rack-border);
+  background: #fff;
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.clo-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--rack-red-deep);
+  background: #fdecea;
+}
+.clo-addform {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.clo-addform-err {
+  grid-column: 1 / -1;
+}
+
+/* ---- the print page (US Letter) ----------------------------------------- */
+.clo-printpage {
+  padding: var(--rack-space-xl) var(--rack-space-lg);
+}
+.clo-noprint {
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 auto 16px;
+}
+.clo-printsheet {
+  display: flex;
+  justify-content: center;
+}
+@page {
+  size: letter;
+  margin: 0.5in;
+}
+@media print {
+  .clo-noprint {
+    display: none;
+  }
+  .clo-printpage {
+    padding: 0;
+    background: #fff;
+    min-height: 0;
+  }
+  .clo-printpage .clo-qrsign {
+    max-width: none;
+    width: 7.2in;
+    font-size: 22px;
+    break-inside: avoid;
+  }
+}

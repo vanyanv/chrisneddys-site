@@ -13,6 +13,7 @@ import { isShopOpenFor } from "@/lib/shopStatus";
 import { OrdersTable, type OrdersTableRow } from "./OrdersTable";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -29,14 +30,6 @@ export const dynamic = "force-dynamic";
  * `markRefunded` and the packing slip all take one order at a time — so
  * they're left out rather than built as UI with nothing real underneath;
  * see this phase's report for the full note. */
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
-
 const TABS: { key: OrdersAdminFilter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "paid", label: "Paid (to fulfil)" },
@@ -96,7 +89,7 @@ export default async function AdminOrdersPage({
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

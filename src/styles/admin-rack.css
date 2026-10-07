@@ -1096,10 +1096,22 @@
   .rack-topbar {
     padding: 13px var(--rack-space-lg);
   }
+  /* Logo and account on the first line, the tabs as one scrolling strip
+     under them (six tabs no longer fit beside the logo). */
+  .rack-topbar {
+    flex-wrap: wrap;
+  }
   .rack-tabs {
-    padding: 0 var(--rack-space-lg) 0;
-    gap: var(--rack-space-lg);
+    order: 3;
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    padding: 0;
+    gap: var(--rack-space-xl);
     overflow-x: auto;
+  }
+  .rack-tab {
+    flex: none;
+    padding: 12px 0;
   }
   .rack-page-header {
     padding: var(--rack-space-lg) var(--rack-space-lg) 0;

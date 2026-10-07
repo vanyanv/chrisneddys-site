@@ -14,7 +14,7 @@ import { NextRequest } from "next/server";
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { getAuth } from "@/lib/betterAuth";
-import { proxy } from "./proxy";
+import { config, proxy } from "./proxy";
 
 const migrationsFolder = fileURLToPath(new URL("../drizzle", import.meta.url));
 
@@ -70,5 +70,13 @@ describe("proxy", () => {
       const response = await proxy(requestFor(pathname, { withSession: true }));
       expect(response.headers.get("cache-control")).toBe("private, no-store");
     }
+  });
+
+  it("keeps the crew closing page out of the owner sign-in and out of every cache", async () => {
+    const response = await proxy(requestFor("/close/some-secret-token"));
+    expect(response.status).not.toBe(307);
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(config.matcher).toContain("/close/:path*");
   });
 });

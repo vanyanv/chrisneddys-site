@@ -41,7 +41,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const ymd = (y: number, mo: number, d: number) => `${y}-${pad(mo)}-${pad(d)}`;
 
 /** Adds whole days to a `YYYY-MM-DD` string (calendar arithmetic, no zones). */
-function addDays(date: string, days: number): string {
+export function addDays(date: string, days: number): string {
   const [y, m, d] = date.split("-").map(Number) as [number, number, number];
   const t = new Date(Date.UTC(y, m - 1, d) + days * DAY_MS);
   return ymd(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate());
@@ -54,7 +54,7 @@ function addDays(date: string, days: number): string {
  * happens (spring forward, e.g. 02:00) the PST reading is used, which lands
  * on 03:00 PDT.
  */
-function laInstant(date: string, hh: number, mm: number): Date {
+export function laInstant(date: string, hh: number, mm: number): Date {
   const [y, mo, d] = date.split("-").map(Number) as [number, number, number];
   const asUtc = Date.UTC(y, mo - 1, d, hh, mm);
   const candidates = [7, 8].map((off) => new Date(asUtc + off * 3600_000));

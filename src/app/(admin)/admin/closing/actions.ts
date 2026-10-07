@@ -116,7 +116,7 @@ async function ownCrew(id: string) {
 export async function newCodeAction(formData: FormData): Promise<void> {
   await requireOwner();
   const { db, person } = await ownCrew(str(formData, "id"));
-  if (!person) redirect(CREW);
+  if (!person || !person.active) redirect(CREW);
   await newCode(db, person.id);
   redirect(`${CREW}?done=newcode&who=${person.id}`);
 }

@@ -67,7 +67,12 @@ export function ItemSheet({ item, areas }: { item: SheetItem | null; areas: stri
         if (e.target === ref.current) ref.current?.close();
       }}
     >
-      <form action={action} className="clo-sheet-form" noValidate>
+      <form
+        key={v ? JSON.stringify(v) : "fresh"}
+        action={action}
+        className="clo-sheet-form"
+        noValidate
+      >
         <div className="clo-grab" aria-hidden="true" />
         <h2 id="clo-sheet-title" className="clo-sheet-title">
           {item ? "Edit item" : "Add item"}

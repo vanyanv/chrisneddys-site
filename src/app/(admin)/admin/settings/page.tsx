@@ -14,16 +14,9 @@ import { OwnersCard } from "./OwnersCard";
 import { PasskeysCard } from "./PasskeysCard";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-settings.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
-
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
 
 /** The left-hand wayfinding column in `Settings.dc.html` — plain anchors
  * into the sections below rather than separate routes, since every field
@@ -71,7 +64,7 @@ export default async function AdminSettingsPage() {
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

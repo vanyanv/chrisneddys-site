@@ -4,6 +4,8 @@ export type Lang = "en" | "es";
 
 export const LANG_COOKIE = "cne_close_lang";
 export const CREW_COOKIE = "cne_close_crew";
+/** Set when Send finds the phone no longer signed in; the code screen explains it once. */
+export const SIGNED_OUT_COOKIE = "cne_close_signedout";
 
 export function parseLang(value: string | undefined): Lang {
   return value === "es" ? "es" : "en";

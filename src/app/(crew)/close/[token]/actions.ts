@@ -6,7 +6,13 @@ import { resolveClientIp } from "@/lib/auth";
 import { closingNow } from "@/lib/closing/clock";
 import { checkCode, resolveCrew, signCrewToken } from "@/lib/closing/crew";
 import { submitCheck, type Answer } from "@/lib/closing/checks";
-import { CREW_COOKIE, LANG_COOKIE, normalizeTemp, parseLang } from "@/lib/closing/crewText";
+import {
+  CREW_COOKIE,
+  LANG_COOKIE,
+  SIGNED_OUT_COOKIE,
+  normalizeTemp,
+  parseLang,
+} from "@/lib/closing/crewText";
 import { getStoreByToken } from "@/lib/closing/store";
 
 const CREW_COOKIE_MAX_AGE = 180 * 24 * 60 * 60;
@@ -27,6 +33,7 @@ export async function enterCode(token: string, code: string): Promise<EnterCodeR
   if (result.status === "locked") {
     return { status: "locked", minutes: Math.max(1, Math.ceil(result.retryAfterSeconds / 60)) };
   }
+  (await cookies()).delete({ name: SIGNED_OUT_COOKIE, path: "/close" });
   (await cookies()).set(CREW_COOKIE, signCrewToken(result.crew.id, result.crew.sessionVersion), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -79,7 +86,16 @@ export async function submitNight(input: {
   if (!store) return { status: "gone" };
   const jar = await cookies();
   const crew = await resolveCrew(db, store.store, jar.get(CREW_COOKIE)?.value);
-  if (!crew) return { status: "signin" };
+  if (!crew) {
+    jar.set(SIGNED_OUT_COOKIE, "1", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/close",
+      maxAge: 600,
+    });
+    return { status: "signin" };
+  }
   const result = await submitCheck(db, {
     store: store.store,
     crew,

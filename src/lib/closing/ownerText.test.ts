@@ -156,6 +156,13 @@ describe("parseItemForm", () => {
     const dflt = parseItemForm(form(base), areas);
     expect(dflt.ok && dflt.input.maxValue).toBe(41);
     expect(parseItemForm(form({ ...base, maxValue: "38" }), areas).ok).toBe(true);
+    const zero = parseItemForm(form({ ...base, maxValue: "0" }), areas);
+    expect(zero.ok && zero.input.maxValue).toBe(0);
+    const neg = parseItemForm(form({ ...base, maxValue: "-20" }), areas);
+    expect(neg.ok && neg.input.maxValue).toBe(-20);
+    expect(parseItemForm(form({ ...base, maxValue: "-21" }), areas).ok).toBe(false);
+    expect(parseItemForm(form({ ...base, maxValue: "99" }), areas).ok).toBe(true);
+    expect(parseItemForm(form({ ...base, maxValue: "100" }), areas).ok).toBe(false);
     expect(parseItemForm(form({ ...base, maxValue: "cold" }), areas).ok).toBe(false);
     expect(parseItemForm(form({ ...base, maxValue: "38.5" }), areas).ok).toBe(false);
   });

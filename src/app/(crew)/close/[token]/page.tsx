@@ -7,6 +7,7 @@ import { closingNow } from "@/lib/closing/clock";
 import { resolveCrew } from "@/lib/closing/crew";
 import {
   CREW_COOKIE,
+  SIGNED_OUT_COOKIE,
   LANG_COOKIE,
   formatTimeLA,
   nightLabel,
@@ -217,7 +218,7 @@ export default async function ClosePage({
       <>
         {head}
         {banner}
-        <CodeStep token={token} lang={lang} />
+        <CodeStep token={token} lang={lang} signedOut={jar.get(SIGNED_OUT_COOKIE)?.value === "1"} />
       </>
     );
   }

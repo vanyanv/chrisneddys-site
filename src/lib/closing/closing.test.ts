@@ -105,11 +105,11 @@ describe("crew", () => {
     expect(on.sessionVersion).toBeGreaterThan(off.sessionVersion);
   });
 
-  it("locks an IP after 8 wrong codes", async () => {
+  it("locks an IP after 20 wrong codes", async () => {
     const jose = await addCrew(db, STORE, "Jose");
     const now = new Date("2026-10-07T08:00:00Z");
     const wrong = jose.code === "0000" ? "1111" : "0000";
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 20; i++) {
       expect((await checkCode(db, STORE, wrong, "9.9.9.9", now)).status).toBe("wrong");
     }
     expect((await checkCode(db, STORE, jose.code, "9.9.9.9", now)).status).toBe("locked");

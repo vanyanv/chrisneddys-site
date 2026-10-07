@@ -138,8 +138,8 @@ export function parseItemForm(get: Field, existingAreas: string[]): ItemFormResu
   if (kind === "temp") {
     const raw = text("maxValue");
     maxValue = raw === "" ? DEFAULT_MAX_TEMP : Number(raw);
-    if (!Number.isInteger(maxValue) || maxValue < 1 || maxValue > 500) {
-      fieldErrors.maxValue = "Enter a whole number of degrees, like 41.";
+    if (!Number.isInteger(maxValue) || maxValue < -20 || maxValue > 99) {
+      fieldErrors.maxValue = "Enter a whole number from -20 to 99, like 41.";
     }
   }
 

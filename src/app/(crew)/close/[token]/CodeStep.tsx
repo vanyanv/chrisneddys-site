@@ -6,7 +6,15 @@ import { pick, type Lang } from "@/lib/closing/crewText";
 import { enterCode } from "./actions";
 
 /** One big numeric box; the 4th digit submits on its own. */
-export function CodeStep({ token, lang }: { token: string; lang: Lang }) {
+export function CodeStep({
+  token,
+  lang,
+  signedOut = false,
+}: {
+  token: string;
+  lang: Lang;
+  signedOut?: boolean;
+}) {
   const router = useRouter();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -59,6 +67,15 @@ export function CodeStep({ token, lang }: { token: string; lang: Lang }) {
         if (value.length === 4 && !pending) submit(value);
       }}
     >
+      {signedOut ? (
+        <div className="cl-warn" role="status">
+          {pick(
+            lang,
+            "You were signed out. Enter your code.",
+            "Se cerró tu sesión. Escribe tu código.",
+          )}
+        </div>
+      ) : null}
       <label className="cl-label" htmlFor="cl-code">
         {pick(lang, "Your code", "Tu código")}
       </label>

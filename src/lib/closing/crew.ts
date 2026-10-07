@@ -13,7 +13,7 @@ import {
 export type CrewMember = typeof closingCrew.$inferSelect;
 
 export const CREW_CODE_KIND = "crew_code";
-const MAX_CODE_ATTEMPTS = 8;
+const MAX_CODE_ATTEMPTS = 20;
 
 export async function listCrew(db: Db, store: string): Promise<CrewMember[]> {
   return db
@@ -153,7 +153,7 @@ export type CodeResult =
   | { status: "wrong"; attemptsLeft: number }
   | { status: "locked"; retryAfterSeconds: number };
 
-/** Checks a typed code. Throttled per IP: 8 failures / 15 minutes. */
+/** Checks a typed code. Throttled per IP: 20 failures / 15 minutes (the crew shares one Wi-Fi). */
 export async function checkCode(
   db: Db,
   store: string,

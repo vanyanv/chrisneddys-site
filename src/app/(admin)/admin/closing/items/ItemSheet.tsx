@@ -182,7 +182,6 @@ export function ItemSheet({ item, areas }: { item: SheetItem | null; areas: stri
               id={`${idPrefix}-max`}
               name="maxValue"
               className="clo-input clo-maxinput"
-              inputMode="numeric"
               defaultValue={v?.maxValue ?? String(item?.maxValue ?? 41)}
             />
             <span>°F</span>

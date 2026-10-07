@@ -14,6 +14,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -463,3 +464,88 @@ export const variantsRelations = relations(variants, ({ one, many }) => ({
 export const editionsRelations = relations(editions, ({ one }) => ({
   variant: one(variants, { fields: [editions.variantId], references: [variants.id] }),
 }));
+
+// --- Nightly closing checklist (issue #288) ---------------------------------
+
+export const closingItemKindEnum = pgEnum("closing_item_kind", ["check", "temp"]);
+
+/** One row per store (location id, e.g. "vannuys"): the secret `/close/[token]`
+ * link printed as a QR sign, and the submit window around closing time. */
+export const closingStores = pgTable("closing_stores", {
+  store: text("store").primaryKey(),
+  linkToken: text("link_token").notNull().unique(),
+  opensBeforeMin: integer("opens_before_min").notNull().default(30),
+  graceMin: integer("grace_min").notNull().default(60),
+  ...timestamps,
+});
+
+/** The owner-editable checklist. Retired items stay so history keeps a link. */
+export const closingItems = pgTable(
+  "closing_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    store: text("store").notNull(),
+    section: text("section").notNull(),
+    label: text("label").notNull(),
+    labelEs: text("label_es"),
+    detail: text("detail"),
+    detailEs: text("detail_es"),
+    kind: closingItemKindEnum("kind").notNull().default("check"),
+    /** Upper limit in °F for `temp` items. */
+    maxValue: integer("max_value"),
+    position: integer("position").notNull(),
+    retiredAt: timestamp("retired_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index("closing_items_store_live_position_idx").on(t.store, t.retiredAt, t.position)],
+);
+
+/** Crew members and their personal 4-digit codes. */
+export const closingCrew = pgTable(
+  "closing_crew",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    store: text("store").notNull(),
+    name: text("name").notNull(),
+    code: text("code").notNull(),
+    active: boolean("active").notNull().default(true),
+    sessionVersion: integer("session_version").notNull().default(1),
+    ...timestamps,
+  },
+  (t) => [unique("closing_crew_store_code_unique").on(t.store, t.code)],
+);
+
+/** One submitted checklist per store per business night. */
+export const closingChecks = pgTable(
+  "closing_checks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    store: text("store").notNull(),
+    businessDate: date("business_date", { mode: "string" }).notNull(),
+    crewId: uuid("crew_id").references(() => closingCrew.id, { onDelete: "set null" }),
+    crewName: text("crew_name").notNull(),
+    lang: text("lang").notNull().default("en"),
+    note: text("note"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps,
+  },
+  (t) => [unique("closing_checks_store_night_unique").on(t.store, t.businessDate)],
+);
+
+/** Snapshot of each item as it was when the night was submitted. */
+export const closingCheckItems = pgTable("closing_check_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  checkId: uuid("check_id")
+    .notNull()
+    .references(() => closingChecks.id, { onDelete: "cascade" }),
+  itemId: uuid("item_id").references(() => closingItems.id, { onDelete: "set null" }),
+  section: text("section").notNull(),
+  label: text("label").notNull(),
+  labelEs: text("label_es"),
+  kind: closingItemKindEnum("kind").notNull().default("check"),
+  maxValue: integer("max_value"),
+  /** Typed temperature for `temp` items. */
+  value: text("value"),
+  done: boolean("done").notNull(),
+  position: integer("position").notNull(),
+});

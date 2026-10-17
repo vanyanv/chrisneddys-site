@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { bowlby, inter, jetbrains } from "@/lib/fonts";
+import { barlow, barlowSemi, bowlby } from "@/lib/fonts";
 import "@/styles/admin.css";
 import { OfflineIndicator } from "@/app/(admin)/admin/OfflineIndicator";
 
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
  */
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bowlby.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${bowlby.variable} ${barlow.variable} ${barlowSemi.variable}`}>
       <body>
         {children}
         <OfflineIndicator />

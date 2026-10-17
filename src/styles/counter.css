@@ -353,7 +353,7 @@ body {
   height: 26px;
   filter: none;
 }
-/* The admin's `.rack-wordmark-tag`: JetBrains Mono, tracked, in The Rack's
+/* The admin's `.rack-wordmark-tag`: the label face, tracked, in The Rack's
    muted brown (#7a6f5e, 4.65:1 on the cream). */
 .cne-logo-tag {
   font-family: var(--font-mono);

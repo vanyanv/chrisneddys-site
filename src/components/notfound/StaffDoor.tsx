@@ -90,7 +90,7 @@ export function StaffDoor() {
               x={n.x}
               y={n.y}
               transform={`rotate(${n.r} ${n.x} ${n.y})`}
-              fontFamily="var(--font-mono-jb), ui-monospace, monospace"
+              fontFamily="var(--font-mono)"
               fontSize={n.size}
               fill={MONSTER_COLORS.lime.body}
               opacity={0.35}

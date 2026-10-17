@@ -23,7 +23,10 @@
   --a-photo: #fff;
   --a-ink: #1a1612;
   --a-sub: rgba(26, 22, 18, 0.62);
-  --a-nav: #e63027;
+  /* The header bar. The same deeper red as the tab strip under it and the home
+     hero panel, so the top of every page is one red rather than two that sit
+     a shade apart. */
+  --a-nav: #d0281c;
   /* The tab strip runs a shade deeper than the display red, because 10px cream
      type cannot clear 4.5:1 on #E63027 — that red tops out at 4.35:1 against
      pure white, so no text colour passes on it. Both edges of the strip are

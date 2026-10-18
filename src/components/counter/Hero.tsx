@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { formatPrice } from "@/lib/otter";
-import { SLIDER_PRICE } from "@/data/menu";
 import { HERO, HERO_WIDE } from "@/lib/heroImage";
 import { Watcher } from "@/components/storeart/Watcher";
 import { HeroOpenLine } from "@/components/counter/HeroOpenLine";
@@ -30,10 +28,8 @@ export function Hero() {
               <b>two slices of melted cheese</b> and your favorite toppings served on a buttered
               Martin&rsquo;s Potato Roll.
             </p>
-            {/* The figure comes from the menu data rather than the copy: it and the /menu/
-                meta description had already drifted a dollar apart. */}
             <p className="cne-hero-meta">
-              Sliders from <b>{formatPrice(SLIDER_PRICE)}</b>
+              Hollywood <span aria-hidden="true">✦</span> Van Nuys
             </p>
             <div className="cne-cta" data-surface="hero">
               <HeroOrderButton />

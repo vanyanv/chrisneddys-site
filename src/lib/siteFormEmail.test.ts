@@ -140,6 +140,7 @@ describe("openingReplyEmail", () => {
     expect(text).toContain("One of only 50 made.");
     expect(text).not.toContain("Date to be announced");
     expect(html).toContain("https://www.chrisneddys.com/email/glendale-grand-opening.jpg");
+    expect(text).toContain("Flyer: https://www.chrisneddys.com/email/glendale-grand-opening.jpg");
     expect(html).toContain("GET DIRECTIONS");
 
     // Late on opening day in Los Angeles it's still the announcement; the

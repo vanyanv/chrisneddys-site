@@ -300,6 +300,7 @@ export function openingReplyEmail(location: Location, at: Date = new Date()): Bu
   if (opening) {
     const subject = `${brand.name} ${hood}: Grand Opening ${opening.dateLabel.replace(/, \d{4}$/, "")}`;
     const intro = `You're on the ${hood} list. Here's opening day.`;
+    const flyer = `${brand.siteUrl}${opening.flyerPath}`;
     const text = [
       opening.heading,
       "",
@@ -313,13 +314,14 @@ export function openingReplyEmail(location: Location, at: Date = new Date()): Bu
       opening.extras,
       "",
       `Directions: ${directions}`,
+      `Flyer: ${flyer}`,
       "",
       note,
     ].join("\n");
 
     const bodyHtml = `
     <tr><td style="padding-top:16px">
-      <img src="${brand.siteUrl}${opening.flyerPath}" width="480" alt="${escapeHtml(opening.flyerAlt)}" style="display:block;width:100%;max-width:480px;height:auto;border:1px solid ${RULE};font-family:${BODY_FONT};font-size:14px;color:${INK}">
+      <img src="${flyer}" width="480" alt="${escapeHtml(opening.flyerAlt)}" style="display:block;width:100%;max-width:480px;height:auto;border:1px solid ${RULE};font-family:${BODY_FONT};font-size:14px;color:${INK}">
     </td></tr>
     <tr><td style="padding-top:14px;font-family:${BODY_FONT};font-size:15px;line-height:1.55;color:${INK}">${escapeHtml(intro)}</td></tr>
     <tr><td style="padding-top:12px">

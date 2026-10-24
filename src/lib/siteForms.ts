@@ -131,6 +131,9 @@ export async function sendContactMessage(data: FormData): Promise<SiteFormResult
 export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
   if (field(data, "botcheck")) return { ok: true };
 
+  // Which reply the visitor gets depends on when they signed up (a grand
+  // opening cuts over at midnight), not on how long the owner's copy took.
+  const at = new Date();
   const email = field(data, "email");
   const hood = field(data, "location");
 
@@ -147,7 +150,7 @@ export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {
   // inbox. Only after the owner's copy went (so the throttle has counted
   // this send), and a failure here is logged, not shown: the sign-up itself
   // already reached the inbox.
-  const reply = openingReplyEmail(location);
+  const reply = openingReplyEmail(location, at);
   const sent = await sendEmail(email, reply.subject, reply.text, reply.html, brand.email);
   if (!sent.sent) console.error(`[site-form] opening reply to visitor failed: ${sent.reason}`);
   return result;

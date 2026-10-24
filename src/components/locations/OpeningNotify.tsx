@@ -9,7 +9,7 @@ import { joinOpeningList } from "@/lib/siteForms";
 import { emailLooksSendable } from "@/lib/siteFormFields";
 
 /**
- * "Tell me when this one opens", on the Glendale and Van Nuys pages.
+ * "Tell me when this one opens", on the page of any store that has not opened.
  *
  * Those pages currently answer a real question — where the next location is —
  * and then collect nothing from the person who asked. Two neighbourhoods of

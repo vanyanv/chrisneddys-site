@@ -42,7 +42,12 @@ const eaterLa = press.find((p) => p.pub === "Eater LA");
  * Neither runs, and the drip renders at full height with the teardrop
  * hidden, when the visitor's OS asks for reduced motion.
  */
-export function DripStory(): ReactElement {
+export function DripStory({
+  glendaleOpen,
+}: {
+  /** From the server's render, not this browser's clock, so hydration agrees. */
+  glendaleOpen: boolean;
+}): ReactElement {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -269,14 +274,15 @@ export function DripStory(): ReactElement {
 
         {/* Van Nuys opened on 2026-09-25, so this chapter is Glendale's alone
             (issue #265); it used to read "GLENDALE + VAN NUYS / Two more
-            locations on the way." */}
+            locations on the way." It changes by itself when Glendale opens
+            (`GLENDALE_OPENS_AT`). */}
         {eaterLa ? (
           <div className="cne-drip-st cne-drip-rv">
             <i className="cne-drip-dot" aria-hidden="true" />
             <div className="cne-drip-txt">
-              <span className="cne-drip-yr">next</span>
+              <span className="cne-drip-yr">{glendaleOpen ? "2026" : "next"}</span>
               <h2>GLENDALE</h2>
-              <p>One more location on the way.</p>
+              <p>{glendaleOpen ? "Now open on Colorado St." : "One more location on the way."}</p>
             </div>
             <div className="cne-drip-med">
               <div className="cne-drip-qstk is-wide" style={{ "--r": "2deg" } as CSSProperties}>

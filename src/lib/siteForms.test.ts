@@ -34,7 +34,15 @@ beforeEach(async () => {
   await db.execute(sql`delete from sign_in_attempts where kind = 'site_form'`);
 });
 
+/** Glendale takes sign-ups until it opens (`GLENDALE_OPENS_AT`); pin the
+ * clock before then so these keep testing a not-yet-open store after it. */
+function beforeGlendaleOpens() {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-10-24T12:00:00-07:00"));
+}
+
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   delete process.env.RESEND_API_KEY;
   delete process.env.EMAIL_FROM;
@@ -135,6 +143,7 @@ describe("sendContactMessage", () => {
   });
 
   it("caps one IP at five sends per window, across both forms", async () => {
+    beforeGlendaleOpens();
     const fetchMock = mockResend();
     for (let i = 0; i < 4; i++) {
       expect(await sendContactMessage(form(contact))).toEqual({ ok: true });
@@ -152,6 +161,8 @@ describe("sendContactMessage", () => {
 });
 
 describe("joinOpeningList", () => {
+  beforeEach(beforeGlendaleOpens);
+
   it("emails the signup for a location that hasn't opened", async () => {
     const fetchMock = mockResend();
     expect(
@@ -206,6 +217,15 @@ describe("joinOpeningList", () => {
         reason: "invalid",
       });
     }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("stops taking Glendale sign-ups the moment it opens", async () => {
+    vi.setSystemTime(new Date("2026-10-30T18:00:00-07:00"));
+    const fetchMock = mockResend();
+    expect(
+      await joinOpeningList(form({ email: "delivered@resend.dev", location: "Glendale" })),
+    ).toEqual({ ok: false, reason: "invalid" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

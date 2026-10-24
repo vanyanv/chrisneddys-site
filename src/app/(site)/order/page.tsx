@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/data/brand";
-import { locations } from "@/data/locations";
+import { GLENDALE_OPENS_AT, hasPassed, locations } from "@/data/locations";
 import { SLIDER_PRICE, COMBO_FROM_PRICE } from "@/data/menu";
 import { deliveryFor } from "@/data/delivery";
 import { sharedFaq, type FaqEntry } from "@/data/faq";
@@ -60,8 +60,13 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Is there parking?",
-    // Owner, 2026-09-26.
-    a: "Yes, at both. In Hollywood there is parking behind the store, and more in the WSS parking lot next door. In Van Nuys there is a parking lot right in front of the store.",
+    // Owner, 2026-09-26. Glendale's parking is not known yet, so once it
+    // opens the answer stops saying "both" and speaks for the two it knows.
+    get a() {
+      const known =
+        "In Hollywood there is parking behind the store, and more in the WSS parking lot next door. In Van Nuys there is a parking lot right in front of the store.";
+      return hasPassed(GLENDALE_OPENS_AT) ? known : `Yes, at both. ${known}`;
+    },
   },
   {
     q: "Do you have anything vegetarian?",
@@ -177,7 +182,7 @@ export default function OrderPage() {
           </div>
         ))}
 
-        {/* Glendale and Van Nuys haven't opened, so each gets one compact
+        {/* A store that hasn't opened gets one compact
             row instead of a full card with an address, a placeholder hours
             line and a footer link — that's real space on a phone, and none
             of it is a fact yet. "Tell me when it opens" (issue #108) is the
@@ -207,7 +212,10 @@ export default function OrderPage() {
                 }}
               >
                 <span style={{ fontSize: 13, lineHeight: 1.4 }}>
-                  <strong>{loc.neighbourhood.toUpperCase()}</strong> — opening soon
+                  <strong>{loc.neighbourhood.toUpperCase()}</strong> —{" "}
+                  {loc.openingAnnouncement
+                    ? `${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`
+                    : "opening soon"}
                 </span>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <Link

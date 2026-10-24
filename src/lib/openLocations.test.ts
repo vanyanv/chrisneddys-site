@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { sharedFaq } from "@/data/faq";
 import { locations } from "@/data/locations";
 import {
@@ -13,6 +13,10 @@ import { orderTargetUrl } from "./orderChoice";
 
 const byId = (id: string) => locations.find((l) => l.id === id)!;
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("sitewide copy names every open store, not just Hollywood (issue #178)", () => {
   it("joins names the way a sentence does", () => {
     expect(joinNames(["Hollywood"])).toBe("Hollywood");
@@ -21,6 +25,9 @@ describe("sitewide copy names every open store, not just Hollywood (issue #178)"
   });
 
   it("speaks for both open stores", () => {
+    // Before Glendale opens by itself (GLENDALE_OPENS_AT).
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-24T12:00:00-07:00"));
     expect(openNames("or")).toBe("Hollywood or Van Nuys");
     expect(openHoursAnswer()).toMatch(/^Late\. Hollywood and Van Nuys are both open 10 AM/);
     expect(closingLine()).toMatch(/^Hollywood and Van Nuys both serve until 1 AM/);
@@ -29,6 +36,19 @@ describe("sitewide copy names every open store, not just Hollywood (issue #178)"
     );
     expect(phoneList()).toBe("Hollywood (323) 544-3600, Van Nuys (818) 208-9315");
     for (const { a } of sharedFaq) expect(a).not.toMatch(/The Hollywood location/);
+  });
+
+  it("names all three once Glendale opens, with no delivery app claimed for it", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-30T18:00:00-07:00"));
+    expect(openNames()).toBe("Hollywood, Glendale and Van Nuys");
+    expect(openHoursAnswer()).toMatch(
+      /^Late\. Hollywood, Glendale and Van Nuys are all open 10 AM/,
+    );
+    expect(deliverySentence()).toBe(
+      "DoorDash and Uber Eats deliver from Hollywood and Van Nuys, and Grubhub from Hollywood",
+    );
+    expect(phoneList()).toBe("Hollywood (323) 544-3600, Van Nuys (818) 208-9315");
   });
 });
 

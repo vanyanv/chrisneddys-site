@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildLlmsTxt } from "@/lib/llmsTxt";
 import { brand } from "@/data/brand";
 import { locations } from "@/data/locations";
@@ -8,8 +8,21 @@ import { merch, type MerchProduct } from "@/data/merch";
 
 const flagship = locations.find((l) => l.id === "hollywood")!;
 
+/** Glendale opens by itself at GLENDALE_OPENS_AT; these run before it so
+ * they keep testing a not-yet-open store after that date. */
+function beforeGlendaleOpens() {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-10-24T12:00:00-07:00"));
+}
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("buildLlmsTxt", () => {
+  beforeGlendaleOpens();
   const text = buildLlmsTxt(merch);
+  vi.useRealTimers();
 
   it("sends catering to the catering page and the contact form, not ezCater", () => {
     expect(text).toContain(`${brand.siteUrl}/catering/`);
@@ -25,7 +38,8 @@ describe("buildLlmsTxt", () => {
     expect(text).toMatch(/1 AM|2 AM/);
   });
 
-  it("keeps not-yet-open locations to a status and a page link", () => {
+  it("keeps a not-yet-open location to its launch date, address and page link", () => {
+    beforeGlendaleOpens();
     const notOpen = locations.filter((l) => !l.isOpen);
     expect(notOpen.map((l) => l.id)).toEqual(["glendale"]);
     for (const loc of notOpen) {
@@ -37,10 +51,12 @@ describe("buildLlmsTxt", () => {
       const rest = text.slice(start + 1);
       const nextHeadingOffset = rest.search(/\n#{2,3} /);
       const section = nextHeadingOffset === -1 ? rest : rest.slice(0, nextHeadingOffset);
-      expect(section).toContain("Status: opening soon.");
+      expect(section).toContain(`Status: ${loc.openingAnnouncement}.`);
+      expect(section).toContain(`- Address: ${loc.address}`);
       expect(section).not.toContain(brand.phone);
-      expect(section).not.toMatch(/\d{1,2}(:\d{2})?\s?(AM|PM)/);
-      expect(section.toLowerCase()).not.toContain("address");
+      // The opening time, but never opening hours: there are none to claim yet.
+      expect(section).not.toMatch(/\d{1,2}(:\d{2})?\s?(AM|PM) (to|–)/);
+      expect(section).not.toContain("Hours:");
     }
   });
 

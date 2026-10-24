@@ -18,7 +18,7 @@
  * verbatim would otherwise put that word in someone's mouth.
  */
 import { brand } from "@/data/brand";
-import { locations, type Location } from "@/data/locations";
+import { GLENDALE_OPENS_AT, hasPassed, locations, type Location } from "@/data/locations";
 import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
 import { deliveryFor } from "@/data/delivery";
@@ -47,7 +47,17 @@ function locationSection(loc: Location): string {
   const pageLine = `- Page: ${locationPageUrl(loc)}`;
 
   if (!loc.isOpen) {
-    return [heading, "Status: opening soon.", pageLine].join("\n");
+    return [
+      heading,
+      `Status: ${loc.openingAnnouncement ?? "opening soon"}.`,
+      ...(loc.openingAnnouncement
+        ? [
+            `- Address: ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`.trim(),
+            ...(loc.phone ? [`- Phone: ${loc.phone}`] : []),
+          ]
+        : []),
+      pageLine,
+    ].join("\n");
   }
 
   const lines = [
@@ -137,13 +147,16 @@ function optionalSection(): string {
  * `await listPublishedProducts()` (`src/lib/catalog.ts`) from the route.
  */
 export function buildLlmsTxt(products: MerchProduct[]): string {
+  const glendaleOpen = hasPassed(GLENDALE_OPENS_AT);
   const summary =
     `${brand.name} is a Los Angeles smash-burger restaurant (${brand.tagline}), open now ` +
-    `on Sunset Blvd in Hollywood and on Sherman Way in Van Nuys. ` +
+    (glendaleOpen
+      ? `on Sunset Blvd in Hollywood, on Sherman Way in Van Nuys and on Colorado St in Glendale. `
+      : `on Sunset Blvd in Hollywood and on Sherman Way in Van Nuys. `) +
     `The signature order is the slider: two smashed patties, two ` +
     `slices of cheese, a buttered Martin's roll. Order pickup direct ` +
-    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub. ` +
-    `Glendale is opening soon.`;
+    `on the storefront, or delivery through DoorDash, Uber Eats or Grubhub.` +
+    (glendaleOpen ? "" : ` Glendale has its grand opening Friday, Oct 30 at 6 PM.`);
 
   return [
     `# ${brand.name}`,

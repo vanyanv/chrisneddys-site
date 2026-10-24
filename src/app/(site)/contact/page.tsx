@@ -105,7 +105,7 @@ export default function ContactPage() {
                     <span className="cne-ct-loca">{loc.isOpen ? loc.address : loc.status}</span>
                   </a>
                   <span className={`cne-ct-tag${loc.isOpen ? " is-open" : ""}`}>
-                    {loc.isOpen ? "Open" : "Soon"}
+                    {loc.isOpen ? "Open" : loc.openingAnnouncement ? "Oct 30, 6 PM" : "Soon"}
                   </span>
                 </li>
               ))}

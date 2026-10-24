@@ -118,8 +118,10 @@ describe("openingListEmail", () => {
 describe("openingReplyEmail", () => {
   const find = (id: string) => locations.find((l) => l.id === id)!;
 
+  const afterOpening = new Date("2026-11-02T20:00:00Z");
+
   it("never invents a date for a store that has none", () => {
-    const { subject, text, html } = openingReplyEmail(find("glendale"));
+    const { subject, text, html } = openingReplyEmail(find("glendale"), afterOpening);
     expect(subject).toBe("Chris N Eddy's Glendale: you're on the list");
     expect(text).toContain("Date to be announced");
     expect(text).not.toContain("Hours:");
@@ -127,5 +129,26 @@ describe("openingReplyEmail", () => {
     expect(text).toContain("Where: 1360 E Colorado St, Glendale, CA 91205");
     expect(html).toContain("GET DIRECTIONS");
     expect(html).toContain("not a newsletter");
+  });
+
+  it("sends the grand opening announcement until opening day is over", () => {
+    const glendale = find("glendale");
+    const { subject, text, html } = openingReplyEmail(glendale, new Date("2026-10-25T03:00:00Z"));
+    expect(subject).toBe("Chris N Eddy's Glendale: Grand Opening Friday, October 30");
+    expect(text).toContain("When: Friday, October 30, 2026. Doors open at 6 PM.");
+    expect(text).toContain("Where: 1360 E Colorado St, Glendale, CA 91205");
+    expect(text).toContain("One of only 50 made.");
+    expect(text).not.toContain("Date to be announced");
+    expect(html).toContain("https://www.chrisneddys.com/email/glendale-grand-opening.jpg");
+    expect(html).toContain("GET DIRECTIONS");
+
+    // Late on opening day in Los Angeles it's still the announcement; the
+    // next morning it isn't.
+    expect(openingReplyEmail(glendale, new Date("2026-10-31T06:59:00Z")).subject).toContain(
+      "Grand Opening",
+    );
+    expect(openingReplyEmail(glendale, new Date("2026-10-31T07:00:00Z")).subject).toBe(
+      "Chris N Eddy's Glendale: you're on the list",
+    );
   });
 });

@@ -7,9 +7,9 @@ import { useEffect, useState, type ReactNode } from "react";
  * nothing before it — a page change that has to happen on a set day without
  * anyone deploying.
  *
- * The server decides first (`initial`, from its own clock at render): these
- * pages regenerate every minute, so the HTML itself flips within a minute of
- * `at`. The browser then checks its own clock on mount, and if the page is
+ * The server decides first (`initial`, from its own clock at render): the
+ * `/api/opening` cron re-renders the storefront at each opening moment, so
+ * the HTML itself flips within a minute of `at`. The browser then checks its own clock on mount, and if the page is
  * still open when `at` arrives, flips it then too.
  */
 export function FromDate({

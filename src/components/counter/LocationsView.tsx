@@ -16,8 +16,10 @@ type LocationId = Location["id"];
 
 /** Open stores first, so the list never makes a visitor scroll past a store
     that isn't serving yet to reach one that is (issue #261). The map, the
-    footer and every other list keep `locations`' own order. */
-const listed = [...locations].sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
+    footer and every other list keep `locations`' own order. A function, not
+    a module constant: a store opens by itself (`GLENDALE_OPENS_AT`) long
+    after a warm server or an open tab loaded this file. */
+const listed = () => [...locations].sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
 
 /**
  * Map plus store cards, as in the prototype: pick a pin or a card and the other
@@ -100,7 +102,7 @@ export function LocationsView({ mapCanvas }: { mapCanvas: ReactNode }) {
         <GlyphRow />
         <div className="cne-eyebrow">Three locations</div>
         <h1>Find us.</h1>
-        {listed.map((loc) => (
+        {listed().map((loc) => (
           /* A pointer tap anywhere on the card picks the store, as a shortcut.
              The card itself is not a button: it holds the ORDER, DIRECTIONS
              and CALL links, and a button cannot contain links (screen readers

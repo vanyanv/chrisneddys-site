@@ -171,7 +171,9 @@ describe("joinOpeningList", () => {
     expect(payload.to).toBe("delivered@resend.dev");
     expect(payload.from).toBe("Chris N Eddy's <hello@chrisneddys.com>");
     expect(payload.reply_to).toBe(brand.email);
-    expect(payload.subject).toBe("Chris N Eddy's Glendale: you're on the list");
+    // The wording depends on whether Glendale's grand opening is still ahead
+    // (see siteFormEmail.test.ts); either way it is Glendale's reply.
+    expect(payload.subject).toMatch(/^Chris N Eddy's Glendale: /);
     expect(payload.text).toContain("1360 E Colorado St, Glendale, CA 91205");
   });
 

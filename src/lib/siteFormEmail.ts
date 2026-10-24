@@ -13,6 +13,7 @@
  * every piece the visitor typed is escaped before it touches the HTML.
  */
 import { brand } from "@/data/brand";
+import { upcomingGrandOpening } from "@/data/grandOpening";
 import type { Location } from "@/data/locations";
 import { googleDirections } from "@/lib/directions";
 import { holdColors, solidFill } from "@/lib/emailColor";
@@ -283,17 +284,72 @@ export function openingListEmail(
 /**
  * The one email a visitor gets straight back after joining a location's
  * opening list: where it is, and that the date is to be announced. Facts
- * from `src/data/locations.ts` only — no store on the list has a date, so
- * the email says so rather than guessing one.
+ * from `src/data/locations.ts` only, so a store with no date says so rather
+ * than guessing one. Until a store's grand opening in
+ * `src/data/grandOpening.ts` has passed, the reply is that announcement
+ * instead: the flyer, the date, the doors and the opening-day drop.
  */
-export function openingReplyEmail(location: Location): BuiltEmail {
+export function openingReplyEmail(location: Location, at: Date = new Date()): BuiltEmail {
   const hood = location.neighbourhood;
   const street = location.address;
   const cityLine = `${location.city}, ${location.region} ${location.postal}`;
-  const heading = `You're on the ${hood} list.`;
-  const subject = `${brand.name} ${hood}: you're on the list`;
   const directions = googleDirections(location);
   const note = `You got this because you signed up on chrisneddys.com. It's a one-off, not a newsletter.`;
+
+  const opening = upcomingGrandOpening(location, at);
+  if (opening) {
+    const subject = `${brand.name} ${hood}: Grand Opening ${opening.dateLabel.replace(/, \d{4}$/, "")}`;
+    const intro = `You're on the ${hood} list. Here's opening day.`;
+    const flyer = `${brand.siteUrl}${opening.flyerPath}`;
+    const text = [
+      opening.heading,
+      "",
+      intro,
+      "",
+      `When: ${opening.dateLabel}. ${opening.doors}.`,
+      `Where: ${street}, ${cityLine}`,
+      "",
+      `Opening-day drop: ${opening.drop}`,
+      "",
+      opening.extras,
+      "",
+      `Directions: ${directions}`,
+      `Flyer: ${flyer}`,
+      "",
+      note,
+    ].join("\n");
+
+    const bodyHtml = `
+    <tr><td style="padding-top:16px">
+      <img src="${flyer}" width="480" alt="${escapeHtml(opening.flyerAlt)}" style="display:block;width:100%;max-width:480px;height:auto;border:1px solid ${RULE};font-family:${BODY_FONT};font-size:14px;color:${INK}">
+    </td></tr>
+    <tr><td style="padding-top:14px;font-family:${BODY_FONT};font-size:15px;line-height:1.55;color:${INK}">${escapeHtml(intro)}</td></tr>
+    <tr><td style="padding-top:12px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${detailRow("When", `${escapeHtml(opening.dateLabel)}<br><strong>${escapeHtml(opening.doors)}</strong>`)}
+        ${detailRow("Where", `${escapeHtml(street)}<br>${escapeHtml(cityLine)}`)}
+        ${detailRow("The drop", escapeHtml(opening.drop))}
+        ${detailRow("Also", escapeHtml(opening.extras))}
+      </table>
+    </td></tr>`;
+
+    const html = shell({
+      tag: hood,
+      label: "Grand opening",
+      monster: HOOD_MONSTER[hood] ?? "blue",
+      urgent: false,
+      heading: opening.heading,
+      stamp: `${street}, ${location.city}`,
+      bodyHtml,
+      buttonsHtml: [button(directions, "GET DIRECTIONS", true)],
+      note,
+    });
+
+    return { subject, text, html };
+  }
+
+  const heading = `You're on the ${hood} list.`;
+  const subject = `${brand.name} ${hood}: you're on the list`;
   const when = "Date to be announced. We'll email you when the doors open.";
 
   const text = [

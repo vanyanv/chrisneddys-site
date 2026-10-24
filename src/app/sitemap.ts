@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { brand } from "@/data/brand";
 import { slugFor } from "@/lib/locationSlug";
-import { locations } from "@/data/locations";
+import { GLENDALE_OPENS_AT, hasPassed, locations } from "@/data/locations";
 import { storeArtImages } from "@/data/storeArt";
 import { menuPhotoLargest } from "@/lib/menuPhoto";
 import {
@@ -29,8 +29,14 @@ export const dynamic = "force-static";
  */
 const asDate = (iso: string): Date => new Date(`${iso}T12:00:00Z`);
 
-/** When the location set — addresses, hours, which locations are open — last moved. */
-const LOCATIONS_UPDATED = "2026-09-30";
+/**
+ * When the location set — addresses, hours, which locations are open — last
+ * moved: Glendale's opening date going up (2026-10-24), then Glendale opening
+ * (2026-10-30). A function because the second one happens by itself
+ * (`GLENDALE_OPENS_AT`); the `/api/opening` cron re-renders this file then.
+ * Every page that names which stores are open carries it too.
+ */
+const locationsUpdated = (): string => (hasPassed(GLENDALE_OPENS_AT) ? "2026-10-30" : "2026-10-24");
 /**
  * When each page's own copy or structure last changed. Bump the one you touch:
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
@@ -72,6 +78,7 @@ const uniqueMenuImages = Array.from(new Set(menuImages));
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [merch, merchUpdated] = await Promise.all([listPublishedProducts(), catalogueUpdatedAt()]);
+  const LOCATIONS_UPDATED = locationsUpdated();
 
   const entries: Array<{
     path: string;
@@ -82,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       path: "/",
       priority: 1.0,
-      updated: HOME_UPDATED,
+      updated: latest(HOME_UPDATED, LOCATIONS_UPDATED),
       // The files the page actually serves, which is what an image result has
       // to be able to fetch: the `.jpg` originals listed here before are only
       // ever referenced from structured data, and one of them (`fries.jpg`) is
@@ -113,7 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ? allPhotosFor(i).map((photo) => `${brand.siteUrl}${menuPhotoLargest(photo)}`)
         : undefined,
     })),
-    { path: "/order/", priority: 0.9, updated: ORDER_UPDATED },
+    { path: "/order/", priority: 0.9, updated: latest(ORDER_UPDATED, LOCATIONS_UPDATED) },
     // The page a "catering" search should land on; catering is arranged
     // through the contact form, so it sits under /order/ rather than beside it.
     { path: "/catering/", priority: 0.7, updated: CATERING_UPDATED },
@@ -142,15 +149,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...(images.length ? { images } : {}),
       };
     }),
-    { path: "/about/", priority: 0.5, updated: ABOUT_UPDATED },
-    { path: "/contact/", priority: 0.5, updated: CONTACT_UPDATED },
+    { path: "/about/", priority: 0.5, updated: latest(ABOUT_UPDATED, LOCATIONS_UPDATED) },
+    { path: "/contact/", priority: 0.5, updated: latest(CONTACT_UPDATED, LOCATIONS_UPDATED) },
     // A page for people, not customers — never the answer to a search someone
     // orders from, so it sits with /about/ and /contact/ rather than up with
     // the menu or the shop.
     {
       path: "/careers/",
       priority: 0.4,
-      updated: CAREERS_UPDATED,
+      updated: latest(CAREERS_UPDATED, LOCATIONS_UPDATED),
       images: [`${brand.siteUrl}/photos/art/hollywood-wall-900.webp`],
     },
     // Listed, but at the floor: it is a page that has to be findable and is

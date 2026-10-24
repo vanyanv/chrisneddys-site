@@ -5,13 +5,16 @@ import { LocationsMapCanvas } from "@/components/locations/LocationsMapCanvas";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { brand } from "@/data/brand";
-import { locations, flagship } from "@/data/locations";
+import { locations, flagship, hasPassed, GLENDALE_OPENS_AT } from "@/data/locations";
 import { slugFor } from "@/lib/locationSlug";
 import { closingSummary } from "@/lib/hours";
 
 const title = "Locations — Hollywood, Glendale & Van Nuys";
+// A function so it changes by itself when Glendale opens (`GLENDALE_OPENS_AT`).
 function description(): string {
-  return `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd) and Van Nuys (14523 Sherman Way), open until ${closingSummary(flagship)}. Glendale opening soon.`;
+  return hasPassed(GLENDALE_OPENS_AT)
+    ? `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd), Van Nuys (14523 Sherman Way) and Glendale (1360 E Colorado St), open until ${closingSummary(flagship)}.`
+    : `Chris N Eddy’s in Hollywood (5539 W. Sunset Blvd) and Van Nuys (14523 Sherman Way), open until ${closingSummary(flagship)}. Glendale grand opening Friday, Oct 30 at 6 PM.`;
 }
 
 export function generateMetadata(): Metadata {

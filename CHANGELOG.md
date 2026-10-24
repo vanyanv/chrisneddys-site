@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Site: Glendale's grand opening, Friday, Oct 30 at 6 PM, now shows on the Glendale page, the locations page, the order page, the contact page, the footer and the FAQ, and the header tag on the Glendale page says "OPENS FRI 6 PM". From midnight on Oct 30 the Glendale page shows its hours, and at 6 PM Glendale turns into an open store everywhere on the site by itself, with no deploy: its hours, its live open/closed tag, its card on the home page, its map pin and the FAQ and careers wording. The hours are the same as Van Nuys until the real Glendale hours are in. If the switch ever misses, saving Admin → Settings refreshes every page ([#293](https://github.com/vanyanv/chrisneddys-site/issues/293))
+
 ### Fixed
 
 - Site: anyone who joins the Glendale opening list from now until October 30 gets the grand opening details straight back (the flyer, Friday, October 30, doors at 6 PM, the address and the numbered-hat drop for the first 30) instead of "Date to be announced". From the day after opening the reply goes back to normal ([#291](https://github.com/vanyanv/chrisneddys-site/issues/291))

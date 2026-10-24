@@ -42,7 +42,7 @@ export function OrderDock() {
 
   if (pathname.startsWith("/shop")) return null;
 
-  const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel();
+  const message = !status ? " " : loc.isOpen ? statusLabel(status) : openingLabel(loc);
 
   return (
     // An <aside> so screen readers can find the bar as its own landmark; it sits

@@ -2,12 +2,6 @@ import { mapBox } from "@/data/laGeo";
 import { SCALE_BAR, TWO_MILES } from "@/components/locations/mapLayout";
 import { placeMapLettering } from "@/components/locations/mapLettering";
 
-/**
- * Street names and shields that clear every pin, tag, plate and edge — worked
- * out once per build, since none of those move. See `mapLettering.ts`.
- */
-const lettering = placeMapLettering();
-
 /** The lettering layer sits over the geometry and under the pins. */
 const letteringStyle = {
   position: "absolute" as const,
@@ -51,6 +45,11 @@ const letteringStyle = {
  * preload from a `Link` header in next.config.mjs instead.
  */
 export function LocationsMapCanvas({ eager }: { eager?: boolean }) {
+  // Street names and shields that clear every pin, tag, plate and edge (see
+  // `mapLettering.ts`). Worked out per render, not once per module: an open
+  // store's tag reserves room, and Glendale gains one by itself at
+  // `GLENDALE_OPENS_AT`, long after a warm server loaded this file.
+  const lettering = placeMapLettering();
   const image = (
     <img
       src="/map-base.svg"

@@ -142,10 +142,19 @@ export function SiteFooter() {
             </div>
           ))}
           {/* Not-yet-open locations get one compact status line each, so a
-              future store never looks open before it is. */}
+              confirmed launch can be named without making every future store
+              look open before it is. */}
           {comingSoon.map((loc) => (
             <div className="cne-foot-counter" data-location={slugFor(loc)} key={loc.id}>
-              <p className="cne-foot-soon">{loc.neighbourhood} — coming soon.</p>
+              <p className="cne-foot-soon">
+                {loc.neighbourhood} — {loc.openingAnnouncement ?? "coming soon"}.
+                {loc.openingAnnouncement ? (
+                  <>
+                    <br />
+                    {loc.address}, {loc.city}, {loc.region} {loc.postal}
+                  </>
+                ) : null}
+              </p>
             </div>
           ))}
         </div>

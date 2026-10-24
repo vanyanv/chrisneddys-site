@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/about.css";
 import { DripStory } from "@/components/about/DripStory";
+import { GLENDALE_OPENS_AT, hasPassed } from "@/data/locations";
 import { JsonLdScript } from "@/components/shared/JsonLd";
 import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
 import { brand } from "@/data/brand";
@@ -49,7 +50,7 @@ export default function AboutPage() {
     <>
       <JsonLdScript data={breadcrumbLd([{ name: "About", path: "/about/" }])} />
       <JsonLdScript data={aboutLd} />
-      <DripStory />
+      <DripStory glendaleOpen={hasPassed(GLENDALE_OPENS_AT)} />
     </>
   );
 }

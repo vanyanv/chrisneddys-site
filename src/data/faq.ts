@@ -1,3 +1,4 @@
+import { GLENDALE_OPENS_AT, hasPassed, locations } from "@/data/locations";
 import { deliverySentence, openHoursAnswer } from "@/lib/openLocations";
 
 export type FaqEntry = { q: string; a: string };
@@ -25,7 +26,15 @@ export const sharedFaq: FaqEntry[] = [
   },
   {
     q: "Can I order from Glendale or Van Nuys?",
-    a: "Van Nuys, yes — it is open, and takes pickup orders on its own page. Glendale has not opened yet.",
+    // A getter, so the answer changes itself when Glendale opens.
+    get a() {
+      if (!hasPassed(GLENDALE_OPENS_AT)) {
+        return "Van Nuys, yes — it is open, and takes pickup orders on its own page. Glendale opens Friday, Oct 30 at 6 PM.";
+      }
+      return locations.find((l) => l.id === "glendale")?.orderUrl
+        ? "Yes — both are open, and each takes pickup orders on its own page."
+        : "Yes — both are open. Van Nuys takes pickup orders on its own page; Glendale’s online ordering isn’t live on Otter yet.";
+    },
   },
   {
     q: "What time do you close?",

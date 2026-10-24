@@ -350,8 +350,12 @@ Two traps worth knowing, both of which have already cost an afternoon:
 
 The app has a server (`next build` / `next start`), so this is a standard
 Next.js deployment. The security headers and cache policy above ship from
-`headers()` in `next.config.mjs` — one source for every host, Vercel included,
-so there is no `vercel.json` to add. `img-src` in that CSP also allows Vercel
+`headers()` in `next.config.mjs` — one source for every host, Vercel included.
+`vercel.json` holds only cron jobs: `/api/opening` re-renders the storefront
+at the start of Glendale's opening day and at its 6 PM doors (2026-10-30), so
+the store opens on the site with no deploy. The route does nothing outside
+those moments and checks `CRON_SECRET` when one is set. If it ever misses,
+Admin → Settings → Save re-renders every storefront page the same way. `img-src` in that CSP also allows Vercel
 Blob (`https://*.public.blob.vercel-storage.com`), where product photos live.
 The same `headers()` sends `X-Robots-Tag: noindex, nofollow` on any
 `*.vercel.app` host, so the Vercel address never gets indexed as a second copy

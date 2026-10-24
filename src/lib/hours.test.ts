@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   closingSummary,
   hoursSentence,
@@ -15,6 +15,13 @@ import { locations, type Location } from "@/data/locations";
 const hollywood = locations.find((l) => l.id === "hollywood") as Location;
 const glendale = locations.find((l) => l.id === "glendale") as Location;
 const vannuys = locations.find((l) => l.id === "vannuys") as Location;
+
+/** Glendale opens by itself at GLENDALE_OPENS_AT; pin the clock before it so
+ * these keep testing a not-yet-open store after that date. */
+function beforeGlendaleOpens() {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-10-24T12:00:00-07:00"));
+}
 
 /** A synthetic store open the same hours every day, to exercise the single-group case. */
 const uniform: Location = {
@@ -80,7 +87,9 @@ describe("storeStatus", () => {
   });
 
   it("reports unknown for a location that is not open yet", () => {
+    beforeGlendaleOpens();
     expect(storeStatus(glendale, at("2026-09-14T17:30:00Z"))).toEqual({ state: "unknown" });
+    vi.useRealTimers();
   });
 });
 
@@ -103,7 +112,9 @@ describe("statusParts / statusLabel", () => {
     const closed = storeStatus(hollywood, at("2026-09-15T08:05:00Z"));
     expect(statusLabel(closed)).toBe("CLOSED · OPENS 10 AM");
 
+    beforeGlendaleOpens();
     const unknown = storeStatus(glendale, at("2026-09-14T17:30:00Z"));
+    vi.useRealTimers();
     expect(statusLabel(unknown)).toBe("");
   });
 });
@@ -158,8 +169,10 @@ describe("closingSummary / hoursSentence", () => {
   });
 
   it("returns empty strings for a location that isn't open yet, rather than inventing hours", () => {
+    beforeGlendaleOpens();
     expect(closingSummary(glendale)).toBe("");
     expect(hoursSentence(glendale)).toBe("");
+    vi.useRealTimers();
   });
 
   it("gives Van Nuys the same hours as Hollywood", () => {
@@ -170,9 +183,29 @@ describe("closingSummary / hoursSentence", () => {
 });
 
 describe("openingParts / openingLabel", () => {
-  it("says coming soon for a store that has not opened", () => {
-    expect(glendale.isOpen).toBe(false);
-    expect(openingLabel()).toBe("COMING SOON");
-    expect(openingParts().aria).toBe("Coming soon");
+  it("says when a dated store opens, in LA time, with the day kept in the value", () => {
+    beforeGlendaleOpens();
+    expect(openingParts(glendale)).toEqual({
+      state: { short: "OPENS", rest: "" },
+      time: { lead: "", value: "FRI 6 PM" },
+      aria: "Opens Fri at 6 PM",
+    });
+    expect(openingLabel(glendale)).toBe("OPENS FRI 6 PM");
+    vi.useRealTimers();
+  });
+
+  it("drops the opening time once the store has opened", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-30T18:00:00-07:00"));
+    expect(glendale.isOpen).toBe(true);
+    expect(glendale.opensAt).toBeUndefined();
+    vi.useRealTimers();
+  });
+
+  it("says coming soon for an undated store", () => {
+    expect(openingLabel({ ...vannuys, isOpen: false, opensAt: undefined })).toBe("COMING SOON");
+    expect(openingParts({ ...vannuys, isOpen: false, opensAt: undefined }).aria).toBe(
+      "Coming soon",
+    );
   });
 });

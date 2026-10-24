@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { locations } from "@/data/locations";
 import { mapBox } from "@/data/laGeo";
 import { shields as allShields } from "@/data/laGeoPaths";
@@ -46,7 +46,24 @@ describe("map lettering", () => {
   });
 
   it("keeps every freeway shield", () => {
-    expect(shields.map((s) => s.ref).sort()).toEqual(allShields.map((s) => s.ref).sort());
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-24T12:00:00-07:00"));
+    const before = placeMapLettering().shields;
+    vi.useRealTimers();
+    expect(before.map((s) => s.ref).sort()).toEqual(allShields.map((s) => s.ref).sort());
+  });
+
+  it("gives way to Glendale's open-now tag only for the 134, which runs past the store", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-30T18:00:00-07:00"));
+    const after = placeMapLettering().shields;
+    vi.useRealTimers();
+    expect(after.map((s) => s.ref).sort()).toEqual(
+      allShields
+        .map((s) => s.ref)
+        .filter((ref) => ref !== "134")
+        .sort(),
+    );
   });
 });
 

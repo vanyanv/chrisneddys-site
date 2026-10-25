@@ -6,11 +6,11 @@ describe("robots", () => {
   const result = robots();
   const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
 
-  it("keeps the default rule allowing everything but /admin and /api/", () => {
+  it("keeps the default rule allowing everything but /admin, /api/ and /close", () => {
     const wildcard = rules.find((r) => r.userAgent === "*");
     expect(wildcard).toBeDefined();
     expect(wildcard!.allow).toBe("/");
-    expect(wildcard!.disallow).toEqual(["/admin", "/api/"]);
+    expect(wildcard!.disallow).toEqual(["/admin", "/api/", "/close"]);
   });
 
   it("names every AI search crawler from issue #88 with the same disallow list", () => {
@@ -30,7 +30,7 @@ describe("robots", () => {
       const rule = rules.find((r) => r.userAgent === agent);
       expect(rule, `expected a rule for ${agent}`).toBeDefined();
       expect(rule!.allow).toBe("/");
-      expect(rule!.disallow).toEqual(["/admin", "/api/"]);
+      expect(rule!.disallow).toEqual(["/admin", "/api/", "/close"]);
     }
   });
 

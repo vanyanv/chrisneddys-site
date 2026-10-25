@@ -10,6 +10,7 @@ import { isShopOpenFor } from "@/lib/shopStatus";
 import { RackCatalogue } from "./RackCatalogue";
 import { RackEmptyState } from "./RackEmptyState";
 import "@/styles/admin-rack.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -18,14 +19,6 @@ export const dynamic = "force-dynamic";
  * (`src/app/(admin)/admin/page.tsx`) does, rather than the Sheet chrome
  * `admin/layout.tsx` still gives Orders and Settings — `admin/layout.tsx`
  * special-cases this path the same way it already does for `/admin`. */
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
-
 export default async function AdminProductsPage({
   searchParams,
 }: {
@@ -63,7 +56,7 @@ export default async function AdminProductsPage({
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

@@ -23,18 +23,11 @@ import { AddressBlock, FulfilmentCard } from "./FulfilmentCard";
 import { RefundTrigger } from "./RefundPanel";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-orders.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
 type Params = { id: string };
-
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
 
 function ItemsCard({ order }: { order: AdminOrderDetail }) {
   return (
@@ -319,7 +312,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

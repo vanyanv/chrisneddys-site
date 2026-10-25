@@ -42,6 +42,9 @@ export default function CustomerDetailLoading() {
             Customers
           </span>
           <span className="rack-tab" aria-current="false">
+            Closing
+          </span>
+          <span className="rack-tab" aria-current="false">
             Settings
           </span>
         </div>

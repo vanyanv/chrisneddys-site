@@ -9,6 +9,7 @@ import { isShopOpenFor } from "@/lib/shopStatus";
 import { CustomersTable, type CustomersTableRow } from "./CustomersTable";
 import "@/styles/admin-rack.css";
 import "@/styles/admin-customers.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -19,14 +20,6 @@ export const dynamic = "force-dynamic";
  * and the identity-key caveat. Own shell, same convention as every other
  * signed-in admin route now that `admin/layout.tsx` draws none itself.
  */
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
-
 export default async function AdminCustomersPage() {
   const session = await requireOwner();
   const [customers, settings] = await Promise.all([listCustomersForAdmin(), getStoreSettings()]);
@@ -59,7 +52,7 @@ export default async function AdminCustomersPage() {
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

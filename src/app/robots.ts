@@ -4,12 +4,13 @@ import { brand } from "@/data/brand";
 export const dynamic = "force-static";
 
 /**
- * `/admin` is the owner's sign-in and dashboard; `/api/` is server routes
+ * `/admin` is the owner's sign-in and dashboard; `/close` is the crew's private
+ * closing checklist (reached by a secret link); `/api/` is server routes
  * (checkout, the Stripe webhook, admin actions) — neither has anything a
  * crawler should index or an AI answer engine should read as the site's own
  * words.
  */
-const DISALLOW = ["/admin", "/api/"];
+const DISALLOW = ["/admin", "/api/", "/close"];
 
 /**
  * The AI answer engines named in issue #88, so ChatGPT search, Perplexity,

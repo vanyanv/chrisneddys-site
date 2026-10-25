@@ -14,6 +14,7 @@ import {
   type WorkQueueItem,
 } from "@/lib/workQueue";
 import "@/styles/admin-rack.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -24,14 +25,6 @@ export const dynamic = "force-dynamic";
  * which is the only place this queue's real-data rules live (and the only
  * part of this feature that's unit-tested — this file is presentation
  * only). */
-
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
 
 function formatMoney(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -262,7 +255,7 @@ export default async function TodayPage() {
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

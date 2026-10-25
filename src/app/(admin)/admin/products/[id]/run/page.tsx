@@ -9,18 +9,11 @@ import { getStoreSettings } from "@/lib/orders";
 import { isShopOpenFor } from "@/lib/shopStatus";
 import { RunBoard } from "./RunBoard";
 import "@/styles/admin-rack.css";
+import { ADMIN_NAV } from "@/app/(admin)/admin/adminNav";
 
 export const dynamic = "force-dynamic";
 
 type Params = { id: string };
-
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/settings", label: "Settings" },
-];
 
 /**
  * `/admin/products/[id]/run` — "All fifty numbers" (issue #36 phase 3).
@@ -56,7 +49,7 @@ export default async function AdminRunPage({ params }: { params: Promise<Params>
           <span className="rack-wordmark-tag rack-mono">STORE</span>
         </Link>
         <div className="rack-tabs">
-          {NAV.map((item) => (
+          {ADMIN_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

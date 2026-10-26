@@ -51,7 +51,14 @@ export async function getOrderByNumberAndEmail(
   });
 }
 
-export type ListOrdersInput = { status?: OrderStatus; limit?: number; cursor?: string };
+export type ListOrdersInput = {
+  status?: OrderStatus;
+  /** Any of these statuses (e.g. an "open" desk view: paid or ready for
+   * pickup). Combined with `status` by intersection when both are given. */
+  statuses?: OrderStatus[];
+  limit?: number;
+  cursor?: string;
+};
 export type ListOrdersResult = {
   orders: (typeof orders.$inferSelect)[];
   nextCursor: string | null;
@@ -71,6 +78,7 @@ export async function listOrders(input: ListOrdersInput = {}, db?: Db): Promise<
 
   const conditions = [];
   if (input.status) conditions.push(eq(orders.status, input.status));
+  if (input.statuses) conditions.push(inArray(orders.status, input.statuses));
   if (cursorCreatedAt) conditions.push(lt(orders.createdAt, cursorCreatedAt));
 
   const rows = await database

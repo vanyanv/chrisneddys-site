@@ -78,6 +78,15 @@ export async function saveStoreSettings(
   patch: StoreSettingsPatch,
 ): Promise<UpdateStoreSettingsResult> {
   await requireOwner();
+  return saveStoreSettingsAsSystem(patch);
+}
+
+/** `saveStoreSettings` without the owner-session check, for the signed
+ * internal API (`src/lib/internalApi.ts`), which authenticates the caller
+ * itself. Never call this from anything that has not done that. */
+export async function saveStoreSettingsAsSystem(
+  patch: StoreSettingsPatch,
+): Promise<UpdateStoreSettingsResult> {
   const result = await updateStoreSettings(patch);
   if (!result.ok) return result;
 

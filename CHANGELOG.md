@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Admin: a private connection lets the restaurant dashboard run the shop: it can see what is waiting to ship or be picked up, sales for the last 30 days and low stock, move orders along (shipped, ready, picked up, refunded), manage products, look at customers and change the shop settings, using the same rules and emails as this admin. It stays shut until `SHOP_INTERNAL_API_SECRET` is set (see DEPLOY.md)
 - Site: Glendale's grand opening, Friday, Oct 30 at 6 PM, now shows on the Glendale page, the locations page, the order page, the contact page, the footer and the FAQ, and the header tag on the Glendale page says "OPENS FRI 6 PM". From midnight on Oct 30 the Glendale page shows its hours, and at 6 PM Glendale turns into an open store everywhere on the site by itself, with no deploy: its hours, its live open/closed tag, its card on the home page, its map pin and the FAQ and careers wording. The hours are the same as Van Nuys until the real Glendale hours are in. If the switch ever misses, saving Admin → Settings refreshes every page ([#293](https://github.com/vanyanv/chrisneddys-site/issues/293))
 
 ### Fixed

@@ -41,20 +41,30 @@ export type OrderMutationResult = { ok: true } | { ok: false; error: string };
  */
 export type OrdersAdminFilter =
   | "all"
+  | "open"
   | "paid"
   | "ready_for_pickup"
   | "fulfilled"
+  | "picked_up"
   | "refunded"
   | "cancelled";
 
-const FILTER_STATUS: Record<OrdersAdminFilter, OrderStatus | undefined> = {
+/** `open` is the work still on the desk: paid (to ship or bag) or ready for
+ * pickup. `picked_up` is a filter value for callers that want it, but the
+ * admin's own tabs don't show one. */
+const FILTER_STATUSES: Record<OrdersAdminFilter, OrderStatus[] | undefined> = {
   all: undefined,
-  paid: "paid",
-  ready_for_pickup: "ready_for_pickup",
-  fulfilled: "fulfilled",
-  refunded: "refunded",
-  cancelled: "cancelled",
+  open: ["paid", "ready_for_pickup"],
+  paid: ["paid"],
+  ready_for_pickup: ["ready_for_pickup"],
+  fulfilled: ["fulfilled"],
+  picked_up: ["picked_up"],
+  refunded: ["refunded"],
+  cancelled: ["cancelled"],
 };
+
+/** Every value `listOrdersForAdmin` accepts, for callers validating input. */
+export const ORDERS_ADMIN_FILTERS = Object.keys(FILTER_STATUSES) as OrdersAdminFilter[];
 
 export type AdminOrderListRow = {
   id: string;
@@ -93,7 +103,7 @@ export async function listOrdersForAdmin(
   cursor?: string,
 ): Promise<ListOrdersForAdminResult> {
   const { orders: rows, nextCursor } = await listOrders({
-    status: FILTER_STATUS[filter],
+    statuses: FILTER_STATUSES[filter],
     cursor,
     limit: 50,
   });
@@ -331,6 +341,16 @@ export async function markShipped(
   patch: MarkShippedPatch,
 ): Promise<OrderMutationResult> {
   await requireOwner();
+  return markShippedAsSystem(orderId, patch);
+}
+
+/** `markShipped` without the owner-session check, for the signed internal
+ * API (`src/lib/internalApi.ts`), which authenticates the caller itself.
+ * Never call this from anything that has not done that. */
+export async function markShippedAsSystem(
+  orderId: string,
+  patch: MarkShippedPatch,
+): Promise<OrderMutationResult> {
   const carrier = patch.carrier.trim();
   const trackingNumber = patch.trackingNumber.trim();
   if (!carrier) return { ok: false, error: "Choose a carrier." };
@@ -346,6 +366,11 @@ export async function markShipped(
 /** paid -> ready_for_pickup. */
 export async function markReadyForPickup(orderId: string): Promise<OrderMutationResult> {
   await requireOwner();
+  return markReadyForPickupAsSystem(orderId);
+}
+
+/** See `markShippedAsSystem`. */
+export async function markReadyForPickupAsSystem(orderId: string): Promise<OrderMutationResult> {
   const result = await transitionReadyForPickup(orderId);
   if (!result.ok) return result;
 
@@ -357,6 +382,11 @@ export async function markReadyForPickup(orderId: string): Promise<OrderMutation
  * standing at the counter. */
 export async function markPickedUp(orderId: string): Promise<OrderMutationResult> {
   await requireOwner();
+  return markPickedUpAsSystem(orderId);
+}
+
+/** See `markShippedAsSystem`. */
+export async function markPickedUpAsSystem(orderId: string): Promise<OrderMutationResult> {
   return transitionPickedUp(orderId);
 }
 
@@ -379,6 +409,14 @@ export async function markRefunded(
   input: MarkRefundedInput = {},
 ): Promise<OrderMutationResult> {
   await requireOwner();
+  return markRefundedAsSystem(orderId, input);
+}
+
+/** See `markShippedAsSystem`. */
+export async function markRefundedAsSystem(
+  orderId: string,
+  input: MarkRefundedInput = {},
+): Promise<OrderMutationResult> {
   const reason = input.reason?.trim();
   const result = await transitionRefunded(orderId, {
     release: input.release,

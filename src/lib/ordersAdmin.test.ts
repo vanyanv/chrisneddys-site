@@ -12,7 +12,7 @@ import { getDb } from "@/db/client";
 import { seedCatalogue } from "@/db/seed";
 import * as schema from "@/db/schema";
 import { createPendingOrder, markPaid } from "@/lib/orders";
-import { getOrderForAdmin } from "@/lib/ordersAdmin";
+import { getOrderForAdmin, listOrdersForAdmin } from "@/lib/ordersAdmin";
 
 // `server-only` throws when a module carrying it is resolved outside a real
 // Next.js server build — see the note in `src/app/api/checkout/route.test.ts`.
@@ -63,5 +63,29 @@ describe("getOrderForAdmin", () => {
   it("returns undefined for an id that doesn't exist", async () => {
     const order = await getOrderForAdmin("00000000-0000-0000-0000-000000000000");
     expect(order).toBeUndefined();
+  });
+});
+
+describe("listOrdersForAdmin filters", () => {
+  it("`open` is paid plus ready_for_pickup; `picked_up` is its own filter", async () => {
+    const paid = await paidOrderId();
+    const ready = await paidOrderId();
+    const done = await paidOrderId();
+    const { markReadyForPickupAsSystem, markPickedUpAsSystem } = await import("@/lib/ordersAdmin");
+    expect((await markReadyForPickupAsSystem(ready)).ok).toBe(true);
+    expect((await markPickedUpAsSystem(done)).ok).toBe(true);
+
+    const open = await listOrdersForAdmin("open");
+    const openIds = open.rows.map((r) => r.id);
+    expect(openIds).toContain(paid);
+    expect(openIds).toContain(ready);
+    expect(openIds).not.toContain(done);
+    expect(open.rows.every((r) => r.status === "paid" || r.status === "ready_for_pickup")).toBe(
+      true,
+    );
+
+    const pickedUp = await listOrdersForAdmin("picked_up");
+    expect(pickedUp.rows.map((r) => r.id)).toContain(done);
+    expect(pickedUp.rows.every((r) => r.status === "picked_up")).toBe(true);
   });
 });

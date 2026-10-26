@@ -361,6 +361,10 @@ dashboard. Each request carries two headers:
 - `x-shop-signature`: lowercase hex HMAC-SHA256, keyed with the secret, of
   `${timestamp}.${METHOD}.${pathnameWithSearch}.${rawBody}` — METHOD upper-case,
   the path plus `?query` if there is one, and the exact body text (`""` for a GET).
+  The path ends in a slash (`/api/internal/shop/orders/?filter=open`) because this
+  site runs with `trailingSlash: true`: an unslashed path is a 308 to the slashed
+  one, and the slashed one is what is checked. The exception is a last segment that
+  looks like a file name, such as an email-keyed customer path, which has no slash.
   `signInternalRequest` in `src/lib/internalApi.ts` is the reference implementation.
 
 Unset or too-short secret: 503. Missing, stale or wrong signature: 401. Rotate it by

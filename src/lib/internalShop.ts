@@ -74,6 +74,10 @@ export function parseProductChanges(value: unknown): ProductChange[] | null {
       typeof c !== "object" ||
       typeof (c as ProductChange).id !== "string" ||
       typeof (c as ProductChange).field !== "string" ||
+      // Counts go through the inventory route, which checks them; here
+      // `applyProductChanges` would coerce null or true to 0 or 1.
+      (c as ProductChange).field === "inventoryN" ||
+      (c as ProductChange).field === "onlineN" ||
       !("value" in c)
     ) {
       return null;

@@ -539,7 +539,14 @@ describe("products", () => {
     expect(failing.json).toMatchObject({ ok: false, failedIndex: 1 });
     expect((await getProductForAdmin(id))?.eyebrow).toBe("New");
 
-    for (const body of [{}, { changes: [] }, { changes: [{ id, field: "eyebrow" }] }]) {
+    for (const body of [
+      {},
+      { changes: [] },
+      { changes: [{ id, field: "eyebrow" }] },
+      // Counts belong to the inventory route; null would coerce to 0 here.
+      { changes: [{ id, field: "inventoryN", value: null }] },
+      { changes: [{ id, field: "onlineN", value: true }] },
+    ]) {
       expect((await call(fieldsPOST, "POST", path, { params: { id }, body })).status).toBe(400);
     }
     const other = await call(fieldsPOST, "POST", path, {

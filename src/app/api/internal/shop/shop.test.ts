@@ -363,6 +363,33 @@ describe("orders", () => {
     expect(gone.status).toBe(404);
   });
 
+  it("won't ship a pickup order or bag a ship order", async () => {
+    const pickup = await paidOrder("pickup");
+    const shipped = await call(shipPOST, "POST", `/api/internal/shop/orders/${pickup}/ship`, {
+      params: { id: pickup },
+      body: { carrier: "USPS", trackingNumber: "9400100000000000000000" },
+    });
+    expect(shipped).toMatchObject({
+      status: 400,
+      json: { ok: false, error: "This is a pickup order. Mark it ready for pickup instead." },
+    });
+    const ship = await paidOrder("ship");
+    for (const [handler, leaf] of [
+      [readyPOST, "ready"],
+      [pickedUpPOST, "picked-up"],
+    ] as const) {
+      const r = await call(handler, "POST", `/api/internal/shop/orders/${ship}/${leaf}`, {
+        params: { id: ship },
+      });
+      expect(r).toMatchObject({
+        status: 400,
+        json: { error: "This order ships. Mark it shipped instead." },
+      });
+    }
+    expect((await getOrder(pickup))?.status).toBe("paid");
+    expect((await getOrder(ship))?.status).toBe("paid");
+  });
+
   it("refunds with a reason, files it as a note, and refuses a second refund", async () => {
     const id = await paidOrder("ship");
     const path = `/api/internal/shop/orders/${id}/refund`;

@@ -13,7 +13,9 @@
  * - `x-shop-signature`: lowercase hex HMAC-SHA256, keyed with the secret, of
  *   the string `${timestamp}.${METHOD}.${pathnameWithSearch}.${rawBody}`
  *   where METHOD is upper-case, `pathnameWithSearch` is the URL path plus
- *   `?query` when there is one (`/api/internal/shop/orders?filter=open`) and
+ *   `?query` when there is one, and WITH the trailing slash this site's
+ *   `trailingSlash: true` gives every path (`/api/internal/shop/orders/?filter=open`):
+ *   an unslashed path is a 308 to the slashed one, which is the path checked. And
  *   `rawBody` is the exact request body string (`""` for a GET).
  *   `signInternalRequest` below is that computation.
  *

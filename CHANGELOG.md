@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Site: the Glendale location now shows its own phone number, (747) 215-6218, with a CALL button on its page and its number in the footer, the order page and search listings ([#296](https://github.com/vanyanv/chrisneddys-site/issues/296))
+
 ### Added
 
 - Admin: a private connection lets the restaurant dashboard run the shop: it can see what is waiting to ship or be picked up, sales for the last 30 days and low stock, move orders along (shipped, ready, picked up, refunded), manage products, look at customers and change the shop settings, using the same rules and emails as this admin. It stays shut until `SHOP_INTERNAL_API_SECRET` is set (see DEPLOY.md)

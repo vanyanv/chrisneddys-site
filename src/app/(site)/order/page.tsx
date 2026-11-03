@@ -7,7 +7,7 @@ import { deliveryFor } from "@/data/delivery";
 import { sharedFaq, type FaqEntry } from "@/data/faq";
 import { formatPrice } from "@/lib/otter";
 import { slugFor } from "@/lib/locationSlug";
-import { closingLine, openLocations, openNames, phoneList } from "@/lib/openLocations";
+import { closingLine, joinNames, openLocations, openNames, phoneList } from "@/lib/openLocations";
 import { LocationCard } from "@/components/locations/LocationCard";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { JsonLdScript, restaurantLd } from "@/components/shared/JsonLd";
@@ -34,7 +34,14 @@ const FAQ: FaqEntry[] = [
   {
     q: "How do I order from Chris N Eddy's?",
     get a() {
-      return `Order online from the location you are picking up at — ${openNames()} each have their own ORDER button on this page — or call that location: ${phoneList()}.`;
+      // Only stores with an Otter storefront get an ORDER button; Glendale
+      // opened before its storefront was live.
+      const online = joinNames(
+        openLocations()
+          .filter((loc) => loc.orderUrl)
+          .map((loc) => loc.neighbourhood),
+      );
+      return `Order online from the location you are picking up at — ${online} each have their own ORDER button on this page — or call that location: ${phoneList()}.`;
     },
   },
   // Shared with /contact/'s "Answered already" card — one answer, defined once,

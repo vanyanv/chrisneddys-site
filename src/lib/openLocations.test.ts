@@ -38,7 +38,7 @@ describe("sitewide copy names every open store, not just Hollywood (issue #178)"
     for (const { a } of sharedFaq) expect(a).not.toMatch(/The Hollywood location/);
   });
 
-  it("names all three once Glendale opens, with no delivery app claimed for it", () => {
+  it("names all three once Glendale opens, with its phone and no delivery app claimed for it", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-30T18:00:00-07:00"));
     expect(openNames()).toBe("Hollywood, Glendale and Van Nuys");
@@ -48,7 +48,9 @@ describe("sitewide copy names every open store, not just Hollywood (issue #178)"
     expect(deliverySentence()).toBe(
       "DoorDash and Uber Eats deliver from Hollywood and Van Nuys, and Grubhub from Hollywood",
     );
-    expect(phoneList()).toBe("Hollywood (323) 544-3600, Van Nuys (818) 208-9315");
+    expect(phoneList()).toBe(
+      "Hollywood (323) 544-3600, Glendale (747) 215-6218, Van Nuys (818) 208-9315",
+    );
   });
 });
 

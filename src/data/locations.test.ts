@@ -84,7 +84,7 @@ describe("Glendale opens by itself at 6 PM Friday, Oct 30 (LA time)", () => {
     expect(closingSummary(g)).toBe(closingSummary(vanNuys()));
     expect(openLocations().map((l) => l.id)).toEqual(["hollywood", "glendale", "vannuys"]);
     expect(siteDescription()).toContain("Hollywood, Van Nuys and Glendale.");
-    expect(orderFaq()).toMatch(/^Yes — both are open/);
+    expect(orderFaq()).toBe("Yes — both are open, and each takes pickup orders on its own page.");
   });
 
   it("is in llms.txt as a dated store before, and as open after", () => {
@@ -99,10 +99,10 @@ describe("Glendale opens by itself at 6 PM Friday, Oct 30 (LA time)", () => {
     expect(after).toContain("on Colorado St in Glendale");
     expect(after).not.toMatch(/grand opening/i);
     expect(after).toContain("- Phone: (747) 215-6218");
-    // Glendale has no Otter storefront yet, so it is not named as having one.
     expect(after).toContain(
-      "Pickup orders go to the location you choose: Hollywood and Van Nuys each have their own order link",
+      "- Order online: https://order.tryotter.com/brand/3b02ef30-03b0-43c8-845a-da34666e55d0",
     );
+    expect(after).toMatch(/Pickup orders go to the location you choose: .*Glendale/);
     const start = after.indexOf("### Glendale");
     expect(after.slice(start, after.indexOf("\n### ", start + 1))).toContain("Status: open now.");
   });

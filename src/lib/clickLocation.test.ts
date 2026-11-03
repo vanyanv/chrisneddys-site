@@ -6,11 +6,14 @@ import { deliveryFor } from "@/data/delivery";
 
 const vanNuys = locations.find((l) => l.id === "vannuys")!;
 const hollywood = locations.find((l) => l.id === "hollywood")!;
+const glendale = locations.find((l) => l.id === "glendale")!;
 
 describe("clickLocation", () => {
   it("reads the store from an Otter storefront link, whatever the button declares", () => {
     expect(clickLocation(orderUrl("hero"))).toBe("hollywood");
     expect(clickLocation(withUtm(vanNuys.orderUrl!, "header"), "hollywood")).toBe("van-nuys");
+    // Glendale's link is Otter's /brand/{id} form.
+    expect(clickLocation(withUtm(glendale.orderUrl!, "dock"), "hollywood")).toBe("glendale");
   });
 
   it("reads the store from an Otter item link", () => {

@@ -8,7 +8,8 @@ import { slugFor } from "@/lib/locationSlug";
  * so one store is one row in a report.
  *
  * The link itself is the most reliable witness. Every Otter storefront URL
- * carries its store's ID (`/s/{brand}/{address}/{storeId}/…`), and each open
+ * carries its store's ID (`/s/{brand}/{address}/{storeId}/…`, or Glendale's
+ * `/brand/{id}`), and each open
  * store has its own phone number, so an ORDER or CALL link says where it goes
  * whichever button, picker or page it sits in — including buttons added later
  * that nobody remembers to label. A `data-location` declared on an ancestor is
@@ -22,8 +23,10 @@ const digits = (tel: string) => tel.replace(/\D/g, "");
 /** The Otter store ID in a storefront or item URL, if it is one. */
 export function otterStoreId(url: URL): string | undefined {
   if (url.hostname !== "order.tryotter.com") return undefined;
-  const [, s, , , storeId] = url.pathname.split("/");
-  return s === "s" && storeId ? storeId : undefined;
+  const parts = url.pathname.split("/");
+  if (parts[1] === "s" && parts[4]) return parts[4];
+  if (parts[1] === "brand" && parts[2]) return parts[2];
+  return undefined;
 }
 
 const byOtterStore = new Map<string, string>();

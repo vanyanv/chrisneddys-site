@@ -119,6 +119,9 @@ function glendale(): Location {
     showHoursFrom: GLENDALE_HOURS_FROM,
     phone: "(747) 215-6218",
     phoneTel: "+17472156218",
+    // The owner's link from Otter (2026-11-03): a /brand/ URL, not the
+    // /s/{brand}/{address}/{storeId} form the other two stores use.
+    orderUrl: "https://order.tryotter.com/brand/3b02ef30-03b0-43c8-845a-da34666e55d0",
     lat: 34.1393,
     lng: -118.238,
     hours: [

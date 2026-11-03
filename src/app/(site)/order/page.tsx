@@ -15,10 +15,21 @@ import { breadcrumbLd, pageMetadata, ID, OG_SPREAD } from "@/lib/seo";
 import { ArtPhoto } from "@/components/art/ArtPhoto";
 
 const title = "Order Now — Pickup, Open Late";
+
+/** The open stores that take online orders (have an Otter storefront). Glendale
+ * opened before its storefront was live, so it is left out until it has one. */
+function orderNames(conjunction: "and" | "or" = "and"): string {
+  return joinNames(
+    openLocations()
+      .filter((loc) => loc.orderUrl)
+      .map((loc) => loc.neighbourhood),
+    conjunction,
+  );
+}
 // Built per request of the metadata rather than at import, so a store that
 // opens later joins the description by itself.
 function description(): string {
-  return `Order ${brand.name} smash burgers online for pickup in ${openNames("or")}. Live menu prices. ${closingLine()}.`;
+  return `Order ${brand.name} smash burgers online for pickup in ${orderNames("or")}. Live menu prices. ${closingLine()}.`;
 }
 
 export function generateMetadata(): Metadata {
@@ -34,14 +45,8 @@ const FAQ: FaqEntry[] = [
   {
     q: "How do I order from Chris N Eddy's?",
     get a() {
-      // Only stores with an Otter storefront get an ORDER button; Glendale
-      // opened before its storefront was live.
-      const online = joinNames(
-        openLocations()
-          .filter((loc) => loc.orderUrl)
-          .map((loc) => loc.neighbourhood),
-      );
-      return `Order online from the location you are picking up at — ${online} each have their own ORDER button on this page — or call that location: ${phoneList()}.`;
+      // Only stores with an Otter storefront get an ORDER button.
+      return `Order online from the location you are picking up at — ${orderNames()} each have their own ORDER button on this page — or call that location: ${phoneList()}.`;
     },
   },
   // Shared with /contact/'s "Answered already" card — one answer, defined once,
@@ -124,8 +129,8 @@ export default function OrderPage() {
         <div className="cne-eyebrow">Pickup from {openNames("or")}</div>
         <h1>Order now.</h1>
         <p className="cne-lede">
-          Order online for pickup from {openNames("or")}. Pick your location below and it opens that
-          location&rsquo;s ordering page. Prices are the pickup prices you see on{" "}
+          Order online for pickup from {orderNames("or")}. Pick your location below and it opens
+          that location&rsquo;s ordering page. Prices are the pickup prices you see on{" "}
           <Link
             prefetch={false}
             href="/menu/"

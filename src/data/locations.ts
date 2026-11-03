@@ -10,7 +10,7 @@ export type Location = {
    * The line this location answers itself. A store only gets a CALL button and a
    * `telephone` in its JSON-LD once it has one — three addresses across two
    * cities sharing the Hollywood number is the pattern local search reads as a
-   * virtual office. Glendale gets its own once the owner gives it.
+   * virtual office.
    */
   phone?: string;
   phoneTel?: string;
@@ -87,8 +87,9 @@ const GLENDALE_ANNOUNCEMENT = "Grand opening Friday, Oct 30 at 6 PM";
  * module loaded.
  *
  * The hours are Van Nuys' until the owner gives Glendale's own (assumed
- * 2026-10-24). No phone, Otter storefront or delivery listing yet: each is
- * added here, or in `src/data/delivery.ts`, once the owner sends it.
+ * 2026-10-24). Phone from the owner, 2026-11-02. No Otter storefront or
+ * delivery listing yet: each is added here, or in `src/data/delivery.ts`,
+ * once the owner sends it.
  */
 function glendale(): Location {
   const open = () => hasPassed(GLENDALE_OPENS_AT);
@@ -116,6 +117,8 @@ function glendale(): Location {
       return open() ? undefined : GLENDALE_OPENS_AT;
     },
     showHoursFrom: GLENDALE_HOURS_FROM,
+    phone: "(747) 215-6218",
+    phoneTel: "+17472156218",
     lat: 34.1393,
     lng: -118.238,
     hours: [

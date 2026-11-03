@@ -43,7 +43,6 @@ describe("buildLlmsTxt", () => {
     const notOpen = locations.filter((l) => !l.isOpen);
     expect(notOpen.map((l) => l.id)).toEqual(["glendale"]);
     for (const loc of notOpen) {
-      expect(loc.phone).toBeUndefined();
       // The section for this location is everything between its own heading
       // and the next `###`/`##` heading.
       const start = text.indexOf(`### ${loc.name}`);

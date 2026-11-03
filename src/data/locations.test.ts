@@ -98,6 +98,11 @@ describe("Glendale opens by itself at 6 PM Friday, Oct 30 (LA time)", () => {
     const after = buildLlmsTxt(merch);
     expect(after).toContain("on Colorado St in Glendale");
     expect(after).not.toMatch(/grand opening/i);
+    expect(after).toContain("- Phone: (747) 215-6218");
+    // Glendale has no Otter storefront yet, so it is not named as having one.
+    expect(after).toContain(
+      "Pickup orders go to the location you choose: Hollywood and Van Nuys each have their own order link",
+    );
     const start = after.indexOf("### Glendale");
     expect(after.slice(start, after.indexOf("\n### ", start + 1))).toContain("Status: open now.");
   });

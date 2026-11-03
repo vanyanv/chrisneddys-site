@@ -23,6 +23,7 @@ import { foodMenu, categoryTitles, type MenuCategoryKey } from "@/data/menu";
 import { sharedFaq } from "@/data/faq";
 import { deliveryFor } from "@/data/delivery";
 import { hoursSentence } from "@/lib/hours";
+import { joinNames } from "@/lib/openLocations";
 import { slugFor } from "@/lib/locationSlug";
 import { storeUrl, formatPrice } from "@/lib/otter";
 import type { MerchProduct } from "@/data/merch";
@@ -77,6 +78,15 @@ function locationsSection(): string {
   return ["## Locations", ...locations.map(locationSection)].join("\n\n");
 }
 
+/** Names only the stores that really have an order link: an open store can
+ * still be waiting on its Otter storefront (Glendale, from 2026-10-30). */
+function pickupLine(withLink: Location[]): string {
+  const names = joinNames(withLink.map((l) => l.name));
+  return withLink.length === 1
+    ? `Pickup orders go to the location you choose: ${names} has its own order link under Locations above.`
+    : `Pickup orders go to the location you choose: ${names} each have their own order link under Locations above.`;
+}
+
 function orderingSection(): string {
   const openLocations = locations.filter((l) => l.isOpen);
   const lines = [
@@ -84,7 +94,7 @@ function orderingSection(): string {
     `Order direct on our own storefront for pickup — it's the cheaper way to buy, since the delivery apps set their own prices and add their own fees${openLocations.length === 1 ? `: ${storeUrl}` : "."}`,
     openLocations.length === 1
       ? `Every online order runs through the ${openLocations[0]!.name} location today — the other locations have not opened yet.`
-      : `Pickup orders go to the location you choose: ${openLocations.map((l) => l.name).join(" and ")} each have their own order link under Locations above.`,
+      : pickupLine(openLocations.filter((l) => l.orderUrl)),
     ...openLocations
       .map((l) => [l, deliveryFor(l.id)] as const)
       .filter(([, apps]) => apps.length > 0)

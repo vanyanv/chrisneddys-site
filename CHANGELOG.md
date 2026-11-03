@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Site: the Glendale location now shows its own phone number, (747) 215-6218, with a CALL button on its page and its number in the footer, the order page and search listings ([#296](https://github.com/vanyanv/chrisneddys-site/issues/296))
+- Site: the order page no longer says Glendale takes online orders; it names only the locations with an online ordering page until Glendale's Otter link is added ([#298](https://github.com/vanyanv/chrisneddys-site/issues/298))
 
 ### Added
 

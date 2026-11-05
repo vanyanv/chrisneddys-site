@@ -16,7 +16,6 @@ import {
   emailLooksSendable,
   type ContactTopic as Topic,
 } from "@/lib/siteFormFields";
-import { TurnstileBox, TURNSTILE_SITE_KEY } from "./TurnstileBox";
 
 /**
  * The contact form, drawn as a diner guest check.
@@ -32,8 +31,7 @@ import { TurnstileBox, TURNSTILE_SITE_KEY } from "./TurnstileBox";
  *
  * Bot screening, none of which a person sees: the honeypot below, a typing
  * record (keys pressed in the message box, and how long the page was open)
- * that lets the server tag a pasted-in-seconds message as "[Likely bot]",
- * and Cloudflare Turnstile once its keys are set (`TurnstileBox.tsx`).
+ * that lets the server tag a pasted-in-seconds message as "[Likely bot]".
  */
 
 /** The message box's hint follows the chosen topic, so "Order issue" asks for
@@ -96,9 +94,6 @@ export function GuestCheck(): ReactElement {
   useEffect(() => {
     openedRef.current = Date.now();
   }, []);
-  /* A Turnstile token is good for one send; bumping this draws a fresh
-     widget after a failed one. */
-  const [turnstileRound, setTurnstileRound] = useState(0);
   const receiptRef = useRef<HTMLDivElement>(null);
 
   /* Moving focus to the receipt is what tells a screen reader — and a keyboard
@@ -157,15 +152,12 @@ export function GuestCheck(): ReactElement {
       const result = await sendContactMessage(data);
       if (!result.ok) {
         setStatus("error");
-        if (TURNSTILE_SITE_KEY) setTurnstileRound((n) => n + 1);
         setFailure(
           result.reason === "not_configured"
             ? "The form isn't wired up yet."
             : result.reason === "throttled"
               ? "That's a lot of messages in a row."
-              : result.reason === "not_verified"
-                ? "We couldn't check that you're a person."
-                : "That didn't go through.",
+              : "That didn't go through.",
         );
         // A fixed token, never the message, the name, the email or the phone.
         track("contact_error", { topic, reason: result.reason });
@@ -182,7 +174,6 @@ export function GuestCheck(): ReactElement {
       }
     } catch {
       setStatus("error");
-      if (TURNSTILE_SITE_KEY) setTurnstileRound((n) => n + 1);
       setFailure("That didn't go through.");
       track("contact_error", { topic, reason: "network" });
     }
@@ -366,8 +357,6 @@ export function GuestCheck(): ReactElement {
           autoComplete="off"
           aria-hidden="true"
         />
-
-        {TURNSTILE_SITE_KEY && <TurnstileBox key={turnstileRound} />}
 
         {status === "error" && (
           <p className="cne-ck-fail" role="alert" data-surface="contact">

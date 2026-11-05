@@ -17,9 +17,9 @@
  * to flood the inbox; the throttle is best-effort and never blocks a real
  * message if the database is unreachable.
  *
- * The contact form also gets Cloudflare Turnstile once its keys are set
- * (`turnstile.ts`), and two tags that sort without dropping: "[Sales pitch]"
- * and "[Likely bot]" at the front of the subject (`contactScreening.ts`).
+ * The contact form also gets two tags that sort without dropping: "[Sales
+ * pitch]" and "[Likely bot]" at the front of the subject
+ * (`contactScreening.ts`).
  */
 import { getDb } from "@/db/client";
 import { brand } from "@/data/brand";
@@ -34,7 +34,6 @@ import {
 } from "@/lib/siteFormEmail";
 import { automatedReason, looksLikeSalesPitch } from "@/lib/contactScreening";
 import { checkIpThrottle, pruneSignInAttempts, recordSignInAttempt } from "@/lib/signInThrottle";
-import { turnstileEnabled, verifyTurnstile } from "@/lib/turnstile";
 import {
   CONTACT_TOPICS,
   EMAIL_MAX,
@@ -42,7 +41,6 @@ import {
   NAME_MAX,
   OPEN_MS_FIELD,
   PHONE_MAX,
-  TURNSTILE_FIELD,
   TYPED_KEYS_FIELD,
   emailLooksSendable,
   type SiteFormResult,
@@ -134,13 +132,6 @@ export async function sendContactMessage(data: FormData): Promise<SiteFormResult
     message.length > MESSAGE_MAX
   ) {
     return { ok: false, reason: "invalid" };
-  }
-
-  if (turnstileEnabled()) {
-    const ip = await resolveClientIp().catch(() => "unknown");
-    if (!(await verifyTurnstile(field(data, TURNSTILE_FIELD), ip))) {
-      return { ok: false, reason: "not_verified" };
-    }
   }
 
   const flags = {

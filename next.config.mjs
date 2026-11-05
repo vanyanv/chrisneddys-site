@@ -33,9 +33,7 @@ const CSP = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://va.vercel-scripts.com" : ""} https://www.googletagmanager.com https://challenges.cloudflare.com`,
-  // Cloudflare Turnstile on the contact form draws its check in an iframe.
-  "frame-src https://challenges.cloudflare.com",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://va.vercel-scripts.com" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.public.blob.vercel-storage.com",
   "font-src 'self'",

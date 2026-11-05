@@ -33,14 +33,12 @@ export const EMAIL_MAX = 254;
  * - `not_configured` — Resend isn't set up on this deployment.
  * - `throttled` — too many sends from this address in a short window.
  * - `send_failed` — Resend was asked and said no, or could not be reached.
- * - `not_verified` — Cloudflare Turnstile (contact form, when switched on)
- *   didn't pass the visitor.
  */
 export type SiteFormResult =
   | { ok: true }
   | {
       ok: false;
-      reason: "invalid" | "not_configured" | "throttled" | "send_failed" | "not_verified";
+      reason: "invalid" | "not_configured" | "throttled" | "send_failed";
     };
 
 /** Hidden fields the contact form adds on send: how many keys were pressed in
@@ -49,8 +47,6 @@ export type SiteFormResult =
  * `contactScreening.ts`. */
 export const TYPED_KEYS_FIELD = "typed_keys";
 export const OPEN_MS_FIELD = "open_ms";
-/** The field Cloudflare's widget writes its token into. */
-export const TURNSTILE_FIELD = "cf-turnstile-response";
 
 /**
  * Deliberately permissive: the only thing worth rejecting in the browser is an

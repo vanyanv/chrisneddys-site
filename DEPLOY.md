@@ -119,6 +119,25 @@ the other.
 
 ---
 
+## Contact form spam
+
+The contact form (`/contact/`) has four screens. Two block, two only sort:
+
+- **Honeypot** (`botcheck`) — a hidden box only a bot fills. Quiet success, no email.
+- **Send cap** — 5 sends per IP per 15 minutes across both forms.
+- **Typing check** — the form records how many keys were pressed in the message
+  box and how long the page was open. A message pasted in whole and sent within
+  15 seconds of the page opening, or a submission without that record at all,
+  arrives with **`[Likely bot]`** at the front of the subject. Tagged, never
+  dropped: phone keyboards, autofill and voice typing look like pasting.
+- **Sales-pitch tag** — a message with phrases like "qualify for", "funding",
+  "SEO" or "10 minutes" (list in `src/lib/contactScreening.ts`) arrives with
+  **`[Sales pitch]`** at the front of the subject. Never applied to the "Order
+  issue" topic.
+
+A Gmail or Outlook rule on the subject starting `[Sales pitch]` or `[Likely bot]`
+files them; nothing is ever thrown away.
+
 ## Database
 
 The shop's catalogue lives in Postgres (Neon), read through `src/lib/catalog.ts`.

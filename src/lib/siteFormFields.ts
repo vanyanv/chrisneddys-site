@@ -36,7 +36,17 @@ export const EMAIL_MAX = 254;
  */
 export type SiteFormResult =
   | { ok: true }
-  | { ok: false; reason: "invalid" | "not_configured" | "throttled" | "send_failed" };
+  | {
+      ok: false;
+      reason: "invalid" | "not_configured" | "throttled" | "send_failed";
+    };
+
+/** Hidden fields the contact form adds on send: how many keys were pressed in
+ * the message box, and how long the page had been open (ms). The server uses
+ * them to tag a pasted-in-seconds message, never to refuse one — see
+ * `contactScreening.ts`. */
+export const TYPED_KEYS_FIELD = "typed_keys";
+export const OPEN_MS_FIELD = "open_ms";
 
 /**
  * Deliberately permissive: the only thing worth rejecting in the browser is an

@@ -10,7 +10,9 @@ import {
   EMAIL_MAX,
   MESSAGE_MAX as MAX,
   NAME_MAX,
+  OPEN_MS_FIELD,
   PHONE_MAX,
+  TYPED_KEYS_FIELD,
   emailLooksSendable,
   type ContactTopic as Topic,
 } from "@/lib/siteFormFields";
@@ -26,6 +28,10 @@ import {
  * Every failure path ends somewhere the sender can still reach us: email not
  * set up, a rejected send and a dead network all fall through to the same
  * mailto.
+ *
+ * Bot screening, none of which a person sees: the honeypot below, a typing
+ * record (keys pressed in the message box, and how long the page was open)
+ * that lets the server tag a pasted-in-seconds message as "[Likely bot]".
  */
 
 /** The message box's hint follows the chosen topic, so "Order issue" asks for
@@ -81,6 +87,13 @@ export function GuestCheck(): ReactElement {
   }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
+  /* The typing record. Keys pressed in the message box, and when the form
+     appeared. Not state: nothing renders from them. */
+  const keysRef = useRef(0);
+  const openedRef = useRef(0);
+  useEffect(() => {
+    openedRef.current = Date.now();
+  }, []);
   const receiptRef = useRef<HTMLDivElement>(null);
 
   /* Moving focus to the receipt is what tells a screen reader — and a keyboard
@@ -132,6 +145,8 @@ export function GuestCheck(): ReactElement {
     // The topic comes from state, not the radio group, so the server sees
     // exactly what the chips show.
     data.set("topic", topic);
+    data.set(TYPED_KEYS_FIELD, String(keysRef.current));
+    data.set(OPEN_MS_FIELD, String(Math.max(0, Date.now() - openedRef.current)));
 
     try {
       const result = await sendContactMessage(data);
@@ -172,6 +187,8 @@ export function GuestCheck(): ReactElement {
     setMessage("");
     setTopic(TOPICS[0]);
     formRef.current?.reset();
+    keysRef.current = 0;
+    openedRef.current = Date.now();
     setTicket(String(4000 + Math.floor(Math.random() * 900)));
     setStamp(stampNow(new Date()));
   }
@@ -306,6 +323,9 @@ export function GuestCheck(): ReactElement {
               maxLength={MAX}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={() => {
+                keysRef.current += 1;
+              }}
               placeholder={HINTS[topic]}
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errors.message ? id("message-err") : id("message-count")}

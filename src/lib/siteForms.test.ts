@@ -69,6 +69,9 @@ const contact = {
   topic: "Catering & events",
   message: "Forty sliders for a birthday on the 12th?",
   botcheck: "",
+  // Typed by hand over a minute: the typing record a person leaves.
+  typed_keys: "45",
+  open_ms: "60000",
 };
 
 describe("sendContactMessage", () => {
@@ -157,6 +160,58 @@ describe("sendContactMessage", () => {
 
     ipState.ip = "198.51.100.7";
     expect(await sendContactMessage(form(contact))).toEqual({ ok: true });
+  });
+});
+
+describe("sendContactMessage screening", () => {
+  function subjectOf(fetchMock: ReturnType<typeof mockResend>): string {
+    return JSON.parse(fetchMock.mock.calls[0]![1].body).subject;
+  }
+
+  it("tags a sales pitch at the front of the subject and still sends it", async () => {
+    const fetchMock = mockResend();
+    const pitch = "Your business may qualify for up to $250k in funding. Got 10 minutes?";
+    expect(
+      await sendContactMessage(form({ ...contact, message: pitch, typed_keys: "90" })),
+    ).toEqual({ ok: true });
+    expect(subjectOf(fetchMock)).toBe(
+      "[Sales pitch] [Catering & events] Sam Rivera — chrisneddys.com",
+    );
+    expect(JSON.parse(fetchMock.mock.calls[0]![1].body).text).toMatch(/^SALES PITCH: /);
+  });
+
+  it("doesn't call an order complaint a pitch", async () => {
+    const fetchMock = mockResend();
+    await sendContactMessage(
+      form({ ...contact, topic: "Order issue", message: "Waited 10 minutes past pickup time." }),
+    );
+    expect(subjectOf(fetchMock)).toBe("[Order issue] Sam Rivera — chrisneddys.com");
+  });
+
+  it("tags a message pasted in whole seconds after the page opened as a likely bot", async () => {
+    const fetchMock = mockResend();
+    await sendContactMessage(form({ ...contact, typed_keys: "1", open_ms: "4200" }));
+    expect(subjectOf(fetchMock)).toBe(
+      "[Likely bot] [Catering & events] Sam Rivera — chrisneddys.com",
+    );
+    const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(payload.text).toContain("1 key pressed), sent 4 seconds after the page opened");
+    expect(payload.html).toContain("LIKELY BOT");
+  });
+
+  it("leaves a slow paste alone: a person can paste a message they wrote elsewhere", async () => {
+    const fetchMock = mockResend();
+    await sendContactMessage(form({ ...contact, typed_keys: "1", open_ms: "90000" }));
+    expect(subjectOf(fetchMock)).toBe("[Catering & events] Sam Rivera — chrisneddys.com");
+  });
+
+  it("tags a submission that didn't come from the form's page", async () => {
+    const fetchMock = mockResend();
+    const bare = form(contact);
+    bare.delete("typed_keys");
+    bare.delete("open_ms");
+    await sendContactMessage(bare);
+    expect(subjectOf(fetchMock)).toMatch(/^\[Likely bot\] /);
   });
 });
 

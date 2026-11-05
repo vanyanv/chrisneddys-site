@@ -10,10 +10,13 @@ import {
   EMAIL_MAX,
   MESSAGE_MAX as MAX,
   NAME_MAX,
+  OPEN_MS_FIELD,
   PHONE_MAX,
+  TYPED_KEYS_FIELD,
   emailLooksSendable,
   type ContactTopic as Topic,
 } from "@/lib/siteFormFields";
+import { TurnstileBox, TURNSTILE_SITE_KEY } from "./TurnstileBox";
 
 /**
  * The contact form, drawn as a diner guest check.
@@ -26,6 +29,11 @@ import {
  * Every failure path ends somewhere the sender can still reach us: email not
  * set up, a rejected send and a dead network all fall through to the same
  * mailto.
+ *
+ * Bot screening, none of which a person sees: the honeypot below, a typing
+ * record (keys pressed in the message box, and how long the page was open)
+ * that lets the server tag a pasted-in-seconds message as "[Likely bot]",
+ * and Cloudflare Turnstile once its keys are set (`TurnstileBox.tsx`).
  */
 
 /** The message box's hint follows the chosen topic, so "Order issue" asks for
@@ -81,6 +89,16 @@ export function GuestCheck(): ReactElement {
   }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
+  /* The typing record. Keys pressed in the message box, and when the form
+     appeared. Not state: nothing renders from them. */
+  const keysRef = useRef(0);
+  const openedRef = useRef(0);
+  useEffect(() => {
+    openedRef.current = Date.now();
+  }, []);
+  /* A Turnstile token is good for one send; bumping this draws a fresh
+     widget after a failed one. */
+  const [turnstileRound, setTurnstileRound] = useState(0);
   const receiptRef = useRef<HTMLDivElement>(null);
 
   /* Moving focus to the receipt is what tells a screen reader — and a keyboard
@@ -132,17 +150,22 @@ export function GuestCheck(): ReactElement {
     // The topic comes from state, not the radio group, so the server sees
     // exactly what the chips show.
     data.set("topic", topic);
+    data.set(TYPED_KEYS_FIELD, String(keysRef.current));
+    data.set(OPEN_MS_FIELD, String(Math.max(0, Date.now() - openedRef.current)));
 
     try {
       const result = await sendContactMessage(data);
       if (!result.ok) {
         setStatus("error");
+        if (TURNSTILE_SITE_KEY) setTurnstileRound((n) => n + 1);
         setFailure(
           result.reason === "not_configured"
             ? "The form isn't wired up yet."
             : result.reason === "throttled"
               ? "That's a lot of messages in a row."
-              : "That didn't go through.",
+              : result.reason === "not_verified"
+                ? "We couldn't check that you're a person."
+                : "That didn't go through.",
         );
         // A fixed token, never the message, the name, the email or the phone.
         track("contact_error", { topic, reason: result.reason });
@@ -159,6 +182,7 @@ export function GuestCheck(): ReactElement {
       }
     } catch {
       setStatus("error");
+      if (TURNSTILE_SITE_KEY) setTurnstileRound((n) => n + 1);
       setFailure("That didn't go through.");
       track("contact_error", { topic, reason: "network" });
     }
@@ -172,6 +196,8 @@ export function GuestCheck(): ReactElement {
     setMessage("");
     setTopic(TOPICS[0]);
     formRef.current?.reset();
+    keysRef.current = 0;
+    openedRef.current = Date.now();
     setTicket(String(4000 + Math.floor(Math.random() * 900)));
     setStamp(stampNow(new Date()));
   }
@@ -306,6 +332,9 @@ export function GuestCheck(): ReactElement {
               maxLength={MAX}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={() => {
+                keysRef.current += 1;
+              }}
               placeholder={HINTS[topic]}
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errors.message ? id("message-err") : id("message-count")}
@@ -337,6 +366,8 @@ export function GuestCheck(): ReactElement {
           autoComplete="off"
           aria-hidden="true"
         />
+
+        {TURNSTILE_SITE_KEY && <TurnstileBox key={turnstileRound} />}
 
         {status === "error" && (
           <p className="cne-ck-fail" role="alert" data-surface="contact">

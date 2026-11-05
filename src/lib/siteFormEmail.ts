@@ -189,17 +189,40 @@ function shell(opts: {
 </html>`);
 }
 
+/** What the contact action's screens found (`contactScreening.ts`). Each one
+ * puts a tag at the very front of the subject, where a mail rule can match
+ * it, and a line above the message saying why. */
+type ContactFlags = { salesPitch: boolean; automated: string | null };
+
 export function contactEmail(
-  input: { name: string; email: string; phone: string; topic: string; message: string },
+  input: {
+    name: string;
+    email: string;
+    phone: string;
+    topic: string;
+    message: string;
+    flags?: ContactFlags;
+  },
   at: Date = new Date(),
 ): BuiltEmail {
   const { name, email, phone, topic, message } = input;
   const first = firstNameOf(name);
   const stamp = laStamp(at);
-  const subject = `[${topic}] ${oneLine(name)} — chrisneddys.com`;
+  const notes: { tag: string; why: string }[] = [];
+  if (input.flags?.salesPitch) {
+    notes.push({
+      tag: "Sales pitch",
+      why: "Reads like a sales pitch (funding, SEO, a quick call).",
+    });
+  }
+  if (input.flags?.automated) notes.push({ tag: "Likely bot", why: input.flags.automated });
+  const tags = notes.map((n) => `[${n.tag}] `).join("");
+  const subject = `${tags}[${topic}] ${oneLine(name)} — chrisneddys.com`;
   const tel = dialable(phone);
 
   const text = [
+    ...notes.map((n) => `${n.tag.toUpperCase()}: ${n.why}`),
+    ...(notes.length ? [""] : []),
     `${topic.toUpperCase()}`,
     `${name} wrote in through the website, ${stamp}.`,
     "",
@@ -211,7 +234,14 @@ export function contactEmail(
     `Hit Reply to answer ${first}.`,
   ].join("\n");
 
-  const bodyHtml = `
+  const flagHtml = notes
+    .map(
+      (n) =>
+        `<div style="margin-top:6px;font-family:${MONO_FONT};font-size:12px;line-height:1.5;color:${SIGNAL_RED}"><strong>${escapeHtml(n.tag.toUpperCase())}</strong> · ${escapeHtml(n.why)}</div>`,
+    )
+    .join("");
+
+  const bodyHtml = `${flagHtml ? `\n    <tr><td style="padding-top:12px">${flagHtml}</td></tr>` : ""}
     <tr><td style="padding-top:16px">
       <div style="background:${PAPER};border:1px solid ${RULE};border-left:4px solid ${INK};padding:14px 16px;font-family:${BODY_FONT};font-size:15px;line-height:1.55;color:${INK};white-space:pre-wrap;word-break:break-word">${escapeHtml(message)}</div>
     </td></tr>

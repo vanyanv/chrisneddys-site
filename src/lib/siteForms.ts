@@ -40,9 +40,11 @@ import {
   MESSAGE_MAX,
   NAME_MAX,
   OPEN_MS_FIELD,
+  ORDER_TOPIC,
   PHONE_MAX,
   TYPED_KEYS_FIELD,
   emailLooksSendable,
+  readOrderDetails,
   type SiteFormResult,
 } from "@/lib/siteFormFields";
 
@@ -120,8 +122,12 @@ export async function sendContactMessage(data: FormData): Promise<SiteFormResult
   const phone = field(data, "phone");
   const topic = field(data, "topic");
   const message = field(data, "message");
+  // Only an order issue carries the order lines; on any other topic they are
+  // left out rather than rejected (the form hides them there).
+  const order = topic === ORDER_TOPIC ? readOrderDetails(data) : undefined;
 
   if (
+    order === null ||
     !name ||
     name.length > NAME_MAX ||
     !emailLooksSendable(email) ||
@@ -138,7 +144,7 @@ export async function sendContactMessage(data: FormData): Promise<SiteFormResult
     salesPitch: looksLikeSalesPitch(topic, message),
     automated: automatedReason(message, field(data, TYPED_KEYS_FIELD), field(data, OPEN_MS_FIELD)),
   };
-  return deliver(contactEmail({ name, email, phone, topic, message, flags }), email);
+  return deliver(contactEmail({ name, email, phone, topic, message, flags, order }), email);
 }
 
 export async function joinOpeningList(data: FormData): Promise<SiteFormResult> {

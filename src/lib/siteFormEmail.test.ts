@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { contactEmail, laStamp, openingListEmail, openingReplyEmail } from "@/lib/siteFormEmail";
 import { locations } from "@/data/locations";
+import { ORDER_LOCATIONS, orderWhenLabel } from "@/lib/siteFormFields";
 
 // 18:12 UTC on a Thursday in September is 11:12 AM in Los Angeles (PDT).
 const AT = new Date("2026-09-24T18:12:00Z");
@@ -46,6 +47,37 @@ describe("contactEmail", () => {
   it("marks an order issue in red so it stands out", () => {
     expect(contactEmail({ ...base, topic: "Order issue" }, AT).html).toContain("#d0281c");
     expect(contactEmail(base, AT).html).not.toContain("#d0281c");
+  });
+
+  it("adds the order lines as detail rows on an order issue, marking blanks", () => {
+    const { html, text } = contactEmail(
+      {
+        ...base,
+        topic: "Order issue",
+        order: {
+          store: "Van Nuys",
+          via: "DoorDash",
+          when: "",
+          number: "<b>A1</b>",
+          problems: ["Missing item", "Cold"],
+        },
+      },
+      AT,
+    );
+    expect(text).toContain("Location: Van Nuys");
+    expect(text).toContain("Ordered: DoorDash");
+    expect(text).toContain("When: not given");
+    expect(text).toContain("Problem: Missing item, Cold");
+    expect(html).toContain("&lt;b&gt;A1&lt;/b&gt;");
+    // Same rows as Name, Email and Phone, just before them.
+    expect(html.indexOf("Van Nuys")).toBeLessThan(html.indexOf(">Name<"));
+    expect(html.indexOf("Van Nuys")).toBeGreaterThan(html.indexOf("Forty sliders"));
+  });
+
+  it("has no order lines on other topics", () => {
+    const { html, text } = contactEmail(base, AT);
+    expect(text).not.toContain("Location:");
+    expect(html).not.toContain("Order no.");
   });
 
   it("escapes everything the visitor typed", () => {
@@ -151,5 +183,21 @@ describe("openingReplyEmail", () => {
     expect(openingReplyEmail(glendale, new Date("2026-10-31T07:00:00Z")).subject).toBe(
       "Chris N Eddy's Glendale: you're on the list",
     );
+  });
+});
+
+describe("order lines", () => {
+  it("names only real locations", () => {
+    for (const hood of ORDER_LOCATIONS) {
+      expect(locations.some((l) => l.neighbourhood === hood)).toBe(true);
+    }
+    expect(ORDER_LOCATIONS.length).toBe(locations.length);
+  });
+
+  it("reads the order time as typed", () => {
+    expect(orderWhenLabel("2026-10-28T20:30")).toBe("Wed 10/28 · 8:30 PM");
+    expect(orderWhenLabel("2026-11-01T00:05")).toBe("Sun 11/1 · 12:05 AM");
+    expect(orderWhenLabel("2026-02-30T10:00")).toBe("");
+    expect(orderWhenLabel("yesterday")).toBe("");
   });
 });

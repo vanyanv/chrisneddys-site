@@ -18,6 +18,7 @@ import type { Location } from "@/data/locations";
 import { googleDirections } from "@/lib/directions";
 import { holdColors, solidFill } from "@/lib/emailColor";
 import { emailLogoImg } from "@/lib/emailLogo";
+import { orderWhenLabel, type OrderDetails } from "@/lib/siteFormFields";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
 
@@ -189,6 +190,20 @@ function shell(opts: {
 </html>`);
 }
 
+/** The order lines as label/value pairs, in reading order. They join the
+ * Name, Email and Phone rows under the message, in the same style, so the
+ * email looks as it always has with a few more rows. A blank line stays in
+ * as "" so the owner sees what the guest skipped. */
+function orderLines(order: OrderDetails): Array<[string, string]> {
+  return [
+    ["Location", order.store],
+    ["Ordered", order.via],
+    ["When", orderWhenLabel(order.when)],
+    ["Order no.", order.number],
+    ["Problem", order.problems.join(", ")],
+  ];
+}
+
 /** What the contact action's screens found (`contactScreening.ts`). Each one
  * puts a tag at the very front of the subject, where a mail rule can match
  * it, and a line above the message saying why. */
@@ -202,10 +217,15 @@ export function contactEmail(
     topic: string;
     message: string;
     flags?: ContactFlags;
+    /** Order issue only: the optional order lines. */
+    order?: OrderDetails;
   },
   at: Date = new Date(),
 ): BuiltEmail {
-  const { name, email, phone, topic, message } = input;
+  const { name, email, phone, topic, message, order } = input;
+  const notGiven = `<span style="color:${MUTED}">Not given</span>`;
+  const lines = order ? orderLines(order) : [];
+  const orderRows = lines.map(([k, v]) => detailRow(k, v ? escapeHtml(v) : notGiven)).join("");
   const first = firstNameOf(name);
   const stamp = laStamp(at);
   const notes: { tag: string; why: string }[] = [];
@@ -228,6 +248,7 @@ export function contactEmail(
     "",
     message,
     "",
+    ...lines.map(([k, v]) => `${k}: ${v || "not given"}`),
     `Email: ${email}`,
     `Phone: ${phone || "not given"}`,
     "",
@@ -247,9 +268,9 @@ export function contactEmail(
     </td></tr>
     <tr><td style="padding-top:14px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        ${detailRow("Name", escapeHtml(name))}
+        ${orderRows}${detailRow("Name", escapeHtml(name))}
         ${detailRow("Email", link(`mailto:${email}`, email))}
-        ${detailRow("Phone", tel ? link(`tel:${tel}`, phone) : `<span style="color:${MUTED}">Not given</span>`)}
+        ${detailRow("Phone", tel ? link(`tel:${tel}`, phone) : notGiven)}
       </table>
     </td></tr>`;
 

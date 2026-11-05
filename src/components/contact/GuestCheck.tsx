@@ -11,6 +11,12 @@ import {
   MESSAGE_MAX as MAX,
   NAME_MAX,
   OPEN_MS_FIELD,
+  ORDER_CHANNELS,
+  ORDER_FIELDS,
+  ORDER_LOCATIONS,
+  ORDER_NUMBER_MAX,
+  ORDER_PROBLEMS,
+  ORDER_TOPIC,
   PHONE_MAX,
   TYPED_KEYS_FIELD,
   emailLooksSendable,
@@ -41,11 +47,19 @@ const HINTS: Record<Topic, string> = {
     "Tell us what you need. Dates, headcount and a neighbourhood help us answer in one go.",
   "Press & media": "Tell us what you need.",
   Partnerships: "Tell us what you need.",
-  "Order issue": "Your order number and what went wrong.",
+  "Order issue": "Tell us what happened.",
   "Something else": "Tell us what you need.",
 };
 
-type Sent = { ticket: string; stamp: string; name: string; email: string; topic: Topic };
+type Sent = {
+  ticket: string;
+  stamp: string;
+  name: string;
+  email: string;
+  topic: Topic;
+  store: string;
+  orderNumber: string;
+};
 type Status = "idle" | "sending" | "sent" | "error";
 
 /** Field-level messages, keyed by input name. */
@@ -62,6 +76,13 @@ function stampNow(d: Date): string {
   return `${DAYS[d.getDay()]} ${mo}/${dd} · ${h12}:${mm} ${hh >= 12 ? "PM" : "AM"}`;
 }
 
+/** `YYYY-MM-DDTHH:MM` in the browser's own clock, for the `max` on the
+ * order's date and time: nobody's order happened tomorrow. */
+function localInputNow(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 export function GuestCheck(): ReactElement {
   const uid = useId();
   const id = (k: string) => `${uid}-${k}`;
@@ -72,6 +93,12 @@ export function GuestCheck(): ReactElement {
   const [errors, setErrors] = useState<Errors>({});
   const [failure, setFailure] = useState("");
   const [sent, setSent] = useState<Sent | null>(null);
+  /* The order lines' single-pick rows are held here, not left to the radio
+     group, so tapping the picked chip again clears it: every order line is
+     optional, and a radio on its own can't be un-picked. */
+  const [store, setStore] = useState("");
+  const [via, setVia] = useState("");
+  const [nowMax, setNowMax] = useState<string | undefined>(undefined);
 
   /**
    * The number and the time are the two things that make a check read as a
@@ -84,6 +111,7 @@ export function GuestCheck(): ReactElement {
   useEffect(() => {
     setTicket(String(4000 + Math.floor(Math.random() * 900)));
     setStamp(stampNow(new Date()));
+    setNowMax(localInputNow(new Date()));
   }, []);
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -138,6 +166,8 @@ export function GuestCheck(): ReactElement {
 
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
+    const isOrder = topic === ORDER_TOPIC;
+    const orderNumber = isOrder ? String(data.get(ORDER_FIELDS.number) ?? "").trim() : "";
 
     setStatus("sending");
     setFailure("");
@@ -147,6 +177,10 @@ export function GuestCheck(): ReactElement {
     data.set("topic", topic);
     data.set(TYPED_KEYS_FIELD, String(keysRef.current));
     data.set(OPEN_MS_FIELD, String(Math.max(0, Date.now() - openedRef.current)));
+    if (isOrder) {
+      data.set(ORDER_FIELDS.store, store);
+      data.set(ORDER_FIELDS.via, via);
+    }
 
     try {
       const result = await sendContactMessage(data);
@@ -164,7 +198,7 @@ export function GuestCheck(): ReactElement {
         return;
       }
 
-      setSent({ ticket, stamp, name, email, topic });
+      setSent({ ticket, stamp, name, email, topic, store: isOrder ? store : "", orderNumber });
       setStatus("sent");
       // Fired only once the form is genuinely delivered, not on submit — a
       // conversion that counts attempts counts its own failures as successes.
@@ -186,6 +220,8 @@ export function GuestCheck(): ReactElement {
     setFailure("");
     setMessage("");
     setTopic(TOPICS[0]);
+    setStore("");
+    setVia("");
     formRef.current?.reset();
     keysRef.current = 0;
     openedRef.current = Date.now();
@@ -219,6 +255,8 @@ export function GuestCheck(): ReactElement {
               ["Ticket", `No. ${sent.ticket}`],
               ["From", sent.name],
               ["Subject", sent.topic],
+              ...(sent.store ? [["Location", sent.store] as const] : []),
+              ...(sent.orderNumber ? [["Order no.", sent.orderNumber] as const] : []),
               ["Sent", sent.stamp],
             ] as const
           ).map(([k, v]) => (
@@ -311,6 +349,62 @@ export function GuestCheck(): ReactElement {
           </div>
         </fieldset>
 
+        {topic === ORDER_TOPIC && (
+          <div className="cne-ck-order" role="group" aria-labelledby={id("order-h")}>
+            <p className="cne-ck-order-h" id={id("order-h")}>
+              About the order<span className="cne-ck-opt"> — all optional</span>
+            </p>
+            <p className="cne-ck-order-sub">Any of these helps us find it and fix it.</p>
+
+            <PickRow
+              label="Which location?"
+              name={ORDER_FIELDS.store}
+              options={ORDER_LOCATIONS}
+              value={store}
+              onPick={setStore}
+            />
+            <PickRow
+              label="How did you order?"
+              name={ORDER_FIELDS.via}
+              options={ORDER_CHANNELS}
+              value={via}
+              onPick={setVia}
+            />
+            <Field
+              id={id("order-when")}
+              name={ORDER_FIELDS.when}
+              label="When was it?"
+              type="datetime-local"
+              max={nowMax}
+            />
+            <Field
+              id={id("order-number")}
+              name={ORDER_FIELDS.number}
+              label="Order number"
+              type="text"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              maxLength={ORDER_NUMBER_MAX}
+              placeholder="On your receipt or in the app"
+            />
+
+            <fieldset className="cne-ck-fs">
+              <legend className="cne-ck-label">
+                What went wrong?<span className="cne-ck-opt"> — tick any</span>
+              </legend>
+              <div className="cne-ck-chips is-sub">
+                {ORDER_PROBLEMS.map((p) => (
+                  <label className="cne-ck-chip" key={p}>
+                    <input type="checkbox" name={ORDER_FIELDS.problem} value={p} />
+                    <span>{p}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        )}
+
         <div className={`cne-ck-field${errors.message ? " is-bad" : ""}`}>
           <label className="cne-ck-label" htmlFor={id("message")}>
             Message
@@ -380,6 +474,45 @@ export function GuestCheck(): ReactElement {
         </div>
       </div>
     </form>
+  );
+}
+
+/** A row of chips where one (or none) can be picked; tapping the picked chip
+ * again clears it. */
+function PickRow({
+  label,
+  name,
+  options,
+  value,
+  onPick,
+}: {
+  label: string;
+  name: string;
+  options: readonly string[];
+  value: string;
+  onPick: (v: string) => void;
+}): ReactElement {
+  return (
+    <fieldset className="cne-ck-fs">
+      <legend className="cne-ck-label">{label}</legend>
+      <div className="cne-ck-chips is-sub">
+        {options.map((o) => (
+          <label className="cne-ck-chip" key={o}>
+            <input
+              type="radio"
+              name={name}
+              value={o}
+              checked={value === o}
+              onChange={() => onPick(o)}
+              onClick={() => {
+                if (value === o) onPick("");
+              }}
+            />
+            <span>{o}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 

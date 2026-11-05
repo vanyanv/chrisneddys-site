@@ -250,6 +250,79 @@
   }
 }
 
+/* ---- order issue lines ---------------------------------------------------
+   Opens under the topic stamps when "Order issue" is picked: a dashed box on
+   the check, like a stapled-on slip, with the same ruled lines and smaller
+   stamps inside. Picked stamps here go ink, not red, so the topic stays the
+   one red mark on the check. */
+.cne-ck-order {
+  display: grid;
+  gap: 16px;
+  padding: 14px 14px 16px;
+  border: 2px dashed var(--ck-rule);
+  background: rgba(245, 184, 46, 0.1);
+  animation: cne-ck-slip 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.cne-ck-order-h {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.cne-ck-order-h .cne-ck-opt {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--a-sub);
+  vertical-align: 2px;
+}
+
+.cne-ck-order-sub {
+  margin: -10px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--a-sub);
+}
+
+.cne-ck-chips.is-sub {
+  gap: 6px;
+}
+
+.cne-ck-chips.is-sub .cne-ck-chip span {
+  padding: 7px 11px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.cne-ck-chips.is-sub .cne-ck-chip input:checked + span {
+  background: var(--a-ink);
+  border-color: var(--a-ink);
+}
+
+/* iOS draws a date-time input as a centred grey pill; this keeps it on the
+   rule, left-aligned, at the height of the other lines. */
+.cne-ck-order input[type="datetime-local"] {
+  min-height: 42px;
+  text-align: left;
+}
+
+.cne-ck-order input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+@keyframes cne-ck-slip {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---- honeypot: gone from sight, from AT, and from the tab order --------- */
 .cne-ck-pot {
   position: absolute !important;
@@ -734,6 +807,7 @@
   .cne-ck-mark,
   .cne-ck-spin,
   .cne-ck-chip span,
+  .cne-ck-order,
   .cne-ct-faq summary::after,
   .cne-ct-faq details p {
     animation: none !important;

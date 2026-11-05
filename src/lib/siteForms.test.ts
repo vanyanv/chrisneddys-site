@@ -130,6 +130,60 @@ describe("sendContactMessage", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("carries the order lines on an order issue, and drops them on any other topic", async () => {
+    const fetchMock = mockResend();
+    const order = form({
+      ...contact,
+      topic: "Order issue",
+      message: "Fries were soggy.",
+      orderStore: "Hollywood",
+      orderVia: "In store",
+      orderWhen: "2026-10-28T20:30",
+      orderNumber: "412-K",
+    });
+    order.append("orderProblem", "Cold");
+    expect(await sendContactMessage(order)).toEqual({ ok: true });
+    const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(payload.subject).toBe("[Order issue] Sam Rivera — chrisneddys.com");
+    expect(payload.text).toContain("Location: Hollywood");
+    expect(payload.text).toContain("Ordered: In store");
+    expect(payload.text).toContain("When: Wed 10/28 · 8:30 PM");
+    expect(payload.text).toContain("Order no.: 412-K");
+    expect(payload.text).toContain("Problem: Cold");
+
+    await sendContactMessage(form({ ...contact, orderStore: "Hollywood", orderNumber: "412-K" }));
+    const other = JSON.parse(fetchMock.mock.calls[1]![1].body);
+    expect(other.text).not.toContain("412-K");
+    expect(other.text).not.toContain("Location:");
+  });
+
+  it("takes an order issue with every order line left blank", async () => {
+    const fetchMock = mockResend();
+    expect(
+      await sendContactMessage(form({ ...contact, topic: "Order issue", message: "Cold." })),
+    ).toEqual({ ok: true });
+    const payload = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(payload.text).toContain("Location: not given");
+  });
+
+  it("rejects order lines the form could not have sent", async () => {
+    const fetchMock = mockResend();
+    for (const bad of [
+      { orderStore: "Pasadena" },
+      { orderVia: "Fax" },
+      { orderWhen: "last night" },
+      { orderWhen: "2026-02-30T10:00" },
+      { orderNumber: "x".repeat(41) },
+      { orderProblem: "Too tasty" },
+    ] as Record<string, string>[]) {
+      expect(await sendContactMessage(form({ ...contact, topic: "Order issue", ...bad }))).toEqual({
+        ok: false,
+        reason: "invalid",
+      });
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("says not_configured, without calling Resend, when email isn't set up", async () => {
     delete process.env.RESEND_API_KEY;
     const fetchMock = mockResend();

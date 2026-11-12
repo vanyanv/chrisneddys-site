@@ -16,7 +16,6 @@ import { Vortex } from "@/components/storeart/Vortex";
 import { WallTethers } from "@/components/storeart/WallTethers";
 import { WelcomeIntro } from "@/components/storeart/WelcomeIntro";
 import { GlyphRow, OpStamp } from "@/components/storeart/SectionOpener";
-import { ArtPhoto } from "@/components/art/ArtPhoto";
 import { OG_SPREAD, SITE_TITLE, openGraphFor, siteDescription, twitterFor } from "@/lib/seo";
 
 /**
@@ -120,20 +119,6 @@ export default function HomePage() {
           <FeaturedCards />
         </div>
       </section>
-      {/* The full spread, edge to edge. Its red table runs off the bottom of
-          the photo as real paint drips onto the page's own paper colour
-          (generated in Higgsfield, issue #250), so no drawn drip edge follows. */}
-      <div className="cne-spread">
-        <ArtPhoto
-          name="spread-home"
-          widths={[720, 1080, 1600, 2200, 2752]}
-          phoneWidths={[720, 1080]}
-          width={2752}
-          height={1576}
-          sizes="(max-width: 600px) 117vw, 100vw"
-          alt="Overhead of a Chris N Eddy’s spread on a red table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes, with red paint dripping off the table’s edge."
-        />
-      </div>
 
       <section className="cne-split">
         <div className="cne-split-l cne-sec cne-rv cne-op-tag">

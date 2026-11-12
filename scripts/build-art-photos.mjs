@@ -14,7 +14,7 @@
  *     pnpm images:art
  *
  * Re-run after replacing a source in `assets/photos/`. Name photos to cut
- * only those (`pnpm images:art spread-home`).
+ * only those (`pnpm images:art spread-order`).
  */
 import sharp from "sharp";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -79,19 +79,6 @@ const PHOTOS = [
   { name: "vannuys-spec", ratio: 3 / 4, focusX: 0.62, focusY: 0.45, widths: [360, 540] },
   // The full-spread food photos (issue #250), kept whole at their 3168x1344
   // ratio: the pages crop them with `object-fit: cover`, so nothing is cut here.
-  // The overhead on red, the home page's band. The owner asked for this one at
-  // the best quality the page can carry: it sits below the fold, so its bytes
-  // never touch LCP. Quality 60 keeps the red table's grain, which 34 smears,
-  // and the top cut is the master's own 2752px.
-  {
-    name: "spread-home",
-    ratio: 2752 / 1576,
-    focusX: 0.5,
-    focusY: 0.5,
-    widths: [720, 1080, 1600, 2200, 2752],
-    quality: 60,
-    webpQuality: 88,
-  },
   // Side-on on white, the order page's card.
   {
     name: "spread-order",

@@ -156,7 +156,7 @@ export default function HomePage() {
             </h2>
           </div>
         </div>
-        <div className="cne-pressrow">
+        <div className="cne-pressrow cne-stagger">
           {PRESS.map((p) => (
             <blockquote className="cne-quote" key={p.cite + p.quote.slice(0, 12)}>
               <p>&ldquo;{p.quote}&rdquo;</p>
@@ -187,7 +187,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      <div className="cne-ig cne-rv">
+      <div className="cne-ig cne-rv cne-stagger">
         {GRAM.map((g) => (
           <span key={g.src}>
             {/* 3 columns on a phone (~130px), 6 on a tablet (~16vw) and on

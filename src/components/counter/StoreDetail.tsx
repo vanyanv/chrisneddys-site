@@ -223,8 +223,13 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
       <section className="cne-sec cne-locd cne-lp-menu cne-rv cne-op-stamp">
         <div className="cne-eyebrow">What we serve in {hood}</div>
         <h2>
-          Same menu everywhere.
-          <OpStamp kind="checker" size={44} />
+          Same menu{" "}
+          {/* The stamp stays with the last word: on a phone it used to drop
+              onto a line of its own under the heading. */}
+          <span className="cne-nowrap">
+            everywhere.
+            <OpStamp kind="checker" size={44} />
+          </span>
         </h2>
         <p className="cne-lp-prose">
           Every Chris N Eddy&rsquo;s runs the same short menu: a slider is two smashed patties on

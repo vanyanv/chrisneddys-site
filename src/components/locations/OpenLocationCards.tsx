@@ -18,7 +18,7 @@ export function OpenLocationCards({ surface }: { surface: OrderSurface }) {
   const open = openLocations();
 
   return (
-    <div className={`cne-loc-rail${open.length > 1 ? " is-multi" : ""}`}>
+    <div className={`cne-loc-rail cne-stagger${open.length > 1 ? " is-multi" : ""}`}>
       {open.map((loc) => (
         // Both declared on the card rather than on each button: the surface and
         // the store are properties of where the link sits, not of the link.

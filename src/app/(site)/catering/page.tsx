@@ -182,11 +182,14 @@ export default function CateringPage() {
         />
       </div>
 
-      <section className="cne-sec is-band cne-op-glyph cne-cat-food" aria-labelledby="cat-food">
+      <section
+        className="cne-sec is-band cne-rv cne-op-glyph cne-cat-food"
+        aria-labelledby="cat-food"
+      >
         <GlyphRow />
         <div className="cne-eyebrow">&#9733; What travels best</div>
         <h2 id="cat-food">What the room orders.</h2>
-        <ul className="cne-cardgrid">
+        <ul className="cne-cardgrid cne-stagger">
           {food.map((it, i) => (
             <li key={it.id} className={`cne-card${i === 0 ? " is-star" : ""}`}>
               <span className="cne-card-img">
@@ -217,7 +220,7 @@ export default function CateringPage() {
       <section className="cne-cat-blue" aria-labelledby="cat-steps">
         <div className="cne-eyebrow">How it works</div>
         <h2 id="cat-steps">Three steps.</h2>
-        <ol className="cne-cat-steps">
+        <ol className="cne-cat-steps cne-rv cne-stagger">
           {STEPS.map((s, i) => (
             <li key={s.title}>
               <span className="n" aria-hidden="true">

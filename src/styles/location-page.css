@@ -746,3 +746,8 @@
     opacity: 0.2;
   }
 }
+
+/* "Same menu everywhere." keeps its checker stamp beside the last word. */
+.cne-nowrap {
+  white-space: nowrap;
+}

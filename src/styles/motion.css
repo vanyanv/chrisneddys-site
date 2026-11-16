@@ -1,0 +1,141 @@
+/*
+ * Small motion pass (site review, Nov 2026).
+ *
+ * Everything here is CSS: no script, no new assets, nothing on the menu's
+ * lead photo. Every movement sits behind `prefers-reduced-motion:
+ * no-preference`, so a phone set to reduce motion sees the finished page.
+ * The two non-motion rules (the press colour on the red buttons and the
+ * hero's open dot) apply to everyone.
+ *
+ * Movement uses the individual `translate` and `scale` properties rather
+ * than `transform`, so it adds to the hover and selected states that already
+ * use `transform` instead of replacing them.
+ */
+
+/* ---- 1. Cards arrive one after another ------------------------------------
+   `.cne-rv` sections already fade up as a block when they scroll into view
+   (`RevealRoot`). A `.cne-stagger` list inside one, or carrying `.cne-rv`
+   itself, now brings its cards in one at a time, 70ms apart, instead of all
+   at once. The section is still at `opacity: 0` until `is-in` lands, so the
+   cards are never seen in their start position. Fill is `backwards` only:
+   once a card lands, its own hover and press rules are back in charge. */
+@keyframes cne-stagger-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .cne-rv.is-in .cne-stagger > *,
+  .js .cne-rv.is-in.cne-stagger > * {
+    animation: cne-stagger-in 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.08s backwards;
+  }
+  .js .cne-rv.is-in .cne-stagger > :nth-child(2),
+  .js .cne-rv.is-in.cne-stagger > :nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .js .cne-rv.is-in .cne-stagger > :nth-child(3),
+  .js .cne-rv.is-in.cne-stagger > :nth-child(3) {
+    animation-delay: 0.22s;
+  }
+  .js .cne-rv.is-in .cne-stagger > :nth-child(4),
+  .js .cne-rv.is-in.cne-stagger > :nth-child(4) {
+    animation-delay: 0.29s;
+  }
+  .js .cne-rv.is-in .cne-stagger > :nth-child(5),
+  .js .cne-rv.is-in.cne-stagger > :nth-child(5) {
+    animation-delay: 0.36s;
+  }
+  .js .cne-rv.is-in .cne-stagger > :nth-child(n + 6),
+  .js .cne-rv.is-in.cne-stagger > :nth-child(n + 6) {
+    animation-delay: 0.43s;
+  }
+}
+
+/* ---- 2. Buttons answer a tap ----------------------------------------------
+   ORDER, DIRECTIONS and CALL on the location cards (home, /order/,
+   /locations/) and the "Start here" cards had no pressed state, so on a
+   phone a tap gave no sign it landed until the next page loaded. They now
+   dip slightly under the finger, like the store page's buttons and the
+   header ORDER already do. */
+.cne-loc-btns .cne-mini.is-red:active {
+  background: var(--a-red-deep);
+}
+.cne-loc-btns .cne-mini.is-plain:active {
+  background: var(--a-cream);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-loc-btns .cne-mini {
+    transition:
+      scale 0.12s ease-out,
+      background-color 0.12s;
+  }
+  .cne-loc-btns .cne-mini:active {
+    scale: 0.96;
+  }
+  .cne-lp-other.cne-loc {
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s,
+      border-color 0.25s,
+      scale 0.12s ease-out;
+  }
+  .cne-lp-other.cne-loc:active {
+    scale: 0.98;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 900px) {
+  .cne-card {
+    transition: scale 0.12s ease-out;
+  }
+  .cne-card:active {
+    scale: 0.98;
+  }
+}
+
+/* ---- 3. The phone's ORDER bar slides up once ------------------------------
+   It used to be on screen from the first frame, sitting over the hero before
+   the page had finished arriving. It now rises into place just after load.
+   `translate` does not move anything else on the page, so there is no
+   layout shift. */
+@keyframes cne-dock-in {
+  from {
+    translate: 0 100%;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-dock {
+    animation: cne-dock-in 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) 0.6s backwards;
+  }
+}
+
+/* ---- 4. The hero's open dot can be seen -----------------------------------
+   The green "open" dot beside OPEN · TILL 2 AM is the one positive colour
+   on the site, but on the red hero it was 6px of dark green on red and read
+   as a speck of dirt. It now sits on a cream ring (the header pill's own
+   background), and instead of fading in and out with it, the ring sends out
+   a soft cream ping every couple of seconds, like the map pins do. */
+@keyframes cne-hero-ping {
+  0% {
+    box-shadow:
+      0 0 0 2.5px var(--a-cream),
+      0 0 0 2.5px rgb(255 242 201 / 0.7);
+  }
+  70%,
+  100% {
+    box-shadow:
+      0 0 0 2.5px var(--a-cream),
+      0 0 0 10px rgb(255 242 201 / 0);
+  }
+}
+.cne-hero-open-dot {
+  width: 7px;
+  height: 7px;
+  margin: 0 3px 0 2px;
+  box-shadow: 0 0 0 2.5px var(--a-cream);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cne-hero-open .cne-hero-open-dot {
+    animation: cne-hero-ping 2.2s ease-out infinite;
+  }
+}

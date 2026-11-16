@@ -6,6 +6,7 @@ import "@/styles/counter.css";
 import "@/styles/mascots.css";
 import "@/styles/chrome-art.css";
 import "@/styles/way-monsters.css";
+import "@/styles/motion.css";
 import { MascotDefs } from "@/components/mascots/MascotDefs";
 import { SiteHeader } from "@/components/counter/SiteHeader";
 import { SiteFooter } from "@/components/counter/SiteFooter";

@@ -15,7 +15,7 @@ export function FeaturedCards() {
 
   return (
     <>
-      <div className="cne-cardgrid">
+      <div className="cne-cardgrid cne-stagger">
         {items.map((it, i) => (
           <button
             key={it.id}

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Site: on iPhone, the ORDER bar at the bottom of the screen now sits above Chrome's new bottom toolbar (Ask Gemini, new tab, tabs) and the home bar instead of being partly hidden behind them ([#310](https://github.com/vanyanv/chrisneddys-site/issues/310))
 - Site: on a phone, the ORDER, DIRECTIONS and CALL buttons on the location cards and the "Start here" cards now dip under your finger when tapped, so you can tell the tap landed; the green "open" dot in the home page's top section now sits on a cream ring and can be seen on the red; and the checker stamp after "Same menu everywhere." on each location page stays beside the heading instead of falling onto its own line ([#308](https://github.com/vanyanv/chrisneddys-site/issues/308))
 - Site: small, quiet motion: cards on the home page and the catering page come in one after another as you scroll to them, the catering page's food and three steps fade up like the rest of the site, and the phone's ORDER bar slides up just after the page loads. Phones set to reduce motion see everything in place, as before ([#308](https://github.com/vanyanv/chrisneddys-site/issues/308))
 - Site: the Glendale location now shows its own phone number, (747) 215-6218, with a CALL button on its page and its number in the footer, the order page and search listings ([#296](https://github.com/vanyanv/chrisneddys-site/issues/296))

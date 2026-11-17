@@ -35,6 +35,11 @@ html {
 body {
   background: var(--a-bg);
   color: var(--a-fg);
+  /* The viewport is `viewport-fit=cover` so the ORDER dock can read the
+     bottom inset. That also lets content run under the camera notch on a
+     sideways iPhone; these put it back where it was. 0 everywhere else. */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 /* ---- header ------------------------------------------------------------- */

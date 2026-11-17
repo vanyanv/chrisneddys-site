@@ -118,6 +118,12 @@ export const viewport: Viewport = {
   themeColor: "#E63027",
   width: "device-width",
   initialScale: 1,
+  // Lets the phone tell the page how much of the bottom edge its own bars
+  // cover. Without it iPhone browsers report a safe-area inset of 0, so the
+  // ORDER dock's `env(safe-area-inset-bottom)` padding did nothing and Chrome
+  // for iOS's floating bottom toolbar (Ask Gemini, new tab, tabs) sat on top
+  // of the dock's button. Sides are padded back in counter.css (`body`).
+  viewportFit: "cover",
 };
 
 /**

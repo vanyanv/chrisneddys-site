@@ -19,7 +19,7 @@ type LocationId = Location["id"];
     footer and every other list keep `locations`' own order. A function, not
     a module constant: a store opens by itself (`GLENDALE_OPENS_AT`) long
     after a warm server or an open tab loaded this file. */
-const listed = () => [...locations].sort((a, b) => Number(b.isOpen) - Number(a.isOpen));
+const listed = () => locations.toSorted((a, b) => Number(b.isOpen) - Number(a.isOpen));
 
 /**
  * Map plus store cards, as in the prototype: pick a pin or a card and the other

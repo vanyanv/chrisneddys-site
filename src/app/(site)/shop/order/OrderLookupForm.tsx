@@ -106,6 +106,7 @@ export function OrderLookupForm() {
               id="order-email"
               name="email"
               type="email"
+              enterKeyHint="go"
               inputMode="email"
               autoComplete="email"
               required

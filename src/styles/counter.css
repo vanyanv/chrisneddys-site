@@ -1033,6 +1033,20 @@ body {
   .cne-menu-jump a:hover {
     transform: none !important;
   }
+
+  /* Tab bar slide, heading underline sweep, card photo zoom and ribbon nudge:
+     they land in their end state at once. */
+  .cne-tabind,
+  .cne-sec h1::after,
+  .cne-sec h2::after,
+  .cne-card-img img,
+  .cne-card-rib {
+    transition: none !important;
+  }
+  .cne-card:hover .cne-card-img img,
+  .cne-card:hover .cne-card-rib {
+    transform: none !important;
+  }
 }
 
 /* ---- footer ------------------------------------------------------------- */
@@ -2635,7 +2649,14 @@ h3 {
   cursor: pointer;
   color: var(--a-fg);
   line-height: 1;
-  padding: 6px 8px;
+  padding: 0;
+  /* 44px hit area; the negative margin gives back what the box grew by, so the
+     glyph and the header row keep their old position and height. */
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -7px -11px;
 }
 
 .cne-dr-body {
@@ -3016,6 +3037,7 @@ h3 {
    phone, a small card in the middle on anything wider. Printed like every
    other card here: ink rule, hard offset shadow, cream paper. */
 .cne-pick {
+  overscroll-behavior: contain;
   margin: auto auto 0;
   padding: 0;
   width: 100%;
@@ -3026,6 +3048,8 @@ h3 {
   color: var(--a-ink);
 }
 .cne-pick::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
   background: rgba(20, 16, 12, 0.55);
 }
 .cne-pick[open] {

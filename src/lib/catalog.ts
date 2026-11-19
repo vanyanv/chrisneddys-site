@@ -67,7 +67,7 @@ type ImageRow = {
 
 /** Maps a database product row (with its images) onto the app's existing `MerchProduct` shape. */
 function mapProductRow(row: ProductRow & { images: ImageRow[] }): MerchProduct {
-  const images = [...row.images].sort((a, b) => a.position - b.position);
+  const images = row.images.toSorted((a, b) => a.position - b.position);
   const views: MerchView[] = images
     .filter((img) => img.kind === "view")
     .map((img) => ({
@@ -241,8 +241,8 @@ async function queryInventory(slug: string): Promise<InventoryStatus | undefined
   // `src/lib/orders.ts` on every reservation/payment/release).
   const editionCells: EditionCell[] | undefined =
     variant.editionSize !== null
-      ? [...variant.editions]
-          .sort((a, b) => a.number - b.number)
+      ? variant.editions
+          .toSorted((a, b) => a.number - b.number)
           .map((e) => ({ number: e.number, status: e.status }))
       : undefined;
   const available =

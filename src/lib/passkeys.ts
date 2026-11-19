@@ -94,8 +94,8 @@ export async function listOwnerPasskeys(): Promise<OwnerPasskey[]> {
   const headerList = await headers();
   try {
     const rows = await auth.api.listPasskeys({ headers: headerList });
-    return [...rows]
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    return rows
+      .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .map((row) => ({
         id: row.id,
         name: displayName(row.name, row.aaguid),

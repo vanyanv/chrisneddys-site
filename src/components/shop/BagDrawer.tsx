@@ -15,6 +15,7 @@ import {
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 import { getGaIdentity } from "@/lib/gaIdentity";
+import { inertOthers } from "@/lib/inertOthers";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
@@ -73,6 +74,7 @@ export function BagDrawer({
 }) {
   const { lines, open } = useBag();
   const panel = useRef<HTMLDivElement>(null);
+  const scrim = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -141,9 +143,12 @@ export function BagDrawer({
     const id = requestAnimationFrame(() => {
       panel.current?.querySelector<HTMLElement>("button, a")?.focus();
     });
+    // The page behind the bag can't be reached by keyboard or screen reader.
+    const release = inertOthers([panel.current, scrim.current]);
     return () => {
       document.removeEventListener("keydown", onKey);
       cancelAnimationFrame(id);
+      release();
     };
   }, [open, dismiss]);
 
@@ -241,6 +246,7 @@ export function BagDrawer({
         className={`cne-bag-scrim${mounted ? " is-in" : ""}`}
         aria-label="Close bag"
         onClick={dismiss}
+        ref={scrim}
       />
       <div
         className={`cne-drawer${mounted ? " is-in" : ""}`}

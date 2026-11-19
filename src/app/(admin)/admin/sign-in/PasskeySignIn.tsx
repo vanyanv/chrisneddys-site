@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   browserSupportsWebAuthn,
   browserSupportsWebAuthnAutofill,
@@ -45,6 +45,7 @@ export function PasskeySignIn({ next }: { next: string }) {
   // button. SimpleWebAuthn cancels this pending request when the button starts
   // its own ceremony; the form's submit and unmount cancel it explicitly.
   // An aborted or dismissed request is silent.
+  const buttonStarted = useRef(false);
   useEffect(() => {
     let active = true;
     let finishing = false;
@@ -52,7 +53,9 @@ export function PasskeySignIn({ next }: { next: string }) {
       try {
         if (!(await browserSupportsWebAuthnAutofill())) return;
         const start = await passkeySignInStartAction();
-        if (!active || !start.ok) return;
+        // The button may have started its own ceremony (and challenge) while
+        // this was loading; starting autofill now would abort it.
+        if (!active || !start.ok || buttonStarted.current) return;
         const response = await startAuthentication({
           optionsJSON: start.options,
           useBrowserAutofill: true,
@@ -95,6 +98,7 @@ export function PasskeySignIn({ next }: { next: string }) {
   }
 
   async function handleClick() {
+    buttonStarted.current = true;
     setError(null);
     setPending(true);
     try {

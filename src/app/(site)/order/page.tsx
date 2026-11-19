@@ -151,7 +151,7 @@ export default function OrderPage() {
             widths={[480, 720, 1080, 1440]}
             width={1440}
             height={611}
-            sizes="(max-width: 600px) calc(118vw - 50px), (max-width: 900px) calc(100vw - 36px), calc(100vw - 94px)"
+            sizes="(max-width: 37.5em) calc(118vw - 50px), (max-width: 56.25em) calc(100vw - 36px), calc(100vw - 94px)"
             alt="Side-on view of a Chris N Eddy’s spread on a white table: a Chris’s Way slider, an Eddy’s Way slider, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes."
             priority
           />

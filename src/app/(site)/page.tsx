@@ -201,12 +201,12 @@ export default function HomePage() {
               <source
                 type="image/avif"
                 srcSet={`${g.src.replace(".webp", "-300.avif")} 300w, ${g.src.replace(".webp", "-400.avif")} 400w`}
-                sizes="(min-width: 901px) 230px, (min-width: 600px) 16vw, 33vw"
+                sizes="(min-width: 56.3125em) 230px, (min-width: 37.5em) 16vw, 33vw"
               />
               <img
                 src={g.src}
                 srcSet={`${g.src.replace(".webp", "-sm.webp")} 300w, ${g.src} 500w`}
-                sizes="(min-width: 901px) 230px, (min-width: 600px) 16vw, 33vw"
+                sizes="(min-width: 56.3125em) 230px, (min-width: 37.5em) 16vw, 33vw"
                 alt={g.alt}
                 width={500}
                 height={500}

@@ -99,7 +99,7 @@
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-ck-label {
     font-size: 0.625rem;
   }

@@ -224,7 +224,7 @@
   right: 18px;
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-cat-hero {
     padding: 60px 44px 0;
   }
@@ -258,7 +258,7 @@
 }
 
 /* From tablet up the whole crowd fits: nine across, placed by width. */
-@media (min-width: 600px) {
+@media (min-width: 37.5em) {
   .cne-cat-crowd li {
     left: var(--ld);
     width: var(--wd);
@@ -267,7 +267,7 @@
     display: block;
   }
 }
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-cat-hero {
     padding-inline: 30px;
   }
@@ -295,7 +295,7 @@
   object-fit: cover;
   object-position: center;
 }
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
   .cne-cat-spread {
     aspect-ratio: 2 / 1;
   }

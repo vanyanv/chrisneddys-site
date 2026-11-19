@@ -24,7 +24,7 @@
    wrap's map colour fills the sides. On an upright phone the cap is far wider
    than the screen, so nothing changes there, and from 901px up the map sits
    in the desktop panel's own frame (`.cne-split-frame`) instead. */
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-mapbox {
     position: relative;
     max-width: max(300px, (100svh - var(--cne-stuck) - 16px) * 360 / 259);
@@ -32,7 +32,7 @@
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-locs {
     display: grid;
     grid-template-columns: 1.25fr 0.75fr;

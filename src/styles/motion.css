@@ -84,7 +84,7 @@
     scale: 0.98;
   }
 }
-@media (prefers-reduced-motion: no-preference) and (max-width: 900px) {
+@media (prefers-reduced-motion: no-preference) and (max-width: 56.25em) {
   .cne-card {
     transition: scale 0.12s ease-out;
   }

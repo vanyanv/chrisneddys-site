@@ -83,7 +83,7 @@
   border-color: var(--a-red-cta);
   color: var(--a-cream);
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-menu-chipnav {
     display: none;
   }
@@ -91,7 +91,7 @@
 /* The short-landscape header (`counter.css`, `max-height: 500px`) drops its
    own padding to fit; this strip does the same so it doesn't reintroduce the
    height the header rule just clawed back. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-menu-chipnav {
     padding: 6px 15px;
   }
@@ -102,7 +102,7 @@
    thumb still renders (`MenuRow` never stops drawing it) so this is purely a
    `display: none` here; desktop, which never sets `.is-compact`, is
    untouched either way. */
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-row.is-compact .cne-row-thumb {
     display: none;
   }
@@ -162,7 +162,7 @@
   --x: 28px;
   --y: -6px;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-smash {
     width: 44px;
     height: 44px;
@@ -299,7 +299,7 @@
 .cne-dots-key .is-c {
   margin-left: 8px;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-dots i {
     width: 14px;
     height: 14px;

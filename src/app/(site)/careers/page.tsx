@@ -106,7 +106,7 @@ export default function CareersPage() {
             widths={[480, 720, 900]}
             width={900}
             height={506}
-            sizes="(min-width: 901px) 672px, (min-width: 790px) 730px, calc(100vw - 30px)"
+            sizes="(min-width: 56.3125em) 672px, (min-width: 49.375em) 730px, calc(100vw - 30px)"
             alt="The dining room wall at Chris N Eddy's Hollywood: grinning one-eyed monsters, checkerboards, bullseyes and Sliders tags painted over the tables."
             priority
           />

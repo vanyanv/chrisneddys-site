@@ -139,7 +139,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
                 phoneWidths={[480, 720]}
                 width={720}
                 height={540}
-                sizes="(min-width: 901px) 52vw, 100vw"
+                sizes="(min-width: 56.3125em) 52vw, 100vw"
                 alt={art.room.alt}
                 priority
               />
@@ -177,7 +177,7 @@ export function StoreDetail({ loc, hood }: { loc: Location; hood: string }) {
                   widths={[360, 540]}
                   width={360}
                   height={480}
-                  sizes="(min-width: 901px) 360px, 62vw"
+                  sizes="(min-width: 56.3125em) 360px, 62vw"
                   alt={m.alt}
                 />
               </li>

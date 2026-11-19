@@ -116,7 +116,7 @@
    that used to live here cleared the page ground at 1.68:1, which is not a
    focus indicator; yellow is only legible where the surface is ink. */
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-row {
     gap: 16px;
     padding: 15px 0;
@@ -211,7 +211,7 @@
   color: var(--a-red-cta);
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-menu {
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -282,19 +282,19 @@
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-menu-side .cne-eyebrow {
     margin-bottom: 0;
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-only-desk {
     display: block;
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* The prototype tightens prices only on the phone. */
   .cne-row-price {
     letter-spacing: normal;
@@ -313,13 +313,13 @@
 .cne-menu-side {
   padding-top: 14px;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-menu-side {
     padding-top: 0;
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* Only the phone clamps the description; desktop has the column for it. */
   .cne-row-name .d {
     display: block;
@@ -342,7 +342,7 @@
    beside the grid, not the grid's own width budget). The 260px floor is what
    keeps a lone column from reappearing across the whole band the way the
    single-column fallback used to. */
-@media (min-width: 600px) and (max-width: 1279px) {
+@media (min-width: 37.5em) and (max-width: 79.9375em) {
   .cne-menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -389,7 +389,7 @@
    design's headline step. As 11px mono they were the smallest words in each
    section, under item names set at 15px, so five screens of food ran
    together (issue #257). Desktop's rule in counter.css is untouched. */
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-menu .cne-cat h2.cne-cat-h {
     font-family: var(--font-display);
     font-size: 1.5rem;

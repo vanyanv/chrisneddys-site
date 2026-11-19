@@ -4,7 +4,7 @@
  * The gallery, the buy column, the details and authenticity blocks, the
  * edition map, and what the page looks like when a drop is sold out or the
  * shop is paused. Ported from the checkout prototype: phone values are the
- * base and `@media (min-width: 901px)` carries the desktop ones, same as the
+ * base and `@media (min-width: 56.3125em)` carries the desktop ones, same as the
  * rest of the site.
  */
 
@@ -485,7 +485,7 @@
    and pushed the title, price and Add to bag roughly a page down. Borrows
    the desktop grid's two columns (photo + thumbs left, buy box right) so the
    price and the button are on screen without waiting for 901px. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-pdp-crumb {
     padding: 16px 20px 0;
   }
@@ -517,7 +517,7 @@
    the whole viewport for a square shot. Cap the shot to a share of the
    viewport height and let its width follow from the aspect ratio already set
    on `.cne-capshot`, so it never runs past the bottom of the screen. */
-@media (min-width: 600px) and (max-width: 900px) and (max-height: 500px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-pdp-main {
     display: flex;
     justify-content: center;
@@ -548,7 +548,7 @@
   }
 }
 
-@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 56.3125em) and (prefers-reduced-motion: no-preference) {
   .cne-pdp-mq .cne-mq-track {
     animation-iteration-count: 0.16;
   }
@@ -557,14 +557,14 @@
 /* A phone on its side has about 400px of height, and the header and nav take
    most of it. The ticker repeats facts the page states anyway, so it goes and
    the hat moves up into the first screen. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-pdp-mq {
     display: none;
   }
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-pdp-crumb {
     padding: 20px 30px 0;
   }

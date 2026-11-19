@@ -149,7 +149,7 @@ export default async function ShopPage() {
                   <ProductShot
                     product={product}
                     view={firstView(product)}
-                    sizes="(min-width: 901px) 700px, 100vw"
+                    sizes="(min-width: 56.3125em) 700px, 100vw"
                     priority
                     cropToFrame
                   />

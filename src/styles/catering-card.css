@@ -62,7 +62,7 @@
 }
 /* Side by side on a wide card, the button would sit under the peeking
    monster; drop it clear. */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-catcard-act {
     padding-top: 18px;
   }

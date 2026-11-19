@@ -23,7 +23,7 @@
   align-items: start;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
   .cne-ord.has-result {
     grid-template-columns: minmax(260px, 17.5rem) minmax(0, 29.75rem);
     gap: 40px;

@@ -715,7 +715,7 @@
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-ct-hero {
     padding: 56px 44px 62px;
   }

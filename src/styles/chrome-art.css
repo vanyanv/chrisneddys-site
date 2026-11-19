@@ -154,7 +154,7 @@
     no-repeat left / contain;
   pointer-events: none;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-eyebrow {
     font-size: 1.125rem;
     padding-bottom: 13px;

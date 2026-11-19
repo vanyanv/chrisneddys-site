@@ -190,7 +190,7 @@
   text-underline-offset: 3px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
   .cne-lg-toc ol {
     columns: 2;
     column-gap: 28px;
@@ -201,7 +201,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
   .cne-lg {
     padding: 52px 24px 80px;
   }

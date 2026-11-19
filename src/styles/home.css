@@ -10,7 +10,7 @@
    outer edge, so the photo can run flush to it — `.cne-hero-in` carries the
    actual shape, a flex column here with the photo reordered first, and a
    three-track grid (panel / seam / photo) from the tablet tier up (see
-   below and `@media (min-width: 901px)`). */
+   below and `@media (min-width: 56.3125em)`). */
 .cne-hero {
   position: relative;
   overflow: hidden;
@@ -227,14 +227,20 @@
   }
 }
 
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-hero-in {
     display: grid;
     grid-template-columns: 1fr 16px 1fr;
     /* Short landscape windows (874x402) are the reason this is a cap rather
        than a fixed height, same concern the old aspect-ratio box had. */
-    height: min(64svh, 560px);
-    min-height: 420px;
+    height: auto;
+    min-height: max(420px, min(64svh, 560px));
+  }
+  /* Grows with larger text instead of clipping the copy; the photo side takes
+     no height of its own, so at normal sizes the box is exactly as before. */
+  .cne-heromedia {
+    height: auto;
+    contain: size;
   }
   .cne-hero-copy,
   .cne-heromedia {
@@ -396,7 +402,7 @@
    with counts that divide what they hold: three quotes across and all six
    gram photos in one row, as on desktop. A width-driven `auto-fill` count
    left one quote or one or two photos stranded on a row of their own. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-quote {
     border-left-width: 5px;
     padding: 3px 0 3px 16px;
@@ -427,7 +433,7 @@
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* hero: red panel on the left, edge-to-edge photo on the right */
   .cne-hero {
     border-bottom: 4px solid var(--a-ink);
@@ -438,8 +444,12 @@
     /* The height the brief specs directly: tall enough to be a real hero,
        capped so it never eats a whole 900px laptop screen, and never so
        short a squeezed window collapses the copy. */
-    height: min(80svh, 720px);
-    min-height: 520px;
+    height: auto;
+    min-height: max(520px, min(80svh, 720px));
+  }
+  .cne-heromedia {
+    height: auto;
+    contain: size;
   }
   .cne-hero-copy,
   .cne-heromedia {
@@ -620,7 +630,7 @@
   transform: translateX(3px);
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-card-ft {
     justify-content: space-between;
     margin-top: 8px;
@@ -673,7 +683,7 @@
   }
 }
 
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-card-ft {
     justify-content: space-between;
     margin-top: 6px;
@@ -697,7 +707,7 @@
 }
 
 /* On a phone the split is one column and the map is decoration we can drop. */
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-split-r {
     display: none;
   }
@@ -714,20 +724,20 @@
 .cne-split {
   position: relative;
 }
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-split {
     display: grid;
     grid-template-columns: 1fr;
     border-bottom: 3px solid var(--a-ink);
   }
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-split {
     min-height: 560px;
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-mq-phone {
     display: none;
   }
@@ -736,7 +746,7 @@
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* The prototype tightens prices only on the phone. */
   .cne-card-pr {
     letter-spacing: normal;

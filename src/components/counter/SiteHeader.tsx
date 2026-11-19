@@ -84,7 +84,7 @@ export function SiteHeader() {
           <img
             src={LOGO.src}
             srcSet={LOGO.srcSet}
-            sizes="(min-width: 901px) 156px, 107px"
+            sizes="(min-width: 56.3125em) 156px, 107px"
             alt={brand.name}
             width={LOGO.width}
             height={LOGO.height}

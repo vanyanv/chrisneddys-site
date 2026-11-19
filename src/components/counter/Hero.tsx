@@ -61,13 +61,13 @@ export function Hero() {
               proportions, so the portrait cut (`HERO`) stays the better fit there. */}
           <picture>
             <source
-              media="(max-width: 599px)"
+              media="(max-width: 37.4375em)"
               type="image/avif"
               srcSet={HERO_WIDE.avifSrcSet}
               sizes={HERO_WIDE.sizes}
             />
             <source
-              media="(max-width: 599px)"
+              media="(max-width: 37.4375em)"
               type="image/webp"
               srcSet={HERO_WIDE.webpSrcSet}
               sizes={HERO_WIDE.sizes}

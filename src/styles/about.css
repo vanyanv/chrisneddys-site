@@ -33,7 +33,7 @@
   --u: min(1vw, 14.4px);
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip {
     --u: 2.7vw;
   }
@@ -115,7 +115,7 @@
   height: auto;
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   /* 4u of timeline padding + 1.6u, so the line runs through the dots. */
   .cne-drip-line,
   .cne-drip-drop {
@@ -192,7 +192,7 @@
   color: var(--color-cne-ink);
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-st {
     grid-template-columns: minmax(0, 1fr);
     padding-left: calc(var(--u) * 4.4);
@@ -539,7 +539,7 @@
   transform: scaleX(-1);
 }
 
-@media (min-width: 700px) {
+@media (min-width: 43.75em) {
   .cne-drip-btn {
     /* Floored so an iPad or a phone on its side doesn't shrink it to 10px. */
     font-size: clamp(0.875rem, 1.2vw, 1.08rem);
@@ -555,7 +555,7 @@
   }
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-btn {
     font-size: max(3.4vw, 0.8125rem);
     padding: 3.4vw 2.4vw;
@@ -625,7 +625,7 @@
   object-position: center;
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-spread {
     margin-bottom: 22px;
     aspect-ratio: 2 / 1;

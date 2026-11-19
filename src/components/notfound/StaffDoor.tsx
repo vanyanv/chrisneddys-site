@@ -62,7 +62,7 @@ export function StaffDoor() {
           position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
           width: 34px; height: 18px; background: ${MONSTER_COLORS.lime.body};
         }
-        @media (max-width: 640px) {
+        @media (max-width: 40em) {
           .rnf-door-wrap { width: ${Math.round(DOOR_W * 0.8)}px; height: ${WRAP_H_PHONE}px; }
           .rnf-door { width: ${Math.round(DOOR_W * 0.8)}px; height: ${Math.round(DOOR_H * 0.8)}px; }
         }

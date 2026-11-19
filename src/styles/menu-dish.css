@@ -258,7 +258,7 @@
 
 /* An odd count on a phone: the last card goes wide rather than leaving a
    hole beside it. */
-@media (max-width: 599px) {
+@media (max-width: 37.4375em) {
   .cne-dish-grid.is-odd > .cne-dish:last-child {
     grid-column: 1 / -1;
     flex-direction: row;
@@ -273,7 +273,7 @@
 
 /* iPad and a landscape phone: three or four across, and the lead cards get
    room for a proper photo. */
-@media (min-width: 600px) {
+@media (min-width: 37.5em) {
   .cne-dish-grid {
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   }
@@ -339,7 +339,7 @@
   }
 }
 /* A landscape phone is short: keep the opening card from filling it. */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 31.25em) {
   .cne-lead-ph {
     flex-basis: 42%;
     aspect-ratio: 16 / 10;
@@ -349,7 +349,7 @@
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-menu-main .cne-lead {
     margin-bottom: 20px;
   }

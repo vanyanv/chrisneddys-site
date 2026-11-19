@@ -35,7 +35,7 @@ export function SlideCode() {
   // Desktop + fine pointer only, checked once on mount.
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
-    const desktop = window.matchMedia("(min-width: 901px)").matches;
+    const desktop = window.matchMedia("(min-width: 56.3125em)").matches;
     setPrimed(fine && desktop);
   }, []);
 

@@ -45,7 +45,7 @@ export function ProductGallery({
           key={view?.id ?? "none"}
           product={product}
           view={view}
-          sizes="(min-width: 901px) 620px, 100vw"
+          sizes="(min-width: 56.3125em) 620px, 100vw"
           priority
           className="is-swap"
         />

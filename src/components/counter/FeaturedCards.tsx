@@ -32,7 +32,7 @@ export function FeaturedCards() {
                    it at 60px. */
                 <MenuPhoto
                   photo={it.photo}
-                  sizes="(min-width: 901px) 440px, (min-width: 600px) 260px, 90px"
+                  sizes="(min-width: 56.3125em) 440px, (min-width: 37.5em) 260px, 90px"
                   alt={itemPhotoAlt(it)}
                   loading="lazy"
                   decoding="async"

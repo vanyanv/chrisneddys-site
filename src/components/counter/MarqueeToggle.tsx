@@ -32,7 +32,7 @@ export function MarqueeToggle() {
       ref={ref}
       type="button"
       className="cne-mq-toggle"
-      aria-label={paused ? "Play scrolling text" : "Pause scrolling text"}
+      aria-label="Pause scrolling text"
       aria-pressed={paused}
       onClick={() => {
         const next = !paused;

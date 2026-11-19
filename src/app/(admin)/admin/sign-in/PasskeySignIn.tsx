@@ -52,6 +52,7 @@ export function PasskeySignIn({ next }: { next: string }) {
     (async () => {
       try {
         if (!(await browserSupportsWebAuthnAutofill())) return;
+        if (!active || buttonStarted.current) return;
         const start = await passkeySignInStartAction();
         // The button may have started its own ceremony (and challenge) while
         // this was loading; starting autofill now would abort it.

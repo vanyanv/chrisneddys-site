@@ -544,7 +544,13 @@ body {
     animation: cne-marquee 24s linear infinite;
   }
 }
-.cne-mq:hover .cne-mq-track,
+/* Hover pause only where there is a real hover: on a phone a tap leaves
+   :hover stuck and would freeze the band with no way to tell why. */
+@media (hover: hover) {
+  .cne-mq:hover .cne-mq-track {
+    animation-play-state: paused;
+  }
+}
 .cne-mq[data-paused] .cne-mq-track,
 .cne-mq[data-paused] .cne-mq-rider {
   animation-play-state: paused;

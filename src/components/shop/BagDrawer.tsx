@@ -76,6 +76,7 @@ export function BagDrawer({
   const panel = useRef<HTMLDivElement>(null);
   const scrim = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
+  const releaseInert = useRef<(() => void) | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [fulfilment, setFulfilment] = useState<Fulfilment>("ship");
@@ -109,6 +110,10 @@ export function BagDrawer({
 
   const dismiss = useCallback(() => {
     closeBag();
+    // The page behind is still inert until the effect below cleans up, and an
+    // inert button can't take focus, so let it go first.
+    releaseInert.current?.();
+    releaseInert.current = null;
     returnFocus.current?.focus?.();
   }, []);
 
@@ -144,11 +149,12 @@ export function BagDrawer({
       panel.current?.querySelector<HTMLElement>("button, a")?.focus();
     });
     // The page behind the bag can't be reached by keyboard or screen reader.
-    const release = inertOthers([panel.current, scrim.current]);
+    releaseInert.current = inertOthers([panel.current, scrim.current]);
     return () => {
       document.removeEventListener("keydown", onKey);
       cancelAnimationFrame(id);
-      release();
+      releaseInert.current?.();
+      releaseInert.current = null;
     };
   }, [open, dismiss]);
 

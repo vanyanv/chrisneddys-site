@@ -124,6 +124,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
           id={`notify-${hood}`}
           name="email"
           type="email"
+          enterKeyHint="send"
           inputMode="email"
           autoComplete="email"
           required

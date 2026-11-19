@@ -54,6 +54,7 @@ gtag('js',new Date());
 gtag('config','${GA_ID}',dbg?{debug_mode:true}:{});
 var s=document.createElement('script');
 s.async=true;
+s.fetchPriority='low';
 s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';
 document.head.appendChild(s);
 })()`;

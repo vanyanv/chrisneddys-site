@@ -7,6 +7,7 @@ import { buildFor } from "@/data/build";
 import { framingFor } from "@/data/photoFocus";
 import { menuPhotoImageSet } from "@/lib/menuPhoto";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
+import { inertOthers } from "@/lib/inertOthers";
 import { comboFor } from "@/data/upsell";
 import { formatPrice, itemPhotoAlt, priceString } from "@/lib/otter";
 import { Monster } from "@/components/mascots/Monster";
@@ -55,6 +56,7 @@ const FLICK_VELOCITY = 0.5;
 export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: Props) {
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
+  const scrimRef = useRef<HTMLDivElement | null>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -90,10 +92,14 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
     // The page behind a modal shouldn't scroll under it.
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // The page behind it can't be reached by keyboard or screen reader either.
+    // Released before focus goes back, which an inert trigger would refuse.
+    const release = inertOthers([sheetRef.current, scrimRef.current]);
     return () => {
       cancelAnimationFrame(id);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      release();
       restoreRef.current?.focus?.({ preventScroll: true });
     };
   }, [open, onClose]);
@@ -187,7 +193,12 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
 
   return (
     <>
-      <div className={`cne-scrim${open ? " is-open" : ""}`} onClick={onClose} aria-hidden="true" />
+      <div
+        ref={scrimRef}
+        className={`cne-scrim${open ? " is-open" : ""}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <div
         ref={sheetRef}
         className={`cne-sheet${open ? " is-open" : ""}${dragging ? " is-dragging" : ""}`}
@@ -268,7 +279,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
                   price drops its "$" the way a board does; the button below
                   still says it in full, and a screen reader hears it here. */}
               <div className="cne-board-hd">
-                <h3 className="cne-sheet-name">{item.name}</h3>
+                <h2 className="cne-sheet-name">{item.name}</h2>
                 <i aria-hidden="true" />
                 {/* Every location charges the same pickup price (owner,
                     2026-09-26), so the label names the price, not a store. */}

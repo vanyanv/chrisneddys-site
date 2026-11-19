@@ -233,7 +233,7 @@ export function PhotosEditor({
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const views = [...product.views].sort((a, b) => a.position - b.position);
+  const views = product.views.toSorted((a, b) => a.position - b.position);
   const viewIds = views.map((v) => v.id);
 
   const reorder = usePointerListReorder(viewIds, (orderedIds) => {

@@ -75,6 +75,7 @@
 
 .rack-root {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--rack-paper);
   color: var(--rack-ink);
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -1515,6 +1516,7 @@
 
 .rack-slip-page {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--rack-rule);
   padding: var(--rack-space-xl) 0;
 }
@@ -1777,6 +1779,7 @@
 
 .rack-break-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1873,6 +1876,7 @@
 
 .rack-guest-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }

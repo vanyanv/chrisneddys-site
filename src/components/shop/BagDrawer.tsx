@@ -15,6 +15,7 @@ import {
 import { formatPrice } from "@/lib/otter";
 import { track, type TrackItem } from "@/lib/track";
 import { getGaIdentity } from "@/lib/gaIdentity";
+import { inertOthers } from "@/lib/inertOthers";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
@@ -73,7 +74,9 @@ export function BagDrawer({
 }) {
   const { lines, open } = useBag();
   const panel = useRef<HTMLDivElement>(null);
+  const scrim = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
+  const releaseInert = useRef<(() => void) | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [fulfilment, setFulfilment] = useState<Fulfilment>("ship");
@@ -107,6 +110,10 @@ export function BagDrawer({
 
   const dismiss = useCallback(() => {
     closeBag();
+    // The page behind is still inert until the effect below cleans up, and an
+    // inert button can't take focus, so let it go first.
+    releaseInert.current?.();
+    releaseInert.current = null;
     returnFocus.current?.focus?.();
   }, []);
 
@@ -141,9 +148,13 @@ export function BagDrawer({
     const id = requestAnimationFrame(() => {
       panel.current?.querySelector<HTMLElement>("button, a")?.focus();
     });
+    // The page behind the bag can't be reached by keyboard or screen reader.
+    releaseInert.current = inertOthers([panel.current, scrim.current]);
     return () => {
       document.removeEventListener("keydown", onKey);
       cancelAnimationFrame(id);
+      releaseInert.current?.();
+      releaseInert.current = null;
     };
   }, [open, dismiss]);
 
@@ -241,6 +252,7 @@ export function BagDrawer({
         className={`cne-bag-scrim${mounted ? " is-in" : ""}`}
         aria-label="Close bag"
         onClick={dismiss}
+        ref={scrim}
       />
       <div
         className={`cne-drawer${mounted ? " is-in" : ""}`}

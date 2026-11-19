@@ -70,6 +70,8 @@ export function SiteFooter() {
                 srcSet={LOGO.srcSet}
                 sizes="(min-width: 901px) 135px, 120px"
                 alt={brand.name}
+                loading="lazy"
+                decoding="async"
                 width={LOGO.width}
                 height={LOGO.height}
                 style={{ aspectRatio: "309 / 87" }}

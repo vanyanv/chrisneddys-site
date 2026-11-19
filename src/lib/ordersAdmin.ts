@@ -223,8 +223,7 @@ async function toAdminDetail(order: OrderWithItems): Promise<AdminOrderDetail> {
     phone: order.phone,
     shipTo: order.shipTo,
     items: order.items
-      .slice()
-      .sort((a, b) => (a.editionNumber ?? 0) - (b.editionNumber ?? 0))
+      .toSorted((a, b) => (a.editionNumber ?? 0) - (b.editionNumber ?? 0))
       .map((item) => {
         const facts = variantFacts.get(item.variantId);
         return {

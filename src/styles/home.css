@@ -471,7 +471,6 @@
     line-height: 0.84;
     letter-spacing: 1px;
     text-shadow: 6px 6px 0 var(--a-ink);
-    animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
   }
   .cne-hero-sub {
     /* 24px is where the WCAG large-text threshold starts, and cream clears 3:1
@@ -480,7 +479,6 @@
     line-height: 1.4;
     margin-top: 26px;
     max-width: 32ch;
-    animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.12s both;
   }
   /* Lands between the subtitle (0.12s) and the buttons (0.22s), so the stack still
      resolves top to bottom rather than the price arriving with the CTA. */
@@ -488,12 +486,10 @@
     font-size: 15px;
     letter-spacing: 0.08em;
     margin-top: 20px;
-    animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
   }
   .cne-cta {
     gap: 16px;
     margin-top: 34px;
-    animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.22s both;
   }
   @keyframes cne-heroin {
     from {
@@ -503,6 +499,20 @@
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cne-hero h1 {
+      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+    }
+    .cne-hero-sub {
+      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.12s both;
+    }
+    .cne-hero-meta {
+      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
+    }
+    .cne-cta {
+      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.22s both;
     }
   }
 

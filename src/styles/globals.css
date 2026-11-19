@@ -7,6 +7,10 @@
    headline set in var(--font-display) falls back to the body font. */
 @import "tailwindcss" source(none);
 
+:root {
+  color-scheme: light;
+}
+
 @theme static {
   --color-cne-red: #e63027;
   --color-cne-red-deep: #b41d14;

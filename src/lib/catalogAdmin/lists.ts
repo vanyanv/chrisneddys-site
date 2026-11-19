@@ -235,8 +235,7 @@ export async function getProductForAdmin(id: string): Promise<AdminProduct | und
     sku: variant?.sku ?? null,
     inventory: summarizeInventory(variant),
     editions: (variant?.editions ?? [])
-      .slice()
-      .sort((a, b) => a.number - b.number)
+      .toSorted((a, b) => a.number - b.number)
       .map((e) => ({ number: e.number, status: e.status })),
   };
 }

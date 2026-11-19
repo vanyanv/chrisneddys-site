@@ -15,3 +15,6 @@ src/data/laGeoPaths.ts
 .claude/worktrees/
 # Written by scripts/build-menu-cards.mjs, one key per line so diffs stay readable.
 src/data/menuPhotoCuts.json
+# Vendored agent skill (modern-web-guidance), kept byte-for-byte as installed.
+.agents/
+skills-lock.json

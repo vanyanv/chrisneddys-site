@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
+import {
+  browserSupportsWebAuthn,
+  browserSupportsWebAuthnAutofill,
+  startAuthentication,
+  WebAuthnAbortService,
+} from "@simplewebauthn/browser";
+import type { AuthenticationResponseJSON } from "@simplewebauthn/browser";
 import { passkeySignInFinishAction, passkeySignInStartAction } from "@/app/(admin)/admin/actions";
 
 /**
@@ -34,7 +40,59 @@ export function PasskeySignIn({ next }: { next: string }) {
     setSupported(browserSupportsWebAuthn());
   }, []);
 
+  // Conditional UI: offer saved passkeys in the email field's autofill list.
+  // Uses the same discoverable-credential options and finish action as the
+  // button. SimpleWebAuthn cancels this pending request when the button starts
+  // its own ceremony; the form's submit and unmount cancel it explicitly.
+  // An aborted or dismissed request is silent.
+  useEffect(() => {
+    let active = true;
+    let finishing = false;
+    (async () => {
+      try {
+        if (!(await browserSupportsWebAuthnAutofill())) return;
+        const start = await passkeySignInStartAction();
+        if (!active || !start.ok) return;
+        const response = await startAuthentication({
+          optionsJSON: start.options,
+          useBrowserAutofill: true,
+        });
+        if (!active) return;
+        finishing = true;
+        setPending(true);
+        await finish(response);
+        setPending(false);
+      } catch {
+        // Aborted (the button took over), dismissed, or unsupported: silent,
+        // and only this path's own "pending" is cleared, never the button's.
+        if (active && finishing) setPending(false);
+      }
+    })();
+    return () => {
+      active = false;
+      WebAuthnAbortService.cancelCeremony();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!supported) return null;
+
+  async function finish(response: AuthenticationResponseJSON) {
+    const result = await passkeySignInFinishAction(response, next);
+    // A successful finish redirects server-side and never returns here —
+    // reaching this line means it didn't.
+    if (typeof result?.retryAfterSeconds === "number") {
+      // The same wording the password form shows for the same lockout
+      // (`SignInForm`), because it is the same throttle on the same
+      // table. Without this a locked-out owner was told their credential
+      // was wrong and left free to keep trying — which is the exact
+      // thing issue #45 was about: warn before the lock, not after.
+      setError("Too many attempts. Try again in a few minutes.");
+      setLocked(true);
+      return;
+    }
+    if (result?.error) setError(result.error);
+  }
 
   async function handleClick() {
     setError(null);
@@ -55,20 +113,7 @@ export function PasskeySignIn({ next }: { next: string }) {
         return;
       }
 
-      const result = await passkeySignInFinishAction(response, next);
-      // A successful finish redirects server-side and never returns here —
-      // reaching this line means it didn't.
-      if (typeof result?.retryAfterSeconds === "number") {
-        // The same wording the password form shows for the same lockout
-        // (`SignInForm`), because it is the same throttle on the same
-        // table. Without this a locked-out owner was told their credential
-        // was wrong and left free to keep trying — which is the exact
-        // thing issue #45 was about: warn before the lock, not after.
-        setError("Too many attempts. Try again in a few minutes.");
-        setLocked(true);
-        return;
-      }
-      if (result?.error) setError(result.error);
+      await finish(response);
     } catch {
       setError("Couldn't sign in with a passkey. Try again, or use your password below.");
     } finally {

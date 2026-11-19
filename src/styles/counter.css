@@ -529,7 +529,7 @@ body {
   color: var(--a-yel);
   border-top: 3px solid var(--a-ink);
   border-bottom: 3px solid var(--a-ink);
-  overflow: hidden;
+  overflow-x: clip;
   padding: 7px 0;
 }
 .cne-mq-track {
@@ -544,8 +544,41 @@ body {
     animation: cne-marquee 24s linear infinite;
   }
 }
-.cne-mq:hover .cne-mq-track {
+.cne-mq:hover .cne-mq-track,
+.cne-mq[data-paused] .cne-mq-track,
+.cne-mq[data-paused] .cne-mq-rider {
   animation-play-state: paused;
+}
+/* Pause/play (WCAG 2.2.2): a 44px hit area at the right end of the band; the
+   visible mark is a small ink patch so the text never runs under the icon. */
+.cne-mq-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--a-yel);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.cne-mq-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0 8px 8px;
+  background: var(--a-ink);
+}
+.cne-mq-toggle svg {
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-mq-toggle {
+    display: none;
+  }
 }
 @keyframes cne-marquee {
   from {

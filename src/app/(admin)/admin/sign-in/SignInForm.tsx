@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { WebAuthnAbortService } from "@simplewebauthn/browser";
 import { useActionState } from "react";
 import { signInAction, type SignInState } from "@/app/(admin)/admin/actions";
 import { signInPolicySummary } from "@/lib/signInPolicy";
@@ -44,7 +45,12 @@ export function SignInForm({
   const locked = typeof state.retryAfterSeconds === "number";
 
   return (
-    <form action={formAction} className="rack-guest-card" noValidate>
+    <form
+      action={formAction}
+      onSubmit={() => WebAuthnAbortService.cancelCeremony()}
+      className="rack-guest-card"
+      noValidate
+    >
       <p className="rack-eyebrow rack-guest-eyebrow">Store room</p>
       <h1 className="rack-bow rack-guest-title">Sign in.</h1>
       <p className="rack-guest-lede">Two owners. Nobody else gets in.</p>
@@ -68,7 +74,7 @@ export function SignInForm({
         <label className="adm-label" htmlFor="email">
           Email
         </label>
-        <input id="email" name="email" type="email" autoComplete="email" required />
+        <input id="email" name="email" type="email" autoComplete="username webauthn" required />
       </div>
 
       <div className="adm-field">

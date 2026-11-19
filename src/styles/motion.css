@@ -139,3 +139,27 @@
     animation: cne-hero-ping 2.2s ease-out infinite;
   }
 }
+
+/* ---- Page-to-page cross-fade ------------------------------------------------
+   src/app/(site)/template.tsx tags each in-site navigation's old and new page
+   `.cne-page`; the browser snapshots them and these rules fade one into the
+   other. Everything else (header, ORDER dock, footer) is the root snapshot and
+   gets the same short cross-fade, which looks still where it hasn't changed.
+   Reduced motion: no animation at all, the new page just appears. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(.cne-page),
+  ::view-transition-new(.cne-page) {
+    animation-duration: 0.18s;
+    animation-timing-function: ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

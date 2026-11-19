@@ -169,7 +169,7 @@ export function SiteFooter() {
           <span>
             © {new Date().getFullYear()} {brand.name}
           </span>
-          <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: 18 }}>
+          <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: "1.125rem" }}>
             Sliders
           </span>
           <FooterTag />

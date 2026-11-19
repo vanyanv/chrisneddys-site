@@ -60,7 +60,7 @@ export function OpenLateNight({ loc, hood }: { loc: Location; hood: string }) {
           <svg key={idx} x={`${n.x}%`} y={`${n.y}%`} overflow="visible">
             <text
               transform={`rotate(${n.rot})`}
-              style={{ fontSize: `${Math.round(n.scale * 26)}px`, "--i": n.i } as NumStyle}
+              style={{ fontSize: `${Math.round(n.scale * 26) / 16}rem`, "--i": n.i } as NumStyle}
             >
               {n.text}
             </text>

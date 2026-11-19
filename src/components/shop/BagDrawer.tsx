@@ -320,10 +320,14 @@ export function BagDrawer({
                   className="cne-fulfil"
                   style={{ border: 0, padding: 0, margin: "0 0 12px" }}
                 >
-                  <legend style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, padding: 0 }}>
+                  <legend
+                    style={{ fontSize: "0.8125rem", fontWeight: 700, marginBottom: 6, padding: 0 }}
+                  >
                     How do you want it?
                   </legend>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                  <label
+                    style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.875rem" }}
+                  >
                     <input
                       type="radio"
                       name="cne-fulfilment"
@@ -338,7 +342,7 @@ export function BagDrawer({
                       display: "flex",
                       alignItems: "center",
                       gap: 8,
-                      fontSize: 14,
+                      fontSize: "0.875rem",
                       marginTop: 4,
                     }}
                   >

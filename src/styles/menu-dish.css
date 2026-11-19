@@ -33,7 +33,7 @@
   z-index: 2;
   left: -6px;
   top: -10px;
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 3px 8px;
 }
 .cne-lead-ph {
@@ -64,12 +64,12 @@
 }
 .cne-lead-body .n {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.05;
   text-wrap: balance;
 }
 .cne-lead-body .d {
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   line-height: 1.4;
 }
 .cne-lead-body .ft {
@@ -82,14 +82,14 @@
 }
 .cne-lead-body .p {
   font-family: var(--font-mono);
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 .cne-lead-body .cta,
 .cne-dish-cta {
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--a-ink);
   background: var(--a-yel);
   border: 2px solid #fff2c9;
@@ -165,7 +165,7 @@
   padding: 9px 10px 10px;
 }
 .cne-dish-body .n {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -173,7 +173,7 @@
    every card opens has it in full. */
 .cne-dish-body .d {
   display: none;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.35;
   color: var(--a-sub);
 }
@@ -181,7 +181,7 @@
   margin-top: auto;
   padding-right: 34px;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -198,7 +198,7 @@
   left: -5px;
   top: -9px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--a-ink);
@@ -232,7 +232,7 @@
 }
 .cne-dish.is-lead .n {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 400;
   line-height: 1.05;
   text-wrap: balance;
@@ -245,12 +245,12 @@
   overflow: hidden;
 }
 .cne-dish.is-lead .p {
-  font-size: 19px;
+  font-size: 1.1875rem;
   padding-right: 0;
 }
 .cne-dish.is-lead .cne-dish-cta {
   align-self: flex-start;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   padding: 6px 9px;
   border-color: var(--a-ink);
   box-shadow: 2px 2px 0 var(--a-ink);
@@ -295,20 +295,20 @@
     padding: 18px 20px;
   }
   .cne-dish.is-lead .n {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
   .cne-dish.is-lead .d {
     -webkit-line-clamp: 4;
     line-clamp: 4;
-    font-size: 14.5px;
+    font-size: 0.90625rem;
     max-width: 48ch;
   }
   .cne-dish.is-lead .p {
     margin-top: 8px;
-    font-size: 21px;
+    font-size: 1.3125rem;
   }
   .cne-dish.is-lead .cne-dish-cta {
-    font-size: 14px;
+    font-size: 0.875rem;
     padding: 8px 12px;
   }
   .cne-lead-card {
@@ -325,16 +325,16 @@
     padding: 24px;
   }
   .cne-lead-body .n {
-    font-size: 34px;
+    font-size: 2.125rem;
   }
   .cne-lead-body .d {
-    font-size: 15.5px;
+    font-size: 0.96875rem;
   }
   .cne-lead-body .p {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
   .cne-lead-body .cta {
-    font-size: 16px;
+    font-size: 1rem;
     padding: 10px 16px;
   }
 }
@@ -345,7 +345,7 @@
     aspect-ratio: 16 / 10;
   }
   .cne-lead-body .n {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 }
 
@@ -354,7 +354,7 @@
     margin-bottom: 20px;
   }
   .cne-lead-body .n {
-    font-size: clamp(30px, 2.9vw, 42px);
+    font-size: clamp(1.875rem, 2.9vw, 2.625rem);
   }
   .cne-dish-grid {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -368,7 +368,7 @@
     padding: 12px 14px 14px;
   }
   .cne-dish-body .n {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .cne-dish-body .d {
     display: -webkit-box;
@@ -378,7 +378,7 @@
     overflow: hidden;
   }
   .cne-dish-body .p {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .cne-dish .cne-chev {
     right: 12px;
@@ -388,10 +388,10 @@
     margin-bottom: 20px;
   }
   .cne-dish.is-lead .n {
-    font-size: 34px;
+    font-size: 2.125rem;
   }
   .cne-dish.is-lead .d {
-    font-size: 16px;
+    font-size: 1rem;
   }
   /* The drinks list under the shakes. */
   .cne-dish-grid + .cne-menu-grid {

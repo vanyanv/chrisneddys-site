@@ -80,10 +80,10 @@ html.cne-intro-gate .cne-intro-overlay.is-out * {
 
 .cne-intro-skip {
   position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
+  right: 1.3125rem;
+  bottom: 1.3125rem;
   z-index: 9600;
-  font: 700 13px/1 var(--font-body);
+  font: 700 0.8125rem/1 var(--font-body);
   color: var(--color-cne-ink);
   background: var(--color-cne-cream);
   border: 2px solid var(--color-cne-ink);

@@ -104,7 +104,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
     <form onSubmit={onSubmit} noValidate style={{ marginTop: 14, maxWidth: "42ch" }}>
       <label
         htmlFor={`notify-${hood}`}
-        style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}
+        style={{ display: "block", fontSize: "0.8125rem", fontWeight: 700, marginBottom: 6 }}
       >
         Know when {hood} opens
       </label>
@@ -156,7 +156,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
         <p
           id={`notify-err-${hood}`}
           role="alert"
-          style={{ margin: "8px 0 0", fontSize: 13, color: "var(--a-red, #e63027)" }}
+          style={{ margin: "8px 0 0", fontSize: "0.8125rem", color: "var(--a-red, #e63027)" }}
         >
           {error} You can always reach us at{" "}
           <a href={`mailto:${brand.email}`} style={{ color: "inherit" }}>
@@ -166,7 +166,7 @@ export function OpeningNotify({ hood }: { hood: string }) {
         </p>
       )}
 
-      <p style={{ margin: "8px 0 0", fontSize: 12, opacity: 0.7 }}>
+      <p style={{ margin: "8px 0 0", fontSize: "0.75rem", opacity: 0.7 }}>
         One email, when the doors open. No newsletter.
       </p>
     </form>

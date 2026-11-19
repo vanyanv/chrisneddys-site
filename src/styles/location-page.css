@@ -36,7 +36,7 @@
    cream (3.75:1) both fell short of 4.5:1 there (issue #261). */
 .cne-lp-crumb {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -55,7 +55,7 @@
 
 .cne-lp-eyebrow {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -66,7 +66,7 @@
 .cne-lp-hero h1 {
   font-family: var(--font-display);
   /* 13cqi fits "Hollywood." (the longest name) on one line in any panel. */
-  font-size: clamp(36px, 13cqi, 88px);
+  font-size: clamp(2.25rem, 13cqi, 5.5rem);
   white-space: nowrap;
   line-height: 0.9;
   letter-spacing: 0.5px;
@@ -89,7 +89,7 @@
 .cne-lp-addr {
   font-family: var(--font-mono);
   font-style: normal;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
   letter-spacing: 0.04em;
   color: var(--a-cream);
@@ -102,7 +102,7 @@
   color: var(--a-cream);
   border: 2.5px solid var(--a-ink);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.9;
   font-variant-numeric: tabular-nums;
 }
@@ -130,7 +130,7 @@
   color: var(--a-ink);
   border: 2.5px dashed var(--a-ink);
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -145,7 +145,7 @@
   margin-top: 18px;
 }
 .cne-lp-btns .cne-big {
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 15px 12px;
 }
 .cne-lp-minis {
@@ -153,7 +153,7 @@
   gap: 8px;
 }
 .cne-lp-minis .cne-mini {
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 11px 6px;
   box-shadow: 3px 3px 0 var(--a-ink);
 }
@@ -164,7 +164,7 @@
 
 .cne-lp-note {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 12px 0 0;
@@ -298,7 +298,7 @@
   color: var(--a-cream);
   opacity: 0.9;
   max-width: 62ch;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 /* Two paragraphs: without this they ran together as one block. */
 .cne-lp-night .cne-lede + .cne-lede {
@@ -326,7 +326,7 @@
 }
 .cne-lp-night-numbers text {
   font-family: var(--font-marker), var(--font-bowlby), cursive;
-  font-size: 13px;
+  font-size: 0.8125rem;
   fill: var(--a-lime);
   --num-op: 0.18;
   opacity: var(--num-op);
@@ -371,7 +371,7 @@
 /* ---- menu + notify -------------------------------------------------------- */
 .cne-lp-prose {
   max-width: 62ch;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -387,13 +387,13 @@
   padding: 20px 15px 18px;
 }
 .cne-notify-email {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 /* iOS zooms the page into a text box under 16px on tap, in every iPhone
    browser; iPhone and iPad only (see the same rule in admin.css). */
 @supports (-webkit-touch-callout: none) {
   .cne-notify-email {
-    font-size: 16px;
+    font-size: 1rem;
   }
 }
 .cne-lp-notify-mon {
@@ -487,11 +487,11 @@
     justify-content: center;
   }
   .cne-lp-crumb {
-    font-size: 12px;
+    font-size: 0.75rem;
     margin-bottom: 22px;
   }
   .cne-lp-eyebrow {
-    font-size: 13px;
+    font-size: 0.8125rem;
     letter-spacing: 0.24em;
     margin-bottom: 8px;
   }
@@ -503,16 +503,16 @@
     background-size: 22px 22px;
   }
   .cne-lp-addr {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .cne-lp-hrs {
-    font-size: 13px;
+    font-size: 0.8125rem;
     max-width: 420px;
     padding: 12px 16px;
     margin-top: 20px;
   }
   .cne-lp-ticket {
-    font-size: 19px;
+    font-size: 1.1875rem;
     padding: 12px 18px;
   }
   .cne-lp-btns {
@@ -523,7 +523,7 @@
   }
   .cne-lp-btns .cne-big {
     flex: none;
-    font-size: 17px;
+    font-size: 1.0625rem;
     padding: 18px 26px;
     border-width: 3px;
     box-shadow: 6px 6px 0 var(--a-ink);
@@ -534,7 +534,7 @@
   }
   .cne-lp-minis .cne-mini {
     flex: none;
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -564,7 +564,7 @@
     padding: 56px 44px 60px;
   }
   .cne-lp-night .cne-lede {
-    font-size: 17px;
+    font-size: 1.0625rem;
   }
   .cne-lp-night-mon {
     width: 120px;
@@ -655,7 +655,7 @@
   justify-content: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: 0.08em;
   margin: 16px 0 0;
 }

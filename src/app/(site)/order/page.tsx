@@ -223,7 +223,7 @@ export default function OrderPage() {
                   borderTop: i === 0 ? "none" : "1px solid var(--a-line)",
                 }}
               >
-                <span style={{ fontSize: 13, lineHeight: 1.4 }}>
+                <span style={{ fontSize: "0.8125rem", lineHeight: 1.4 }}>
                   <strong>{loc.neighbourhood.toUpperCase()}</strong> —{" "}
                   {loc.openingAnnouncement
                     ? `${loc.openingAnnouncement} at ${loc.address}, ${loc.city}, ${loc.region} ${loc.postal}`
@@ -264,7 +264,7 @@ export default function OrderPage() {
           if (apps.length === 0) return null;
           return (
             <div key={loc.id} style={{ marginTop: 16 }}>
-              <h3 style={{ fontSize: 14, margin: "0 0 8px" }}>{loc.neighbourhood}</h3>
+              <h3 style={{ fontSize: "0.875rem", margin: "0 0 8px" }}>{loc.neighbourhood}</h3>
               <div className="cne-loc-btns" data-surface="order-page" data-location={slugFor(loc)}>
                 {apps.map((platform) => (
                   <a
@@ -289,11 +289,11 @@ export default function OrderPage() {
         <dl style={{ maxWidth: "62ch", margin: "14px 0 0" }}>
           {FAQ.map(({ q, a }) => (
             <div key={q} style={{ marginTop: 16 }}>
-              <dt style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.4 }}>{q}</dt>
+              <dt style={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.4 }}>{q}</dt>
               <dd
                 style={{
                   margin: "5px 0 0",
-                  fontSize: 14,
+                  fontSize: "0.875rem",
                   lineHeight: 1.6,
                   color: "var(--a-sub)",
                 }}

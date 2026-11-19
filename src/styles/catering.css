@@ -19,7 +19,7 @@
 .cne-cat-k {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -31,7 +31,7 @@
   margin: 10px 0 14px;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(46px, 9vw, 112px);
+  font-size: clamp(2.875rem, 9vw, 7rem);
   line-height: 0.86;
   text-transform: uppercase;
   text-wrap: balance;
@@ -45,7 +45,7 @@
   z-index: 2;
   max-width: 40ch;
   margin: 0;
-  font-size: clamp(15px, 1.6vw, 20px);
+  font-size: clamp(0.9375rem, 1.6vw, 1.25rem);
   line-height: 1.45;
 }
 .cne-cat-cta {
@@ -59,7 +59,7 @@
 }
 .cne-cat-cta .cne-big {
   flex: 1.4;
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 15px 12px;
 }
 /* The monsters stand along the bottom edge with their chins below the floor,
@@ -126,7 +126,7 @@
   margin: 6px 0 22px;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(34px, 5vw, 64px);
+  font-size: clamp(2.125rem, 5vw, 4rem);
   line-height: 0.95;
 }
 .cne-cat-steps {
@@ -153,7 +153,7 @@
   width: 52px;
   height: 52px;
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 1.625rem;
   line-height: 1;
   background: var(--a-yel);
   border: 2.5px solid var(--a-ink);
@@ -164,11 +164,11 @@
   margin-bottom: 3px;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 19px;
+  font-size: 1.1875rem;
   line-height: 1.05;
 }
 .cne-cat-steps b + span {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.45;
   color: var(--a-sub);
 }
@@ -201,7 +201,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(30px, 4.4vw, 56px);
+  font-size: clamp(1.875rem, 4.4vw, 3.5rem);
   line-height: 0.95;
 }
 .cne-cat-endcard .scr {
@@ -215,7 +215,7 @@
   transform-origin: left;
 }
 .cne-cat-endcard .cne-big {
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 15px 22px;
 }
 .cne-cat-peek {

@@ -34,17 +34,22 @@ body {
   background: var(--color-cne-paper);
   color: var(--color-cne-ink);
   font-family: var(--font-body);
-  /* The prototype's page is 14px/1.6, not Tailwind preflight's 16px/1.5. Almost
-     every element sets its own size, but the ones that don't — flex rows, the
-     card footer — inherit this, and the difference showed up as a pixel or two
-     on prices, eyebrows, the marquee and card heights. */
-  font-size: 14px;
   line-height: 1.6;
   /* Belt-and-braces: no single element should ever be able to widen the page
      past the viewport on mobile. `clip`, not `hidden` — `hidden` here would
      turn html/body into a scroll container and break every `position: sticky`
      descendant (the header, the item-sheet header, ...); `clip` doesn't. */
   overflow-x: clip;
+}
+
+/* The prototype's page is 14px/1.6, not Tailwind preflight's 16px/1.5. Almost
+   every element sets its own size, but the ones that don't — flex rows, the
+   card footer — inherit this, and the difference showed up as a pixel or two
+   on prices, eyebrows, the marquee and card heights. Set on body, in rem, and
+   never on html: the root has to stay at the reader's own text-size setting
+   for every rem on the site to follow it. */
+body {
+  font-size: 0.875rem;
 }
 
 *,
@@ -190,7 +195,7 @@ body .cne-quote a {
 }
 .cne-map-label {
   font-family: var(--font-mono);
-  font-size: 5.4px;
+  font-size: 0.3375rem;
   letter-spacing: 0.85px;
   font-weight: 700;
   fill: var(--a-sub);
@@ -202,7 +207,7 @@ body .cne-quote a {
 }
 .cne-map-attr {
   font-family: var(--font-mono);
-  font-size: 4.4px;
+  font-size: 0.275rem;
   letter-spacing: 0.4px;
   fill: var(--a-sub);
   opacity: 0.75;
@@ -212,7 +217,7 @@ body .cne-quote a {
 }
 .cne-map-shield text {
   font-family: var(--font-mono);
-  font-size: 5.6px;
+  font-size: 0.35rem;
   font-weight: 800;
   fill: var(--a-cream);
   text-anchor: middle;
@@ -254,7 +259,7 @@ body .cne-quote a {
 .cne-map-pin .cap {
   font-family: var(--font-mono);
   /* PIN.capSize in mapLayout.ts, which reserves the room for it. */
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   font-weight: 800;
   letter-spacing: 0.9px;
   fill: var(--a-fg);
@@ -291,7 +296,7 @@ body .cne-quote a {
     bottom: 10px;
     right: 10px;
     padding: 6px 9px !important;
-    font-size: 9px !important;
+    font-size: 0.5625rem !important;
     gap: 4px !important;
     box-shadow: 2px 2px 0 var(--color-cne-ink) !important;
     border-width: 2px !important;

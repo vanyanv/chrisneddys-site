@@ -19,7 +19,6 @@ import { avifSrcSet } from "@/lib/productImage";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { BuyProvider, BuyRow, StickyBuy } from "@/components/shop/ProductBuy";
 import { JsonLdScript } from "@/components/shared/JsonLd";
-import { MarqueeToggle } from "@/components/counter/MarqueeToggle";
 import { productLd } from "@/lib/merchLd";
 import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 import { resolveProductSeo } from "@/lib/productSeo";
@@ -136,15 +135,16 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       />
 
       {/* Only things that are true about the product go past on the reel. */}
-      <div className="cne-mq cne-pdp-mq">
-        <div className="cne-mq-track" aria-hidden="true">
+      {/* This reel runs once (about 5 s) and stops, so unlike the home
+          marquee it needs no pause button (WCAG 2.2.2's limit is 5 s). */}
+      <div className="cne-mq cne-pdp-mq" aria-hidden="true">
+        <div className="cne-mq-track">
           {[...Array(2)].flatMap((_, pass) =>
             reel
               .flatMap((word) => [word, "★"])
               .map((word, i) => <span key={`${pass}-${i}`}>{word}</span>),
           )}
         </div>
-        <MarqueeToggle />
       </div>
 
       <BuyProvider

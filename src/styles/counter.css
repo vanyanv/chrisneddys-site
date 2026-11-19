@@ -4,7 +4,7 @@
  * The prototype rendered a phone and a desktop browser side by side, so it
  * carried two parallel class sets (.hero/.dhero, .sec/.dsec, .item/.ditem).
  * A real site has one DOM, so those pairs are merged here: the base rules are
- * the phone values and `@media (min-width: 901px)` carries the desktop ones.
+ * the phone values and `@media (min-width: 56.3125em)` carries the desktop ones.
  * Values are ported verbatim — this file is the reference for pixel parity.
  *
  * Sitewide only. What one page draws sits beside this file and is loaded by
@@ -17,7 +17,7 @@
 @import "./tokens.css";
 
 /* Above 901px the tab strip folds into the nav row and the header loses 9px. */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   :root {
     --cne-stuck: 95px;
   }
@@ -99,7 +99,7 @@ body {
 
 .cne-orderbtn {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
   background: var(--a-yel);
   color: var(--a-ink);
@@ -176,7 +176,7 @@ body {
   background: var(--stat-fill);
   color: var(--stat-text);
   font-family: var(--font-display);
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   letter-spacing: 0.02em;
   transition:
     background 0.3s,
@@ -193,7 +193,7 @@ body {
   color: var(--stat-inv-text);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 9px;
+  font-size: 0.5625rem;
   letter-spacing: 0.05em;
   transition:
     background 0.3s,
@@ -243,7 +243,7 @@ body {
 .cne-tab {
   flex: 1;
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 0.11em;
   padding: 10px 4px;
   /* Five equal tabs on a 390px phone leave ~70px of content box each, and
@@ -307,9 +307,9 @@ body {
    sits at the floor) and lets it grow toward 13px as the strip widens past
    ~460px, all the way through the 600-900px tablet tier. `min-height` is a
    flat 44px rather than something padding has to add up to, so it holds at
-   every size in between. The short-landscape query below (max-height: 500px)
+   every size in between. The short-landscape query below (max-height: 31.25em)
    still trims this down further — that header is deliberately slimmer. */
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-tab.cne-tab-home {
     display: none;
   }
@@ -318,7 +318,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 44px;
-    font-size: clamp(11.5px, 3vw, 13px);
+    font-size: clamp(0.71875rem, 3vw, 0.8125rem);
     letter-spacing: 0.01em;
     padding: 8px 3px;
   }
@@ -362,7 +362,7 @@ body {
    muted brown (#7a6f5e, 4.65:1 on the cream). */
 .cne-logo-tag {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   color: var(--a-muted);
@@ -380,7 +380,7 @@ body {
 }
 /* STORE under the mark. The tracking trails the last letter, so the same
    amount of indent on the left keeps the word on the mark's centre. */
-@media (max-width: 480px), (min-width: 901px) and (max-width: 1439px) {
+@media (max-width: 30em), (min-width: 56.3125em) and (max-width: 89.9375em) {
   .cne-header.is-shop .cne-logo {
     flex-direction: column;
     align-items: center;
@@ -390,23 +390,23 @@ body {
     text-indent: 0.14em;
   }
 }
-@media (max-width: 480px) {
+@media (max-width: 30em) {
   .cne-header.is-shop .cne-nav img {
     height: 27px;
   }
   .cne-logo-tag {
-    font-size: 9px;
+    font-size: 0.5625rem;
   }
 }
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-header.is-shop .cne-nav img {
     height: 20px;
   }
   .cne-logo-tag {
-    font-size: 9px;
+    font-size: 0.5625rem;
   }
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-header.is-shop {
     background: var(--a-bg);
   }
@@ -417,7 +417,7 @@ body {
     height: 40px;
   }
   .cne-logo-tag {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   /* The current tab's cream box would vanish into a cream bar, so on the
      shop it is the order button's yellow instead. */
@@ -426,18 +426,18 @@ body {
     color: var(--a-ink);
   }
 }
-@media (min-width: 901px) and (max-width: 1339px) {
+@media (min-width: 56.3125em) and (max-width: 83.6875em) {
   .cne-header.is-shop .cne-nav img {
     height: 29px;
   }
   .cne-logo-tag {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
 }
 
 .cne-big {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   border: 2.5px solid var(--a-ink);
   padding: 13px 10px;
@@ -468,7 +468,7 @@ body {
    as body copy. Focus ring comes from the sitewide `:focus-visible` rule. */
 .cne-hero-menu {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   color: var(--a-cream);
   text-decoration: underline;
@@ -512,10 +512,10 @@ body {
 /* ---- tablet tier: hero (600-900) ----------------------------------------
    The two-column shape starts here rather than at desktop: panel and photo
    side by side, split by the same seam turned vertical, at smaller type. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-big,
   .cne-hero-menu {
-    font-size: 12.5px;
+    font-size: 0.78125rem;
   }
   .cne-big {
     padding: 14px 10px;
@@ -529,14 +529,14 @@ body {
   color: var(--a-yel);
   border-top: 3px solid var(--a-ink);
   border-bottom: 3px solid var(--a-ink);
-  overflow: hidden;
+  overflow-x: clip;
   padding: 7px 0;
 }
 .cne-mq-track {
   display: flex;
   width: max-content;
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -544,8 +544,47 @@ body {
     animation: cne-marquee 24s linear infinite;
   }
 }
-.cne-mq:hover .cne-mq-track {
+/* Hover pause only where there is a real hover: on a phone a tap leaves
+   :hover stuck and would freeze the band with no way to tell why. */
+@media (hover: hover) {
+  .cne-mq:hover .cne-mq-track {
+    animation-play-state: paused;
+  }
+}
+.cne-mq[data-paused] .cne-mq-track,
+.cne-mq[data-paused] .cne-mq-rider {
   animation-play-state: paused;
+}
+/* Pause/play (WCAG 2.2.2): a 44px hit area at the right end of the band; the
+   visible mark is a small ink patch so the text never runs under the icon. */
+.cne-mq-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--a-yel);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.cne-mq-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0 8px 8px;
+  background: var(--a-ink);
+}
+.cne-mq-toggle svg {
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cne-mq-toggle {
+    display: none;
+  }
 }
 @keyframes cne-marquee {
   from {
@@ -566,7 +605,7 @@ body {
 }
 .cne-eyebrow {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
@@ -576,7 +615,7 @@ body {
 .cne-sec h1,
 .cne-sec h2 {
   font-family: var(--font-display);
-  font-size: 23px;
+  font-size: 1.4375rem;
   margin: 0 0 10px;
   line-height: 1;
   position: relative;
@@ -614,7 +653,7 @@ body {
   height: 18px;
   margin: 0 0 6px;
 }
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
   .cne-op-glyphrow {
     width: 126px;
     height: 14px;
@@ -626,7 +665,7 @@ body {
   display: inline-block;
   font-family: var(--font-marker), var(--font-bowlby), Impact, sans-serif;
   font-weight: 400;
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: normal;
   text-transform: none;
   color: var(--a-ink);
@@ -670,7 +709,7 @@ body {
 .cne-way .t {
   display: block;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
 }
 /* Was 9px. This is prose — "Lettuce, tomato, sauce, raw onion" — not a mono
@@ -678,7 +717,7 @@ body {
    the row description to 12.5px; the sheet is where people actually decide. */
 .cne-way .s {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--a-sub);
   margin-top: 4px;
@@ -728,7 +767,7 @@ body {
 .cne-loc-rail > .cne-loc {
   margin-bottom: 0;
 }
-@media (max-width: 599px) {
+@media (max-width: 37.4375em) {
   .cne-loc-rail.is-multi {
     /* The scroller's width comes from its column, never from the cards in
        it; without this the home page's grid cell grew to fit both cards. */
@@ -771,7 +810,7 @@ body {
 .cne-loc h3,
 .cne-loc h2.cne-loc-name {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 1.1875rem;
   margin: 0;
   line-height: 1;
   position: static;
@@ -788,7 +827,7 @@ body {
   box-sizing: border-box;
 }
 .cne-loc-addr {
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.45;
   margin-top: 7px;
 }
@@ -812,7 +851,7 @@ body {
   font-family: var(--font-mono);
   /* Hours are one of the three facts a phone visitor came for; 12px is the
      floor for them (they were 10px). Desktop steps up to 12.5px below. */
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.9;
   margin-top: 8px;
   color: var(--a-sub);
@@ -823,7 +862,7 @@ body {
 }
 .cne-loc-note {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -840,7 +879,7 @@ body {
   font-family: var(--font-display);
   /* 12px is the phone floor for a label someone has to read before they tap
      it (issue #261; was 10px). Desktop steps up to 13px below. */
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   border: 2px solid var(--a-ink);
   padding: 10px 6px;
@@ -878,7 +917,7 @@ body {
   border-bottom: 3px solid var(--a-ink);
   padding: 9px 15px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -932,14 +971,14 @@ body {
 }
 .cne-dock-msg .t {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   font-weight: 700;
   color: var(--a-yel);
 }
 .cne-dock-msg .s {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -947,7 +986,7 @@ body {
 }
 .cne-dockbtn {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
   background: var(--a-yel);
   color: var(--a-ink);
@@ -968,7 +1007,7 @@ body {
    vertical padding here (tabs stay >=36px tall, still a real tap target,
    overriding the flat 44px the width-only query above sets) and the dock
    steps aside. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   :root {
     --cne-stuck: 86px;
   }
@@ -980,7 +1019,7 @@ body {
   }
   .cne-orderbtn {
     padding: 11px 9px;
-    font-size: 10px;
+    font-size: 0.625rem;
   }
   .cne-header .cne-stat-a,
   .cne-header .cne-stat-b {
@@ -989,7 +1028,7 @@ body {
   .cne-tab {
     min-height: 36px;
     padding: 6px 3px;
-    font-size: clamp(11.5px, 2.4vw, 12.5px);
+    font-size: clamp(0.71875rem, 2.4vw, 0.78125rem);
   }
   /* The header's own Order button is on screen the whole time, so on a
      landscape phone the dock is a second copy of it standing on the little
@@ -1060,7 +1099,7 @@ body {
   flex-direction: column;
   gap: 22px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.6;
 }
 /* Everything the footer actually says lives in this stacking layer, above the
@@ -1134,7 +1173,7 @@ body {
    page's own outline and has no business adding levels to it. */
 .cne-foot-h {
   margin: 0 0 10px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1186,7 +1225,7 @@ body {
   border-top: 1px solid var(--a-foot-rule);
   padding-top: 14px;
   color: var(--a-foot-sub);
-  font-size: 12px;
+  font-size: 0.75rem;
   /* Wraps rather than crushing on a 320px handset, where the copyright line and
      the policy link together outrun the column. */
   display: flex;
@@ -1212,7 +1251,7 @@ body {
    repeating its own "Coming soon" block. Scoped to phone only — the tablet
    and desktop tiers below already lay the same three top-level pieces out as
    real columns and are untouched. */
-@media (max-width: 599px) {
+@media (max-width: 37.4375em) {
   .cne-foot {
     padding: 18px 15px;
   }
@@ -1247,7 +1286,7 @@ body {
    shape as desktop's, fix that; `.cne-foot-counters` is already
    `auto-fit`/`minmax` unconditionally, so it already lays out 2-3 columns in
    this range on its own. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-foot {
     padding: 30px 28px;
   }
@@ -1281,22 +1320,22 @@ body {
 /* Every step below is scoped to the header's tag. It is the only one with a
    width problem — the tags on the location cards have a whole card to sit in
    and keep their words at every size. */
-@media (max-width: 480px) {
+@media (max-width: 30em) {
   /* "LAST CALL" becomes "LAST". The tag is yellow with a deep red dot by then,
      and the cell beside it is counting minutes down. */
   .cne-stat.is-head .cne-stat-rest {
     display: none;
   }
 }
-@media (max-width: 390px) {
+@media (max-width: 24.375em) {
   .cne-stat.is-head .cne-stat-a {
-    font-size: 8.5px;
+    font-size: 0.53125rem;
     padding: 9.5px 7px;
     gap: 4px;
     min-width: 38px;
   }
   .cne-stat.is-head .cne-stat-b {
-    font-size: 8px;
+    font-size: 0.5rem;
     padding: 9.5px 7px;
     min-width: 40px;
   }
@@ -1305,7 +1344,7 @@ body {
     height: 5px;
   }
 }
-@media (max-width: 360px) {
+@media (max-width: 22.5em) {
   .cne-stat.is-head .cne-stat-a {
     padding-left: 6px;
     padding-right: 6px;
@@ -1345,7 +1384,7 @@ body {
     letter-spacing: 0;
   }
 }
-@media (max-width: 330px) {
+@media (max-width: 20.625em) {
   .cne-stat.is-head.is-soon .cne-stat-a,
   .cne-stat.is-head.is-soon .cne-stat-b {
     padding-left: 3px;
@@ -1356,7 +1395,7 @@ body {
 /* =========================================================================
    Desktop — the prototype's 1440px frame.
    ========================================================================= */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-header {
     display: flex;
     align-items: center;
@@ -1394,13 +1433,13 @@ body {
   }
 
   .cne-stat-a {
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 11px 13px;
     gap: 8px;
     min-width: 0;
   }
   .cne-stat-b {
-    font-size: 11px;
+    font-size: 0.6875rem;
     padding: 11px 13px;
     min-width: 0;
   }
@@ -1417,13 +1456,13 @@ body {
     box-shadow: 3px 3px 0 var(--a-ink);
   }
   .cne-stat.is-head .cne-stat-a {
-    font-size: 14px;
+    font-size: 0.875rem;
     padding: 15px 14px;
     min-width: 78px;
     justify-content: flex-start;
   }
   .cne-stat.is-head .cne-stat-b {
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     padding: 15px 14px;
     border-left-width: 3px;
     letter-spacing: 0.08em;
@@ -1433,7 +1472,7 @@ body {
     display: inline;
   }
   .cne-orderbtn {
-    font-size: 15px;
+    font-size: 0.9375rem;
     padding: 14px 22px;
     border-width: 3px;
     box-shadow: 5px 5px 0 var(--a-ink);
@@ -1459,7 +1498,7 @@ body {
   }
   .cne-tab {
     flex: none;
-    font-size: 13px;
+    font-size: 0.8125rem;
     /* Six tabs, not five: the run has to end before the centred wordmark
        starts, and the wordmark is positioned against the header rather than
        laid out in the row, so nothing pushes it out of the way — the tabs run
@@ -1485,7 +1524,7 @@ body {
     box-shadow: 4px 4px 0 var(--a-ink);
   }
   .cne-big {
-    font-size: 19px;
+    font-size: 1.1875rem;
     padding: 22px 34px;
     border-width: 4px;
     box-shadow: 7px 7px 0 var(--a-ink);
@@ -1499,7 +1538,7 @@ body {
     box-shadow: 10px 10px 0 var(--a-ink);
   }
   .cne-hero-menu {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .cne-mq {
     padding: 13px 0;
@@ -1507,7 +1546,7 @@ body {
     border-bottom-width: 4px;
   }
   .cne-mq-track {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
   @media (prefers-reduced-motion: no-preference) {
     .cne-mq-track {
@@ -1526,12 +1565,12 @@ body {
     border-bottom: 4px solid var(--a-ink);
   }
   .cne-eyebrow {
-    font-size: 13px;
+    font-size: 0.8125rem;
     letter-spacing: 0.24em;
   }
   .cne-sec h1,
   .cne-sec h2 {
-    font-size: 52px;
+    font-size: 3.25rem;
     margin: 8px 0 0;
     line-height: 0.95;
     padding-bottom: 14px;
@@ -1565,10 +1604,10 @@ body {
     transform: translateX(3px);
   }
   .cne-way .t {
-    font-size: 16px;
+    font-size: 1rem;
   }
   .cne-way .s {
-    font-size: 13px;
+    font-size: 0.8125rem;
     margin-top: 4px;
   }
 
@@ -1585,20 +1624,20 @@ body {
   }
   .cne-loc h3,
   .cne-loc h2.cne-loc-name {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
   .cne-loc-addr {
-    font-size: 15px;
+    font-size: 0.9375rem;
     margin-top: 10px;
     line-height: 1.5;
   }
   .cne-loc-hrs {
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     line-height: 2;
     margin-top: 12px;
   }
   .cne-loc-note {
-    font-size: 12px;
+    font-size: 0.75rem;
     margin-top: 9px;
   }
   .cne-loc-btns {
@@ -1606,7 +1645,7 @@ body {
     margin-top: 16px;
   }
   .cne-mini {
-    font-size: 13px;
+    font-size: 0.8125rem;
     border-width: 3px;
     padding: 13px 8px;
   }
@@ -1616,14 +1655,14 @@ body {
     display: none;
   }
   .cne-lastcall {
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 12px 44px;
   }
 
   .cne-foot {
     padding: 36px 44px;
     gap: 26px;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .cne-foot-top {
     grid-template-columns: 1.3fr 0.8fr 0.8fr;
@@ -1641,7 +1680,7 @@ body {
     gap: 40px;
   }
   .cne-foot-legal {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 }
 
@@ -1713,7 +1752,7 @@ body {
   grid-column: 2;
   grid-row: 1;
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 800;
   line-height: 1.22;
   margin: 0;
@@ -1722,7 +1761,7 @@ body {
 .cne-card-desc {
   grid-column: 2;
   grid-row: 2;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--a-sub);
   margin: 3px 0 0;
@@ -1739,7 +1778,7 @@ body {
   display: block;
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-cardgrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1795,13 +1834,13 @@ body {
   .cne-card h3,
   .cne-card-name {
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: 1.25rem;
     line-height: 1.08;
     font-weight: 700;
   }
   .cne-card p,
   .cne-card-desc {
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.45;
     flex: 1;
     -webkit-line-clamp: 4;
@@ -1817,7 +1856,7 @@ body {
     color: var(--a-ink);
     border: 3px solid var(--a-ink);
     font-family: var(--font-display);
-    font-size: 12px;
+    font-size: 0.75rem;
     letter-spacing: 0.08em;
     padding: 6px 12px;
     transition: transform 0.28s cubic-bezier(0.2, 1.3, 0.4, 1);
@@ -1856,7 +1895,7 @@ body {
    row (two across left the third card alone on a half-empty row). `.cne-cardgrid`
    is `position: relative` (home-art.css) and stays the ribbon's containing
    block at any column count, so `.cne-card-rib` needs nothing extra here. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-cardgrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1899,13 +1938,13 @@ body {
   .cne-card h3,
   .cne-card-name {
     font-family: var(--font-display);
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.1;
     font-weight: 700;
   }
   .cne-card p,
   .cne-card-desc {
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     line-height: 1.4;
     flex: 1;
     -webkit-line-clamp: 3;
@@ -1921,7 +1960,7 @@ body {
     color: var(--a-ink);
     border: 2px solid var(--a-ink);
     font-family: var(--font-display);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.06em;
     padding: 5px 10px;
   }
@@ -1933,7 +1972,7 @@ body {
    the "Our other locations" cards run edge to edge of the viewport, the
    same 1280px cap `contact.css` and `careers.css` already give their own
    pages. Scoped to this one class rather than `.cne-sec` itself. */
-@media (min-width: 1024px) {
+@media (min-width: 64em) {
   .cne-locd {
     max-width: 1280px;
     margin-inline: auto;
@@ -1958,7 +1997,7 @@ body {
    page-specific. */
 .cne-lede {
   max-width: 62ch;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -1978,7 +2017,7 @@ body {
    under it. Bounding it by `vh` keeps it under ~60% of whatever viewport it
    lands in without touching the portrait case, where 60vh is far taller than
    the photo ever gets and the rule never binds. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-item-photo-img {
     max-height: 60vh;
     width: auto;
@@ -1995,7 +2034,7 @@ body {
 /* The category label: a mono eyebrow on the phone, a display heading on desktop. */
 .cne-cat-h {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
@@ -2017,7 +2056,7 @@ body {
   height: 36px;
   margin-left: 0;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-cat-stamp {
     width: 44px;
     height: 44px;
@@ -2027,7 +2066,7 @@ body {
 .cne-op-pillar {
   display: none;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-op-pillar {
     display: block;
     position: relative;
@@ -2061,14 +2100,14 @@ body {
   }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-cat {
     padding: 0;
     margin-bottom: 38px;
   }
   .cne-cat-h {
     font-family: var(--font-display);
-    font-size: 28px;
+    font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: normal;
     text-transform: none;
@@ -2092,7 +2131,7 @@ h3 {
 .cne-cat h2.cne-cat-h {
   position: static;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-weight: 700;
@@ -2101,10 +2140,10 @@ h3 {
   line-height: 1.6;
   padding-bottom: 0;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-cat h2.cne-cat-h {
     font-family: var(--font-display);
-    font-size: 28px;
+    font-size: 1.75rem;
     letter-spacing: normal;
     text-transform: none;
     color: var(--a-fg);
@@ -2117,7 +2156,7 @@ h3 {
 .cne-way {
   line-height: 1.3;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-way {
     line-height: normal;
   }
@@ -2132,7 +2171,7 @@ h3 {
 .cne-mq-desk {
   display: none;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-only-phone {
     display: none;
   }
@@ -2142,7 +2181,7 @@ h3 {
 }
 
 /* ---- desktop chrome: values the port had rounded off -------------------- */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* The prototype's desktop pill and buttons take the page's 1.6 leading.
      Only the phone versions set line-height 1, which is what the base carries. */
   .cne-stat-a,
@@ -2160,7 +2199,7 @@ h3 {
 }
 
 /* ---- more desktop values the port had rounded off ----------------------- */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   /* `.cne-big.is-primary` carries the phone's 1.7 flex ratio, which out-weighs
      the `.cne-big { flex: none }` beside it. Desktop sizes it to its label. */
   .cne-big.is-primary {
@@ -2171,7 +2210,7 @@ h3 {
 /* `.dway` is a bare <button>: it never inherits the page size, it takes the
    UA's 13.333px. Its labels are sized explicitly, so this only sets the box. */
 .cne-way {
-  font-size: 13.3333px;
+  font-size: 0.833331rem;
 }
 
 /* ---- desktop header, 901–1339 ------------------------------------------- */
@@ -2180,7 +2219,7 @@ h3 {
    the row steps down a size until there is room for all three groups, which is
    from 1340px up. The ceiling moved with /contact, and again with /shop: each
    tab added is ~40px the run has to find before it reaches the wordmark. */
-@media (min-width: 901px) and (max-width: 1339px) {
+@media (min-width: 56.3125em) and (max-width: 83.6875em) {
   .cne-header {
     gap: 8px;
     padding: 0 12px;
@@ -2192,7 +2231,7 @@ h3 {
     gap: 1px;
   }
   .cne-tab {
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.01em;
     padding: 8px 2px;
   }
@@ -2200,12 +2239,12 @@ h3 {
      leading, 11px padding, 3px rule) and the tag sits level with it or it is
      back to being a badge floated on the bar. */
   .cne-stat.is-head .cne-stat-a {
-    font-size: 11.5px;
+    font-size: 0.71875rem;
     padding: 12.2px 11px;
     min-width: 66px;
   }
   .cne-stat.is-head .cne-stat-b {
-    font-size: 10.5px;
+    font-size: 0.65625rem;
     padding: 12.2px 11px;
     min-width: 78px;
   }
@@ -2215,7 +2254,7 @@ h3 {
     display: none;
   }
   .cne-orderbtn {
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 11px 14px;
   }
   .cne-orderbtn .cne-only-desk-i {
@@ -2227,7 +2266,7 @@ h3 {
 .cne-dir-word {
   display: none;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-dir-word {
     display: inline;
   }
@@ -2255,7 +2294,7 @@ h3 {
   background: var(--a-red);
   overflow: hidden;
   aspect-ratio: 4 / 3;
-  --cne-mark: 15px;
+  --cne-mark: 0.9375rem;
 }
 
 /* 720x411 is the Otter cut, and the frame is cut to match it: a product shot
@@ -2386,7 +2425,7 @@ h3 {
   bottom: 0;
   z-index: 5;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 0.46875rem;
   letter-spacing: 0.14em;
   font-weight: 700;
   text-transform: uppercase;
@@ -2398,7 +2437,7 @@ h3 {
 /* ---- shop index --------------------------------------------------------- */
 .cne-shop-lede {
   max-width: 62ch;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--a-sub);
   margin: 0 0 18px;
@@ -2415,7 +2454,7 @@ h3 {
   flex: 1;
   width: 100%;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: 0.05em;
   color: var(--a-cream);
   background: var(--a-red-cta);
@@ -2450,7 +2489,7 @@ h3 {
   border-style: dashed;
   box-shadow: none;
   cursor: not-allowed;
-  font-size: 11.5px;
+  font-size: 0.71875rem;
 }
 
 .cne-btn-primary:disabled:active {
@@ -2462,7 +2501,7 @@ h3 {
   width: 100%;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   background: transparent;
@@ -2478,7 +2517,7 @@ h3 {
    the first at a lower shout, or the two compete for the same weight. */
 .cne-btn-ghost.is-sub {
   padding-top: 0;
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   letter-spacing: 0.06em;
   text-transform: none;
 }
@@ -2502,7 +2541,7 @@ h3 {
   gap: 7px;
   position: relative;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--a-ink);
@@ -2537,7 +2576,7 @@ h3 {
   background: var(--a-ink);
   color: var(--a-yel);
   padding: 0 5px;
-  font-size: 9px;
+  font-size: 0.5625rem;
   min-width: 16px;
   height: 14px;
   text-align: center;
@@ -2548,7 +2587,7 @@ h3 {
 .cne-bagbtn-c span {
   display: block;
   height: 14px;
-  line-height: 14px;
+  line-height: 0.875rem;
 }
 
 /* At the two narrowest phone widths (see DESIGN.md's "How the tag narrows":
@@ -2558,7 +2597,7 @@ h3 {
    fuller icon-count-with-room button it is above 480px. The count moves out
    of flow onto the button's corner so it costs nothing but the icon's own
    width, and the order button's own padding gives up a couple of px too. */
-@media (max-width: 480px) {
+@media (max-width: 30em) {
   .cne-nav {
     gap: 4px;
   }
@@ -2579,7 +2618,7 @@ h3 {
     min-width: 14px;
     height: 14px;
     padding: 0 3px;
-    font-size: 8px;
+    font-size: 0.5rem;
     border: 1.5px solid var(--a-yel);
   }
 }
@@ -2634,7 +2673,7 @@ h3 {
 
 .cne-dr-head h2 {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 1.125rem;
   margin: 0;
   font-weight: 400;
   line-height: 1;
@@ -2644,7 +2683,7 @@ h3 {
   background: none;
   border: none;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 800;
   cursor: pointer;
   color: var(--a-fg);
@@ -2688,7 +2727,7 @@ h3 {
 
 .cne-li-art .cne-capshot {
   aspect-ratio: 1 / 1;
-  --cne-mark: 8px;
+  --cne-mark: 0.5rem;
 }
 
 .cne-li-art .cne-cap {
@@ -2705,13 +2744,13 @@ h3 {
 
 .cne-li-b .n {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.1;
 }
 
 .cne-li-b .v {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   color: var(--a-sub);
   letter-spacing: 0.06em;
 }
@@ -2725,7 +2764,7 @@ h3 {
 }
 
 .cne-li-ft .cne-price {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .cne-qty-sm {
@@ -2740,7 +2779,7 @@ h3 {
   border: none;
   color: var(--a-fg);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   cursor: pointer;
   line-height: 1;
@@ -2757,7 +2796,7 @@ h3 {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
   border-left: 1.5px solid var(--a-line);
   border-right: 1.5px solid var(--a-line);
@@ -2768,7 +2807,7 @@ h3 {
   background: none;
   border: none;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 0.5625rem;
   letter-spacing: 0.1em;
   color: var(--a-sub);
   text-decoration: underline;
@@ -2799,7 +2838,7 @@ h3 {
   justify-content: space-between;
   align-items: baseline;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 
 .cne-tot div span:last-child {
@@ -2808,7 +2847,7 @@ h3 {
 }
 
 .cne-tot .sub span:last-child {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .cne-tot .muted {
@@ -2819,17 +2858,17 @@ h3 {
   border-top: 2px solid var(--a-ink);
   padding-top: 9px;
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .cne-tot .grand span:last-child {
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 
 .cne-dr-note.is-terms {
   margin: 10px 0 13px;
   text-align: left;
-  font-size: 11px;
+  font-size: 0.6875rem;
   padding: 10px 11px;
   border: 2px dashed var(--a-line);
 }
@@ -2837,7 +2876,7 @@ h3 {
 .cne-dr-note {
   margin: 9px 0 0;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 0.625rem;
   letter-spacing: 0.06em;
   line-height: 1.6;
   color: var(--a-sub);
@@ -2962,7 +3001,7 @@ h3 {
    the one scroll container — full height, head and foot scroll with the
    lines rather than being squeezed against them — so everything stays
    reachable. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-drawer {
     height: 100dvh;
     max-height: 100dvh;
@@ -2976,19 +3015,19 @@ h3 {
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-shop-lede {
-    font-size: 15px;
+    font-size: 0.9375rem;
     margin-bottom: 22px;
   }
 
   .cne-btn-primary {
-    font-size: 13.5px;
+    font-size: 0.84375rem;
     padding: 16px;
   }
 
   .cne-bagbtn {
-    font-size: 10px;
+    font-size: 0.625rem;
     padding: 8px 11px;
     box-shadow: 2px 2px 0 var(--a-ink);
   }
@@ -3020,7 +3059,7 @@ h3 {
   }
 
   .cne-dr-head h2 {
-    font-size: 19px;
+    font-size: 1.1875rem;
   }
 
   .cne-dr-body {
@@ -3078,7 +3117,7 @@ h3 {
 }
 .cne-pick-hd h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 1.375rem;
   line-height: 1.1;
 }
 .cne-pick-x {
@@ -3088,7 +3127,7 @@ h3 {
   border: 0;
   background: none;
   color: var(--a-ink);
-  font-size: 18px;
+  font-size: 1.125rem;
   cursor: pointer;
 }
 .cne-pick-list {
@@ -3128,14 +3167,14 @@ h3 {
 .cne-pick-name {
   grid-area: name;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.05;
 }
 .cne-pick-stat {
   grid-area: stat;
   margin-top: 4px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -3146,19 +3185,19 @@ h3 {
 }
 .cne-pick-addr {
   grid-area: addr;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .cne-pick-go {
   grid-area: go;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 .cne-pick-note {
   margin: 14px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--a-sub);
 }
-@media (min-width: 600px) {
+@media (min-width: 37.5em) {
   .cne-pick {
     margin: auto;
     width: min(440px, calc(100% - 32px));
@@ -3175,7 +3214,7 @@ h3 {
 .cne-pick-switch {
   display: none;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-pick-switch {
     display: inline-flex;
     align-items: center;
@@ -3186,7 +3225,7 @@ h3 {
     background: none;
     color: var(--a-cream);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     cursor: pointer;
@@ -3233,7 +3272,7 @@ button.cne-dock-msg .s {
   object-fit: cover;
   object-position: center;
 }
-@media (min-width: 601px) {
+@media (min-width: 37.5625em) {
   .cne-order-spread {
     margin: 28px 0 30px;
     aspect-ratio: 21 / 8;

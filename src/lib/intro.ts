@@ -18,7 +18,7 @@ export const INTRO_GATE_CLASS = "cne-intro-gate";
 export interface ShouldShowIntroInput {
   /** `localStorage.getItem(INTRO_STORAGE_KEY)` — `null` means not opted out. */
   stored: string | null;
-  /** `(min-width: 901px)` */
+  /** `(min-width: 56.3125em)` */
   wide: boolean;
   /** `(hover: hover) and (pointer: fine)` */
   finePointer: boolean;
@@ -55,4 +55,4 @@ export const INTRO_GATE_SCRIPT = `(function(){try{var k=${JSON.stringify(
   INTRO_STORAGE_KEY,
 )},c=${JSON.stringify(
   INTRO_GATE_CLASS,
-)},s=null;try{s=window.localStorage.getItem(k)}catch(e){}var w=matchMedia("(min-width: 901px)").matches,f=matchMedia("(hover: hover) and (pointer: fine)").matches,r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s===null&&w&&f&&!r){document.documentElement.classList.add(c);new Image().src="/cne-logo-lg.webp"}}catch(e){}})();`;
+)},s=null;try{s=window.localStorage.getItem(k)}catch(e){}var w=matchMedia("(min-width: 56.3125em)").matches,f=matchMedia("(hover: hover) and (pointer: fine)").matches,r=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s===null&&w&&f&&!r){document.documentElement.classList.add(c);new Image().src="/cne-logo-lg.webp"}}catch(e){}})();`;

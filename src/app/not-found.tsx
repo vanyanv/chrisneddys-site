@@ -52,7 +52,7 @@ export default function RootNotFound() {
             <div
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: 18,
+                fontSize: "1.125rem",
                 letterSpacing: 3,
                 color: "var(--color-cne-yellow)",
                 textTransform: "uppercase",
@@ -63,7 +63,7 @@ export default function RootNotFound() {
             <h1
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(56px, 10vw, 120px)",
+                fontSize: "clamp(3.5rem, 10vw, 7.5rem)",
                 letterSpacing: 1,
                 lineHeight: 0.9,
                 textShadow: "5px 5px 0 var(--color-cne-ink)",
@@ -72,7 +72,7 @@ export default function RootNotFound() {
             >
               NOT ON THE MENU.
             </h1>
-            <p style={{ fontSize: 18, opacity: 0.95, marginBottom: 32 }}>
+            <p style={{ fontSize: "1.125rem", opacity: 0.95, marginBottom: 32 }}>
               The page you&rsquo;re looking for has left the building. Here&rsquo;s where to go
               instead.
             </p>
@@ -84,7 +84,7 @@ export default function RootNotFound() {
                 color: "var(--color-cne-ink)",
                 padding: "18px 30px",
                 fontFamily: "var(--font-display)",
-                fontSize: 18,
+                fontSize: "1.125rem",
                 letterSpacing: 1.5,
                 textTransform: "uppercase",
                 textDecoration: "none",

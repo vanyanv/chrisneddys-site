@@ -44,7 +44,7 @@
 .cne-drop-art {
   position: relative;
   overflow: hidden;
-  --cne-mark: 20px;
+  --cne-mark: 1.25rem;
   border-bottom: 2.5px solid var(--a-ink);
 }
 
@@ -72,7 +72,7 @@
 
 .cne-drop-b h2 {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 1.3125rem;
   line-height: 1.05;
   margin: 0;
   padding: 0;
@@ -85,14 +85,14 @@
 
 .cne-drop-price {
   font-family: var(--font-mono);
-  font-size: 19px;
+  font-size: 1.1875rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
 .cne-drop-b p {
   margin: 2px 0 0;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.55;
   color: var(--a-sub);
   max-width: 44ch;
@@ -101,7 +101,7 @@
 .cne-drop-go {
   margin-top: 8px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   color: var(--a-red-cta);
@@ -124,7 +124,7 @@
   top: 12px;
   z-index: 6;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
   background: var(--a-red-cta);
   color: var(--a-cream);
@@ -140,7 +140,7 @@
   gap: 10px;
   margin: 16px 0 0;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -162,7 +162,7 @@
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-drops {
     gap: 20px;
   }
@@ -178,7 +178,7 @@
   }
 
   .cne-drop-art {
-    --cne-mark: 30px;
+    --cne-mark: 1.875rem;
   }
 
   .cne-drop-art .cne-capshot {
@@ -222,19 +222,19 @@
   }
 
   .cne-drop-b h2 {
-    font-size: 34px;
+    font-size: 2.125rem;
   }
 
   .cne-drop-price {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 
   .cne-drop-b p {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .cne-drop-flag {
-    font-size: 11px;
+    font-size: 0.6875rem;
     padding: 7px 9px;
     top: 16px;
     right: -8px;

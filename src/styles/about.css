@@ -33,7 +33,7 @@
   --u: min(1vw, 14.4px);
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip {
     --u: 2.7vw;
   }
@@ -70,7 +70,7 @@
 
 .cne-drip-top p {
   margin: 0;
-  font-size: max(calc(var(--u) * 1.25), 15px);
+  font-size: max(calc(var(--u) * 1.25), 0.9375rem);
   max-width: 44ch;
   color: var(--color-cne-ink);
 }
@@ -115,7 +115,7 @@
   height: auto;
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   /* 4u of timeline padding + 1.6u, so the line runs through the dots. */
   .cne-drip-line,
   .cne-drip-drop {
@@ -180,19 +180,19 @@
 .cne-drip-st h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: max(calc(var(--u) * 1.9), 18px);
+  font-size: max(calc(var(--u) * 1.9), 1.125rem);
   line-height: 1;
   margin: 0;
 }
 
 .cne-drip-st p {
   margin: 0;
-  font-size: max(calc(var(--u) * 1.12), 15px);
+  font-size: max(calc(var(--u) * 1.12), 0.9375rem);
   max-width: 34ch;
   color: var(--color-cne-ink);
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-st {
     grid-template-columns: minmax(0, 1fr);
     padding-left: calc(var(--u) * 4.4);
@@ -241,7 +241,7 @@
 .cne-drip-ring {
   display: inline-block;
   font-family: var(--font-display);
-  font-size: max(calc(var(--u) * 2.6), 18px);
+  font-size: max(calc(var(--u) * 2.6), 1.125rem);
   line-height: 0.95;
   background: var(--color-cne-yellow);
   border: calc(var(--u) * 0.3) solid var(--color-cne-ink);
@@ -317,7 +317,7 @@
 .cne-drip-tp figcaption {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: max(calc(var(--u) * 0.7), 12px);
+  font-size: max(calc(var(--u) * 0.7), 0.75rem);
   letter-spacing: 0.12em;
   padding: calc(var(--u) * 0.4) calc(var(--u) * 0.6);
 }
@@ -354,7 +354,7 @@
 .cne-drip-qstk blockquote {
   margin: 0;
   font-weight: 600;
-  font-size: max(calc(var(--u) * 1.15), 15px);
+  font-size: max(calc(var(--u) * 1.15), 0.9375rem);
   line-height: 1.35;
 }
 
@@ -362,7 +362,7 @@
   display: block;
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: max(calc(var(--u) * 0.72), 12px);
+  font-size: max(calc(var(--u) * 0.72), 0.75rem);
   letter-spacing: 0.14em;
   color: var(--color-cne-muted);
   margin-top: calc(var(--u) * 0.5);
@@ -442,14 +442,14 @@
 
 .cne-drip-pool p {
   margin: 0;
-  font-size: max(calc(var(--u) * 1.2), 15px);
+  font-size: max(calc(var(--u) * 1.2), 0.9375rem);
   max-width: 44ch;
 }
 
 .cne-drip-quiet {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: max(calc(var(--u) * 0.85), 12px);
+  font-size: max(calc(var(--u) * 0.85), 0.75rem);
   letter-spacing: 0.04em;
   color: var(--color-cne-cream);
   display: flex;
@@ -539,10 +539,10 @@
   transform: scaleX(-1);
 }
 
-@media (min-width: 700px) {
+@media (min-width: 43.75em) {
   .cne-drip-btn {
     /* Floored so an iPad or a phone on its side doesn't shrink it to 10px. */
-    font-size: clamp(14px, 1.2vw, 17.28px);
+    font-size: clamp(0.875rem, 1.2vw, 1.08rem);
     padding: min(1.25vw, 18px) min(2vw, 28.8px);
     border-width: min(0.28vw, 4.03px);
     box-shadow: min(0.45vw, 6.48px) min(0.45vw, 6.48px) 0 var(--color-cne-ink);
@@ -555,9 +555,9 @@
   }
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-btn {
-    font-size: max(3.4vw, 13px);
+    font-size: max(3.4vw, 0.8125rem);
     padding: 3.4vw 2.4vw;
     border-width: 0.65vw;
     box-shadow: 1vw 1vw 0 var(--color-cne-ink);
@@ -625,7 +625,7 @@
   object-position: center;
 }
 
-@media (max-width: 699px) {
+@media (max-width: 43.6875em) {
   .cne-drip-spread {
     margin-bottom: 22px;
     aspect-ratio: 2 / 1;

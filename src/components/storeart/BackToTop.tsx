@@ -10,7 +10,7 @@ const BOTTOM_BARS = [".cne-dock", ".cne-pdp-sticky"];
 
 /** Matches the storefront's phone/tablet tier, where the button hides while
  * scrolling down. */
-const PHONE_QUERY = "(max-width: 900px)";
+const PHONE_QUERY = "(max-width: 56.25em)";
 
 /** How far a scroll has to travel in one direction before it counts, so a
  * finger's wobble doesn't flicker the button. */

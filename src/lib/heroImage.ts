@@ -54,7 +54,7 @@ export const HERO = {
   // and every other width keep the 50vw pick. A browser that ignores the
   // `resolution` feature in `sizes` just falls through to 50vw, as before.
   sizes:
-    "(min-width: 600px) and (max-width: 900px) and (max-height: 500px) and (min-resolution: 2.5dppx) 36vw, (min-width: 600px) 50vw, 100vw",
+    "(min-width: 37.5em) and (max-width: 56.25em) and (max-height: 31.25em) and (min-resolution: 2.5dppx) 36vw, (min-width: 37.5em) 50vw, 100vw",
   width: 1400,
   height: 1480,
   alt: "A basket of Chris N Eddy's smashed cheeseburger sliders",

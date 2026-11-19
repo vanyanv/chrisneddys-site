@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { MapCallout } from "@/components/locations/MapCallout";
 
 /** The width at which home's map column appears (`.cne-split-r` in home.css). */
-const DESKTOP = "(min-width: 901px)";
+const DESKTOP = "(min-width: 56.3125em)";
 
 /**
  * Home's map callouts, mounted only while the map is on screen.

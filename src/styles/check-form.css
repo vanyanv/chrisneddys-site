@@ -20,7 +20,7 @@
 
 .cne-ck-label {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 0.59375rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -37,7 +37,7 @@
   font-family: var(--font-body);
   /* 16px is the threshold below which iOS Safari zooms the viewport on focus
      and never zooms back out. Everything else on the check can be smaller. */
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--a-fg);
   background: transparent;
   border: 0;
@@ -92,16 +92,16 @@
 
 .cne-ck-err {
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.45;
   color: var(--a-red-cta);
   font-weight: 600;
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-ck-label {
-    font-size: 10px;
+    font-size: 0.625rem;
   }
 }
 

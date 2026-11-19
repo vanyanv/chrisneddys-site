@@ -176,7 +176,7 @@ export default function CateringPage() {
           widths={[720, 1080, 1600, 2400]}
           width={2400}
           height={1018}
-          sizes="(max-width: 600px) 118vw, 100vw"
+          sizes="(max-width: 37.5em) 118vw, 100vw"
           alt="Side-on view of a Chris N Eddy’s spread on a red table: sliders, a grilled cheese, fries, cheese fries and vanilla, strawberry and chocolate shakes."
           priority
         />
@@ -196,7 +196,7 @@ export default function CateringPage() {
                 {it.photo && (
                   <MenuPhoto
                     photo={it.photo}
-                    sizes="(min-width: 901px) 440px, (min-width: 600px) 260px, 90px"
+                    sizes="(min-width: 56.3125em) 440px, (min-width: 37.5em) 260px, 90px"
                     alt={itemPhotoAlt(it)}
                     loading="lazy"
                     decoding="async"

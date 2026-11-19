@@ -219,7 +219,7 @@ export function DripStory({
               <img
                 src="/photos/ig-pile.webp"
                 srcSet="/photos/ig-pile-sm.webp 300w, /photos/ig-pile.webp 500w"
-                sizes="(min-width: 1440px) 245px, (min-width: 700px) 17vw, 46vw"
+                sizes="(min-width: 90em) 245px, (min-width: 43.75em) 17vw, 46vw"
                 alt="A pile of Chris N Eddy’s smash sliders"
                 width={500}
                 height={625}
@@ -243,7 +243,7 @@ export function DripStory({
               <img
                 src="/photos/ig-monster.webp"
                 srcSet="/photos/ig-monster-sm.webp 300w, /photos/ig-monster.webp 500w"
-                sizes="(min-width: 1440px) 245px, (min-width: 700px) 17vw, 46vw"
+                sizes="(min-width: 90em) 245px, (min-width: 43.75em) 17vw, 46vw"
                 alt="Stacked sliders in front of Chris N Eddy’s monster mural"
                 width={500}
                 height={500}
@@ -316,7 +316,7 @@ export function DripStory({
             widths={[480, 720, 1080, 1440]}
             width={1440}
             height={611}
-            sizes="(max-width: 699px) calc(118vw - 50px), (max-width: 1070px) calc(92vw - 6px), 974px"
+            sizes="(max-width: 43.6875em) calc(118vw - 50px), (max-width: 66.875em) calc(92vw - 6px), 974px"
             alt="Side-on view of a Chris N Eddy’s spread on a red table with Chris’s Way and Eddy’s Way sliders side by side, a grilled cheese, fries, cheese fries and three shakes."
           />
         </figure>

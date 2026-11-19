@@ -1,3 +1,4 @@
+import { MarqueeToggle } from "@/components/counter/MarqueeToggle";
 import { Monster } from "@/components/mascots/Monster";
 import { MONSTER_COLORS } from "@/components/mascots/monsterColors";
 
@@ -24,13 +25,13 @@ const DESK = [
 /** Each list is duplicated once so the -50% translate loops seamlessly. */
 export function Marquee() {
   return (
-    <div className="cne-mq" aria-hidden="true">
-      <div className="cne-mq-track cne-mq-phone">
+    <div className="cne-mq">
+      <div className="cne-mq-track cne-mq-phone" aria-hidden="true">
         {[...PHONE, ...PHONE].map((w, i) => (
           <span key={i}>{w}</span>
         ))}
       </div>
-      <div className="cne-mq-track cne-mq-desk">
+      <div className="cne-mq-track cne-mq-desk" aria-hidden="true">
         {[...DESK, ...DESK].map((w, i) => (
           <span key={i}>{w}</span>
         ))}
@@ -43,6 +44,7 @@ export function Marquee() {
         size={26}
         className="cne-mq-rider"
       />
+      <MarqueeToggle />
     </div>
   );
 }

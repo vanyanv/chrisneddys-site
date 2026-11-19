@@ -90,6 +90,9 @@ export function generateMetadata(): Metadata {
     alternates: {
       canonical: "/",
     },
+    // Let text follow the larger-text setting on phones (honoured by browsers
+    // that support it; ignored elsewhere).
+    other: { "text-scale": "scale" },
     robots: {
       index: true,
       follow: true,

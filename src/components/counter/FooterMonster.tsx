@@ -41,7 +41,7 @@ export function FooterMonster() {
             <svg key={idx} x={`${n.x}%`} y={`${n.y}%`} overflow="visible">
               <text
                 transform={`rotate(${n.rot})`}
-                style={{ fontSize: `${Math.round(n.scale * 22)}px` }}
+                style={{ fontSize: `${Math.round(n.scale * 22) / 16}rem` }}
               >
                 {n.text}
               </text>

@@ -68,7 +68,7 @@ export function SiteFooter() {
               <img
                 src={LOGO.src}
                 srcSet={LOGO.srcSet}
-                sizes="(min-width: 901px) 135px, 120px"
+                sizes="(min-width: 56.3125em) 135px, 120px"
                 alt={brand.name}
                 loading="lazy"
                 decoding="async"
@@ -169,7 +169,7 @@ export function SiteFooter() {
           <span>
             © {new Date().getFullYear()} {brand.name}
           </span>
-          <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: 18 }}>
+          <span className="cne-tag-word" style={{ color: "#2fb8ff", fontSize: "1.125rem" }}>
             Sliders
           </span>
           <FooterTag />

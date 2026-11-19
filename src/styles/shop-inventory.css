@@ -16,7 +16,7 @@
 
 .cne-inv-text {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: var(--a-fg);
@@ -44,7 +44,7 @@
 /* Smaller cut for the shop index card, under the price rather than the buy
    row — same information, less room. */
 .cne-inv.is-sm .cne-inv-text {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 
 .cne-inv.is-sm .cne-inv-bar {

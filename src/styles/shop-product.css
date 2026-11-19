@@ -4,13 +4,13 @@
  * The gallery, the buy column, the details and authenticity blocks, the
  * edition map, and what the page looks like when a drop is sold out or the
  * shop is paused. Ported from the checkout prototype: phone values are the
- * base and `@media (min-width: 901px)` carries the desktop ones, same as the
+ * base and `@media (min-width: 56.3125em)` carries the desktop ones, same as the
  * rest of the site.
  */
 
 .cne-pdp-crumb {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--a-sub);
@@ -51,7 +51,7 @@
 
 .cne-pdp-main .cne-capshot {
   aspect-ratio: 4 / 3;
-  --cne-mark: 22px;
+  --cne-mark: 1.375rem;
 }
 
 .cne-pdp-main .cne-capshot.is-photo {
@@ -78,7 +78,7 @@
 
 .cne-pdp-t .cne-capshot {
   aspect-ratio: 1 / 1;
-  --cne-mark: 9px;
+  --cne-mark: 0.5625rem;
 }
 
 .cne-pdp-t .cne-cap {
@@ -91,7 +91,7 @@
 
 .cne-pdp-buy h1 {
   font-family: var(--font-display);
-  font-size: 25px;
+  font-size: 1.5625rem;
   line-height: 0.96;
   margin: 5px 0 0;
   font-weight: 400;
@@ -106,12 +106,12 @@
 }
 
 .cne-pdp-price .p {
-  font-size: 26px;
+  font-size: 1.625rem;
 }
 
 .cne-pdp-price .s {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--a-sub);
   font-weight: 500;
 }
@@ -129,7 +129,7 @@
 
 .cne-limited .tag {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.06em;
   background: var(--a-red-cta);
   color: var(--a-cream);
@@ -142,14 +142,14 @@
 
 .cne-limited .txt {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   font-weight: 700;
 }
 
 .cne-pdp-lab {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 700;
@@ -169,7 +169,7 @@
 .cne-chip {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   border: 2px solid var(--a-ink);
@@ -204,7 +204,7 @@
   border: none;
   color: var(--a-fg);
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
   line-height: 1;
@@ -221,7 +221,7 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 800;
   border-left: 2px solid var(--a-line);
   border-right: 2px solid var(--a-line);
@@ -245,7 +245,7 @@
   text-align: center;
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   color: var(--a-fg);
   background: var(--a-cream);
@@ -267,7 +267,7 @@
 .cne-pdp-sticky .cne-btn-secondary {
   margin-top: 0;
   padding: 14px 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   box-shadow: 3px 3px 0 var(--a-shadow);
 }
 
@@ -277,7 +277,7 @@
   padding: 11px 12px;
   border: 2px dashed var(--a-line);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -297,13 +297,13 @@
 }
 
 .cne-pdp-sticky .p {
-  font-size: 19px;
+  font-size: 1.1875rem;
   flex: none;
 }
 
 .cne-pdp-sticky .cne-btn-primary {
   padding: 14px 12px;
-  font-size: 12px;
+  font-size: 0.75rem;
   box-shadow: 3px 3px 0 var(--a-shadow);
 }
 
@@ -314,7 +314,7 @@
 .cne-pdp-more p {
   max-width: 62ch;
   margin: 10px 0 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -341,7 +341,7 @@
 .cne-detail-list li {
   position: relative;
   padding-left: 18px;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   line-height: 1.55;
   color: var(--a-fg);
 }
@@ -364,7 +364,7 @@
 
 .cne-detail-block p {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -386,7 +386,7 @@
 .cne-auth-copy p {
   max-width: 62ch;
   margin: 0;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -406,7 +406,7 @@
 
 .cne-auth-facts dt {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 700;
@@ -416,7 +416,7 @@
 
 .cne-auth-facts dd {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.4;
 }
 
@@ -485,7 +485,7 @@
    and pushed the title, price and Add to bag roughly a page down. Borrows
    the desktop grid's two columns (photo + thumbs left, buy box right) so the
    price and the button are on screen without waiting for 901px. */
-@media (min-width: 600px) and (max-width: 900px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-pdp-crumb {
     padding: 16px 20px 0;
   }
@@ -502,7 +502,7 @@
   }
 
   .cne-pdp-buy h1 {
-    font-size: 27px;
+    font-size: 1.6875rem;
   }
 
   /* The buy row is already on screen beside the photo at this width — same
@@ -517,7 +517,7 @@
    the whole viewport for a square shot. Cap the shot to a share of the
    viewport height and let its width follow from the aspect ratio already set
    on `.cne-capshot`, so it never runs past the bottom of the screen. */
-@media (min-width: 600px) and (max-width: 900px) and (max-height: 500px) {
+@media (min-width: 37.5em) and (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-pdp-main {
     display: flex;
     justify-content: center;
@@ -548,7 +548,7 @@
   }
 }
 
-@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 56.3125em) and (prefers-reduced-motion: no-preference) {
   .cne-pdp-mq .cne-mq-track {
     animation-iteration-count: 0.16;
   }
@@ -557,14 +557,14 @@
 /* A phone on its side has about 400px of height, and the header and nav take
    most of it. The ticker repeats facts the page states anyway, so it goes and
    the hat moves up into the first screen. */
-@media (max-width: 900px) and (max-height: 500px) {
+@media (max-width: 56.25em) and (max-height: 31.25em) {
   .cne-pdp-mq {
     display: none;
   }
 }
 
 /* ---- desktop ------------------------------------------------------------ */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-pdp-crumb {
     padding: 20px 30px 0;
   }
@@ -599,15 +599,15 @@
   }
 
   .cne-pdp-buy h1 {
-    font-size: 31px;
+    font-size: 1.9375rem;
   }
 
   .cne-pdp-price .p {
-    font-size: 27px;
+    font-size: 1.6875rem;
   }
 
   .cne-btn-secondary {
-    font-size: 13.5px;
+    font-size: 0.84375rem;
     padding: 16px;
   }
 
@@ -618,11 +618,11 @@
   }
 
   .cne-limited .txt {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 
   .cne-pending {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 
   .cne-pdp-more {
@@ -670,7 +670,7 @@
   border: 2px dashed var(--a-line);
   background: var(--a-cream);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -693,7 +693,7 @@
   border: 2px solid var(--a-line);
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -722,13 +722,13 @@
 
 .cne-pause-head {
   margin: 0 0 4px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
 .cne-pause-body {
   margin: 0;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.6;
   color: var(--a-sub);
 }
@@ -745,7 +745,7 @@
   top: 10px;
   left: 10px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;

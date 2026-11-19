@@ -116,7 +116,7 @@
   color: var(--a-ink);
   border: 2px solid var(--a-ink);
   box-shadow: 2px 2px 0 var(--a-ink);
-  font-size: 17px;
+  font-size: 1.0625rem;
   line-height: 1;
   cursor: pointer;
   transition:
@@ -215,7 +215,7 @@
   border: 2.5px solid var(--a-ink);
   box-shadow: 3px 3px 0 var(--a-ink);
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   padding: 5px 9px 6px;
   transform: rotate(-4deg);
@@ -232,7 +232,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 25px;
+  font-size: 1.5625rem;
   line-height: 1.02;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -255,13 +255,13 @@
   box-shadow: 3px 3px 0 var(--a-cream);
   padding: 5px 10px 7px;
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .cne-board-price small {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -270,14 +270,14 @@
 }
 .cne-sheet-desc {
   margin: 12px 0 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   max-width: 46ch;
 }
 .cne-board-lbl {
   margin: 22px 0 9px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -300,11 +300,11 @@
   border: 2.5px dashed var(--a-cream);
 }
 .cne-ways-board .cne-way .t {
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: 0.02em;
 }
 .cne-ways-board .cne-way .s {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: inherit;
   margin-top: 3px;
 }
@@ -346,7 +346,7 @@
   background: var(--a-yel);
   color: var(--a-ink);
   border: 2.5px solid var(--a-ink);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 900;
 }
 .cne-ways-board .cne-way:focus-visible,
@@ -365,7 +365,7 @@
     inset 0 0 0 4.5px rgba(255, 242, 201, 0.55);
   padding: 10px 12px 12px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -393,7 +393,7 @@
   background: var(--a-yel);
   color: var(--a-ink);
   padding: 1px 5px;
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
 }
 .cne-board-list .is-total {
@@ -401,14 +401,14 @@
   padding-top: 7px;
   border-top: 2px solid var(--a-cream);
   font-weight: 800;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
 }
 .cne-board-list .is-extra {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .cne-board-sub {
   margin: 12px 0 2px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -460,7 +460,7 @@
 .cne-board-combo .k {
   grid-column: 1 / -1;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -468,12 +468,12 @@
 }
 .cne-board-combo .c {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .cne-board-combo .p {
   font-family: var(--font-mono);
   font-weight: 800;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -496,7 +496,7 @@
   text-align: center;
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 1.0625rem;
   letter-spacing: 0.04em;
   background: var(--a-yel);
   color: var(--a-ink);
@@ -512,7 +512,7 @@
 }
 .cne-fine {
   margin: 9px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
   text-align: center;
   color: var(--a-cream);
@@ -521,7 +521,7 @@
 /* ---- landscape phones ---------------------------------------------------
    Height is what runs out, so the photo goes left and stays while the board
    scrolls on the right. */
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-height: 31.25em) and (orientation: landscape) {
   .cne-sheet {
     max-height: calc(100dvh - 40px);
   }
@@ -546,10 +546,10 @@
     padding-right: 56px;
   }
   .cne-sheet-name {
-    font-size: 21px;
+    font-size: 1.3125rem;
   }
   .cne-board-price {
-    font-size: 22px;
+    font-size: 1.375rem;
   }
   .cne-board-hd,
   .cne-sheet-desc,
@@ -573,7 +573,8 @@
 }
 
 /* ---- desktop, and tablets tall enough for it: the side panel ------------ */
-@media (min-width: 901px) and (min-height: 501px), (min-width: 700px) and (min-height: 900px) {
+@media (min-width: 56.3125em) and (min-height: 31.3125em),
+  (min-width: 43.75em) and (min-height: 56.25em) {
   .cne-sheet {
     top: 0;
     left: auto;
@@ -604,22 +605,22 @@
     max-height: none;
   }
   .cne-sheet-name {
-    font-size: 27px;
+    font-size: 1.6875rem;
   }
   .cne-board-price {
-    font-size: 32px;
+    font-size: 2rem;
   }
   .cne-sheet-desc {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .cne-board-list {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .cne-sheet-foot {
     padding: 16px 24px 20px;
   }
   .cne-fine {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 

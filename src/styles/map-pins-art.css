@@ -28,7 +28,7 @@
 /* The "· SOON" tail on a location that hasn't opened yet. */
 .cne-map-pin .cne-pin-soon {
   /* PIN.soonSize in mapLayout.ts. */
-  font-size: 7.5px;
+  font-size: 0.46875rem;
   font-weight: 700;
   fill: var(--a-sub);
 }
@@ -45,7 +45,7 @@
 .cne-map-tag text {
   font-family: var(--font-mono);
   /* TAG.size in mapLayout.ts. */
-  font-size: 7.5px;
+  font-size: 0.46875rem;
   font-weight: 700;
   letter-spacing: 0.4px;
   fill: var(--a-cream);

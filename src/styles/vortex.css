@@ -35,7 +35,7 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 96px;
 }
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-vortex-band {
     height: 140px;
     contain-intrinsic-size: auto 140px;

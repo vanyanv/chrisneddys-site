@@ -28,7 +28,7 @@
 
 /* Matches `.cne-cardgrid`'s own breakpoint — below it the cards stack into a
    single column and there is nothing left to connect. */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
   .cne-tethers {
     display: block;
   }

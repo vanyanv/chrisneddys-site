@@ -133,7 +133,7 @@ export default async function MenuItemPage({ params }: Params) {
               <MenuPhoto
                 photo={item.photo}
                 max={1080}
-                sizes="(min-width: 556px) 514px, calc(100vw - 36px)"
+                sizes="(min-width: 34.75em) 514px, calc(100vw - 36px)"
                 alt={itemPhotoAlt(item)}
                 fetchPriority="high"
                 decoding="async"

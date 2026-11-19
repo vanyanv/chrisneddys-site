@@ -21,7 +21,7 @@
 
 .cne-lg-eyebrow {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -32,7 +32,7 @@
 
 .cne-lg-head h1 {
   font-family: var(--font-display);
-  font-size: clamp(32px, 9vw, 46px);
+  font-size: clamp(2rem, 9vw, 2.875rem);
   line-height: 0.96;
   margin: 0 0 10px;
   color: var(--a-ink);
@@ -42,7 +42,7 @@
 .cne-lg-date {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--a-sub);
 }
 
@@ -58,14 +58,14 @@
 
 .cne-lg-tldr h2 {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 1.1875rem;
   margin: 0 0 8px;
   color: var(--a-ink);
 }
 
 .cne-lg-tldr p {
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.62;
 }
 
@@ -75,7 +75,7 @@
 
 .cne-lg-sec h2 {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.1;
   margin: 0 0 12px;
   color: var(--a-ink);
@@ -86,7 +86,7 @@
 
 .cne-lg-sec p,
 .cne-lg-sec li {
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.65;
   color: var(--a-ink);
 }
@@ -120,7 +120,7 @@
 
 .cne-lg-sec code {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   background: var(--a-cream);
   border: 1px solid var(--a-line);
   padding: 1px 5px;
@@ -138,7 +138,7 @@
 
 .cne-lg-contact {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Each address is its own 44px row, the size every other call and email link
@@ -158,7 +158,7 @@
 
 .cne-lg-toc h2 {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -181,7 +181,7 @@
   display: flex;
   align-items: center;
   min-height: 44px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--a-ink);
   text-decoration: underline;
@@ -190,7 +190,7 @@
   text-underline-offset: 3px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
   .cne-lg-toc ol {
     columns: 2;
     column-gap: 28px;
@@ -201,7 +201,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
   .cne-lg {
     padding: 52px 24px 80px;
   }
@@ -211,6 +211,6 @@
   }
 
   .cne-lg-sec h2 {
-    font-size: 23px;
+    font-size: 1.4375rem;
   }
 }

@@ -135,6 +135,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       />
 
       {/* Only things that are true about the product go past on the reel. */}
+      {/* This reel runs once (about 5 s) and stops, so unlike the home
+          marquee it needs no pause button (WCAG 2.2.2's limit is 5 s). */}
       <div className="cne-mq cne-pdp-mq" aria-hidden="true">
         <div className="cne-mq-track">
           {[...Array(2)].flatMap((_, pass) =>
@@ -337,7 +339,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         className="cne-auth-img is-cert"
                         src={certFull}
                         srcSet={certSrcSet}
-                        sizes="(min-width: 901px) 280px, 45vw"
+                        sizes="(min-width: 56.3125em) 280px, 45vw"
                         width={cert.width}
                         height={cert.height}
                         style={{ aspectRatio: `${cert.width} / ${cert.height}` }}
@@ -351,7 +353,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         <source
                           type="image/avif"
                           srcSet={certAvif}
-                          sizes="(min-width: 901px) 280px, 45vw"
+                          sizes="(min-width: 56.3125em) 280px, 45vw"
                         />
                         {certImg}
                       </picture>
@@ -379,7 +381,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         className="cne-auth-img is-sticker"
                         src={stickerFull}
                         srcSet={stickerSrcSet}
-                        sizes="(min-width: 901px) 280px, 45vw"
+                        sizes="(min-width: 56.3125em) 280px, 45vw"
                         width={sticker.width}
                         height={sticker.height}
                         style={{ aspectRatio: `${sticker.width} / ${sticker.height}` }}
@@ -393,7 +395,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                         <source
                           type="image/avif"
                           srcSet={stickerAvif}
-                          sizes="(min-width: 901px) 280px, 45vw"
+                          sizes="(min-width: 56.3125em) 280px, 45vw"
                         />
                         {stickerImg}
                       </picture>

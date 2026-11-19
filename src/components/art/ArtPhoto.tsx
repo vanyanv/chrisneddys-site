@@ -35,7 +35,7 @@ export function ArtPhoto({
     <picture>
       {phoneWidths && (
         <source
-          media="(max-width: 600px)"
+          media="(max-width: 37.5em)"
           type="image/avif"
           srcSet={set("avif", phoneWidths)}
           sizes="100vw"

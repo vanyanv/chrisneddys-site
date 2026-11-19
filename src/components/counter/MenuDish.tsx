@@ -7,17 +7,17 @@ import { formatPrice } from "@/lib/otter";
 import { menuCardSrcSet, menuPhotoVersion } from "@/lib/menuPhoto";
 import { PattyDots } from "./PattyDots";
 
-const LADDER_SIZES = "(min-width: 600px) 420px, 100vw";
+const LADDER_SIZES = "(min-width: 37.5em) 420px, 100vw";
 /**
  * The cards sit in auto-fit grids whose column count depends on how many
  * cards a section has, so their width is only known after layout. Every card
  * photo is lazy, which is what lets `auto` use that real width (Chrome and
  * Edge); Safari skips `auto` and takes the estimate after it.
  */
-const CARD_SIZES = "auto, (min-width: 901px) 320px, (min-width: 600px) 30vw, 50vw";
+const CARD_SIZES = "auto, (min-width: 56.3125em) 320px, (min-width: 37.5em) 30vw, 50vw";
 /** A section's lead card: the whole card width on a phone, beside the text
  * (at most 420px) from 600px up. */
-const LEAD_SIZES = "auto, (min-width: 600px) 420px, 100vw";
+const LEAD_SIZES = "auto, (min-width: 37.5em) 420px, 100vw";
 const ladderSet = (base: string, ext: string) =>
   [480, 720, 900].map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
 

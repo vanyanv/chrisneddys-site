@@ -4,7 +4,7 @@ import { photoFor, type MenuItem, type WayId } from "@/data/menu";
 import { formatPrice } from "@/lib/otter";
 
 const CUTS = [480, 720, 900];
-const SIZES = "(min-width: 901px) 44vw, (min-width: 600px) 52vw, 100vw";
+const SIZES = "(min-width: 56.3125em) 44vw, (min-width: 37.5em) 52vw, 100vw";
 
 /**
  * The card the menu opens with (issue #227): 2 Sliders and Fries, the most

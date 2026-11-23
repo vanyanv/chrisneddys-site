@@ -71,6 +71,17 @@ export function MapPinArt({ loc }: { loc: Location }) {
   );
 }
 
+/**
+ * Left-to-right order of a store on the map, for the home page's pin-drop
+ * (`motion.css`): `--i` is the delay step. Fixed by the coordinates, so it is
+ * set at render time rather than measured.
+ */
+export function pinOrder(id: Location["id"]): CSSProperties {
+  const xs = locations.map((l) => projectX(l.lng)).sort((a, b) => a - b);
+  const loc = locations.find((l) => l.id === id);
+  return { "--i": loc ? xs.indexOf(projectX(loc.lng)) : 0 } as CSSProperties;
+}
+
 /** The class list a pin carries for its state, as in the prototype. */
 export function pinClass(loc: Location, selectedId?: string): string {
   return ["cne-map-pin", loc.id === selectedId ? "is-selected" : "", loc.isOpen ? "" : "is-soon"]
@@ -92,6 +103,7 @@ export function MapPins({ selectedId = "hollywood" }: { selectedId?: string }) {
           key={loc.id}
           transform={`translate(${projectX(loc.lng)},${projectY(loc.lat)})`}
           className={pinClass(loc, selectedId)}
+          style={pinOrder(loc.id)}
         >
           <MapPinArt loc={loc} />
         </g>

@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: more motion on the home page and the menu. "SMASH" slams down onto the home page headline when the page opens; the big photo gains depth as you scroll and the ticker under it speeds up and leans with your scroll; the "Start here" cards tilt toward the mouse on a computer and their photos roll in on a phone; tapping any item makes its photo fly into the order panel; the monsters drop onto the home page map one by one; and switching between Chris's Way and Eddy's Way on the menu squashes each changed photo into place (the big photo at the top of the menu stays still). Phones and computers set to reduce motion see everything in place, as before ([#318](https://github.com/vanyanv/chrisneddys-site/issues/318))
 - Site: the scrolling banner of words has a small pause button at its right end, so it can be stopped, and stays stopped while you browse ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))
 - Site: moving between pages now fades quickly from one page to the next instead of jumping; phones set to reduce motion still switch instantly ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))
 - Admin: on the sign-in page, a saved passkey now shows up in the email box's suggestions, so you can sign in with one tap; the "Continue with a passkey" button still works as before ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))

@@ -21,13 +21,19 @@ export function RevealRoot() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // `.cne-pins` (the home map) hides its pins only once marked `is-arm`
+    // here, so a page where this never runs keeps them visible. The pins drop
+    // in when the map is mostly on screen, later than a section's reveal, so
+    // the sweep below handles them and the observer does not.
+    const pins = Array.from(document.querySelectorAll<HTMLElement>(".cne-pins"));
+    pins.forEach((n) => n.classList.add("is-arm"));
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".cne-rv"));
-    if (nodes.length === 0) return;
+    if (nodes.length + pins.length === 0) return;
 
     const show = (n: HTMLElement) => n.classList.add("is-in");
 
     if (!("IntersectionObserver" in window)) {
-      nodes.forEach(show);
+      nodes.concat(pins).forEach(show);
       return;
     }
 
@@ -65,10 +71,14 @@ export function RevealRoot() {
       const due = nodes.filter(
         (n) => !n.classList.contains("is-in") && n.getBoundingClientRect().top < fold,
       );
+      const drop = pins.filter(
+        (n) => !n.classList.contains("is-in") && n.getBoundingClientRect().top < fold * 0.55,
+      );
       due.forEach((n) => {
         show(n);
         io.unobserve(n);
       });
+      drop.forEach(show);
     };
     const onScroll = () => {
       if (queued) return;

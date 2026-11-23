@@ -135,7 +135,7 @@ export default function HomePage() {
             <Link
               href="/locations/"
               prefetch={false}
-              className="cne-split-map"
+              className="cne-split-map cne-pins"
               aria-label="See all three locations on the map"
             >
               <LocationsMapCanvas />

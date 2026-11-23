@@ -37,6 +37,28 @@ export function MenuSectionChips({
   const heldRef = useRef<MenuCategoryKey | null>(null);
 
   useEffect(() => {
+    // Stick flush under the real header, not at `--cne-stuck`: that token is
+    // the header plus air for anchors to land in, and as this bar's `top` the
+    // air showed as a strip of menu scrolling between the two. The header's
+    // height also varies by a few pixels with the phone's width, so it is
+    // read, not assumed. Rounded down so a fractional height tucks the bar
+    // under the header (which sits above it) instead of leaving a hairline.
+    const bar = barRef.current;
+    const header = document.querySelector<HTMLElement>(".cne-header");
+    if (!bar || !header) return;
+    const fit = () => {
+      bar.style.setProperty(
+        "--cne-chip-top",
+        `${Math.floor(header.getBoundingClientRect().height)}px`,
+      );
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
     const ids = sections.map((s) => s.key);
     const els = ids
       .map((key) => document.getElementById(`menu-${key}`))

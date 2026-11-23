@@ -516,21 +516,6 @@
   display: block;
   margin-top: 5px;
 }
-/* The ranked-list line under the quotes: the cite's mono face, a step up in
-   size and in ink so it reads as a fact rather than a fourth quote. */
-.cne-press-rank {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin: 4px 0 0;
-}
-/* From tablet up the quotes sit in a row with no bottom margin of their own. */
-@media (min-width: 37.5em) {
-  .cne-press-rank {
-    margin-top: 24px;
-  }
-}
 /* The handle links out to the profile. It keeps the heading's face and colour
    — the trailing arrow is what marks it as a link, since a phone has no hover
    to reveal one and an underline would collide with the h2's own yellow rule. */
@@ -574,9 +559,9 @@
 }
 
 /* ---- tablet tier: press + gram (600-900) --------------------------------
-   Phone stacked the three quotes in one column and drew the gram grid as
+   Phone stacked the quotes in one column and drew the gram grid as
    three huge squares. Both get the multi-column room a tablet actually has,
-   with counts that divide what they hold: three quotes across and all six
+   with counts that divide what they hold: both quotes across and all six
    gram photos in one row, as on desktop. A width-driven `auto-fill` count
    left one quote or one or two photos stranded on a row of their own. */
 @media (min-width: 37.5em) and (max-width: 56.25em) {
@@ -596,7 +581,7 @@
   }
   .cne-pressrow {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 
@@ -732,7 +717,7 @@
   }
   .cne-pressrow {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 26px;
   }
 

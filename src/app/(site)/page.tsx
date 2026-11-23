@@ -38,6 +38,8 @@ export const metadata: Metadata = {
 };
 
 /** Verbatim, sourced pulls — see the commit that replaced the invented ones.
+ * Only quotes about the food and the people: the owner removed one that quoted
+ * a price (2026-11-22), since prices change and the site should not promise one.
  * `url` links the cite to the piece it is quoted from. */
 const PRESS: Array<{ quote: string; cite: string; url?: string }> = [
   {
@@ -50,11 +52,6 @@ const PRESS: Array<{ quote: string; cite: string; url?: string }> = [
     quote:
       "Co-owned by Poghosyan and his childhood friend, Chris Karimian, who’ve known each other since they were about 13 years old.",
     cite: "NBC LOS ANGELES · FEB 2026",
-  },
-  {
-    quote: "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
-    cite: "THE INFATUATION",
-    url: "https://www.theinfatuation.com/los-angeles/reviews/chris-n-eddys-hollywood",
   },
 ];
 
@@ -78,13 +75,6 @@ const GRAM = [
   },
   { src: "/photos/double.webp", alt: "The signature Chris N Eddy’s double slider" },
 ];
-
-/** The Infatuation's ranked smashburger list (Oct 22, 2026: #7). The line's
- * wording is the owner's (approved 2026-11-22); update both if the rank moves. */
-const RANKING = {
-  label: "#7 on The Infatuation’s LA Smashburger Power Rankings",
-  url: "https://www.theinfatuation.com/los-angeles/guides/best-smashburgers-los-angeles",
-};
 
 /* There used to be a `preload(HERO.src, …)` here, guarded by a comment saying
    "Home only — no other page shows it, and preloading it there would be a
@@ -182,11 +172,6 @@ export default function HomePage() {
             </blockquote>
           ))}
         </div>
-        <p className="cne-press-rank">
-          <a href={RANKING.url} target="_blank" rel="noopener noreferrer">
-            {RANKING.label}
-          </a>
-        </p>
       </section>
 
       <section className="cne-sec cne-rv cne-op-stamp">

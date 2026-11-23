@@ -43,6 +43,9 @@ const locationsUpdated = (): string => (hasPassed(GLENDALE_OPENS_AT) ? "2026-10-
  */
 const HOME_UPDATED = "2026-11-22";
 const ORDER_UPDATED = "2026-10-03";
+/** When each store's Restaurant JSON-LD gained its `sameAs` listings (issue
+ * #316). The store pages and /order/, which emit those nodes, carry it. */
+const STORE_LISTINGS_UPDATED = "2026-11-22";
 const ABOUT_UPDATED = "2026-10-04";
 const CONTACT_UPDATED = "2026-09-27";
 /**
@@ -120,7 +123,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ? allPhotosFor(i).map((photo) => `${brand.siteUrl}${menuPhotoLargest(photo)}`)
         : undefined,
     })),
-    { path: "/order/", priority: 0.9, updated: latest(ORDER_UPDATED, LOCATIONS_UPDATED) },
+    {
+      path: "/order/",
+      priority: 0.9,
+      updated: latest(ORDER_UPDATED, LOCATIONS_UPDATED, STORE_LISTINGS_UPDATED),
+    },
     // The page a "catering" search should land on; catering is arranged
     // through the contact form, so it sits under /order/ rather than beside it.
     { path: "/catering/", priority: 0.7, updated: CATERING_UPDATED },
@@ -145,7 +152,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return {
         path: `/locations/${slugFor(loc)}/`,
         priority: 0.7,
-        updated: LOCATIONS_UPDATED,
+        updated: latest(LOCATIONS_UPDATED, STORE_LISTINGS_UPDATED),
         ...(images.length ? { images } : {}),
       };
     }),

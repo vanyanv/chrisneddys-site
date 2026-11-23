@@ -27,6 +27,59 @@ export function MarqueeToggle() {
     else band.removeAttribute("data-paused");
   }, [paused]);
 
+  /* Scroll lean: the band speeds up with scroll velocity (reverses when
+     scrolling up) and the CSS skews its words via --cne-mq-skew. Idle
+     between scrolls; rAF runs only while moving. Skipped for reduced
+     motion, and never reacts while paused. */
+  useEffect(() => {
+    const band = ref.current?.closest<HTMLElement>(".cne-mq");
+    if (!band || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rate = (r: number) =>
+      band.querySelectorAll(".cne-mq-track").forEach((t) => {
+        t.getAnimations().forEach((a) => (a.playbackRate = r));
+      });
+    const rest = () => {
+      rate(1);
+      band.style.removeProperty("--cne-mq-skew");
+    };
+    let last = scrollY;
+    let v = 0;
+    let raf = 0;
+    const tick = () => {
+      const d = Math.max(-80, Math.min(80, scrollY - last));
+      last = scrollY;
+      if (band.hasAttribute("data-paused")) {
+        v = raf = 0;
+        rest();
+        return;
+      }
+      v += (d - v) * 0.25;
+      if (Math.abs(v) < 0.05 && !d) {
+        v = raf = 0;
+        rest();
+        return;
+      }
+      const r = 1 + Math.min(9, Math.abs(v) * 0.35);
+      rate(v < -0.5 ? -r : r);
+      band.style.setProperty("--cne-mq-skew", Math.max(-22, Math.min(22, -v * 1.1)) + "deg");
+      raf = requestAnimationFrame(tick);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      // `last` is where the page sat when the band last came to rest, so the
+      // first frame already carries this scroll's distance. Paused: keep up
+      // with the page so a resume does not replay the whole gap.
+      if (band.hasAttribute("data-paused")) last = scrollY;
+      else raf = requestAnimationFrame(tick);
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+      rest();
+    };
+  }, []);
+
   return (
     <button
       ref={ref}

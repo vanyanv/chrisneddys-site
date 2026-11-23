@@ -55,7 +55,11 @@ export function useItemSheet() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  const openItem = useCallback((next: MenuItem) => {
+  /** The photo the sheet should fly out of; ItemSheet takes it once it opens. */
+  const from = useRef<HTMLImageElement | null>(null);
+
+  const openItem = useCallback((next: MenuItem, opener?: HTMLElement) => {
+    from.current = opener?.querySelector("img") ?? null;
     setItem(next);
     setOpen(true);
     if (!(window.history.state as { cneSheet?: boolean } | null)?.cneSheet) {
@@ -83,5 +87,5 @@ export function useItemSheet() {
     }
   }, []);
 
-  return { item, open, way, setWay, openItem, switchItem, close };
+  return { item, open, way, setWay, openItem, switchItem, close, from };
 }

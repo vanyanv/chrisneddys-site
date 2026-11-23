@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { MenuItem, WayId } from "@/data/menu";
 import { ways, extras, photoFor } from "@/data/menu";
 import { buildFor } from "@/data/build";
@@ -8,6 +8,7 @@ import { framingFor } from "@/data/photoFocus";
 import { menuPhotoImageSet } from "@/lib/menuPhoto";
 import { FEATURED_OTTER_IDS } from "@/data/featured";
 import { inertOthers } from "@/lib/inertOthers";
+import { onScreen, reducedMotion } from "@/lib/motion";
 import { comboFor } from "@/data/upsell";
 import { formatPrice, itemPhotoAlt, priceString } from "@/lib/otter";
 import { Monster } from "@/components/mascots/Monster";
@@ -28,6 +29,8 @@ type Props = {
   onClose: () => void;
   /** Swap the sheet to another item (the combo suggestion). */
   onSwitch?: (item: MenuItem) => void;
+  /** The tapped item's photo, if any: it flies into the sheet's photo slot. */
+  from?: RefObject<HTMLImageElement | null>;
 };
 
 /**
@@ -53,7 +56,7 @@ const FLICK_VELOCITY = 0.5;
  * link. Rather than make someone choose toppings twice, it names the exact
  * checkboxes waiting on the next screen, then hands off to that one item.
  */
-export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: Props) {
+export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch, from }: Props) {
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const scrimRef = useRef<HTMLDivElement | null>(null);
@@ -103,6 +106,85 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch }: P
       restoreRef.current?.focus?.({ preventScroll: true });
     };
   }, [open, onClose]);
+
+  /* The tapped photo flies into the sheet's photo slot (Web Animations, not a
+     view transition: that deadlocks with the page's <ViewTransition> fade).
+     Runs after the effect above so the scroll lock is already on and the rects
+     are final. However it ends (closed mid-flight, another item, unmount, an
+     error) the cleanup removes the clone and puts the slot and the source
+     photo back. */
+  useEffect(() => {
+    if (!open) return;
+    const img = from?.current;
+    if (from) from.current = null;
+    const sheet = sheetRef.current;
+    const shot = sheet?.querySelector<HTMLElement>(".cne-sheet-shot.is-photo");
+    if (!sheet || !shot || !img?.isConnected || reducedMotion() || !onScreen(img)) return;
+    const clone = img.cloneNode() as HTMLImageElement;
+    let done = false;
+    const restore = () => {
+      done = true;
+      clone.remove();
+      shot.style.opacity = shot.style.transition = img.style.visibility = "";
+    };
+    try {
+      const a = img.getBoundingClientRect();
+      const t = shot.getBoundingClientRect();
+      if (!t.width) return;
+      // The sheet is still sliding in: its slot's final place is where it is now
+      // minus the sheet's current translation.
+      const m = new DOMMatrixReadOnly(getComputedStyle(sheet).transform);
+      const to = { left: t.left - m.m41, top: t.top - m.m42, width: t.width, height: t.height };
+      const px = (r: { left: number; top: number; width: number; height: number }) => ({
+        left: `${r.left}px`,
+        top: `${r.top}px`,
+        width: `${r.width}px`,
+        height: `${r.height}px`,
+      });
+      for (const k of ["loading", "sizes", "srcset"]) clone.removeAttribute(k);
+      clone.src = img.currentSrc || img.src;
+      Object.assign(clone.style, px(a), {
+        position: "fixed",
+        objectFit: "cover",
+        zIndex: 999,
+        margin: 0,
+        pointerEvents: "none",
+        borderRadius: "2px",
+        animation: "none",
+        transform: "none",
+      });
+      document.body.appendChild(clone);
+      shot.style.opacity = "0";
+      img.style.visibility = "hidden";
+      const over = px({
+        left: to.left - to.width * 0.02,
+        top: to.top - 22,
+        width: to.width * 1.04,
+        height: to.height * 1.04,
+      });
+      clone
+        .animate([px(a), { ...over, offset: 0.72 }, px(to)], {
+          duration: 480,
+          easing: "cubic-bezier(0.3, 0.1, 0.15, 1)",
+          fill: "forwards",
+        })
+        .finished.then(() => {
+          if (done) return;
+          shot.style.transition = "opacity .14s";
+          shot.style.opacity = "1";
+          img.style.visibility = "";
+          return clone.animate([{ opacity: 1 }, { opacity: 0 }], {
+            duration: 140,
+            fill: "forwards",
+          }).finished;
+        })
+        .catch(() => {})
+        .finally(() => done || restore());
+    } catch {
+      restore();
+    }
+    return restore;
+  }, [open, from]);
 
   /**
    * Drag to dismiss.

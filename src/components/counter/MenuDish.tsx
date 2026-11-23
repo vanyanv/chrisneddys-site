@@ -50,7 +50,7 @@ export function MenuDish({
   /** A bigger photo for a lead card than the item's own card cut: the base
    * path of a 480/720/900px AVIF and WebP ladder (`<ladder>-<w>.<ext>`). */
   ladder?: string;
-  onOpen: (item: MenuItem) => void;
+  onOpen: (item: MenuItem, from?: HTMLElement) => void;
 }) {
   const mostOrdered = item.otterId === FEATURED_OTTER_IDS[0];
   const photo = photoFor(item, way);
@@ -58,7 +58,7 @@ export function MenuDish({
     <button
       type="button"
       className={`cne-dish${lead ? " is-lead" : ""}`}
-      onClick={() => onOpen(item)}
+      onClick={(e) => onOpen(item, e.currentTarget)}
       aria-haspopup="dialog"
       style={{ "--i": Math.min(index, 5) } as CSSProperties}
     >

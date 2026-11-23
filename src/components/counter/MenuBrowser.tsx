@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import {
   foodMenu,
   categoryTitles,
@@ -16,6 +18,7 @@ import { LazyItemSheet } from "./LazyItemSheet";
 import { CateringCard } from "@/components/catering/CateringCard";
 import { WayPicker } from "./WayPicker";
 import { useItemSheet } from "./useItemSheet";
+import { useWaySquash } from "./useWaySquash";
 import {
   GlyphRow,
   OpStamp,
@@ -88,7 +91,9 @@ const LEAD_LADDER: Partial<Record<string, Record<WayId, string>>> = {
  * with, 2 Sliders and Fries.
  */
 export function MenuBrowser() {
-  const { item, open, way, setWay, openItem, switchItem, close } = useItemSheet();
+  const { item, open, way, setWay, openItem, switchItem, close, from } = useItemSheet();
+  const mainRef = useRef<HTMLDivElement>(null);
+  useWaySquash(mainRef, way);
 
   return (
     <>
@@ -132,7 +137,7 @@ export function MenuBrowser() {
           sections={ORDER.map((key) => ({ key, label: CHIP_LABEL[key] ?? categoryTitles[key] }))}
         />
 
-        <div className="cne-menu-main">
+        <div className="cne-menu-main" ref={mainRef}>
           {ORDER.map((key, i) => {
             /* Issue #206: a section opens with its best seller as a wide
                card, then every other item as a photo card. Drinks without a
@@ -210,6 +215,7 @@ export function MenuBrowser() {
         onWayChange={setWay}
         onClose={close}
         onSwitch={switchItem}
+        from={from}
       />
     </>
   );

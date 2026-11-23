@@ -4,7 +4,7 @@ import { locations } from "@/data/locations";
 import { mapBox } from "@/data/laGeo";
 import { statusLabel } from "@/lib/hours";
 import { useStoreStatus } from "@/lib/useStoreStatus";
-import { mapOverlayStyle } from "@/components/locations/MapPins";
+import { mapOverlayStyle, pinOrder } from "@/components/locations/MapPins";
 import { TAG, pinPoint, tagBox, tagSide } from "@/components/locations/mapLayout";
 
 /** Above the pins, and never in the way of a tap on one. */
@@ -42,7 +42,7 @@ export function MapCallout({ locationId = "hollywood" }: { locationId?: string }
 
   return (
     <svg viewBox={`0 0 ${mapBox.w} ${mapBox.h}`} aria-hidden="true" style={tagLayer}>
-      <g className="cne-map-tag">
+      <g className="cne-map-tag" style={pinOrder(loc.id)}>
         <path className="ptr" d={`M${edge},${cy - 3.6} L${tip},${cy} L${edge},${cy + 3.6} Z`} />
         <rect
           x={right ? edge : box.x0}

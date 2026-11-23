@@ -24,7 +24,7 @@ export function MenuLead({
 }: {
   item: MenuItem;
   way?: WayId;
-  onOpen: (item: MenuItem) => void;
+  onOpen: (item: MenuItem, from?: HTMLElement) => void;
 }) {
   const base = `/photos/${photoFor(item, way)}-16x10`;
   const srcSet = (ext: string) => CUTS.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
@@ -33,7 +33,7 @@ export function MenuLead({
       <button
         type="button"
         className="cne-lead-card"
-        onClick={() => onOpen(item)}
+        onClick={(e) => onOpen(item, e.currentTarget)}
         aria-haspopup="dialog"
       >
         <span className="cne-dish-most" aria-hidden="true">

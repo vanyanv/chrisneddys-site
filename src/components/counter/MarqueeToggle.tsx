@@ -36,7 +36,11 @@ export function MarqueeToggle() {
     if (!band || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const rate = (r: number) =>
       band.querySelectorAll(".cne-mq-track").forEach((t) => {
-        t.getAnimations().forEach((a) => (a.playbackRate = r));
+        // Reverse only with a couple of seconds already played, else hold
+        // still: an animation run back past its start stops applying.
+        t.getAnimations().forEach((a) => {
+          a.playbackRate = r < 0 && Number(a.currentTime) < 2000 ? 0 : r;
+        });
       });
     const rest = () => {
       rate(1);

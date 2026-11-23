@@ -143,6 +143,7 @@ export function ItemSheet({ item, open, way, onWayChange, onClose, onSwitch, fro
       });
       for (const k of ["loading", "sizes", "srcset"]) clone.removeAttribute(k);
       clone.src = img.currentSrc || img.src;
+      clone.alt = "";
       Object.assign(clone.style, px(a), {
         position: "fixed",
         objectFit: "cover",

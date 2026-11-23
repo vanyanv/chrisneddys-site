@@ -559,9 +559,9 @@
 }
 
 /* ---- tablet tier: press + gram (600-900) --------------------------------
-   Phone stacked the three quotes in one column and drew the gram grid as
+   Phone stacked the quotes in one column and drew the gram grid as
    three huge squares. Both get the multi-column room a tablet actually has,
-   with counts that divide what they hold: three quotes across and all six
+   with counts that divide what they hold: both quotes across and all six
    gram photos in one row, as on desktop. A width-driven `auto-fill` count
    left one quote or one or two photos stranded on a row of their own. */
 @media (min-width: 37.5em) and (max-width: 56.25em) {
@@ -581,7 +581,7 @@
   }
   .cne-pressrow {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 
@@ -717,7 +717,7 @@
   }
   .cne-pressrow {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 26px;
   }
 

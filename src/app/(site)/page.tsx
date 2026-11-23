@@ -37,21 +37,21 @@ export const metadata: Metadata = {
   }),
 };
 
-/** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
-const PRESS = [
+/** Verbatim, sourced pulls — see the commit that replaced the invented ones.
+ * Only quotes about the food and the people: the owner removed one that quoted
+ * a price (2026-11-22), since prices change and the site should not promise one.
+ * `url` links the cite to the piece it is quoted from. */
+const PRESS: Array<{ quote: string; cite: string; url?: string }> = [
   {
     quote:
       "The Brendan Fraser of the LA smashburger scene — it might have been a minute since you’ve heard their name, but they clearly can still bring it.",
     cite: "THE INFATUATION · 7.6/10",
+    url: "https://www.theinfatuation.com/los-angeles/reviews/chris-n-eddys-hollywood",
   },
   {
     quote:
       "Co-owned by Poghosyan and his childhood friend, Chris Karimian, who’ve known each other since they were about 13 years old.",
     cite: "NBC LOS ANGELES · FEB 2026",
-  },
-  {
-    quote: "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
-    cite: "THE INFATUATION",
   },
 ];
 
@@ -160,7 +160,15 @@ export default function HomePage() {
           {PRESS.map((p) => (
             <blockquote className="cne-quote" key={p.cite + p.quote.slice(0, 12)}>
               <p>&ldquo;{p.quote}&rdquo;</p>
-              <cite>{p.cite}</cite>
+              <cite>
+                {p.url ? (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer">
+                    {p.cite}
+                  </a>
+                ) : (
+                  p.cite
+                )}
+              </cite>
             </blockquote>
           ))}
         </div>

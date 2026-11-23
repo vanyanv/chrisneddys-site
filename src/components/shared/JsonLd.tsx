@@ -119,6 +119,9 @@ function restaurantNode(loc: Location) {
     },
     geo: { "@type": "GeoCoordinates", latitude: loc.lat, longitude: loc.lng },
     hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(loc))}`,
+    // This store's own Yelp, TripAdvisor, Google and delivery listings, so a
+    // search engine can tie each one to this page and not to a sibling store.
+    sameAs: storeListings(loc),
     openingHoursSpecification:
       loc.openingSpec?.map((spec) => ({
         "@type": "OpeningHoursSpecification",
@@ -164,6 +167,12 @@ function restaurantNode(loc: Location) {
         : undefined,
     acceptsReservations: false,
   };
+}
+
+/** A store's listings elsewhere, deduplicated; undefined when it has none. */
+function storeListings(loc: Location): string[] | undefined {
+  const urls = [...new Set([...(loc.listings ?? []), ...deliveryFor(loc.id).map((p) => p.url)])];
+  return urls.length ? urls : undefined;
 }
 
 /** The same node, ready to be dropped into a page's own `<script>`. */

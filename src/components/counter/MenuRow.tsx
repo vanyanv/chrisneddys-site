@@ -24,13 +24,13 @@ export function MenuRow({
 }: {
   item: MenuItem;
   compact?: boolean;
-  onOpen: (item: MenuItem) => void;
+  onOpen: (item: MenuItem, from?: HTMLElement) => void;
 }) {
   return (
     <button
       type="button"
       className={`cne-row${compact ? " is-compact" : ""}`}
-      onClick={() => onOpen(item)}
+      onClick={(e) => onOpen(item, e.currentTarget)}
       aria-haspopup="dialog"
     >
       <span className="cne-row-thumb" style={{ position: "relative" }}>

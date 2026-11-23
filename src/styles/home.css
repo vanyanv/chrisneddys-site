@@ -227,6 +227,168 @@
   }
 }
 
+/* ---- Motion pass: hero SMASH slam, photo depth, marquee lean --------------
+   Replaces the old desktop-only `cne-heroin` rise. Every phone and desktop
+   width runs the same sequence: SMASH slams down and squashes (0.45s + 0.62s),
+   a spark ring flashes under it, the hero content jolts, then sub, meta and
+   CTA rise in behind. Transform/opacity only, so nothing shifts layout.
+   `both` fill keeps SMASH hidden until its delay and visible if CSS never
+   animates. The desktop WelcomeIntro needs no handshake: intro.css pauses
+   every animation while `html.cne-intro-gate` is set, so delays count from
+   the moment the overlay lifts. Pseudo-elements are not matched by that
+   `*` rule, hence the ::after line below. */
+@media (prefers-reduced-motion: no-preference) {
+  .cne-hero h1 .y {
+    display: inline-block;
+    position: relative;
+    transform-origin: 50% 100%;
+    animation: cne-slam 0.62s cubic-bezier(0.5, 0, 0.9, 0.4) 0.45s both;
+  }
+  @keyframes cne-slam {
+    0% {
+      opacity: 0;
+      transform: translateY(-140%) scale(2.1) rotate(-7deg);
+      animation-timing-function: cubic-bezier(0.6, 0, 1, 0.5);
+    }
+    10% {
+      opacity: 1;
+    }
+    52% {
+      transform: translateY(0) scale(1.22, 0.62) rotate(0deg);
+      animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    72% {
+      transform: translateY(-6%) scale(0.95, 1.1);
+    }
+    88% {
+      transform: translateY(0) scale(1.03, 0.97);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .cne-hero h1 .y::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -4%;
+    width: 150%;
+    aspect-ratio: 3 / 1;
+    translate: -50% 35%;
+    background: repeating-conic-gradient(
+      from -90deg at 50% 100%,
+      var(--a-bg) 0 2deg,
+      transparent 2deg 14deg
+    );
+    -webkit-mask: radial-gradient(
+      ellipse at 50% 100%,
+      transparent 38%,
+      #000 40%,
+      #000 62%,
+      transparent 64%
+    );
+    mask: radial-gradient(
+      ellipse at 50% 100%,
+      transparent 38%,
+      #000 40%,
+      #000 62%,
+      transparent 64%
+    );
+    pointer-events: none;
+    opacity: 0;
+    z-index: -1;
+    animation: cne-spark 0.5s ease-out 0.76s both;
+  }
+  html.cne-intro-gate .cne-hero h1 .y::after {
+    animation-play-state: paused;
+  }
+  @keyframes cne-spark {
+    0% {
+      opacity: 1;
+      scale: 0.3;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.25;
+    }
+  }
+  .cne-hero-in {
+    animation: cne-jolt 0.42s linear 0.77s both;
+  }
+  @keyframes cne-jolt {
+    0% {
+      translate: 0 0;
+    }
+    15% {
+      translate: 0 9px;
+    }
+    35% {
+      translate: 0 -5px;
+    }
+    55% {
+      translate: 0 3px;
+    }
+    75% {
+      translate: 0 -1px;
+    }
+    100% {
+      translate: 0 0;
+    }
+  }
+  .cne-hero-sub {
+    animation: cne-rise 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) 0.95s both;
+  }
+  .cne-hero-meta {
+    animation: cne-rise 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) 1.03s both;
+  }
+  .cne-hero .cne-cta {
+    animation: cne-rise 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) 1.11s both;
+  }
+  @keyframes cne-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Hero photo depth: scales 1.02 -> 1.2 and drifts down 7% over the first 90vh
+   of scroll. It sits on the <img>, inside the <picture> that carries the
+   load-time settle, so the two never fight over `transform`. With the
+   origin at 60% the scaled image always overshoots the clipped box. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cne-heromedia img {
+      transform-origin: 50% 60%;
+      animation: cne-hero-depth linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+    @keyframes cne-hero-depth {
+      from {
+        transform: scale(1.02) translateY(0);
+      }
+      to {
+        transform: scale(1.2) translateY(7%);
+      }
+    }
+  }
+}
+
+/* Marquee lean: MarqueeToggle sets --cne-mq-skew on `.cne-mq` while the page
+   scrolls (never while paused) and clears it once the scroll stops. */
+@media (prefers-reduced-motion: no-preference) {
+  .cne-mq-track span {
+    transform: skewX(var(--cne-mq-skew, 0deg));
+    transition: transform 0.25s ease-out;
+  }
+}
+
 @media (min-width: 37.5em) and (max-width: 56.25em) {
   .cne-hero-in {
     display: grid;
@@ -516,31 +678,6 @@
     gap: 16px;
     margin-top: 34px;
   }
-  @keyframes cne-heroin {
-    from {
-      opacity: 0;
-      transform: translateY(24px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .cne-hero h1 {
-      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
-    }
-    .cne-hero-sub {
-      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.12s both;
-    }
-    .cne-hero-meta {
-      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.17s both;
-    }
-    .cne-cta {
-      animation: cne-heroin 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) 0.22s both;
-    }
-  }
-
   .cne-hero-seam {
     height: auto;
     /* 2 squares across a 24px strip: each square is 12px. */

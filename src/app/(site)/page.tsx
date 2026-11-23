@@ -37,12 +37,14 @@ export const metadata: Metadata = {
   }),
 };
 
-/** Verbatim, sourced pulls — see the commit that replaced the invented ones. */
-const PRESS = [
+/** Verbatim, sourced pulls — see the commit that replaced the invented ones.
+ * `url` links the cite to the piece it is quoted from. */
+const PRESS: Array<{ quote: string; cite: string; url?: string }> = [
   {
     quote:
       "The Brendan Fraser of the LA smashburger scene — it might have been a minute since you’ve heard their name, but they clearly can still bring it.",
     cite: "THE INFATUATION · 7.6/10",
+    url: "https://www.theinfatuation.com/los-angeles/reviews/chris-n-eddys-hollywood",
   },
   {
     quote:
@@ -52,6 +54,7 @@ const PRESS = [
   {
     quote: "Two juicy $6 doubles will fill you up unless you’re a professional bodybuilder.",
     cite: "THE INFATUATION",
+    url: "https://www.theinfatuation.com/los-angeles/reviews/chris-n-eddys-hollywood",
   },
 ];
 
@@ -75,6 +78,13 @@ const GRAM = [
   },
   { src: "/photos/double.webp", alt: "The signature Chris N Eddy’s double slider" },
 ];
+
+/** The Infatuation's ranked smashburger list (Oct 22, 2026: #7). The line's
+ * wording is the owner's (approved 2026-11-22); update both if the rank moves. */
+const RANKING = {
+  label: "#7 on The Infatuation’s LA Smashburger Power Rankings",
+  url: "https://www.theinfatuation.com/los-angeles/guides/best-smashburgers-los-angeles",
+};
 
 /* There used to be a `preload(HERO.src, …)` here, guarded by a comment saying
    "Home only — no other page shows it, and preloading it there would be a
@@ -160,10 +170,23 @@ export default function HomePage() {
           {PRESS.map((p) => (
             <blockquote className="cne-quote" key={p.cite + p.quote.slice(0, 12)}>
               <p>&ldquo;{p.quote}&rdquo;</p>
-              <cite>{p.cite}</cite>
+              <cite>
+                {p.url ? (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer">
+                    {p.cite}
+                  </a>
+                ) : (
+                  p.cite
+                )}
+              </cite>
             </blockquote>
           ))}
         </div>
+        <p className="cne-press-rank">
+          <a href={RANKING.url} target="_blank" rel="noopener noreferrer">
+            {RANKING.label}
+          </a>
+        </p>
       </section>
 
       <section className="cne-sec cne-rv cne-op-stamp">

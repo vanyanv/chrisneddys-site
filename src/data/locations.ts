@@ -51,6 +51,14 @@ export type Location = {
    * live.
    */
   listedOnMaps?: boolean;
+  /**
+   * This store's own listings elsewhere (Yelp, TripAdvisor, its Google Maps
+   * profile, a delivery app the site does not link to yet). They go into the
+   * store's Restaurant JSON-LD as `sameAs`, next to its `deliveryFor` links,
+   * so search engines can tie each listing to this store's page rather than
+   * guessing which of the three it belongs to. Not shown on the page.
+   */
+  listings?: string[];
   lat: number;
   lng: number;
   hours: Array<[string, string]>;
@@ -104,6 +112,10 @@ function glendale(): Location {
     city: "Glendale",
     region: "CA",
     postal: "91205",
+    // Found by search on 2026-11-22 (Uber Eats titles it "Chris N Eddy's
+    // (Glendale)"); not yet a delivery button, since the owner has not said
+    // which apps Glendale is on.
+    listings: ["https://www.ubereats.com/store/chris-n-eddys-glendale/xgninhRmWOKgyzUKSAK4QA"],
     get status() {
       return open() ? "Open daily" : GLENDALE_ANNOUNCEMENT;
     },
@@ -161,6 +173,10 @@ export const locations: Location[] = [
     isOpen: true,
     orderUrl: brand.orderUrl,
     listedOnMaps: true,
+    listings: [
+      "https://www.yelp.com/biz/chris-n-eddy-s-los-angeles",
+      "https://www.tripadvisor.com/Restaurant_Review-g32655-d27967767-Reviews-Chris_N_Eddy_s-Los_Angeles_California.html",
+    ],
     phone: brand.phone,
     phoneTel: brand.phoneTel,
     lat: 34.098,

@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Site: the home page now says Chris N Eddy's is #7 on The Infatuation's LA Smashburger Power Rankings, with a link to the list, and the two Infatuation quotes link to the review. Each location's page now tells Google which Yelp, TripAdvisor and delivery app listings belong to that location, so searches connect the right listing to the right store ([#316](https://github.com/vanyanv/chrisneddys-site/issues/316))
 - Site: the scrolling banner of words has a small pause button at its right end, so it can be stopped, and stays stopped while you browse ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))
 - Site: moving between pages now fades quickly from one page to the next instead of jumping; phones set to reduce motion still switch instantly ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))
 - Admin: on the sign-in page, a saved passkey now shows up in the email box's suggestions, so you can sign in with one tap; the "Continue with a passkey" button still works as before ([#314](https://github.com/vanyanv/chrisneddys-site/issues/314))

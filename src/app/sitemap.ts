@@ -41,7 +41,7 @@ const locationsUpdated = (): string => (hasPassed(GLENDALE_OPENS_AT) ? "2026-10-
  * When each page's own copy or structure last changed. Bump the one you touch:
  * a `lastmod` that trails the page tells a crawler there is nothing new to fetch.
  */
-const HOME_UPDATED = "2026-10-03";
+const HOME_UPDATED = "2026-11-22";
 const ORDER_UPDATED = "2026-10-03";
 const ABOUT_UPDATED = "2026-10-04";
 const CONTACT_UPDATED = "2026-09-27";

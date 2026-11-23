@@ -29,13 +29,13 @@
 /* Idea 17: phone-only section chips.
    A sticky row of jump links just under the sticky header — the phone
    equivalent of the desktop side rail's `.cne-menu-jump`, which a phone never
-   sees (that rail only becomes `position: sticky` at 901px). `top` reads the
-   same `--cne-stuck` custom property the header height and every in-page
-   anchor already agree on, so this can never drift out from under it, at any
-   breakpoint including the short-landscape one that shrinks the header. */
+   sees (that rail only becomes `position: sticky` at 901px). `top` is the
+   header's measured height, set by `MenuSectionChips`, so the bar sits flush
+   under it with no strip of menu showing between the two; `--cne-stuck` (the
+   header plus air for anchors) is only the fallback until that script runs. */
 .cne-menu-chipnav {
   position: sticky;
-  top: var(--cne-stuck);
+  top: var(--cne-chip-top, var(--cne-stuck));
   z-index: 20;
   display: flex;
   gap: 8px;
